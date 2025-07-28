@@ -6,7 +6,7 @@
   "module": "./dist/index.js",
   "type": "module",
   "bin": {
-    "pi": "./dist/index.js"
+    "pi": "dist/index.js"
   },
   "scripts": {
     "build": "tsc -p .",
@@ -28,7 +28,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/0xshariq/package-installer-cli.git"
+    "url": "git+https://github.com/0xshariq/package-installer-cli.git"
   },
   "homepage": "https://github.com/0xshariq/package-installer-cli#readme",
   "bugs": {

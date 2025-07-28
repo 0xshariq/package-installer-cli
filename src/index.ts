@@ -363,9 +363,34 @@ async function main() {
   }
 }
 
+
 program
   .name('pi')
   .description('Package Installer CLI')
+  .usage('[options]')
+  .helpOption('-h, --help', 'Display help for pi CLI')
+  .addHelpText('beforeAll', () => {
+    return (
+      chalk.cyanBright(figlet.textSync('Package Installer', { horizontalLayout: 'default' })) +
+      '\n' + chalk.cyanBright('🌟 Welcome to Package Installer CLI! 🌟') +
+      '\n' + chalk.gray('A cross-platform CLI to scaffold modern web app templates.') +
+      '\n\n' +
+      chalk.yellow('Usage:') + '\n' +
+      chalk.white('  pi') + chalk.gray('        # Start interactive project scaffolding') + '\n' +
+      chalk.white('  pi -h') + chalk.gray('       # Show help') + '\n\n' +
+      chalk.yellow('Features:') + '\n' +
+      chalk.white('  - Multiple frameworks: Next.js, React, Vue, Angular, Express, Rust') + '\n' +
+      chalk.white('  - Language support: JavaScript & TypeScript') + '\n' +
+      chalk.white('  - UI libraries: Shadcn/ui, Material-UI, Headless UI') + '\n' +
+      chalk.white('  - Bundler options: Vite and more') + '\n' +
+      chalk.white('  - Cross-platform: Windows, macOS, Linux, WSL') + '\n' +
+      chalk.white('  - Fast scaffolding: Get started in seconds') + '\n\n' +
+      chalk.yellow('Example:') + '\n' +
+      chalk.white('  pi') + chalk.gray('        # Start the CLI') + '\n' +
+      chalk.white('  pi -h') + chalk.gray('       # Show this help message') + '\n\n' +
+      chalk.gray('For more info, see README.md or visit https://github.com/0xshariq/package-installer-cli') + '\n'
+    );
+  })
   .action(main);
 
 program.parse(process.argv);
