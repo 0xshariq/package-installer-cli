@@ -1,31 +1,51 @@
 {
   "name": "package-installer-cli",
-  "version": "1.0.0",
-  "description": "",
+  "version": "1.2.0",
+  "description": "A cross-platform, interactive CLI to scaffold modern web app templates with framework, language, UI, bundler, and more.",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "type": "module",
+  "bin": {
+    "pi": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc -p .",
+    "start": "node ./dist/index.js"
+  },
+  "author": "Sharique Chaudhary",
+  "license": "MIT",
+  "keywords": [
+    "cli",
+    "template",
+    "react",
+    "nextjs",
+    "vue",
+    "angular",
+    "express",
+    "rust",
+    "starter",
+    "project-generator"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/0xshariq/package-installer-cli.git"
+  },
   "homepage": "https://github.com/0xshariq/package-installer-cli#readme",
   "bugs": {
     "url": "https://github.com/0xshariq/package-installer-cli/issues"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/0xshariq/package-installer-cli.git"
-  },
-  "license": "ISC",
-  "author": "Sharique Chaudhary",
-  "type": "module",
-  "main": "index.js",
-  "scripts": {
-    "build": "tsc -p ."
+  "dependencies": {
+    "@types/figlet": "^1.7.0",
+    "chalk": "^5.4.1",
+    "commander": "^11.1.0",
+    "figlet": "^1.8.2",
+    "inquirer": "^9.2.16",
+    "ora": "^8.2.0"
   },
   "devDependencies": {
-    "autoprefixer": "^10.4.21",
-    "postcss": "^8.5.6",
-    "tailwindcss": "^4.1.11",
-    "typescript": "^5.8.3"
-  },
-  "dependencies": {
-    "execa": "^9.6.0",
-    "fs-extra": "^11.3.0",
-    "prompts": "^2.4.2"
+    "@types/chalk": "^2.2.4",
+    "@types/inquirer": "^9.0.8",
+    "@types/node": "^24.1.0",
+    "typescript": "^5.3.3"
   }
 }

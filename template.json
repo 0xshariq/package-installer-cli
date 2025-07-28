@@ -1,0 +1,55 @@
+{
+  "frameworks": {
+    "nextjs": {
+      "languages": ["javascript", "typescript"],
+      "ui": ["shadcn"],
+      "options": ["src", "tailwind"],
+      "templates": [
+        "no-src-no-tailwind-template",
+        "no-src-shadcn-tailwind-template",
+        "no-src-tailwind-template",
+        "src-no-tailwind-template",
+        "src-shadcn-tailwind-template",
+        "src-tailwind-template"
+      ]
+    },
+    "reactjs": {
+      "languages": ["javascript", "typescript"],
+      "ui": ["shadcn"],
+      "options": ["src", "tailwind"],
+      "bundlers": ["vite"],
+      "templates": [
+        "no-shadcn-no-tailwind-template",
+        "no-shadcn-tailwind-template",
+        "shadcn-tailwind-template"
+      ]
+    },
+    "vuejs": {
+      "languages": ["javascript", "typescript"],
+      "ui": ["headless-ui"],
+      "options": ["tailwind"],
+      "templates": [
+        "headless-tailwind-template",
+        "no-headless-no-tailwind-template"
+      ]
+    },
+    "angularjs": {
+      "languages": ["typescript"],
+      "ui": ["material-ui"],
+      "options": ["tailwind"],
+      "templates": [
+        "material-ui-no-tailwind-template",
+        "material-ui-tailwind-template",
+        "no-material-no-tailwind-template"
+      ]
+    },
+    "expressjs": {
+      "languages": ["javascript", "typescript"],
+      "options": ["basic", "advance"]
+    },
+    "rust": {
+      "languages": ["rust"],
+      "options": ["basic", "advance"]
+    }
+  }
+} 
