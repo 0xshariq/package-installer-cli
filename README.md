@@ -82,7 +82,7 @@ Follow the interactive prompts to create your project!
 
 ## 📸 Screenshot
 
-![Package Installer CLI Screenshot](./screenshot.png)
+![Package Installer CLI Screenshot](./public/screenshot.png)
 
 ## 🛠️ Development
 
