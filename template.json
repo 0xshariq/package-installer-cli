@@ -33,6 +33,12 @@
         "no-headless-no-tailwind-template"
       ]
     },
+    "nestjs":{
+      "languages": ["typescript"],
+      "templates" : [
+        "template"
+      ]
+    },
     "angularjs": {
       "languages": ["typescript"],
       "ui": ["material-ui"],
@@ -41,6 +47,16 @@
         "material-ui-no-tailwind-template",
         "material-ui-tailwind-template",
         "no-material-no-tailwind-template"
+      ]
+    },
+    "remixjs":{
+      "languages": ["typescript"],
+      "ui": ["shadcn"],
+      "options": [ "tailwind"],
+      "templates": [
+        "shadcn-tailwind-template",
+        "no-shadcn-no-tailwind-template",
+        "no-shadcn-tailwind-template"
       ]
     },
     "expressjs": {

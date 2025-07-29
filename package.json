@@ -35,12 +35,19 @@
     "url": "https://github.com/0xshariq/package-installer-cli/issues"
   },
   "dependencies": {
+    "@radix-ui/react-slot": "^1.2.3",
     "@types/figlet": "^1.7.0",
+    "boxen": "^8.0.1",
     "chalk": "^5.4.1",
+    "class-variance-authority": "^0.7.1",
+    "cli-spinners": "^3.2.0",
     "commander": "^11.1.0",
     "figlet": "^1.8.2",
+    "gradient-string": "^3.0.0",
     "inquirer": "^9.2.16",
-    "ora": "^8.2.0"
+    "lucide-react": "^0.533.0",
+    "ora": "^8.2.0",
+    "tailwind-variants": "^2.0.1"
   },
   "devDependencies": {
     "@types/chalk": "^2.2.4",
