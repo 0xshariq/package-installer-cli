@@ -18,29 +18,17 @@ const packageJsonPath = path.join(path.dirname(fileURLToPath(import.meta.url)), 
 const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
 const version = packageJson.version;
 
-// Handle graceful exit on Ctrl+C and other termination signals
-const gracefulExit = () => {
+// Handle graceful exit on Ctrl+C
+process.on('SIGINT', () => {
   console.log(chalk.yellow('\n\n👋 Thanks for using Package Installer! Goodbye!'));
   console.log(chalk.cyanBright('💡 Remember: Always check your dependencies and README for next steps.')); 
   process.exit(0);
-};
-
-process.on('SIGINT', gracefulExit);
-process.on('SIGTERM', gracefulExit);
-process.on('SIGQUIT', gracefulExit);
-process.on('exit', () => {
-  console.log(chalk.yellow('\n👋 Thanks for using Package Installer! Goodbye!'));
 });
 
-// Handle uncaught exceptions
-process.on('uncaughtException', (err) => {
-  console.error(chalk.red('\n❌ An unexpected error occurred:'), err);
-  gracefulExit();
-});
-
-process.on('unhandledRejection', (reason, promise) => {
-  console.error(chalk.red('\n❌ Unhandled promise rejection:'), reason);
-  gracefulExit();
+process.on('SIGTERM', () => {
+  console.log(chalk.yellow('\n\n👋 Thanks for using Package Installer! Goodbye!'));
+  console.log(chalk.cyanBright('💡 Remember: Always check your dependencies and README for next steps.')); 
+  process.exit(0);
 });
 
 // ESM-safe __dirname
@@ -52,9 +40,6 @@ const templateConfigPath = path.join(__dirname, '..', 'template.json');
 const templateConfig = JSON.parse(fs.readFileSync(templateConfigPath, 'utf8'));
 const frameworks = Object.keys(templateConfig.frameworks);
 const templatesRoot = path.join(__dirname, '..', 'templates');
-
-// Debug: Log available frameworks
-console.log('Available frameworks:', frameworks);
 
 // Utility: Capitalize first letter
 function capitalize(str: string) {
@@ -83,11 +68,6 @@ function getFrameworkTheme(framework: string) {
     case 'express':
     case 'expressjs':
       return chalk.greenBright;
-    case 'remix':
-    case 'remixjs':
-      return chalk.blueBright;
-    case 'nestjs':
-      return chalk.magentaBright;
     case 'rust':
       return chalk.yellowBright;
     default:
@@ -375,7 +355,7 @@ async function main(projectNameArg?: string) {
 
     // 4. UI Libraries (ask before framework-specific questions)
     let ui: string | null = null;
-    if (fwConfig.ui && fwConfig.ui.length > 0 && framework !== 'nestjs') {
+    if (fwConfig.ui && fwConfig.ui.length > 0) {
       const wantsUI = (await inquirer.prompt([
         {
           name: 'wantsUI',
@@ -432,15 +412,9 @@ async function main(projectNameArg?: string) {
         }
       ]);
       templateName = typeChoice === 'basic' ? 'basic-expressjs-template' : 'advance-expressjs-template';
-    } else if (framework === 'nestjs') {
-      // NestJS uses a simple template structure
-      templateName = 'template';
-    } else if (framework === 'remixjs') {
-      // Remix uses template composition like other frameworks
-      // Template name will be composed below
     } else {
       // Ask for bundler if available
-      if (fwConfig.bundlers && fwConfig.bundlers.length > 0 && framework !== 'nestjs') {
+      if (fwConfig.bundlers && fwConfig.bundlers.length > 0) {
         bundler = (await inquirer.prompt([
           {
             name: 'bundler',
@@ -454,8 +428,8 @@ async function main(projectNameArg?: string) {
         ])).bundler;
       }
       
-      // Ask for src directory if available and NOT angularjs and NOT reactjs with vite and NOT nestjs
-      if (fwConfig.options && fwConfig.options.includes('src') && framework !== 'angularjs' && framework !== 'nestjs' && !(framework === 'reactjs' && bundler === 'vite')) {
+      // Ask for src directory if available and NOT angularjs and NOT reactjs with vite
+      if (fwConfig.options && fwConfig.options.includes('src') && framework !== 'angularjs' && !(framework === 'reactjs' && bundler === 'vite')) {
         src = (await inquirer.prompt([
           {
             name: 'src',
@@ -466,8 +440,8 @@ async function main(projectNameArg?: string) {
         ])).src;
       }
       
-      // Ask for Tailwind CSS if available and NOT nestjs
-      if (fwConfig.options && fwConfig.options.includes('tailwind') && framework !== 'nestjs') {
+      // Ask for Tailwind CSS if available
+      if (fwConfig.options && fwConfig.options.includes('tailwind')) {
         tailwind = (await inquirer.prompt([
           {
             name: 'tailwind',
@@ -481,13 +455,6 @@ async function main(projectNameArg?: string) {
         if (framework === 'vuejs' && !tailwind) {
           console.log(chalk.redBright('\n❌ Tailwind CSS is required for Headless UI in Vue.js.'));
           console.log(chalk.yellow('💡 Please select Tailwind CSS to continue with Vue.js setup.'));
-          process.exit(1);
-        }
-        
-        // Remixjs: If user selects shadcn but does NOT select tailwind, exit with message
-        if (framework === 'remixjs' && ui === 'shadcn' && !tailwind) {
-          console.log(chalk.redBright('\n❌ Tailwind CSS is required for shadcn/ui in Remix.'));
-          console.log(chalk.yellow('💡 Please select Tailwind CSS to continue with Remix setup.'));
           process.exit(1);
         }
       }
@@ -508,12 +475,6 @@ async function main(projectNameArg?: string) {
         templateName = 'material-ui-no-tailwind-template';
       } else if (framework === 'angularjs' && !ui && !tailwind) {
         templateName = 'no-material-no-tailwind-template';
-      } else if (framework === 'remixjs' && ui === 'shadcn' && tailwind) {
-        templateName = 'shadcn-tailwind-template';
-      } else if (framework === 'remixjs' && !ui && !tailwind) {
-        templateName = 'no-shadcn-no-tailwind-template';
-      } else if (framework === 'remixjs' && !ui && tailwind) {
-        templateName = 'no-shadcn-tailwind-template';
       }
     }
 
@@ -524,9 +485,9 @@ async function main(projectNameArg?: string) {
     if (language && language !== 'rust') console.log(`  ${chalk.bold('Language:')} ${theme(capitalize(language))}`);
     console.log(`  ${chalk.bold('Framework:')} ${theme(capitalize(framework))}`);
     if (bundler) console.log(`  ${chalk.bold('Bundler:')} ${chalk.magenta(capitalize(bundler))}`);
-    if (fwConfig.options && fwConfig.options.includes('src') && framework !== 'angularjs' && framework !== 'nestjs' && !(framework === 'reactjs' && bundler === 'vite'))
+    if (fwConfig.options && fwConfig.options.includes('src') && framework !== 'angularjs' && !(framework === 'reactjs' && bundler === 'vite'))
       console.log(`  ${chalk.bold('Src directory:')} ${src ? chalk.green('✓ Yes') : chalk.red('✗ No')}`);
-    if (fwConfig.options && fwConfig.options.includes('tailwind') && framework !== 'nestjs')
+    if (fwConfig.options && fwConfig.options.includes('tailwind'))
       console.log(`  ${chalk.bold('Tailwind CSS:')} ${tailwind ? chalk.green('✓ Yes') : chalk.red('✗ No')}`);
     if (ui) console.log(`  ${chalk.bold('UI Library:')} ${chalk.blue(capitalize(ui))}`);
     console.log(`  ${chalk.bold('Template:')} ${chalk.yellow(templateName)}`);
@@ -538,10 +499,6 @@ async function main(projectNameArg?: string) {
       templateDir = path.join(templatesRoot, 'rust', templateName);
     } else if (framework === 'expressjs') {
       templateDir = path.join(templatesRoot, 'expressjs', language ?? '', templateName);
-    } else if (framework === 'nestjs') {
-      templateDir = path.join(templatesRoot, 'nestjs', language ?? '', templateName);
-    } else if (framework === 'remixjs') {
-      templateDir = getTemplateDir(framework, language ?? '', templateName, bundler);
     } else {
       templateDir = getTemplateDir(framework, language ?? '', templateName, bundler);
     }
@@ -590,8 +547,7 @@ async function main(projectNameArg?: string) {
 program
   .name('pi')
   .description('Package Installer CLI - The ultimate tool for creating modern web applications')
-  .version(version, '-v, --version')
-  .helpOption('-h, --help')
+  .version(version)
   .argument('[projectName]', 'Project name (use "." for current directory)')
   .action((projectName) => main(projectName));
 
