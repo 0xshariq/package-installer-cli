@@ -66,6 +66,21 @@
     "rust": {
       "languages": ["rust"],
       "options": ["basic", "advance"]
+    },
+    "reactjs+expressjs+shadcn": {
+      "languages": ["javascript", "typescript"],
+      "ui": ["shadcn"],
+      "templates" : [
+        "react-basic-express-template",
+        "react-advance-express-template"
+      ]
+    },
+    "reactjs+nestjs+shadcn": {
+      "languages": [ "typescript"],
+      "ui": ["shadcn"],
+      "templates" : [
+        "react-nest-shadcn-template"
+      ]
     }
   }
 } 
