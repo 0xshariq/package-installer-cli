@@ -6,7 +6,8 @@
   "module": "./dist/index.js",
   "type": "module",
   "bin": {
-    "pi": "dist/index.js"
+    "pi": "dist/index.js",
+    "package-installer": "dist/index.js"
   },
   "scripts": {
     "build": "tsc -p .",

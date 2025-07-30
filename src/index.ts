@@ -4,7 +4,7 @@ import { fileURLToPath } from 'url';
 import path from 'path';
 import inquirer from 'inquirer';
 import * as fs from 'fs';
-import { program } from 'commander';
+import { program, Command } from 'commander';
 import chalk from 'chalk';
 import figlet from 'figlet';
 import ora from 'ora';
@@ -18,17 +18,28 @@ const packageJsonPath = path.join(path.dirname(fileURLToPath(import.meta.url)), 
 const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
 const version = packageJson.version;
 
-// Handle graceful exit on Ctrl+C
-process.on('SIGINT', () => {
+// Handle graceful exit on Ctrl+C and other termination signals
+const gracefulExit = () => {
   console.log(chalk.yellow('\n\n👋 Thanks for using Package Installer! Goodbye!'));
   console.log(chalk.cyanBright('💡 Remember: Always check your dependencies and README for next steps.')); 
   process.exit(0);
+};
+
+process.on('SIGINT', gracefulExit);
+process.on('SIGTERM', gracefulExit);
+process.on('SIGQUIT', gracefulExit);
+process.on('SIGUSR1', gracefulExit);
+process.on('SIGUSR2', gracefulExit);
+
+// Handle uncaught exceptions
+process.on('uncaughtException', (err) => {
+  console.error(chalk.red('\n❌ An unexpected error occurred:'), err);
+  gracefulExit();
 });
 
-process.on('SIGTERM', () => {
-  console.log(chalk.yellow('\n\n👋 Thanks for using Package Installer! Goodbye!'));
-  console.log(chalk.cyanBright('💡 Remember: Always check your dependencies and README for next steps.')); 
-  process.exit(0);
+process.on('unhandledRejection', (reason, promise) => {
+  console.error(chalk.red('\n❌ Unhandled promise rejection:'), reason);
+  gracefulExit();
 });
 
 // ESM-safe __dirname
@@ -68,6 +79,11 @@ function getFrameworkTheme(framework: string) {
     case 'express':
     case 'expressjs':
       return chalk.greenBright;
+    case 'remix':
+    case 'remixjs':
+      return chalk.blueBright;
+    case 'nestjs':
+      return chalk.magentaBright;
     case 'rust':
       return chalk.yellowBright;
     default:
@@ -75,12 +91,12 @@ function getFrameworkTheme(framework: string) {
   }
 }
 
-// Print the banner with commercial-grade styling
+// Enhanced banner with improved styling
 function printBanner() {
   console.clear();
   
-  // Create gradient text
-  const gradientText = gradient(['#667eea', '#764ba2', '#f093fb', '#f5576c', '#4facfe', '#00f2fe']);
+  // Create gradient text with more vibrant colors
+  const gradientText = gradient(['#667eea', '#764ba2', '#f093fb', '#f5576c', '#4facfe', '#00f2fe', '#43e97b', '#38f9d7']);
   
   // ASCII art with gradient
   const asciiArt = figlet.textSync('Package Installer', { 
@@ -90,10 +106,10 @@ function printBanner() {
   
   console.log(gradientText(asciiArt));
   
-  // Version and description in a box
+  // Enhanced version and description box
   const versionBox = boxen(
     chalk.cyanBright(`✨ Welcome to Package Installer CLI v${version} ✨\n`) +
-    chalk.gray('The ultimate tool for creating modern web applications'),
+    chalk.gray('The ultimate tool for creating modern web applications with style'),
     {
       padding: 1,
       margin: 1,
@@ -105,11 +121,12 @@ function printBanner() {
   
   console.log(versionBox);
   
-  // Quick stats
+  // Enhanced stats box with better styling
   const statsBox = boxen(
-    chalk.white(`${chalk.bold('📦 Frameworks:')} ${frameworks.length} supported\n`) +
-    chalk.white(`${chalk.bold('🚀 Templates:')} 50+ ready-to-use\n`) +
-    chalk.white(`${chalk.bold('⚡ Speed:')} Instant project setup`),
+    chalk.white(`${chalk.bold('📦 Frameworks:')} ${chalk.cyan(frameworks.length)} supported\n`) +
+    chalk.white(`${chalk.bold('🚀 Templates:')} ${chalk.green('50+')} ready-to-use\n`) +
+    chalk.white(`${chalk.bold('⚡ Speed:')} ${chalk.yellow('Instant')} project setup\n`) +
+    chalk.white(`${chalk.bold('🎨 Styling:')} ${chalk.magenta('Beautiful')} UI components`),
     {
       padding: 1,
       margin: { top: 1, bottom: 1 },
@@ -120,6 +137,26 @@ function printBanner() {
   );
   
   console.log(statsBox);
+  
+  // Global info box
+  const globalInfoBox = boxen(
+    chalk.white(`${chalk.bold('🌍 Global Usage:')}\n`) +
+    chalk.gray('  pi <project-name>          - Quick start\n') +
+    chalk.gray('  package-installer <name>   - Full command\n') +
+    chalk.gray('  pi .                       - Use current directory name'),
+    {
+      padding: 1,
+      margin: { top: 1, bottom: 1 },
+      borderStyle: 'round',
+      borderColor: 'yellow',
+      backgroundColor: '#1a1a1a'
+    }
+  );
+  
+  console.log(globalInfoBox);
+  
+  console.log();
+  console.log(chalk.magenta('Happy coding! 🚀'));
 }
 
 // Enhanced progress spinner with custom styling
@@ -153,88 +190,86 @@ function copyTemplateContents(templateDir: string, targetPath: string) {
   }
 }
 
-// Get the template directory path for the selected options
+// Get template directory path
 function getTemplateDir(
   framework: string,
   language: string,
   templateName: string,
   bundler?: string
 ) {
-  if (bundler) {
-    return path.join(templatesRoot, framework, bundler, language, templateName);
-  }
-  return path.join(templatesRoot, framework, language, templateName);
+  const bundlerPath = bundler ? path.join(bundler, language) : language;
+  return path.join(templatesRoot, framework, bundlerPath, templateName);
 }
 
-// Enhanced dependency installation with better error handling
+// Install dependencies with enhanced styling
 function installDependencies(targetPath: string, theme: any) {
   const packageJsonPath = path.join(targetPath, 'package.json');
   if (!fs.existsSync(packageJsonPath)) {
-    return false;
+    console.log(chalk.yellow('⚠️  No package.json found, skipping dependency installation.'));
+    return;
   }
 
-  let installCmd = '';
-  let packageManager = '';
-  
-  if (fs.existsSync(path.join(targetPath, 'pnpm-lock.yaml'))) {
-    installCmd = 'pnpm install';
-    packageManager = 'pnpm';
-  } else if (fs.existsSync(path.join(targetPath, 'yarn.lock'))) {
-    installCmd = 'yarn install';
-    packageManager = 'yarn';
-  } else {
-    installCmd = 'npm install';
-    packageManager = 'npm';
-  }
-
-  const installSpinner = createSpinner(`📦 Installing dependencies with ${packageManager}...`, theme);
-  installSpinner.start();
+  console.log();
+  const spinner = createSpinner('📦 Installing dependencies...', theme);
+  spinner.start();
 
   try {
-    execSync(installCmd, { cwd: targetPath, stdio: 'inherit' });
-    installSpinner.succeed(theme(`✅ Dependencies installed successfully with ${packageManager}!`));
-    return true;
-  } catch (err) {
-    installSpinner.fail(chalk.red(`❌ Dependency installation failed with ${packageManager}.`));
-    console.log(chalk.yellow('💡 You can manually install dependencies later.'));
-    return false;
+    // Try pnpm first, then npm
+    try {
+      execSync('pnpm install', { cwd: targetPath, stdio: 'pipe' });
+      spinner.succeed(theme('✨ Dependencies installed with pnpm!'));
+    } catch {
+      try {
+        execSync('npm install', { cwd: targetPath, stdio: 'pipe' });
+        spinner.succeed(theme('✨ Dependencies installed with npm!'));
+      } catch {
+        spinner.warn(chalk.yellow('⚠️  Could not install dependencies automatically.'));
+        console.log(chalk.gray('💡 Please run "npm install" or "pnpm install" in your project directory.'));
+      }
+    }
+  } catch (error) {
+    spinner.fail(chalk.red('Failed to install dependencies.'));
+    console.log(chalk.gray('💡 Please run "npm install" or "pnpm install" manually.'));
   }
 }
 
 // Enhanced project name validation
 function validateProjectName(name: string): string | true {
-  if (!name || name.trim() === '') {
+  if (!name || name.trim().length === 0) {
     return 'Project name cannot be empty';
   }
   
   if (name.length > 50) {
-    return 'Project name must be less than 50 characters';
+    return 'Project name is too long (max 50 characters)';
   }
   
-  if (!/^[a-zA-Z0-9\-_\.]+$/.test(name)) {
+  // Allow letters, numbers, underscores, dashes, and dots
+  const validNameRegex = /^[a-zA-Z0-9._-]+$/;
+  if (!validNameRegex.test(name)) {
     return 'Project name may only include letters, numbers, underscores, dashes, and dots';
   }
   
-  if (name.startsWith('.') || name.endsWith('.')) {
-    return 'Project name cannot start or end with a dot';
-  }
-  
-  if (name.toLowerCase() === 'node_modules' || name.toLowerCase() === 'package.json') {
-    return 'Project name cannot be a reserved name';
+  // Check for reserved names
+  const reservedNames = ['node_modules', 'package.json', 'package-lock.json', 'pnpm-lock.yaml'];
+  if (reservedNames.includes(name.toLowerCase())) {
+    return `"${name}" is a reserved name`;
   }
   
   return true;
 }
 
-// Enhanced success message with commercial styling
+// Enhanced success message with better styling
 function showSuccessMessage(filename: string, targetPath: string, theme: any) {
   console.log();
   
   const successBox = boxen(
-    chalk.green('🎉 Project created successfully!') + '\n\n' +
-    chalk.white(`📁 Location: ${chalk.cyan(targetPath)}\n`) +
-    chalk.white(`📦 Dependencies: ${chalk.green('Installed')}\n`) +
-    chalk.white(`⚡ Status: ${chalk.green('Ready to develop')}`),
+    chalk.green(`🎉 Project "${chalk.bold(filename)}" created successfully!\n\n`) +
+    chalk.white(`${chalk.bold('📁 Location:')} ${chalk.cyan(targetPath)}\n`) +
+    chalk.white(`${chalk.bold('🚀 Next steps:')}\n`) +
+    chalk.gray(`  cd ${filename}\n`) +
+    chalk.gray(`  npm run dev    # or pnpm dev\n`) +
+    chalk.gray(`  npm run build  # or pnpm build\n\n`) +
+    chalk.yellow('💡 Check the README.md file for detailed instructions!'),
     {
       padding: 1,
       margin: 1,
@@ -246,56 +281,31 @@ function showSuccessMessage(filename: string, targetPath: string, theme: any) {
   
   console.log(successBox);
   
-  // Next steps
-  const nextStepsBox = boxen(
-    chalk.cyan('🚀 Next Steps:') + '\n\n' +
-    (filename !== path.basename(process.cwd()) ? 
-      chalk.white(`   cd ${chalk.yellow(filename)}\n`) : '') +
-    (fs.existsSync(path.join(targetPath, 'package.json')) ? 
-      chalk.white('   npm run dev   ') + chalk.gray('# Start development server\n') +
-      chalk.white('   npm run build ') + chalk.gray('# Build for production\n') +
-      chalk.white('   npm test      ') + chalk.gray('# Run tests') : ''),
+  // Quick commands box
+  const commandsBox = boxen(
+    chalk.white(`${chalk.bold('⚡ Quick Commands:')}\n`) +
+    chalk.gray(`  cd ${filename}\n`) +
+    chalk.gray(`  npm install\n`) +
+    chalk.gray(`  npm run dev`),
     {
       padding: 1,
       margin: { top: 1, bottom: 1 },
       borderStyle: 'round',
-      borderColor: 'cyan',
+      borderColor: 'blue',
       backgroundColor: '#1a1a1a'
     }
   );
   
-  console.log(nextStepsBox);
-  
-  // Global installation info
-  const globalInfoBox = boxen(
-    chalk.magenta('📦 Global Installation:') + '\n\n' +
-    chalk.white('   npm i -g pi\n') +
-    chalk.white('   # or\n') +
-    chalk.white('   pnpm i -g pi\n') +
-    chalk.white('   # or\n') +
-    chalk.white('   yarn global add pi'),
-    {
-      padding: 1,
-      margin: { top: 1 },
-      borderStyle: 'round',
-      borderColor: 'magenta',
-      backgroundColor: '#1a1a1a'
-    }
-  );
-  
-  console.log(globalInfoBox);
-  
-  console.log();
-  console.log(chalk.magenta('Happy coding! 🚀'));
+  console.log(commandsBox);
 }
 
-// Main CLI logic
+// Main CLI logic with improved flow
 async function main(projectNameArg?: string) {
   // Print initial banner
   printBanner();
 
   try {
-    // 1. Project name - Only ask if not provided as argument
+    // 1. Project name - FIRST QUESTION (if not provided as argument)
     let filename = projectNameArg;
     if (filename === '.') {
       filename = path.basename(process.cwd());
@@ -320,7 +330,7 @@ async function main(projectNameArg?: string) {
       }
     }
 
-    // 2. Framework
+    // 2. Framework - SECOND QUESTION
     const { framework } = await inquirer.prompt([
       {
         name: 'framework',
@@ -335,7 +345,7 @@ async function main(projectNameArg?: string) {
     const theme = getFrameworkTheme(framework);
     const fwConfig = templateConfig.frameworks[framework];
 
-    // 3. Language (if multiple)
+    // 3. Language (if multiple) - THIRD QUESTION
     let language: string | undefined = undefined;
     if (fwConfig.languages && fwConfig.languages.length > 1) {
       language = (await inquirer.prompt([
@@ -353,9 +363,9 @@ async function main(projectNameArg?: string) {
       language = fwConfig.languages[0];
     }
 
-    // 4. UI Libraries (ask before framework-specific questions)
+    // 4. UI Libraries (if framework supports) - FOURTH QUESTION
     let ui: string | null = null;
-    if (fwConfig.ui && fwConfig.ui.length > 0) {
+    if (fwConfig.ui && fwConfig.ui.length > 0 && framework !== 'nestjs') {
       const wantsUI = (await inquirer.prompt([
         {
           name: 'wantsUI',
@@ -380,7 +390,7 @@ async function main(projectNameArg?: string) {
       }
     }
 
-    // 5. Framework-specific questions
+    // 5. Framework-specific questions - FIFTH QUESTION
     let templateName = '';
     let bundler: string | undefined = undefined;
     let src = false, tailwind = false;
@@ -412,9 +422,15 @@ async function main(projectNameArg?: string) {
         }
       ]);
       templateName = typeChoice === 'basic' ? 'basic-expressjs-template' : 'advance-expressjs-template';
+    } else if (framework === 'nestjs') {
+      // NestJS uses a simple template structure
+      templateName = 'template';
+    } else if (framework === 'remixjs') {
+      // Remix uses template composition like other frameworks
+      // Template name will be composed below
     } else {
-      // Ask for bundler if available
-      if (fwConfig.bundlers && fwConfig.bundlers.length > 0) {
+      // Ask for bundler if available and NOT nestjs
+      if (fwConfig.bundlers && fwConfig.bundlers.length > 0 && framework !== 'nestjs') {
         bundler = (await inquirer.prompt([
           {
             name: 'bundler',
@@ -428,8 +444,8 @@ async function main(projectNameArg?: string) {
         ])).bundler;
       }
       
-      // Ask for src directory if available and NOT angularjs and NOT reactjs with vite
-      if (fwConfig.options && fwConfig.options.includes('src') && framework !== 'angularjs' && !(framework === 'reactjs' && bundler === 'vite')) {
+      // Ask for src directory if available and NOT angularjs and NOT reactjs with vite and NOT nestjs
+      if (fwConfig.options && fwConfig.options.includes('src') && framework !== 'angularjs' && framework !== 'nestjs' && !(framework === 'reactjs' && bundler === 'vite')) {
         src = (await inquirer.prompt([
           {
             name: 'src',
@@ -440,8 +456,8 @@ async function main(projectNameArg?: string) {
         ])).src;
       }
       
-      // Ask for Tailwind CSS if available
-      if (fwConfig.options && fwConfig.options.includes('tailwind')) {
+      // Ask for Tailwind CSS if available and NOT nestjs
+      if (fwConfig.options && fwConfig.options.includes('tailwind') && framework !== 'nestjs') {
         tailwind = (await inquirer.prompt([
           {
             name: 'tailwind',
@@ -457,15 +473,22 @@ async function main(projectNameArg?: string) {
           console.log(chalk.yellow('💡 Please select Tailwind CSS to continue with Vue.js setup.'));
           process.exit(1);
         }
+        
+        // Remixjs: If user selects shadcn but does NOT select tailwind, exit with message
+        if (framework === 'remixjs' && ui === 'shadcn' && !tailwind) {
+          console.log(chalk.redBright('\n❌ Tailwind CSS is required for shadcn/ui in Remix.'));
+          console.log(chalk.yellow('💡 Please select Tailwind CSS to continue with Remix setup.'));
+          process.exit(1);
+        }
       }
       
       // Compose template name for other frameworks
       const parts = [];
-      if (fwConfig.options && fwConfig.options.includes('src') && framework !== 'angularjs' && !(framework === 'reactjs' && bundler === 'vite')) {
+      if (fwConfig.options && fwConfig.options.includes('src') && framework !== 'angularjs' && framework !== 'nestjs' && !(framework === 'reactjs' && bundler === 'vite')) {
         parts.push(src ? 'src' : 'no-src');
       }
       if (ui) parts.push(ui);
-      if (fwConfig.options && fwConfig.options.includes('tailwind')) {
+      if (fwConfig.options && fwConfig.options.includes('tailwind') && framework !== 'nestjs') {
         parts.push(tailwind ? 'tailwind' : 'no-tailwind');
       }
       templateName = parts.length > 0 ? parts.join('-') + '-template' : '';
@@ -475,30 +498,40 @@ async function main(projectNameArg?: string) {
         templateName = 'material-ui-no-tailwind-template';
       } else if (framework === 'angularjs' && !ui && !tailwind) {
         templateName = 'no-material-no-tailwind-template';
+      } else if (framework === 'remixjs' && ui === 'shadcn' && tailwind) {
+        templateName = 'shadcn-tailwind-template';
+      } else if (framework === 'remixjs' && !ui && !tailwind) {
+        templateName = 'no-shadcn-no-tailwind-template';
+      } else if (framework === 'remixjs' && !ui && tailwind) {
+        templateName = 'no-shadcn-tailwind-template';
       }
     }
 
-    // Show summary with enhanced styling
+    // Show enhanced summary with better styling
     console.log(chalk.cyan('\n📋 Project Configuration Summary:'));
     console.log(chalk.gray('═'.repeat(60)));
     console.log(`  ${chalk.bold('Project Name:')} ${chalk.cyan(filename)}`);
     if (language && language !== 'rust') console.log(`  ${chalk.bold('Language:')} ${theme(capitalize(language))}`);
     console.log(`  ${chalk.bold('Framework:')} ${theme(capitalize(framework))}`);
     if (bundler) console.log(`  ${chalk.bold('Bundler:')} ${chalk.magenta(capitalize(bundler))}`);
-    if (fwConfig.options && fwConfig.options.includes('src') && framework !== 'angularjs' && !(framework === 'reactjs' && bundler === 'vite'))
+    if (fwConfig.options && fwConfig.options.includes('src') && framework !== 'angularjs' && framework !== 'nestjs' && !(framework === 'reactjs' && bundler === 'vite'))
       console.log(`  ${chalk.bold('Src directory:')} ${src ? chalk.green('✓ Yes') : chalk.red('✗ No')}`);
-    if (fwConfig.options && fwConfig.options.includes('tailwind'))
+    if (fwConfig.options && fwConfig.options.includes('tailwind') && framework !== 'nestjs')
       console.log(`  ${chalk.bold('Tailwind CSS:')} ${tailwind ? chalk.green('✓ Yes') : chalk.red('✗ No')}`);
     if (ui) console.log(`  ${chalk.bold('UI Library:')} ${chalk.blue(capitalize(ui))}`);
     console.log(`  ${chalk.bold('Template:')} ${chalk.yellow(templateName)}`);
     console.log(chalk.gray('═'.repeat(60)));
 
-    // Create the project
+    // Create the project with proper template directory resolution
     let templateDir = '';
     if (framework === 'rust') {
       templateDir = path.join(templatesRoot, 'rust', templateName);
     } else if (framework === 'expressjs') {
       templateDir = path.join(templatesRoot, 'expressjs', language ?? '', templateName);
+    } else if (framework === 'nestjs') {
+      templateDir = path.join(templatesRoot, 'nestjs', language ?? '', templateName);
+    } else if (framework === 'remixjs') {
+      templateDir = getTemplateDir(framework, language ?? '', templateName, bundler);
     } else {
       templateDir = getTemplateDir(framework, language ?? '', templateName, bundler);
     }
@@ -544,11 +577,23 @@ async function main(projectNameArg?: string) {
   }
 }
 
+// Main pi command
 program
   .name('pi')
   .description('Package Installer CLI - The ultimate tool for creating modern web applications')
-  .version(version)
+  .version(version, '-v, --version')
+  .helpOption('-h, --help')
   .argument('[projectName]', 'Project name (use "." for current directory)')
   .action((projectName) => main(projectName));
 
-program.parse(process.argv);
+// Also support package-installer command
+const packageInstallerProgram = new Command('package-installer')
+  .description('Package Installer CLI - The ultimate tool for creating modern web applications')
+  .version(version, '-v, --version')
+  .helpOption('-h, --help')
+  .argument('[projectName]', 'Project name (use "." for current directory)')
+  .action((projectName: string | undefined) => main(projectName));
+
+program.addCommand(packageInstallerProgram);
+
+program.parse(process.argv); 
