@@ -202,11 +202,11 @@ function getTemplateDir(
 }
 
 // Install dependencies with enhanced styling
-function installDependencies(targetPath: string, theme: any) {
+function installDependencies(targetPath: string, theme: any): boolean {
   const packageJsonPath = path.join(targetPath, 'package.json');
   if (!fs.existsSync(packageJsonPath)) {
     console.log(chalk.yellow('⚠️  No package.json found, skipping dependency installation.'));
-    return;
+    return false;
   }
 
   console.log();
@@ -218,18 +218,22 @@ function installDependencies(targetPath: string, theme: any) {
     try {
       execSync('pnpm install', { cwd: targetPath, stdio: 'pipe' });
       spinner.succeed(theme('✨ Dependencies installed with pnpm!'));
+      return true;
     } catch {
       try {
         execSync('npm install', { cwd: targetPath, stdio: 'pipe' });
         spinner.succeed(theme('✨ Dependencies installed with npm!'));
+        return true;
       } catch {
         spinner.warn(chalk.yellow('⚠️  Could not install dependencies automatically.'));
         console.log(chalk.gray('💡 Please run "npm install" or "pnpm install" in your project directory.'));
+        return false;
       }
     }
   } catch (error) {
     spinner.fail(chalk.red('Failed to install dependencies.'));
     console.log(chalk.gray('💡 Please run "npm install" or "pnpm install" manually.'));
+    return false;
   }
 }
 
@@ -259,14 +263,18 @@ function validateProjectName(name: string): string | true {
 }
 
 // Enhanced success message with better styling
-function showSuccessMessage(filename: string, targetPath: string, theme: any) {
+function showSuccessMessage(filename: string, targetPath: string, theme: any, dependenciesInstalled: boolean = false) {
   console.log();
   
+  const isCurrentDirectory = filename === 'current directory';
+  const projectName = isCurrentDirectory ? path.basename(targetPath) : filename;
+  const cdCommand = isCurrentDirectory ? '' : `cd ${filename}\n`;
+  
   const successBox = boxen(
-    chalk.green(`🎉 Project "${chalk.bold(filename)}" created successfully!\n\n`) +
+    chalk.green(`🎉 Project "${chalk.bold(projectName)}" created successfully!\n\n`) +
     chalk.white(`${chalk.bold('📁 Location:')} ${chalk.cyan(targetPath)}\n`) +
     chalk.white(`${chalk.bold('🚀 Next steps:')}\n`) +
-    chalk.gray(`  cd ${filename}\n`) +
+    chalk.gray(cdCommand) +
     chalk.gray(`  npm run dev    # or pnpm dev\n`) +
     chalk.gray(`  npm run build  # or pnpm build\n\n`) +
     chalk.yellow('💡 Check the README.md file for detailed instructions!'),
@@ -281,11 +289,12 @@ function showSuccessMessage(filename: string, targetPath: string, theme: any) {
   
   console.log(successBox);
   
-  // Quick commands box
+  // Quick commands box - only show install command if dependencies weren't installed
+  const installCommand = dependenciesInstalled ? '' : `  npm install\n`;
   const commandsBox = boxen(
     chalk.white(`${chalk.bold('⚡ Quick Commands:')}\n`) +
-    chalk.gray(`  cd ${filename}\n`) +
-    chalk.gray(`  npm install\n`) +
+    chalk.gray(cdCommand) +
+    chalk.gray(installCommand) +
     chalk.gray(`  npm run dev`),
     {
       padding: 1,
@@ -307,9 +316,12 @@ async function main(projectNameArg?: string) {
   try {
     // 1. Project name - FIRST QUESTION (if not provided as argument)
     let filename = projectNameArg;
+    let useCurrentDirectory = false;
+    
     if (filename === '.') {
+      useCurrentDirectory = true;
       filename = path.basename(process.cwd());
-      console.log(chalk.cyan(`📁 Using current directory name: ${chalk.bold(filename)}`));
+      console.log(chalk.cyan(`📁 Creating project in current directory: ${chalk.bold(process.cwd())}`));
     }
     
     if (!filename) {
@@ -326,7 +338,9 @@ async function main(projectNameArg?: string) {
       ]);
       filename = projectName;
       if (filename === '.') {
+        useCurrentDirectory = true;
         filename = path.basename(process.cwd());
+        console.log(chalk.cyan(`📁 Creating project in current directory: ${chalk.bold(process.cwd())}`));
       }
     }
 
@@ -536,12 +550,12 @@ async function main(projectNameArg?: string) {
       templateDir = getTemplateDir(framework, language ?? '', templateName, bundler);
     }
 
-    const targetPath = path.join(process.cwd(), filename ?? 'my-app');
+    const targetPath = useCurrentDirectory ? process.cwd() : path.join(process.cwd(), filename ?? 'my-app');
     if (!fs.existsSync(templateDir)) {
       console.error(chalk.red(`\n❌ Template not found: ${templateDir}`));
       return;
     }
-    if (fs.existsSync(targetPath) && filename !== path.basename(process.cwd())) {
+    if (!useCurrentDirectory && fs.existsSync(targetPath)) {
       console.error(chalk.red(`\n❌ Folder ${targetPath} already exists. Delete or use another name.`));
       return;
     }
@@ -555,10 +569,10 @@ async function main(projectNameArg?: string) {
       spinner.succeed(theme(`✨ Project ${chalk.bold(filename)} created successfully!`));
 
       // Install dependencies automatically
-      installDependencies(targetPath, theme);
+      const dependenciesInstalled = installDependencies(targetPath, theme);
 
       // Enhanced success message
-      showSuccessMessage(filename ?? 'my-app', targetPath, theme);
+      showSuccessMessage(useCurrentDirectory ? 'current directory' : (filename ?? 'my-app'), targetPath, theme, dependenciesInstalled);
     } catch (err) {
       spinner.fail(chalk.red('Failed to create project.'));
       console.error(chalk.red('Error details:'), err);
