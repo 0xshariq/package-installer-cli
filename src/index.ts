@@ -1,22 +1,64 @@
 #!/usr/bin/env node
 
+/**
+ * Package Installer CLI - The Ultimate Tool for Creating Modern Web Applications
+ * 
+ * This CLI tool allows users to quickly scaffold new projects with various frameworks,
+ * languages, and UI libraries. It provides an interactive experience with beautiful
+ * styling and comprehensive error handling.
+ * 
+ * @author Sharique Chaudhary
+ * @version 1.3.5
+ */
+
+// Core Node.js imports
 import { fileURLToPath } from 'url';
 import path from 'path';
-import inquirer from 'inquirer';
 import * as fs from 'fs';
+import { execSync } from 'child_process';
+
+// Third-party library imports
+import inquirer from 'inquirer';
 import { program, Command } from 'commander';
 import chalk from 'chalk';
 import figlet from 'figlet';
 import ora from 'ora';
-import { execSync } from 'child_process';
 import gradient from 'gradient-string';
 import boxen from 'boxen';
 import cliSpinners from 'cli-spinners';
 
-// Read package.json to get version
+// =============================================================================
+// CONFIGURATION & CONSTANTS
+// =============================================================================
+
+/**
+ * Load package.json to get CLI version and metadata
+ * This is used for version display and CLI information
+ */
 const packageJsonPath = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'package.json');
 const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
 const version = packageJson.version;
+
+/**
+ * ESM-safe __dirname equivalent
+ * Required for ES modules compatibility
+ */
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+/**
+ * Load template configuration from template.json
+ * This contains all available frameworks, languages, and templates
+ */
+const templateConfigPath = path.join(__dirname, '..', 'template.json');
+const templateConfig = JSON.parse(fs.readFileSync(templateConfigPath, 'utf8'));
+const frameworks = Object.keys(templateConfig.frameworks);
+
+/**
+ * Set up template directory path
+ * This is where all project templates are stored
+ */
+const templatesRoot = path.join(__dirname, '..', 'templates');
 
 // Handle graceful exit on Ctrl+C and other termination signals
 const gracefulExit = () => {
@@ -85,27 +127,48 @@ process.on('unhandledRejection', (reason, promise) => {
   gracefulExit();
 });
 
-// ESM-safe __dirname
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+// =============================================================================
+// UTILITY FUNCTIONS
+// =============================================================================
 
-// Load template config and set up paths
-const templateConfigPath = path.join(__dirname, '..', 'template.json');
-const templateConfig = JSON.parse(fs.readFileSync(templateConfigPath, 'utf8'));
-const frameworks = Object.keys(templateConfig.frameworks);
-const templatesRoot = path.join(__dirname, '..', 'templates');
-
-// Utility: Capitalize first letter
-function capitalize(str: string) {
+/**
+ * Capitalizes the first letter of a string
+ * Used for displaying framework names and other text in a user-friendly format
+ * 
+ * @param str - The string to capitalize
+ * @returns The string with the first letter capitalized
+ * 
+ * @example
+ * capitalize('reactjs') // Returns 'Reactjs'
+ */
+function capitalize(str: string): string {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
-// Utility: Cross-platform path handling
+/**
+ * Normalizes a file path for cross-platform compatibility
+ * Converts Windows backslashes to forward slashes for consistency
+ * 
+ * @param inputPath - The path to normalize
+ * @returns The normalized path with forward slashes
+ * 
+ * @example
+ * normalizePath('C:\\Users\\name\\project') // Returns 'C:/Users/name/project'
+ */
 function normalizePath(inputPath: string): string {
   return path.normalize(inputPath).replace(/\\/g, '/');
 }
 
-// Utility: Get color theme for framework
+/**
+ * Returns the appropriate color theme for a given framework
+ * Each framework has its own distinct color for better visual identification
+ * 
+ * @param framework - The framework name (case-insensitive)
+ * @returns A chalk color function for the framework
+ * 
+ * @example
+ * getFrameworkTheme('reactjs') // Returns chalk.cyanBright
+ */
 function getFrameworkTheme(framework: string) {
   switch (framework.toLowerCase()) {
     case 'react':
@@ -134,13 +197,20 @@ function getFrameworkTheme(framework: string) {
   }
 }
 
-// Enhanced banner with improved styling
+/**
+ * Displays the CLI banner with beautiful styling
+ * Shows the Package Installer logo, version info, and quick start guide
+ * Uses gradient colors and styled boxes for a professional appearance
+ * 
+ * @example
+ * printBanner() // Displays the full banner with all information
+ */
 function printBanner() {
   console.clear();
-  
+
   // Create gradient text with more vibrant colors
   const gradientText = gradient(['#667eea', '#764ba2', '#f093fb', '#f5576c', '#4facfe', '#00f2fe', '#43e97b', '#38f9d7']);
-  
+
   // Enhanced ASCII art with better spacing
   const banner = figlet.textSync('Package\nInstaller', {
     font: 'ANSI Shadow',
@@ -148,7 +218,7 @@ function printBanner() {
     verticalLayout: 'default',
     width: 80
   });
-  
+
   // Create a beautiful banner box
   const bannerBox = boxen(
     gradientText(banner) + '\n' +
@@ -164,9 +234,9 @@ function printBanner() {
       titleAlignment: 'center'
     }
   );
-  
+
   console.log(bannerBox);
-  
+
   // Version and info
   const infoBox = boxen(
     chalk.white(`📦 Version: ${chalk.cyanBright(version)}`) + '\n' +
@@ -180,11 +250,24 @@ function printBanner() {
       backgroundColor: '#1a1a1a'
     }
   );
-  
+
   console.log(infoBox);
 }
 
-// Enhanced progress spinner with custom styling
+/**
+ * Creates a styled progress spinner for loading states
+ * Used during project creation and dependency installation
+ * 
+ * @param text - The text to display with the spinner
+ * @param theme - The chalk color function to apply to the text
+ * @returns An ora spinner instance
+ * 
+ * @example
+ * const spinner = createSpinner('Creating project...', chalk.cyan);
+ * spinner.start();
+ * // ... do work ...
+ * spinner.succeed('Project created!');
+ */
 function createSpinner(text: string, theme: any) {
   return ora({
     text: theme(text),
@@ -193,7 +276,17 @@ function createSpinner(text: string, theme: any) {
   });
 }
 
-// Recursively copy the contents of a directory into the target directory
+/**
+ * Recursively copies template contents to the target directory
+ * Handles files, directories, and symbolic links
+ * Preserves file permissions and creates directories as needed
+ * 
+ * @param templateDir - The source template directory path
+ * @param targetPath - The destination directory path
+ * 
+ * @example
+ * copyTemplateContents('/templates/react', '/my-project')
+ */
 function copyTemplateContents(templateDir: string, targetPath: string) {
   if (!fs.existsSync(targetPath)) fs.mkdirSync(targetPath, { recursive: true });
   for (const entry of fs.readdirSync(templateDir, { withFileTypes: true })) {
@@ -210,12 +303,25 @@ function copyTemplateContents(templateDir: string, targetPath: string) {
       try {
         const stat = fs.statSync(srcPath);
         fs.chmodSync(destPath, stat.mode);
-      } catch {}
+      } catch { }
     }
   }
 }
 
-// Get template directory path
+/**
+ * Constructs the template directory path based on framework configuration
+ * Handles different template structures for various frameworks
+ * 
+ * @param framework - The framework name (e.g., 'reactjs', 'nextjs')
+ * @param language - The programming language (e.g., 'javascript', 'typescript')
+ * @param templateName - The specific template name
+ * @param bundler - Optional bundler name (e.g., 'vite')
+ * @returns The full path to the template directory
+ * 
+ * @example
+ * getTemplateDir('reactjs', 'typescript', 'shadcn-tailwind-template', 'vite')
+ * // Returns: '/templates/reactjs/vite/typescript/shadcn-tailwind-template'
+ */
 function getTemplateDir(
   framework: string,
   language: string,
@@ -226,11 +332,24 @@ function getTemplateDir(
   return path.join(templatesRoot, framework, bundlerPath, templateName);
 }
 
-// Install dependencies with enhanced styling
+/**
+ * Installs project dependencies automatically
+ * Handles both Node.js (npm/pnpm) and Rust (cargo) projects
+ * Shows progress with styled spinners and appropriate messages
+ * 
+ * @param targetPath - The project directory path
+ * @param theme - The chalk color function for styling
+ * @param framework - Optional framework name for special handling
+ * @returns true if installation succeeded, false otherwise
+ * 
+ * @example
+ * const success = installDependencies('/my-project', chalk.cyan, 'rust');
+ * if (success) console.log('Dependencies installed successfully!');
+ */
 function installDependencies(targetPath: string, theme: any, framework?: string): boolean {
   // Check if it's a Rust project
   const isRustProject = framework === 'rust' || fs.existsSync(path.join(targetPath, 'Cargo.toml'));
-  
+
   if (isRustProject) {
     const cargoTomlPath = path.join(targetPath, 'Cargo.toml');
     if (!fs.existsSync(cargoTomlPath)) {
@@ -288,45 +407,72 @@ function installDependencies(targetPath: string, theme: any, framework?: string)
   }
 }
 
-// Enhanced project name validation
+/**
+ * Validates project names for compatibility and best practices
+ * Ensures names are valid for file systems and package managers
+ * 
+ * @param name - The project name to validate
+ * @returns true if valid, error message string if invalid
+ * 
+ * @example
+ * const result = validateProjectName('my-app');
+ * if (result === true) {
+ *   // Name is valid
+ * } else {
+ *   console.log(result); // Error message
+ * }
+ */
 function validateProjectName(name: string): string | true {
   if (!name || name.trim().length === 0) {
     return 'Project name cannot be empty';
   }
-  
+
   if (name.length > 50) {
     return 'Project name is too long (max 50 characters)';
   }
-  
+
   // Allow letters, numbers, underscores, dashes, and dots
   const validNameRegex = /^[a-zA-Z0-9._-]+$/;
   if (!validNameRegex.test(name)) {
     return 'Project name may only include letters, numbers, underscores, dashes, and dots';
   }
-  
+
   // Check for reserved names
   const reservedNames = ['node_modules', 'package.json', 'package-lock.json', 'pnpm-lock.yaml'];
   if (reservedNames.includes(name.toLowerCase())) {
     return `"${name}" is a reserved name`;
   }
-  
+
   return true;
 }
 
-// Enhanced success message with better styling
+/**
+ * Displays a beautifully styled success message after project creation
+ * Shows project details, next steps, and quick commands
+ * Adapts to different frameworks (Node.js vs Rust)
+ * 
+ * @param filename - The project name or 'current directory'
+ * @param targetPath - The full path where the project was created
+ * @param theme - The chalk color function for styling
+ * @param dependenciesInstalled - Whether dependencies were installed successfully
+ * @param framework - Optional framework name for command adaptation
+ * 
+ * @example
+ * showSuccessMessage('my-app', '/path/to/my-app', chalk.cyan, true, 'reactjs');
+ */
 function showSuccessMessage(filename: string, targetPath: string, theme: any, dependenciesInstalled: boolean = false, framework?: string) {
   console.log();
-  
+
   const isCurrentDirectory = filename === 'current directory';
   const projectName = isCurrentDirectory ? path.basename(targetPath) : filename;
   const cdCommand = isCurrentDirectory ? '' : `cd ${filename}\n`;
-  
-  // Check if it's a Rust project
-  const isRustProject = framework === 'rust' || fs.existsSync(path.join(targetPath, 'Cargo.toml'));
-  
-  // Determine commands based on project type
-  let devCommand, buildCommand, installCommand;
-  
+
+      // Determine project type for appropriate command display
+    const isRustProject = framework === 'rust' || fs.existsSync(path.join(targetPath, 'Cargo.toml'));
+    
+    // Set appropriate commands based on project type (Rust vs Node.js)
+    let devCommand, buildCommand, installCommand;
+
   if (isRustProject) {
     devCommand = `  cargo run`;
     buildCommand = `  cargo build`;
@@ -336,7 +482,7 @@ function showSuccessMessage(filename: string, targetPath: string, theme: any, de
     buildCommand = `  npm run build  # or pnpm build`;
     installCommand = dependenciesInstalled ? '' : `  npm install\n`;
   }
-  
+
   // Enhanced success box with gradient and better styling
   const successBox = boxen(
     gradient(['#43e97b', '#38f9d7'])(`🎉 Project "${chalk.bold(projectName)}" created successfully!`) + '\n\n' +
@@ -356,9 +502,9 @@ function showSuccessMessage(filename: string, targetPath: string, theme: any, de
       titleAlignment: 'center'
     }
   );
-  
+
   console.log(successBox);
-  
+
   // Enhanced quick commands box with better styling
   const commandsBox = boxen(
     chalk.white(`${chalk.bold('⚡ Quick Commands:')}\n`) +
@@ -375,9 +521,9 @@ function showSuccessMessage(filename: string, targetPath: string, theme: any, de
       titleAlignment: 'center'
     }
   );
-  
+
   console.log(commandsBox);
-  
+
   // Additional info box for framework-specific tips
   const tipsBox = boxen(
     chalk.white(`${chalk.bold('💡 Pro Tips:')}\n`) +
@@ -394,26 +540,48 @@ function showSuccessMessage(filename: string, targetPath: string, theme: any, de
       titleAlignment: 'center'
     }
   );
-  
+
   console.log(tipsBox);
 }
 
-// Main CLI logic with improved flow
+/**
+ * Main CLI function that orchestrates the entire project creation process
+ * Handles user interaction, template selection, and project generation
+ * 
+ * Flow:
+ * 1. Display banner and welcome message
+ * 2. Get project name (from args or interactive prompt)
+ * 3. Select framework and configuration options
+ * 4. Validate and create project
+ * 5. Install dependencies
+ * 6. Show success message and next steps
+ * 
+ * @param projectNameArg - Optional project name from command line arguments
+ * 
+ * @example
+ * main('my-app') // Create project with name 'my-app'
+ * main() // Interactive mode
+ */
 async function main(projectNameArg?: string) {
   // Print initial banner
   printBanner();
 
   try {
-    // 1. Project name - FIRST QUESTION (if not provided as argument)
+    // =============================================================================
+    // STEP 1: PROJECT NAME HANDLING
+    // =============================================================================
+    
+    // Handle project name from arguments or prompt user
     let filename = projectNameArg;
     let useCurrentDirectory = false;
-    
+
+    // Handle special case: '.' means use current directory name
     if (filename === '.') {
       useCurrentDirectory = true;
       filename = path.basename(process.cwd());
       console.log(chalk.cyan(`📁 Creating project in current directory: ${chalk.bold(process.cwd())}`));
     }
-    
+
     if (!filename) {
       const { projectName } = await inquirer.prompt([
         {
@@ -434,7 +602,11 @@ async function main(projectNameArg?: string) {
       }
     }
 
-    // 2. Framework - SECOND QUESTION
+    // =============================================================================
+    // STEP 2: FRAMEWORK SELECTION
+    // =============================================================================
+    
+    // Present available frameworks to the user
     const { framework } = await inquirer.prompt([
       {
         name: 'framework',
@@ -449,13 +621,17 @@ async function main(projectNameArg?: string) {
     const theme = getFrameworkTheme(framework);
     const fwConfig = templateConfig.frameworks[framework];
 
-    // Check if this is a combination template (has predefined templates)
+    // =============================================================================
+    // STEP 3: TEMPLATE CONFIGURATION
+    // =============================================================================
+    
+    // Determine if this is a combination template (pre-configured setup)
     const isCombinationTemplate = fwConfig.templates && fwConfig.templates.length > 0;
 
     // Initialize templateName variable
     let templateName = '';
 
-    // 3. Language (if multiple and not combination template) - THIRD QUESTION
+    // Handle language selection for non-combination templates
     let language: string | undefined = undefined;
     if (!isCombinationTemplate && fwConfig.languages && fwConfig.languages.length > 1) {
       language = (await inquirer.prompt([
@@ -487,7 +663,7 @@ async function main(projectNameArg?: string) {
         },
       ]);
       templateName = selectedTemplate;
-      
+
       // Show info about what's included in combination templates
       console.log(chalk.cyan('\n📋 Template includes:'));
       if (framework.includes('shadcn')) {
@@ -536,115 +712,143 @@ async function main(projectNameArg?: string) {
     // Framework-specific questions (only for non-combination templates)
     if (!isCombinationTemplate) {
       if (framework === 'rust') {
-      const { typeChoice } = await inquirer.prompt([
-        {
-          name: 'typeChoice',
-          type: 'list',
-          message: theme('🦀 Choose Rust template type:'),
-          choices: [
-            { name: `${chalk.green('Basic')} ${chalk.gray('(Simple, Clean structure)')}`, value: 'basic' },
-            { name: `${chalk.blue('Advanced')} ${chalk.gray('(Full-featured, Production-ready)')}`, value: 'advance' }
-          ]
-        }
-      ]);
-      templateName = typeChoice === 'basic' ? 'basic-rust-template' : 'advance-rust-template';
-    } else if (framework === 'expressjs') {
-      const { typeChoice } = await inquirer.prompt([
-        {
-          name: 'typeChoice',
-          type: 'list',
-          message: theme('🚦 Select Express template type:'),
-          choices: [
-            { name: `${chalk.green('Basic')} ${chalk.gray('(Simple API structure)')}`, value: 'basic' },
-            { name: `${chalk.blue('Advanced')} ${chalk.gray('(Full-stack with auth, DB)')}`, value: 'advance' }
-          ]
-        }
-      ]);
-      templateName = typeChoice === 'basic' ? 'basic-expressjs-template' : 'advance-expressjs-template';
-    } else if (framework === 'nestjs') {
-      // NestJS uses a simple template structure
-      templateName = 'template';
-    } else if (framework === 'remixjs') {
-      // Remix uses template composition like other frameworks
-      // Template name will be composed below
-    } else {
-      // Ask for bundler if available and NOT nestjs
-      if (fwConfig.bundlers && fwConfig.bundlers.length > 0 && framework !== 'nestjs') {
-        bundler = (await inquirer.prompt([
+        const { typeChoice } = await inquirer.prompt([
           {
-            name: 'bundler',
+            name: 'typeChoice',
             type: 'list',
-            message: theme('📦 Choose a bundler:'),
-            choices: fwConfig.bundlers.map((b: string) => ({
-              name: `${capitalize(b)} ${chalk.gray('(Fast, Modern build tool)')}`,
-              value: b
-            })),
-          },
-        ])).bundler;
-      }
-      
-      // Ask for src directory if available and NOT angularjs and NOT reactjs with vite and NOT nestjs
-      if (fwConfig.options && fwConfig.options.includes('src') && framework !== 'angularjs' && framework !== 'nestjs' && !(framework === 'reactjs' && bundler === 'vite')) {
-        src = (await inquirer.prompt([
+            message: theme('🦀 Choose Rust template type:'),
+            choices: [
+              { name: `${chalk.green('Basic')} ${chalk.gray('(Simple, Clean structure)')}`, value: 'basic' },
+              { name: `${chalk.blue('Advanced')} ${chalk.gray('(Full-featured, Production-ready)')}`, value: 'advance' }
+            ]
+          }
+        ]);
+        templateName = typeChoice === 'basic' ? 'basic-rust-template' : 'advance-rust-template';
+      } else if (framework === 'expressjs') {
+        const { typeChoice } = await inquirer.prompt([
           {
-            name: 'src',
-            type: 'confirm',
-            message: theme('📂 Do you want a src directory?'),
-            default: true,
-          },
-        ])).src;
-      }
-      
-      // Ask for Tailwind CSS if available and NOT nestjs
-      if (fwConfig.options && fwConfig.options.includes('tailwind') && framework !== 'nestjs') {
-        tailwind = (await inquirer.prompt([
-          {
-            name: 'tailwind',
-            type: 'confirm',
-            message: theme('🎨 Do you want to use Tailwind CSS?'),
-            default: false,
-          },
-        ])).tailwind;
-        
-        // Vuejs: If user does NOT select tailwind, exit with message
+            name: 'typeChoice',
+            type: 'list',
+            message: theme('🚦 Select Express template type:'),
+            choices: [
+              { name: `${chalk.green('Basic')} ${chalk.gray('(Simple API structure)')}`, value: 'basic' },
+              { name: `${chalk.blue('Advanced')} ${chalk.gray('(Full-stack with auth, DB)')}`, value: 'advance' }
+            ]
+          }
+        ]);
+        templateName = typeChoice === 'basic' ? 'basic-expressjs-template' : 'advance-expressjs-template';
+      } else if (framework === 'nestjs') {
+        // NestJS uses a simple template structure
+        templateName = 'template';
+      } else if (framework === 'remixjs') {
+        // Remix uses template composition like other frameworks
+        // Template name will be composed below
+      } else {
+        // Ask for bundler if available and NOT nestjs
+        if (fwConfig.bundlers && fwConfig.bundlers.length > 0 && framework !== 'nestjs') {
+          bundler = (await inquirer.prompt([
+            {
+              name: 'bundler',
+              type: 'list',
+              message: theme('📦 Choose a bundler:'),
+              choices: fwConfig.bundlers.map((b: string) => ({
+                name: `${capitalize(b)} ${chalk.gray('(Fast, Modern build tool)')}`,
+                value: b
+              })),
+            },
+          ])).bundler;
+        }
+
+        // Ask for src directory if available and NOT angularjs and NOT reactjs with vite and NOT nestjs
+        if (fwConfig.options && fwConfig.options.includes('src') && framework !== 'angularjs' && framework !== 'nestjs' && !(framework === 'reactjs' && bundler === 'vite')) {
+          src = (await inquirer.prompt([
+            {
+              name: 'src',
+              type: 'confirm',
+              message: theme('📂 Do you want a src directory?'),
+              default: true,
+            },
+          ])).src;
+        }
+
+        // Ask for Tailwind CSS if available and NOT nestjs
+        if (fwConfig.options && fwConfig.options.includes('tailwind') && framework !== 'nestjs') {
+          tailwind = (await inquirer.prompt([
+            {
+              name: 'tailwind',
+              type: 'confirm',
+              message: theme('🎨 Do you want to use Tailwind CSS?'),
+              default: false,
+            },
+          ])).tailwind;
+
+                  // Vuejs: If user does NOT select tailwind, exit with message
         if (framework === 'vuejs' && !tailwind) {
-          console.log(chalk.redBright('\n❌ Tailwind CSS is required for Headless UI in Vue.js.'));
-          console.log(chalk.yellow('💡 Please select Tailwind CSS to continue with Vue.js setup.'));
+          console.log();
+          const errorBox = boxen(
+            gradient(['#ff6b6b', '#ee5a24'])(`❌ Tailwind CSS is required`) + '\n\n' +
+            chalk.red('Tailwind CSS is required for Headless UI in Vue.js.') + '\n\n' +
+            chalk.gray('Please select Tailwind CSS to continue with Vue.js setup.'),
+            {
+              padding: 1,
+              margin: 1,
+              borderStyle: 'round',
+              borderColor: 'red',
+              backgroundColor: '#1a1a1a',
+              title: '🚨 Validation Error',
+              titleAlignment: 'center'
+            }
+          );
+          console.log(errorBox);
           process.exit(1);
         }
         
         // Remixjs: If user selects shadcn but does NOT select tailwind, exit with message
         if (framework === 'remixjs' && ui === 'shadcn' && !tailwind) {
-          console.log(chalk.redBright('\n❌ Tailwind CSS is required for shadcn/ui in Remix.'));
-          console.log(chalk.yellow('💡 Please select Tailwind CSS to continue with Remix setup.'));
+          console.log();
+          const errorBox = boxen(
+            gradient(['#ff6b6b', '#ee5a24'])(`❌ Tailwind CSS is required`) + '\n\n' +
+            chalk.red('Tailwind CSS is required for shadcn/ui in Remix.') + '\n\n' +
+            chalk.gray('Please select Tailwind CSS to continue with Remix setup.'),
+            {
+              padding: 1,
+              margin: 1,
+              borderStyle: 'round',
+              borderColor: 'red',
+              backgroundColor: '#1a1a1a',
+              title: '🚨 Validation Error',
+              titleAlignment: 'center'
+            }
+          );
+          console.log(errorBox);
           process.exit(1);
         }
+        }
+
+        // Compose template name for other frameworks
+        const parts = [];
+        if (fwConfig.options && fwConfig.options.includes('src') && framework !== 'angularjs' && framework !== 'nestjs' && !(framework === 'reactjs' && bundler === 'vite')) {
+          parts.push(src ? 'src' : 'no-src');
+        }
+        if (ui) parts.push(ui);
+        if (fwConfig.options && fwConfig.options.includes('tailwind') && framework !== 'nestjs') {
+          parts.push(tailwind ? 'tailwind' : 'no-tailwind');
+        }
+        templateName = parts.length > 0 ? parts.join('-') + '-template' : '';
+        if (framework === 'angularjs' && ui && tailwind) {
+          templateName = 'material-ui-tailwind-template';
+        } else if (framework === 'angularjs' && ui && !tailwind) {
+          templateName = 'material-ui-no-tailwind-template';
+        } else if (framework === 'angularjs' && !ui && !tailwind) {
+          templateName = 'no-material-no-tailwind-template';
+        } else if (framework === 'remixjs' && ui === 'shadcn' && tailwind) {
+          templateName = 'shadcn-tailwind-template';
+        } else if (framework === 'remixjs' && !ui && !tailwind) {
+          templateName = 'no-shadcn-no-tailwind-template';
+        } else if (framework === 'remixjs' && !ui && tailwind) {
+          templateName = 'no-shadcn-tailwind-template';
+        }
       }
-      
-      // Compose template name for other frameworks
-      const parts = [];
-      if (fwConfig.options && fwConfig.options.includes('src') && framework !== 'angularjs' && framework !== 'nestjs' && !(framework === 'reactjs' && bundler === 'vite')) {
-        parts.push(src ? 'src' : 'no-src');
-      }
-      if (ui) parts.push(ui);
-      if (fwConfig.options && fwConfig.options.includes('tailwind') && framework !== 'nestjs') {
-        parts.push(tailwind ? 'tailwind' : 'no-tailwind');
-      }
-      templateName = parts.length > 0 ? parts.join('-') + '-template' : '';
-      if (framework === 'angularjs' && ui && tailwind) {
-        templateName = 'material-ui-tailwind-template';
-      } else if (framework === 'angularjs' && ui && !tailwind) {
-        templateName = 'material-ui-no-tailwind-template';
-      } else if (framework === 'angularjs' && !ui && !tailwind) {
-        templateName = 'no-material-no-tailwind-template';
-      } else if (framework === 'remixjs' && ui === 'shadcn' && tailwind) {
-        templateName = 'shadcn-tailwind-template';
-      } else if (framework === 'remixjs' && !ui && !tailwind) {
-        templateName = 'no-shadcn-no-tailwind-template';
-      } else if (framework === 'remixjs' && !ui && tailwind) {
-        templateName = 'no-shadcn-tailwind-template';
-      }
-    }
     }
 
     // Show enhanced summary with better styling
@@ -684,11 +888,41 @@ async function main(projectNameArg?: string) {
 
     const targetPath = useCurrentDirectory ? process.cwd() : path.join(process.cwd(), filename ?? 'my-app');
     if (!fs.existsSync(templateDir)) {
-      console.error(chalk.red(`\n❌ Template not found: ${templateDir}`));
+      console.log();
+      const errorBox = boxen(
+        gradient(['#ff6b6b', '#ee5a24'])(`❌ Template not found`) + '\n\n' +
+        chalk.red(`Template directory: ${templateDir}`) + '\n\n' +
+        chalk.gray('Please check if the template exists or report this issue.'),
+        {
+          padding: 1,
+          margin: 1,
+          borderStyle: 'round',
+          borderColor: 'red',
+          backgroundColor: '#1a1a1a',
+          title: '🚨 Error',
+          titleAlignment: 'center'
+        }
+      );
+      console.log(errorBox);
       return;
     }
     if (!useCurrentDirectory && fs.existsSync(targetPath)) {
-      console.error(chalk.red(`\n❌ Folder ${targetPath} already exists. Delete or use another name.`));
+      console.log();
+      const errorBox = boxen(
+        gradient(['#ff6b6b', '#ee5a24'])(`❌ Folder already exists`) + '\n\n' +
+        chalk.red(`Target path: ${targetPath}`) + '\n\n' +
+        chalk.gray('Please delete the existing folder or use a different name.'),
+        {
+          padding: 1,
+          margin: 1,
+          borderStyle: 'round',
+          borderColor: 'red',
+          backgroundColor: '#1a1a1a',
+          title: '🚨 Error',
+          titleAlignment: 'center'
+        }
+      );
+      console.log(errorBox);
       return;
     }
 
@@ -706,22 +940,75 @@ async function main(projectNameArg?: string) {
       // Enhanced success message
       showSuccessMessage(useCurrentDirectory ? 'current directory' : (filename ?? 'my-app'), targetPath, theme, dependenciesInstalled, framework);
     } catch (err) {
+      // Handle project creation errors with styled error messages
       spinner.fail(chalk.red('Failed to create project.'));
-      console.error(chalk.red('Error details:'), err);
+      console.log();
+      const errorBox = boxen(
+        gradient(['#ff6b6b', '#ee5a24'])(`❌ Failed to create project`) + '\n\n' +
+        chalk.red(err instanceof Error ? err.message : String(err)) + '\n\n' +
+        chalk.gray('Please check your permissions and try again.'),
+        {
+          padding: 1,
+          margin: 1,
+          borderStyle: 'round',
+          borderColor: 'red',
+          backgroundColor: '#1a1a1a',
+          title: '🚨 Error',
+          titleAlignment: 'center'
+        }
+      );
+      console.log(errorBox);
     }
   } catch (err: any) {
     if (err && err.isTtyError) {
-      console.error(chalk.red('❌ Terminal does not support interactive prompts.'));
+      console.log();
+      const errorBox = boxen(
+        gradient(['#ff6b6b', '#ee5a24'])(`❌ Terminal does not support interactive prompts`) + '\n\n' +
+        chalk.gray('Please use a terminal that supports interactive prompts.'),
+        {
+          padding: 1,
+          margin: 1,
+          borderStyle: 'round',
+          borderColor: 'red',
+          backgroundColor: '#1a1a1a',
+          title: '🚨 Error',
+          titleAlignment: 'center'
+        }
+      );
+      console.log(errorBox);
     } else if (err && (err.message?.includes('User force closed') || err.message?.includes('canceled'))) {
-      console.log(chalk.yellow('\n\n👋 Thanks for using Package Installer! Goodbye!'));
-      console.log(chalk.cyanBright('💡 Remember: Always check your dependencies and README for next steps.')); 
-      process.exit(0);
+      gracefulExit();
     } else {
-      console.error(chalk.red('❌ An unexpected error occurred:'), err);
+      console.log();
+      const errorBox = boxen(
+        gradient(['#ff6b6b', '#ee5a24'])(`❌ An unexpected error occurred`) + '\n\n' +
+        chalk.red(err instanceof Error ? err.message : String(err)) + '\n\n' +
+        chalk.gray('Please report this issue if it persists.'),
+        {
+          padding: 1,
+          margin: 1,
+          borderStyle: 'round',
+          borderColor: 'red',
+          backgroundColor: '#1a1a1a',
+          title: '🚨 Error',
+          titleAlignment: 'center'
+        }
+      );
+      console.log(errorBox);
     }
     process.exit(1);
   }
 }
+
+// =============================================================================
+// CLI COMMAND SETUP
+// =============================================================================
+
+/**
+ * Set up the main CLI commands with enhanced styling and help text
+ * Supports both 'pi' and 'package-installer' commands
+ * Provides comprehensive help with examples and features
+ */
 
 // Enhanced CLI commands with better styling
 program
@@ -762,4 +1049,4 @@ ${chalk.cyan('💡 Tips:')}
   ${chalk.yellow('•')} ${chalk.gray('Visit docs for advanced features')}
 `);
 
-program.parse(process.argv); 
+program.parse(process.argv);
