@@ -1,5 +1,5 @@
 {
-  "name": "@cli/package-installer",
+  "name": "package-installer-cli",
   "version": "1.4.9",
   "description": "A cross-platform, interactive CLI to scaffold modern web app templates with framework, language, UI, bundler, and more.",
   "main": "./dist/index.js",
