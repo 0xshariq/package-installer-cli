@@ -8,7 +8,7 @@
  * styling and comprehensive error handling.
  * 
  * @author Sharique Chaudhary
- * @version 1.4.2
+ * @version 1.4.3
  */
 
 // Core Node.js imports
@@ -606,16 +606,38 @@ async function main(projectNameArg?: string) {
     // STEP 2: FRAMEWORK SELECTION
     // =============================================================================
     
-    // Present available frameworks to the user
+    // Present available frameworks to the user with types and descriptions
     const { framework } = await inquirer.prompt([
       {
         name: 'framework',
         type: 'list',
         message: chalk.green('🚀 Choose a framework:'),
-        choices: Object.keys(templateConfig.frameworks).map(fw => ({
-          name: `${capitalize(fw)} ${chalk.gray('(Modern, Fast, Production-ready)')}`,
-          value: fw
-        })),
+        choices: Object.keys(templateConfig.frameworks).map(fw => {
+          const fwConfig = templateConfig.frameworks[fw];
+          const type = fwConfig.type || 'unknown';
+          const description = fwConfig.description || 'Modern, Fast, Production-ready';
+          
+          // Color coding based on framework type
+          let typeColor;
+          switch (type) {
+            case 'frontend':
+              typeColor = chalk.cyan;
+              break;
+            case 'backend':
+              typeColor = chalk.magenta;
+              break;
+            case 'fullstack':
+              typeColor = chalk.green;
+              break;
+            default:
+              typeColor = chalk.gray;
+          }
+          
+          return {
+            name: `${capitalize(fw)} ${typeColor(`[${type.toUpperCase()}]`)} ${chalk.gray(`(${description})`)}`,
+            value: fw
+          };
+        }),
       },
     ]);
     const theme = getFrameworkTheme(framework);

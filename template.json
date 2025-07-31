@@ -1,6 +1,8 @@
 {
   "frameworks": {
     "nextjs": {
+      "type": "fullstack",
+      "description": "Full-stack React framework with server-side rendering",
       "languages": ["javascript", "typescript"],
       "ui": ["shadcn"],
       "options": ["src", "tailwind"],
@@ -14,6 +16,8 @@
       ]
     },
     "reactjs": {
+      "type": "frontend",
+      "description": "Modern React library for building user interfaces",
       "languages": ["javascript", "typescript"],
       "ui": ["shadcn"],
       "options": ["src", "tailwind"],
@@ -25,6 +29,8 @@
       ]
     },
     "vuejs": {
+      "type": "frontend",
+      "description": "Progressive JavaScript framework for building UIs",
       "languages": ["javascript", "typescript"],
       "ui": ["headless-ui"],
       "options": ["tailwind"],
@@ -33,13 +39,9 @@
         "no-headless-no-tailwind-template"
       ]
     },
-    "nestjs":{
-      "languages": ["typescript"],
-      "templates" : [
-        "template"
-      ]
-    },
     "angularjs": {
+      "type": "frontend",
+      "description": "Platform for building mobile and desktop web applications",
       "languages": ["typescript"],
       "ui": ["material-ui"],
       "options": ["tailwind"],
@@ -49,10 +51,12 @@
         "no-material-no-tailwind-template"
       ]
     },
-    "remixjs":{
+    "remixjs": {
+      "type": "frontend",
+      "description": "Full-stack web framework focused on web standards",
       "languages": ["typescript"],
       "ui": ["shadcn"],
-      "options": [ "tailwind"],
+      "options": ["tailwind"],
       "templates": [
         "shadcn-tailwind-template",
         "no-shadcn-no-tailwind-template",
@@ -60,25 +64,41 @@
       ]
     },
     "expressjs": {
+      "type": "backend",
+      "description": "Fast, unopinionated web framework for Node.js",
       "languages": ["javascript", "typescript"],
       "options": ["basic", "advance"]
     },
+    "nestjs": {
+      "type": "backend",
+      "description": "Progressive Node.js framework for building efficient server-side applications",
+      "languages": ["typescript"],
+      "templates": [
+        "template"
+      ]
+    },
     "rust": {
+      "type": "backend",
+      "description": "Systems programming language focused on safety and performance",
       "languages": ["rust"],
       "options": ["basic", "advance"]
     },
     "reactjs+expressjs+shadcn": {
+      "type": "fullstack",
+      "description": "Complete full-stack solution with React frontend, Express backend, and Shadcn UI",
       "languages": ["javascript", "typescript"],
       "ui": ["shadcn"],
-      "templates" : [
+      "templates": [
         "react-basic-express-template",
         "react-advance-express-template"
       ]
     },
     "reactjs+nestjs+shadcn": {
-      "languages": [ "typescript"],
+      "type": "fullstack",
+      "description": "Enterprise-grade full-stack solution with React frontend, NestJS backend, and Shadcn UI",
+      "languages": ["typescript"],
       "ui": ["shadcn"],
-      "templates" : [
+      "templates": [
         "react-nest-shadcn-template"
       ]
     }
