@@ -8,7 +8,7 @@
  * styling and comprehensive error handling.
  * 
  * @author Sharique Chaudhary
- * @version 1.4.4
+ * @version 1.4.5
  */
 
 // Core Node.js imports
@@ -648,14 +648,14 @@ async function main(projectNameArg?: string) {
     // =============================================================================
     
     // Determine if this is a combination template (pre-configured setup)
-    const isCombinationTemplate = fwConfig.templates && fwConfig.templates.length > 0;
+    const isCombinationTemplate = framework.includes('+') && fwConfig.templates && fwConfig.templates.length > 0;
 
     // Initialize templateName variable
     let templateName = '';
 
-    // Handle language selection for non-combination templates
+    // Handle language selection for all templates (including combination templates)
     let language: string | undefined = undefined;
-    if (!isCombinationTemplate && fwConfig.languages && fwConfig.languages.length > 1) {
+    if (fwConfig.languages && fwConfig.languages.length > 1) {
       language = (await inquirer.prompt([
         {
           name: 'language',
@@ -877,7 +877,7 @@ async function main(projectNameArg?: string) {
     console.log(chalk.cyan('\n📋 Project Configuration Summary:'));
     console.log(chalk.gray('═'.repeat(60)));
     console.log(`  ${chalk.bold('Project Name:')} ${chalk.cyan(filename)}`);
-    if (!isCombinationTemplate && language && language !== 'rust') console.log(`  ${chalk.bold('Language:')} ${theme(capitalize(language))}`);
+    if (language && language !== 'rust') console.log(`  ${chalk.bold('Language:')} ${theme(capitalize(language))}`);
     console.log(`  ${chalk.bold('Framework:')} ${theme(capitalize(framework))}`);
     if (!isCombinationTemplate && bundler) console.log(`  ${chalk.bold('Bundler:')} ${chalk.magenta(capitalize(bundler))}`);
     if (!isCombinationTemplate && fwConfig.options && fwConfig.options.includes('src') && framework !== 'angularjs' && framework !== 'nestjs' && !(framework === 'reactjs' && bundler === 'vite'))
@@ -894,8 +894,9 @@ async function main(projectNameArg?: string) {
     // Create the project with proper template directory resolution
     let templateDir = '';
     if (isCombinationTemplate) {
-      // For combination templates, use the framework name as directory
-      templateDir = path.join(templatesRoot, framework, templateName);
+      // For combination templates, convert framework name from '+' to '-' for directory structure
+      const frameworkDir = framework.replace(/\+/g, '-');
+      templateDir = path.join(templatesRoot, frameworkDir, language ?? '', templateName);
     } else if (framework === 'rust') {
       templateDir = path.join(templatesRoot, 'rust', templateName);
     } else if (framework === 'expressjs') {

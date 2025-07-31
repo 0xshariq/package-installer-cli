@@ -89,8 +89,8 @@
       "languages": ["javascript", "typescript"],
       "ui": ["shadcn"],
       "templates": [
-        "react-basic-express-template",
-        "react-advance-express-template"
+        "react-basic-express-shadcn-template",
+        "react-advance-express-shadcn-template"
       ]
     },
     "reactjs+nestjs+shadcn": {
