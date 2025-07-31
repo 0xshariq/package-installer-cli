@@ -463,7 +463,7 @@ function validateProjectName(name: string): string | true {
 function showSuccessMessage(filename: string, targetPath: string, theme: any, dependenciesInstalled: boolean = false, framework?: string) {
   console.log();
 
-  const isCurrentDirectory = filename === 'current directory';
+  const isCurrentDirectory = filename === 'current directory' || filename === '.';
   const projectName = isCurrentDirectory ? path.basename(targetPath) : filename;
   const cdCommand = isCurrentDirectory ? '' : `cd ${filename}\n`;
 
@@ -938,7 +938,7 @@ async function main(projectNameArg?: string) {
       const dependenciesInstalled = installDependencies(targetPath, theme, framework);
 
       // Enhanced success message
-      showSuccessMessage(useCurrentDirectory ? 'current directory' : (filename ?? 'my-app'), targetPath, theme, dependenciesInstalled, framework);
+      showSuccessMessage(filename ?? 'my-app', targetPath, theme, dependenciesInstalled, framework);
     } catch (err) {
       // Handle project creation errors with styled error messages
       spinner.fail(chalk.red('Failed to create project.'));
