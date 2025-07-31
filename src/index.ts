@@ -8,7 +8,7 @@
  * styling and comprehensive error handling.
  * 
  * @author Sharique Chaudhary
- * @version 1.4.3
+ * @version 1.4.4
  */
 
 // Core Node.js imports
