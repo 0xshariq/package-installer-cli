@@ -3,3 +3,4 @@ node_modules
 template-output
 .env
 *.zip
+CLI_SUGGESTIONS.md

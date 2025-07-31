@@ -11,7 +11,7 @@ A modern, cross-platform CLI tool to scaffold web applications with beautiful st
 
 ## ✨ Features
 
-- 🚀 **8+ Frameworks** - Next.js, React, Vue, Angular, Express, Rust, **Remix**, **NestJS**
+- 🚀 **10+ Frameworks** - Next.js, React, Vue, Angular, Express, Rust, **Remix**, **NestJS**
 - 💻 **Language Support** - JavaScript & TypeScript
 - 🧩 **UI Libraries** - Shadcn/ui, Material-UI, Headless UI
 - 📦 **Bundler Options** - Vite and more
@@ -24,6 +24,9 @@ A modern, cross-platform CLI tool to scaffold web applications with beautiful st
 - 🎯 **Combination Templates** - Pre-configured full-stack setups
 - 🦀 **Rust Support** - Cargo commands and project structure
 - 🔄 **Auto Dependency Installation** - Smart package manager detection
+- 🏷️ **Framework Types** - Frontend, Backend, Fullstack indicators
+- 🔗 **CORS Integration** - Pre-configured for full-stack templates
+- 📊 **Enhanced Project Summary** - Detailed configuration overview
 
 ## 🚀 Quick Start
 
@@ -31,13 +34,13 @@ A modern, cross-platform CLI tool to scaffold web applications with beautiful st
 
 ```bash
 # Using npm
-npm i -g pi
+npm i -g package-installer-cli
 
 # Using pnpm
-pnpm i -g pi
+pnpm i -g package-installer-cli
 
 # Using yarn
-yarn global add pi
+yarn global add package-installer-cli
 ```
 
 ### Usage
@@ -59,63 +62,65 @@ pi .
 ## 📋 Available Frameworks & Templates
 
 ### Frontend Frameworks
-- **Next.js** (JavaScript/TypeScript)
+- **Next.js** [FULLSTACK] (JavaScript/TypeScript)
   - With/without src directory
   - With/without Tailwind CSS
   - With/without Shadcn/ui
   
-- **React.js** with Vite (JavaScript/TypeScript)
+- **React.js** [FRONTEND] with Vite (JavaScript/TypeScript)
   - With/without Shadcn/ui
   - With/without Tailwind CSS
   
-- **Vue.js** (JavaScript/TypeScript)
+- **Vue.js** [FRONTEND] (JavaScript/TypeScript)
   - With/without Tailwind CSS
   - With/without Headless UI
   
-- **Angular** (TypeScript)
+- **Angular** [FRONTEND] (TypeScript)
   - With/without Tailwind CSS
   - With/without Material-UI
 
 ### Modern Full-Stack Frameworks
-- **Remix** (TypeScript) 🆕
+- **Remix** [FRONTEND] (TypeScript)
   - With/without Shadcn/ui
   - With/without Tailwind CSS
   - Full-stack React framework
 
-- **NestJS** (TypeScript) 🆕
+- **NestJS** [BACKEND] (TypeScript)
   - Enterprise-ready backend framework
   - Simplified setup with single template
   - Built-in TypeScript support
 
 ### Backend Frameworks
-- **Express.js** (JavaScript/TypeScript)
+- **Express.js** [BACKEND] (JavaScript/TypeScript)
   - Basic template
   - Advanced template (with MongoDB, JWT, testing)
 
 ### Systems Programming
-- **Rust**
+- **Rust** [BACKEND]
   - Basic template
   - Advanced template
 
 ### Combination Templates 🆕
-- **React + Express + Shadcn/ui**
+- **React + Express + Shadcn/ui** [FULLSTACK]
   - Pre-configured full-stack setup
   - React frontend with Express backend
   - Shadcn/ui components included
-- **React + NestJS + Shadcn/ui**
+  - CORS pre-configured for frontend-backend communication
+- **React + NestJS + Shadcn/ui** [FULLSTACK]
   - Modern full-stack with NestJS backend
   - TypeScript throughout
   - Enterprise-ready architecture
+  - CORS pre-configured for frontend-backend communication
 
 ## 🎯 Enhanced Workflow
 
 1. **Run command** - `pi` or `package-installer`
 2. **Project name** - Enter name or use "." for current directory
-3. **Choose framework** - Select from 8+ modern frameworks
-4. **Select language** - JavaScript or TypeScript
-5. **Configure options** - UI library, bundler, styling
+3. **Choose framework** - Select from 10+ modern frameworks with type indicators
+4. **Select language** - JavaScript or TypeScript (for combination templates too)
+5. **Configure options** - UI library, bundler, styling (skipped for combination templates)
 6. **Review summary** - Beautiful configuration overview
-7. **Project created!** 🎉 - Auto-install dependencies
+7. **Project created!** 🎉 - Auto-install dependencies (frontend + backend for combination templates)
 
 ## 🎨 Enhanced Styling
 
@@ -127,6 +132,7 @@ The CLI features a modern, beautiful interface with:
 - **Progress Indicators** - Animated spinners
 - **Success Messages** - Detailed next steps
 - **Error Handling** - Graceful error messages
+- **Framework Type Indicators** - [FRONTEND], [BACKEND], [FULLSTACK]
 
 ## 📸 Examples & Usage
 
@@ -150,8 +156,8 @@ $ pi
 └─────────────────────────────────────────────────────────┘
 
 ┌─────────────────────────────────────────────────────────┐
-│ 📦 Version: 1.3.5                                      │
-│ 🌍 Framework Support: 8+ frameworks                     │
+│ 📦 Version: 1.4.8                                      │
+│ 🌍 Framework Support: 10+ frameworks                    │
 │ ⚡ Quick Start: pi <project-name>                       │
 └─────────────────────────────────────────────────────────┘
 ```
@@ -162,24 +168,28 @@ $ pi
 📁 Enter the project folder name: my-awesome-app
 
 🚀 Choose a framework:
-❯ Next.js (Modern, Fast, Production-ready)
-  React.js (Modern, Fast, Production-ready)
-  Vue.js (Modern, Fast, Production-ready)
-  Angular.js (Modern, Fast, Production-ready)
-  Express.js (Modern, Fast, Production-ready)
-  Remix.js (Modern, Fast, Production-ready)
-  NestJS (Modern, Fast, Production-ready)
-  Rust (Modern, Fast, Production-ready)
-  reactjs+expressjs+shadcn (Modern, Fast, Production-ready)
-  reactjs+nestjs+shadcn (Modern, Fast, Production-ready)
+❯ Next.js [FULLSTACK] (Modern, Fast, Production-ready)
+  React.js [FRONTEND] (Modern, Fast, Production-ready)
+  Vue.js [FRONTEND] (Modern, Fast, Production-ready)
+  Angular.js [FRONTEND] (Modern, Fast, Production-ready)
+  Express.js [BACKEND] (Modern, Fast, Production-ready)
+  Remix.js [FRONTEND] (Modern, Fast, Production-ready)
+  NestJS [BACKEND] (Modern, Fast, Production-ready)
+  Rust [BACKEND] (Modern, Fast, Production-ready)
+  reactjs+expressjs+shadcn [FULLSTACK] (Complete full-stack solution with React frontend, Express backend, and Shadcn UI)
+  reactjs+nestjs+shadcn [FULLSTACK] (Enterprise-grade full-stack solution with React frontend, NestJS backend, and Shadcn UI)
 ```
 
 ### Combination Template Example
 
 ```bash
+💻 Choose a language:
+❯ TypeScript (Type-safe, Modern syntax)
+  JavaScript (Type-safe, Modern syntax)
+
 📋 Choose your template:
-❯ react-basic-express-template (Pre-configured setup)
-  react-advance-express-template (Pre-configured setup)
+❯ react-basic-express-shadcn-template (Pre-configured setup)
+  react-advance-express-shadcn-template (Pre-configured setup)
 
 📋 Template includes:
   ✅ Shadcn/ui components
@@ -194,16 +204,14 @@ $ pi
 📋 Project Configuration Summary:
 ════════════════════════════════════════════════════════════
   Project Name: my-awesome-app
+  Framework: reactjs+expressjs+shadcn
   Language: TypeScript
-  Framework: Next.js
-  Src directory: ✓ Yes
-  Tailwind CSS: ✓ Yes
-  UI Library: Shadcn
-  Template: src-shadcn-tailwind-template
+  Template: react-basic-express-shadcn-template
+  Type: Combination Template (Pre-configured)
 ════════════════════════════════════════════════════════════
 ```
 
-### Success Message Example
+### Success Message Example (Combination Template)
 
 ```bash
 ┌─────────────────────────────────────────────────────────┐
@@ -213,28 +221,14 @@ $ pi
 │                                                         │
 │  📁 Location: /path/to/my-awesome-app                  │
 │  🚀 Next steps:                                        │
-│    cd my-awesome-app                                   │
-│    npm run dev    # or pnpm dev                        │
-│    npm run build  # or pnpm build                      │
-│                                                         │
-│  💡 Check the README.md file for detailed instructions! │
-└─────────────────────────────────────────────────────────┘
-
-┌─────────────────────────────────────────────────────────┐
-│                     🚀 Ready to Code                   │
-│                                                         │
-│  ⚡ Quick Commands:                                     │
-│    cd my-awesome-app                                   │
+│    # Frontend (in project root)                        │
 │    npm run dev                                         │
-└─────────────────────────────────────────────────────────┘
-
-┌─────────────────────────────────────────────────────────┐
-│                         💡 Tips                        │
 │                                                         │
-│  💡 Pro Tips:                                          │
-│  • Use Ctrl+C to stop the development server           │
-│  • Check package.json for available scripts            │
-│  • Visit the framework docs for advanced features      │
+│    # Backend (in backend folder)                       │
+│    cd backend && npm run dev                           │
+│                                                         │
+│  💡 Pro Tip: Run frontend and backend in separate     │
+│     terminals for better development experience!        │
 └─────────────────────────────────────────────────────────┘
 ```
 
@@ -296,9 +290,9 @@ package-installer-cli/
 │   ├── remixjs/          # 🆕 Remix templates
 │   ├── nestjs/           # 🆕 NestJS templates
 │   ├── rust/             # 🦀 Rust templates
-│   ├── reactjs+expressjs+shadcn/  # 🆕 Combination templates
-│   └── reactjs+nestjs+shadcn/     # 🆕 Combination templates
-├── template.json         # Framework configurations
+│   ├── reactjs-expressjs-shadcn/  # 🆕 Combination templates
+│   └── reactjs-nestjs-shadcn/     # 🆕 Combination templates
+├── template.json         # Framework configurations with types
 ├── dist/                 # Compiled JavaScript
 └── package.json
 ```
@@ -312,6 +306,8 @@ package-installer-cli/
 - **Auto Dependency Installation**: Tries pnpm first, then npm
 - **Rust Support**: Cargo commands and project structure
 - **Combination Templates**: Pre-configured full-stack setups
+- **Framework Types**: Frontend, Backend, Fullstack indicators
+- **CORS Integration**: Pre-configured for full-stack communication
 
 ## 🎯 Command Examples
 
@@ -371,6 +367,8 @@ pi my-fullstack-app  # Will show pre-configured options
 - **Full-stack ready** - frontend + backend
 - **UI components included** - Shadcn/ui
 - **TypeScript throughout** - for type safety
+- **CORS pre-configured** - for frontend-backend communication
+- **Dual dependency installation** - both frontend and backend
 
 ## 🚀 Advanced Usage
 
@@ -439,7 +437,7 @@ We welcome contributions! Here's how to get started:
 
 ### Adding New Frameworks
 
-1. **Update `template.json`** with framework configuration
+1. **Update `template.json`** with framework configuration and type
 2. **Create template directory** in `templates/`
 3. **Add framework theme** in `getFrameworkTheme()`
 4. **Update documentation** in README.md
