@@ -702,7 +702,7 @@ async function main(projectNameArg?: string) {
 
     // 4. UI Libraries (if framework supports) - FOURTH QUESTION
     let ui: string | null = null;
-    if (fwConfig.ui && fwConfig.ui.length > 0 && framework !== 'nestjs') {
+    if (!isCombinationTemplate && fwConfig.ui && fwConfig.ui.length > 0 && framework !== 'nestjs') {
       const wantsUI = (await inquirer.prompt([
         {
           name: 'wantsUI',
@@ -767,7 +767,7 @@ async function main(projectNameArg?: string) {
         // Template name will be composed below
       } else {
         // Ask for bundler if available and NOT nestjs
-        if (fwConfig.bundlers && fwConfig.bundlers.length > 0 && framework !== 'nestjs') {
+        if (!isCombinationTemplate && fwConfig.bundlers && fwConfig.bundlers.length > 0 && framework !== 'nestjs') {
           bundler = (await inquirer.prompt([
             {
               name: 'bundler',
@@ -782,7 +782,7 @@ async function main(projectNameArg?: string) {
         }
 
         // Ask for src directory if available and NOT angularjs and NOT reactjs with vite and NOT nestjs
-        if (fwConfig.options && fwConfig.options.includes('src') && framework !== 'angularjs' && framework !== 'nestjs' && !(framework === 'reactjs' && bundler === 'vite')) {
+        if (!isCombinationTemplate && fwConfig.options && fwConfig.options.includes('src') && framework !== 'angularjs' && framework !== 'nestjs' && !(framework === 'reactjs' && bundler === 'vite')) {
           src = (await inquirer.prompt([
             {
               name: 'src',
@@ -794,7 +794,7 @@ async function main(projectNameArg?: string) {
         }
 
         // Ask for Tailwind CSS if available and NOT nestjs
-        if (fwConfig.options && fwConfig.options.includes('tailwind') && framework !== 'nestjs') {
+        if (!isCombinationTemplate && fwConfig.options && fwConfig.options.includes('tailwind') && framework !== 'nestjs') {
           tailwind = (await inquirer.prompt([
             {
               name: 'tailwind',
@@ -849,11 +849,11 @@ async function main(projectNameArg?: string) {
 
         // Compose template name for other frameworks
         const parts = [];
-        if (fwConfig.options && fwConfig.options.includes('src') && framework !== 'angularjs' && framework !== 'nestjs' && !(framework === 'reactjs' && bundler === 'vite')) {
+        if (!isCombinationTemplate && fwConfig.options && fwConfig.options.includes('src') && framework !== 'angularjs' && framework !== 'nestjs' && !(framework === 'reactjs' && bundler === 'vite')) {
           parts.push(src ? 'src' : 'no-src');
         }
         if (ui) parts.push(ui);
-        if (fwConfig.options && fwConfig.options.includes('tailwind') && framework !== 'nestjs') {
+        if (!isCombinationTemplate && fwConfig.options && fwConfig.options.includes('tailwind') && framework !== 'nestjs') {
           parts.push(tailwind ? 'tailwind' : 'no-tailwind');
         }
         templateName = parts.length > 0 ? parts.join('-') + '-template' : '';
