@@ -335,6 +335,7 @@ function getTemplateDir(
 /**
  * Installs project dependencies automatically
  * Handles both Node.js (npm/pnpm) and Rust (cargo) projects
+ * For combination templates, installs dependencies in both frontend and backend folders
  * Shows progress with styled spinners and appropriate messages
  * 
  * @param targetPath - The project directory path
@@ -343,7 +344,7 @@ function getTemplateDir(
  * @returns true if installation succeeded, false otherwise
  * 
  * @example
- * const success = installDependencies('/my-project', chalk.cyan, 'rust');
+ * const success = installDependencies('/my-project', chalk.cyan, 'reactjs+expressjs+shadcn');
  * if (success) console.log('Dependencies installed successfully!');
  */
 function installDependencies(targetPath: string, theme: any, framework?: string): boolean {
@@ -371,38 +372,95 @@ function installDependencies(targetPath: string, theme: any, framework?: string)
       return false;
     }
   } else {
-    // Handle Node.js projects
-    const packageJsonPath = path.join(targetPath, 'package.json');
-    if (!fs.existsSync(packageJsonPath)) {
-      console.log(chalk.yellow('⚠️  No package.json found, skipping dependency installation.'));
-      return false;
-    }
+    // Check if it's a combination template (has both frontend and backend)
+    const isCombinationTemplate = framework && framework.includes('+');
+    const backendPath = path.join(targetPath, 'backend');
+    const frontendPath = targetPath; // Frontend is in the root directory
 
-    console.log();
-    const spinner = createSpinner('📦 Installing dependencies...', theme);
-    spinner.start();
+    if (isCombinationTemplate && fs.existsSync(backendPath)) {
+      // Handle combination templates with both frontend and backend
+      console.log();
+      const spinner = createSpinner('📦 Installing dependencies for full-stack project...', theme);
+      spinner.start();
 
-    try {
-      // Try pnpm first, then npm
+      let allSucceeded = true;
+
       try {
-        execSync('pnpm install', { cwd: targetPath, stdio: 'pipe' });
-        spinner.succeed(theme('✨ Dependencies installed with pnpm!'));
-        return true;
-      } catch {
+        // Install frontend dependencies
         try {
-          execSync('npm install', { cwd: targetPath, stdio: 'pipe' });
-          spinner.succeed(theme('✨ Dependencies installed with npm!'));
-          return true;
+          execSync('pnpm install', { cwd: frontendPath, stdio: 'pipe' });
+          console.log(chalk.green('✅ Frontend dependencies installed with pnpm'));
         } catch {
-          spinner.warn(chalk.yellow('⚠️  Could not install dependencies automatically.'));
-          console.log(chalk.gray('💡 Please run "npm install" or "pnpm install" in your project directory.'));
+          try {
+            execSync('npm install', { cwd: frontendPath, stdio: 'pipe' });
+            console.log(chalk.green('✅ Frontend dependencies installed with npm'));
+          } catch {
+            console.log(chalk.yellow('⚠️  Could not install frontend dependencies automatically.'));
+            allSucceeded = false;
+          }
+        }
+
+        // Install backend dependencies
+        try {
+          execSync('pnpm install', { cwd: backendPath, stdio: 'pipe' });
+          console.log(chalk.green('✅ Backend dependencies installed with pnpm'));
+        } catch {
+          try {
+            execSync('npm install', { cwd: backendPath, stdio: 'pipe' });
+            console.log(chalk.green('✅ Backend dependencies installed with npm'));
+          } catch {
+            console.log(chalk.yellow('⚠️  Could not install backend dependencies automatically.'));
+            allSucceeded = false;
+          }
+        }
+
+        if (allSucceeded) {
+          spinner.succeed(theme('✨ Full-stack project dependencies installed successfully!'));
+          return true;
+        } else {
+          spinner.warn(chalk.yellow('⚠️  Some dependencies could not be installed automatically.'));
+          console.log(chalk.gray('💡 Please run "npm install" or "pnpm install" in both frontend and backend directories.'));
           return false;
         }
+      } catch (error) {
+        spinner.fail(chalk.red('Failed to install dependencies.'));
+        console.log(chalk.gray('💡 Please run "npm install" or "pnpm install" manually in both directories.'));
+        return false;
       }
-    } catch (error) {
-      spinner.fail(chalk.red('Failed to install dependencies.'));
-      console.log(chalk.gray('💡 Please run "npm install" or "pnpm install" manually.'));
-      return false;
+    } else {
+      // Handle regular Node.js projects
+      const packageJsonPath = path.join(targetPath, 'package.json');
+      if (!fs.existsSync(packageJsonPath)) {
+        console.log(chalk.yellow('⚠️  No package.json found, skipping dependency installation.'));
+        return false;
+      }
+
+      console.log();
+      const spinner = createSpinner('📦 Installing dependencies...', theme);
+      spinner.start();
+
+      try {
+        // Try pnpm first, then npm
+        try {
+          execSync('pnpm install', { cwd: targetPath, stdio: 'pipe' });
+          spinner.succeed(theme('✨ Dependencies installed with pnpm!'));
+          return true;
+        } catch {
+          try {
+            execSync('npm install', { cwd: targetPath, stdio: 'pipe' });
+            spinner.succeed(theme('✨ Dependencies installed with npm!'));
+            return true;
+          } catch {
+            spinner.warn(chalk.yellow('⚠️  Could not install dependencies automatically.'));
+            console.log(chalk.gray('💡 Please run "npm install" or "pnpm install" in your project directory.'));
+            return false;
+          }
+        }
+      } catch (error) {
+        spinner.fail(chalk.red('Failed to install dependencies.'));
+        console.log(chalk.gray('💡 Please run "npm install" or "pnpm install" manually.'));
+        return false;
+      }
     }
   }
 }
@@ -467,16 +525,23 @@ function showSuccessMessage(filename: string, targetPath: string, theme: any, de
   const projectName = isCurrentDirectory ? path.basename(targetPath) : filename;
   const cdCommand = isCurrentDirectory ? '' : `cd ${filename}\n`;
 
-      // Determine project type for appropriate command display
-    const isRustProject = framework === 'rust' || fs.existsSync(path.join(targetPath, 'Cargo.toml'));
-    
-    // Set appropriate commands based on project type (Rust vs Node.js)
-    let devCommand, buildCommand, installCommand;
+  // Determine project type for appropriate command display
+  const isRustProject = framework === 'rust' || fs.existsSync(path.join(targetPath, 'Cargo.toml'));
+  const isCombinationTemplate = framework && framework.includes('+');
+  const hasBackend = isCombinationTemplate && fs.existsSync(path.join(targetPath, 'backend'));
+  
+  // Set appropriate commands based on project type
+  let devCommand, buildCommand, installCommand;
 
   if (isRustProject) {
     devCommand = `  cargo run`;
     buildCommand = `  cargo build`;
     installCommand = dependenciesInstalled ? '' : `  cargo build\n`; // Rust doesn't have separate install, build fetches dependencies
+  } else if (isCombinationTemplate && hasBackend) {
+    // Combination templates with frontend and backend
+    devCommand = `  # Frontend (in project root)\n  npm run dev\n\n  # Backend (in backend folder)\n  cd backend && npm run dev`;
+    buildCommand = `  # Frontend\n  npm run build\n\n  # Backend\n  cd backend && npm run build`;
+    installCommand = dependenciesInstalled ? '' : `  # Install frontend dependencies\n  npm install\n\n  # Install backend dependencies\n  cd backend && npm install\n`;
   } else {
     devCommand = `  npm run dev    # or pnpm dev`;
     buildCommand = `  npm run build  # or pnpm build`;
@@ -510,7 +575,7 @@ function showSuccessMessage(filename: string, targetPath: string, theme: any, de
     chalk.white(`${chalk.bold('⚡ Quick Commands:')}\n`) +
     chalk.gray(cdCommand) +
     chalk.gray(installCommand) +
-    chalk.gray(isRustProject ? `  cargo run` : `  npm run dev`),
+    chalk.gray(isRustProject ? `  cargo run` : isCombinationTemplate && hasBackend ? `  # Start frontend\n  npm run dev\n\n  # Start backend\n  cd backend && npm run dev` : `  npm run dev`),
     {
       padding: 1,
       margin: { top: 1, bottom: 1 },
@@ -529,6 +594,7 @@ function showSuccessMessage(filename: string, targetPath: string, theme: any, de
     chalk.white(`${chalk.bold('💡 Pro Tips:')}\n`) +
     chalk.gray('• Use ') + chalk.cyan('Ctrl+C') + chalk.gray(' to stop the development server\n') +
     chalk.gray('• Check ') + chalk.cyan('package.json') + chalk.gray(' for available scripts\n') +
+    (isCombinationTemplate && hasBackend ? chalk.gray('• Run frontend and backend in separate terminals for better development experience\n') : '') +
     chalk.gray('• Visit the framework docs for advanced features'),
     {
       padding: 1,
