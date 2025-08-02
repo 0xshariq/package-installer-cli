@@ -40,66 +40,83 @@ npm i -g package-installer-cli
 pnpm i -g package-installer-cli
 
 # Using yarn
-yarn global add package-installer-cli
-```
 
-### Usage
+The Ultimate Tool for Creating Modern Web Applications
+
+## ✨ Features
+
+- Interactive CLI with beautiful UI
+- Argument-based project name (supports `pi my-app` or `pi .` for current directory)
+- Framework, language, and UI library selection
+- **Dynamic database & ORM selection** (ORMs shown are specific to the selected database)
+- Automatic dependency installation (`pnpm` or `npm`)
+- Cross-platform path handling
+- Graceful exit and error messaging
+- Combination templates for full-stack setups
+
+## 🆕 New Feature: Database-Specific ORM Selection
+
+When creating a Next.js project (or other supported frameworks), the CLI will:
+1. Prompt for a database (e.g., PostgreSQL, MySQL, MongoDB)
+2. Show only the ORMs that work with the selected database (as defined in `template.json`)
+
+This ensures you only see relevant ORM options, making setup faster and error-free.
+
+## �️ Database Integration (Next.js Only)
+
+When you scaffold a Next.js project, you can select a database (PostgreSQL, MySQL, MongoDB, etc.) and then choose an ORM that is compatible with your selection. The CLI will automatically set up the project structure and configuration files for your chosen database and ORM, making it easy to start building data-driven applications.
+
+**Example:**
 
 ```bash
-# Quick command
-pi
-
-# Full command name
-package-installer
-
-# With project name
-pi my-awesome-app
-
-# Use current directory name
-pi .
+$ pi my-app
+🚀 Choose a framework: Next.js
+🗄️ Choose a database: PostgreSQL
+🔧 Choose an ORM: Prisma
 ```
 
-## 📋 Available Frameworks & Templates
+The generated project will include all necessary dependencies and configuration for your selected database and ORM.
 
-### Frontend Frameworks
-- **Next.js** [FULLSTACK] (JavaScript/TypeScript)
-  - With/without src directory
-  - With/without Tailwind CSS
-  - With/without Shadcn/ui
-  
-- **React.js** [FRONTEND] with Vite (JavaScript/TypeScript)
-  - With/without Shadcn/ui
-  - With/without Tailwind CSS
-  
-- **Vue.js** [FRONTEND] (JavaScript/TypeScript)
-  - With/without Tailwind CSS
-  - With/without Headless UI
-  
-- **Angular** [FRONTEND] (TypeScript)
-  - With/without Tailwind CSS
-  - With/without Material-UI
+> **Note:** Database integration is currently available only for Next.js projects. For combination templates (full-stack setups), database support will be added soon!
 
-### Modern Full-Stack Frameworks
-- **Remix** [FRONTEND] (TypeScript)
-  - With/without Shadcn/ui
-  - With/without Tailwind CSS
-  - Full-stack React framework
+## �📋 Example Usage
 
-- **NestJS** [BACKEND] (TypeScript)
-  - Enterprise-ready backend framework
-  - Simplified setup with single template
-  - Built-in TypeScript support
+```bash
+$ pi my-app
+🚀 Choose a framework: Next.js
+💻 Choose a language: TypeScript
+🧩 Do you want to add a UI library? Yes
+✨ Choose a UI library: Shadcn
+📦 Choose a bundler: Vite (only for reactjs only)
+📂 Do you want a src directory? Yes
+🎨 Do you want to use Tailwind CSS? Yes
+🗄️ Choose a database: PostgreSQL
+🔧 Choose an ORM: Prisma
+```
 
-### Backend Frameworks
-- **Express.js** [BACKEND] (JavaScript/TypeScript)
-  - Basic template
-  - Advanced template (with MongoDB, JWT, testing)
+## 📦 Installation
 
-### Systems Programming
-- **Rust** [BACKEND]
-  - Basic template
-  - Advanced template
+```bash
+npm install -g package-installer-cli
+```
 
+## 🛠️ Usage
+
+```bash
+pi my-app
+# or
+package-installer my-app
+```
+
+## 💡 Tips
+
+- Use `pi .` to scaffold in the current directory
+- Check the generated `README.md` for next steps
+- Visit framework docs for advanced features
+
+## 📄 License
+
+MIT
 ### Combination Templates 🆕
 - **React + Express + Shadcn/ui** [FULLSTACK]
   - Pre-configured full-stack setup
