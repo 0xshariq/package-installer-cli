@@ -8,7 +8,7 @@
  * styling and comprehensive error handling.
  * 
  * @author Sharique Chaudhary
- * @version 1.5.0
+ * @version 1.5.2
  */
 
 // Core Node.js imports
@@ -1188,10 +1188,22 @@ ${chalk.cyan('📦 Examples:')}
   ${chalk.gray('$')} package-installer my-app     ${chalk.white('Full command name')}
 
 ${chalk.cyan('🎯 Features:')}
-  ${chalk.green('•')} ${chalk.white('8+ frameworks supported')}
-  ${chalk.green('•')} ${chalk.white('Beautiful UI components')}
-  ${chalk.green('•')} ${chalk.white('TypeScript & JavaScript')}
-  ${chalk.green('•')} ${chalk.white('Auto-dependency installation')}
+
+${chalk.cyan('🎯 Features:')}
+  ${chalk.green('•')} ${chalk.white('10+ frameworks supported')}
+  ${chalk.green('•')} ${chalk.white('Beautiful UI components (Shadcn, Material-UI, Headless UI)')}
+  ${chalk.green('•')} ${chalk.white('TypeScript & JavaScript & Rust')}
+  ${chalk.green('•')} ${chalk.white('Auto-dependency installation (pnpm, npm, cargo)')}
+  ${chalk.green('•')} ${chalk.white('Database & ORM selection for Next.js projects')}
+  ${chalk.green('•')} ${chalk.white('Combination templates (full-stack setups)')}
+  ${chalk.green('•')} ${chalk.white('Cross-platform support (Windows, macOS, Linux, WSL)')}
+  ${chalk.green('•')} ${chalk.white('Graceful exit and error messaging')}
+  ${chalk.green('•')} ${chalk.white('Smart project name handling (use "." for current directory)')}
+  ${chalk.green('•')} ${chalk.white('Enhanced project summary and styled CLI')}
+
+${chalk.cyan('🗄️ Database Integration:')}
+  ${chalk.white('• Next.js projects: Select database (PostgreSQL, MySQL, MongoDB, etc.) and compatible ORM (Prisma, TypeORM, Mongoose, etc.)')}
+  ${chalk.white('• Combination templates: Database support coming soon!')}
 
 ${chalk.cyan('💡 Tips:')}
   ${chalk.yellow('•')} ${chalk.gray('Use interactive mode for full customization')}
