@@ -3,30 +3,21 @@
     "nextjs": {
       "type": "fullstack",
       "description": "Full-stack React framework with server-side rendering",
-      "languages": [
-        "javascript",
-        "typescript"
-      ],
-      "databases": [
-        "supabase",
-        "mysql",
-        "mongodb",
-        "neondb"
-      ],
-      "orms": [
-        "prisma",
-        "typeorm",
-        "drizzle",
-        "mongoose",
-        "typegoose"
-      ],
-      "ui": [
-        "shadcn"
-      ],
-      "options": [
-        "src",
-        "tailwind"
-      ],
+      "languages": ["javascript", "typescript"],
+      "databases": {
+        "mongodb": {
+          "orms": ["mongoose", "typegoose"]
+        },
+
+        "supabase": {
+          "orms": ["prisma", "drizzle", "typeorm"]
+        },
+        "neondb": {
+          "orms": ["prisma", "drizzle", "typeorm"]
+        }
+      },
+      "ui": ["shadcn"],
+      "options": ["src", "tailwind"],
       "templates": [
         "no-src-no-tailwind-template",
         "no-src-shadcn-tailwind-template",
@@ -39,20 +30,10 @@
     "reactjs": {
       "type": "frontend",
       "description": "Modern React library for building user interfaces",
-      "languages": [
-        "javascript",
-        "typescript"
-      ],
-      "ui": [
-        "shadcn"
-      ],
-      "options": [
-        "src",
-        "tailwind"
-      ],
-      "bundlers": [
-        "vite"
-      ],
+      "languages": ["javascript", "typescript"],
+      "ui": ["shadcn"],
+      "options": ["src", "tailwind"],
+      "bundlers": ["vite"],
       "templates": [
         "no-shadcn-no-tailwind-template",
         "no-shadcn-tailwind-template",
@@ -62,16 +43,9 @@
     "vuejs": {
       "type": "frontend",
       "description": "Progressive JavaScript framework for building UIs",
-      "languages": [
-        "javascript",
-        "typescript"
-      ],
-      "ui": [
-        "headless-ui"
-      ],
-      "options": [
-        "tailwind"
-      ],
+      "languages": ["javascript", "typescript"],
+      "ui": ["headless-ui"],
+      "options": ["tailwind"],
       "templates": [
         "headless-tailwind-template",
         "no-headless-no-tailwind-template"
@@ -80,15 +54,9 @@
     "angularjs": {
       "type": "frontend",
       "description": "Platform for building mobile and desktop web applications",
-      "languages": [
-        "typescript"
-      ],
-      "ui": [
-        "material-ui"
-      ],
-      "options": [
-        "tailwind"
-      ],
+      "languages": ["typescript"],
+      "ui": ["material-ui"],
+      "options": ["tailwind"],
       "templates": [
         "material-ui-no-tailwind-template",
         "material-ui-tailwind-template",
@@ -98,15 +66,9 @@
     "remixjs": {
       "type": "frontend",
       "description": "Full-stack web framework focused on web standards",
-      "languages": [
-        "typescript"
-      ],
-      "ui": [
-        "shadcn"
-      ],
-      "options": [
-        "tailwind"
-      ],
+      "languages": ["typescript"],
+      "ui": ["shadcn"],
+      "options": ["tailwind"],
       "templates": [
         "shadcn-tailwind-template",
         "no-shadcn-no-tailwind-template",
@@ -116,59 +78,26 @@
     "expressjs": {
       "type": "backend",
       "description": "Fast, unopinionated web framework for Node.js",
-      "languages": [
-        "javascript",
-        "typescript"
-      ],
-      "options": [
-        "basic",
-        "advance"
-      ]
+      "languages": ["javascript", "typescript"],
+      "options": ["basic", "advance"]
     },
     "nestjs": {
       "type": "backend",
       "description": "Progressive Node.js framework for building efficient server-side applications",
-      "languages": [
-        "typescript"
-      ],
-      "templates": [
-        "template"
-      ]
+      "languages": ["typescript"],
+      "templates": ["template"]
     },
     "rust": {
       "type": "backend",
       "description": "Systems programming language focused on safety and performance",
-      "languages": [
-        "rust"
-      ],
-      "options": [
-        "basic",
-        "advance"
-      ]
+      "languages": ["rust"],
+      "options": ["basic", "advance"]
     },
     "reactjs+expressjs+shadcn": {
       "type": "fullstack",
       "description": "Complete full-stack solution with React frontend, Express backend, and Shadcn UI",
-      "languages": [
-        "javascript",
-        "typescript"
-      ],
-      "databases": [
-        "supabase",
-        "mongodb",
-        "neondb"
-      ],
-      "orms": [
-        "prisma",
-        "typeorm",
-        "drizzle",
-        "mongoose",
-        "typegoose",
-        "nextjs-mongoose"
-      ],
-      "ui": [
-        "shadcn"
-      ],
+      "languages": ["javascript", "typescript"],
+      "ui": ["shadcn"],
       "templates": [
         "react-basic-express-shadcn-template",
         "react-advance-express-shadcn-template"
@@ -177,28 +106,9 @@
     "reactjs+nestjs+shadcn": {
       "type": "fullstack",
       "description": "Enterprise-grade full-stack solution with React frontend, NestJS backend, and Shadcn UI",
-      "languages": [
-        "typescript"
-      ],
-      "databases": [
-        "supabase",
-        "mongodb",
-        "neondb"
-      ],
-      "orms": [
-        "prisma",
-        "typeorm",
-        "drizzle",
-        "mongoose",
-        "typegoose",
-        "nestjs-mongoose"
-      ],
-      "ui": [
-        "shadcn"
-      ],
-      "templates": [
-        "react-nest-shadcn-template"
-      ]
+      "languages": ["typescript"],
+      "ui": ["shadcn"],
+      "templates": ["react-nest-shadcn-template"]
     }
   }
 }
