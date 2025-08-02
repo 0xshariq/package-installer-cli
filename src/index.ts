@@ -719,6 +719,10 @@ async function main(projectNameArg?: string) {
     // Initialize templateName variable
     let templateName = '';
 
+    // Initialize database and ORM variables for Next.js
+    let database: string | undefined = undefined;
+    let orm: string | undefined = undefined;
+
     // Handle language selection for all templates (including combination templates)
     let language: string | undefined = undefined;
     if (fwConfig.languages && fwConfig.languages.length > 1) {
@@ -913,6 +917,51 @@ async function main(projectNameArg?: string) {
         }
         }
 
+        // =============================================================================
+        // STEP 4: DATABASE & ORM SELECTION (FOR NEXTJS)
+        // =============================================================================
+        
+        // Add database and ORM selection for Next.js
+        if (framework === 'nextjs' && !isCombinationTemplate) {
+          // Database selection
+          const { selectedDatabase } = await inquirer.prompt([
+            {
+              name: 'selectedDatabase',
+              type: 'list',
+              message: theme('🗄️ Choose a database:'),
+              choices: [
+                { name: `${chalk.blue('None')} ${chalk.gray('(No database setup)')}`, value: 'none' },
+                { name: `${chalk.green('MongoDB')} ${chalk.gray('(NoSQL, Flexible schema)')}`, value: 'mongodb' },
+                { name: `${chalk.blue('Supabase')} ${chalk.gray('(PostgreSQL, Real-time)')}`, value: 'supabase' },
+                { name: `${chalk.cyan('NeonDB')} ${chalk.gray('(Serverless PostgreSQL)')}`, value: 'neondb' }
+              ],
+            },
+          ]);
+          database = selectedDatabase;
+
+          // ORM selection (only if database is selected)
+          if (database !== 'none') {
+            const { selectedOrm } = await inquirer.prompt([
+              {
+                name: 'selectedOrm',
+                type: 'list',
+                message: theme('🔧 Choose an ORM:'),
+                choices: database === 'mongodb' 
+                  ? [
+                      { name: `${chalk.green('Mongoose')} ${chalk.gray('(MongoDB ODM)')}`, value: 'mongoose' },
+                      { name: `${chalk.blue('Typegoose')} ${chalk.gray('(TypeScript + Mongoose)')}`, value: 'typegoose' }
+                    ]
+                  : [
+                      { name: `${chalk.green('Prisma')} ${chalk.gray('(Type-safe database client)')}`, value: 'prisma' },
+                      { name: `${chalk.blue('Drizzle')} ${chalk.gray('(Lightweight ORM)')}`, value: 'drizzle' },
+                      { name: `${chalk.cyan('TypeORM')} ${chalk.gray('(Traditional ORM)')}`, value: 'typeorm' }
+                    ],
+              },
+            ]);
+            orm = selectedOrm;
+          }
+        }
+
         // Compose template name for other frameworks
         const parts = [];
         if (!isCombinationTemplate && fwConfig.options && fwConfig.options.includes('src') && framework !== 'angularjs' && framework !== 'nestjs' && !(framework === 'reactjs' && bundler === 'vite')) {
@@ -951,6 +1000,10 @@ async function main(projectNameArg?: string) {
     if (!isCombinationTemplate && fwConfig.options && fwConfig.options.includes('tailwind') && framework !== 'nestjs')
       console.log(`  ${chalk.bold('Tailwind CSS:')} ${tailwind ? chalk.green('✓ Yes') : chalk.red('✗ No')}`);
     if (!isCombinationTemplate && ui) console.log(`  ${chalk.bold('UI Library:')} ${chalk.blue(capitalize(ui))}`);
+    if (framework === 'nextjs' && database) {
+      console.log(`  ${chalk.bold('Database:')} ${chalk.cyan(capitalize(database))}`);
+      if (orm) console.log(`  ${chalk.bold('ORM:')} ${chalk.blue(capitalize(orm))}`);
+    }
     console.log(`  ${chalk.bold('Template:')} ${chalk.yellow(templateName)}`);
     if (isCombinationTemplate) {
       console.log(`  ${chalk.bold('Type:')} ${chalk.green('Combination Template (Pre-configured)')}`);
@@ -971,6 +1024,15 @@ async function main(projectNameArg?: string) {
       templateDir = path.join(templatesRoot, 'nestjs', language ?? '', templateName);
     } else if (framework === 'remixjs') {
       templateDir = getTemplateDir(framework, language ?? '', templateName, bundler);
+    } else if (framework === 'nextjs') {
+      // Handle Next.js with database and ORM selection
+      if (database === 'none' || !database) {
+        // Use templates from 'none' folder
+        templateDir = path.join(templatesRoot, 'nextjs', language ?? '', 'none', templateName);
+      } else {
+        // Use templates from specific database/ORM folder
+        templateDir = path.join(templatesRoot, 'nextjs', language ?? '', database, orm ?? '', templateName);
+      }
     } else {
       templateDir = getTemplateDir(framework, language ?? '', templateName, bundler);
     }

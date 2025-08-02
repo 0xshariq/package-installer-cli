@@ -11,7 +11,8 @@
   "dependencies": {
     "react": "19.1.0",
     "react-dom": "19.1.0",
-    "next": "15.4.4"
+    "next": "15.4.4",
+    "@prisma/client": "^6.13.0"
   },
   "devDependencies": {
     "typescript": "^5",
@@ -20,6 +21,7 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "15.4.4",
-    "@eslint/eslintrc": "^3"
+    "@eslint/eslintrc": "^3",
+    "prisma": "^6.13.0"
   }
 }

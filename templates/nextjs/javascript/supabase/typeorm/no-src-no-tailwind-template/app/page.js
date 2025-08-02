@@ -60,7 +60,7 @@ DB_NAME=postgres
             Supabase dependencies are already installed:
           </p>
           <ul style={{ margin: '0', paddingLeft: '1.5rem' }}>
-            <li><code style={{ background: '#e9ecef', padding: '0.2rem 0.4rem', borderRadius: '4px' }}>typeorm: ^0.3.20</code></li>
+            <li><code style={{ background: '#e9ecef', padding: '0.2rem 0.4rem', borderRadius: '4px' }}>typeorm: ^0.3.25</code></li>
             <li><code style={{ background: '#e9ecef', padding: '0.2rem 0.4rem', borderRadius: '4px' }}>pg: ^8.11.0</code></li>
           </ul>
         </div>
