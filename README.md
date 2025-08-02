@@ -1,6 +1,23 @@
 
 # Package Installer CLI (pi)
 
+## 🆕 What's New
+
+- **Database Selection for Next.js:**
+  - When creating a Next.js project, you can now select a database (PostgreSQL, MySQL, MongoDB, etc.) and choose an ORM that matches your selection. The CLI will scaffold your project with all necessary dependencies and configuration for your chosen database and ORM.
+  - Example:
+    ```bash
+    $ pi my-app
+    🚀 Choose a framework: Next.js
+    🗄️ Choose a database: PostgreSQL
+    🔧 Choose an ORM: Prisma
+    ```
+  - The generated project is ready for data-driven development out of the box.
+
+- **Combination Templates: Database Support Coming Soon!**
+  - For full-stack combination templates (e.g., React + Express + Shadcn/ui), database selection is not yet available, but will be added in a future release. Stay tuned for updates!
+
+
 [![npm version](https://img.shields.io/npm/v/package-installer-cli?style=flat-square)](https://www.npmjs.com/package/package-installer-cli)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Node.js Version](https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen.svg)](https://nodejs.org/)
@@ -114,9 +131,6 @@ package-installer my-app
 - Check the generated `README.md` for next steps
 - Visit framework docs for advanced features
 
-## 📄 License
-
-MIT
 ### Combination Templates 🆕
 - **React + Express + Shadcn/ui** [FULLSTACK]
   - Pre-configured full-stack setup
