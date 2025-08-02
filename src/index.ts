@@ -921,9 +921,10 @@ async function main(projectNameArg?: string) {
         // STEP 4: DATABASE & ORM SELECTION (FOR NEXTJS)
         // =============================================================================
         
-        // Add database and ORM selection for Next.js
+        // Add database and ORM selection for Next.js (using template.json structure)
         if (framework === 'nextjs' && !isCombinationTemplate) {
-          // Database selection
+          // Database selection from template.json
+          const dbKeys = Object.keys(fwConfig.databases);
           const { selectedDatabase } = await inquirer.prompt([
             {
               name: 'selectedDatabase',
@@ -931,34 +932,32 @@ async function main(projectNameArg?: string) {
               message: theme('🗄️ Choose a database:'),
               choices: [
                 { name: `${chalk.blue('None')} ${chalk.gray('(No database setup)')}`, value: 'none' },
-                { name: `${chalk.green('MongoDB')} ${chalk.gray('(NoSQL, Flexible schema)')}`, value: 'mongodb' },
-                { name: `${chalk.blue('Supabase')} ${chalk.gray('(PostgreSQL, Real-time)')}`, value: 'supabase' },
-                { name: `${chalk.cyan('NeonDB')} ${chalk.gray('(Serverless PostgreSQL)')}`, value: 'neondb' }
+                ...dbKeys.map((db) => ({
+                  name: `${capitalize(db)}`,
+                  value: db
+                }))
               ],
             },
           ]);
-          database = selectedDatabase;
+          database = selectedDatabase !== 'none' ? selectedDatabase : undefined;
 
-          // ORM selection (only if database is selected)
-          if (database !== 'none') {
-            const { selectedOrm } = await inquirer.prompt([
-              {
-                name: 'selectedOrm',
-                type: 'list',
-                message: theme('🔧 Choose an ORM:'),
-                choices: database === 'mongodb' 
-                  ? [
-                      { name: `${chalk.green('Mongoose')} ${chalk.gray('(MongoDB ODM)')}`, value: 'mongoose' },
-                      { name: `${chalk.blue('Typegoose')} ${chalk.gray('(TypeScript + Mongoose)')}`, value: 'typegoose' }
-                    ]
-                  : [
-                      { name: `${chalk.green('Prisma')} ${chalk.gray('(Type-safe database client)')}`, value: 'prisma' },
-                      { name: `${chalk.blue('Drizzle')} ${chalk.gray('(Lightweight ORM)')}`, value: 'drizzle' },
-                      { name: `${chalk.cyan('TypeORM')} ${chalk.gray('(Traditional ORM)')}`, value: 'typeorm' }
-                    ],
-              },
-            ]);
-            orm = selectedOrm;
+          // ORM selection (only if database is selected and orms exist for that database)
+          if (database && fwConfig.databases[database] && Array.isArray(fwConfig.databases[database].orms)) {
+            const dbOrms = fwConfig.databases[database].orms;
+            if (dbOrms.length > 0) {
+              const { selectedOrm } = await inquirer.prompt([
+                {
+                  name: 'selectedOrm',
+                  type: 'list',
+                  message: theme('🔧 Choose an ORM:'),
+                  choices: dbOrms.map((o: string) => ({
+                    name: `${capitalize(o)}`,
+                    value: o
+                  })),
+                },
+              ]);
+              orm = selectedOrm;
+            }
           }
         }
 

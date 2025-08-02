@@ -1,0 +1,94 @@
+---
+title: "Introducing Package Installer CLI: Modern Web App Scaffolding Made Easy"
+date: "2025-08-02"
+author: "Sharique Chaudhary"
+description: "A deep dive into the features and workflow of the Package Installer CLI, including dynamic database/ORM selection."
+---
+
+import { Highlight } from 'components/Highlight'
+
+# 🚀 Package Installer CLI: Modern Web App Scaffolding Made Easy
+
+Package Installer CLI is a powerful tool designed to help developers scaffold modern web applications with ease. Supporting multiple frameworks, languages, UI libraries, and now **database-specific ORM selection**, it streamlines project setup and dependency management.
+
+## ✨ Key Features
+
+- **Interactive CLI** with beautiful UI and strict prompt order
+- **Argument-based project name** (supports `pi my-app` or `pi .` for current directory)
+- **Framework, language, and UI library selection**
+- **Dynamic database & ORM selection** (ORMs shown are specific to the selected database)
+- **Automatic dependency installation** (`pnpm` or `npm`)
+- **Cross-platform path handling**
+- **Graceful exit and error messaging**
+- **Combination templates** for full-stack setups
+
+## 🆕 What's New: Database-Specific ORM Selection
+
+The CLI now reads from `template.json` to show only the ORMs relevant to the selected database. For example, when creating a Next.js project, you'll first choose a database (e.g., PostgreSQL, MySQL, MongoDB), and then only see the ORMs that work with that database.
+
+<Highlight>
+{`
+if (database && fwConfig.databases[database] && Array.isArray(fwConfig.databases[database].orms)) {
+  const dbOrms = fwConfig.databases[database].orms;
+  if (dbOrms.length > 0) {
+    // Prompt for ORM selection
+  }
+}
+`}
+</Highlight>
+
+## 🛠️ How It Works
+
+1. **Run the CLI:**
+   ```bash
+   pi my-app
+   # or
+   package-installer my-app
+   ```
+2. **Follow the prompts:**
+   - Project name
+   - Framework
+   - Language
+   - UI library (if available)
+   - Bundler, src directory, Tailwind CSS (framework-specific)
+   - Database & ORM (Next.js and others)
+3. **Project is scaffolded and dependencies installed automatically.**
+
+## 📋 Example Workflow
+
+```bash
+$ pi my-app
+🚀 Choose a framework: Next.js
+💻 Choose a language: TypeScript
+🧩 Do you want to add a UI library? Yes
+✨ Choose a UI library: Shadcn
+📦 Choose a bundler: Vite
+📂 Do you want a src directory? Yes
+🎨 Do you want to use Tailwind CSS? Yes
+🗄️ Choose a database: PostgreSQL
+🔧 Choose an ORM: Prisma
+```
+
+## 🎯 Why Use Package Installer CLI?
+
+- **Saves time**: No more manual setup
+- **Ensures best practices**: Pre-configured templates
+- **Flexible**: Supports frontend, backend, and full-stack setups
+- **Extensible**: Easy to add new frameworks, databases, and ORMs via `template.json`
+
+## 📦 Get Started
+
+```bash
+npm install -g package-installer-cli
+pi my-app
+```
+
+## 💡 Pro Tips
+
+- Use `pi .` to scaffold in the current directory
+- Check the generated `README.md` for next steps
+- Visit framework docs for advanced features
+
+---
+
+Ready to build your next modern web app? Try Package Installer CLI today!
