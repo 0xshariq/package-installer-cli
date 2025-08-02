@@ -8,7 +8,7 @@
  * styling and comprehensive error handling.
  * 
  * @author Sharique Chaudhary
- * @version 1.5.2
+ * @version 1.5.3
  */
 
 // Core Node.js imports
@@ -61,25 +61,52 @@ const frameworks = Object.keys(templateConfig.frameworks);
 const templatesRoot = path.join(__dirname, '..', 'templates');
 
 // Handle graceful exit on Ctrl+C and other termination signals
-const gracefulExit = () => {
+function showGoodbyeMessage(force = false) {
   console.log();
-  const goodbyeBox = boxen(
-    gradient(['#667eea', '#764ba2'])(`👋 Thanks for using Package Installer!`) + '\n' +
-    chalk.cyanBright('💡 Remember: Always check your dependencies and README for next steps.'),
-    {
-      padding: 1,
-      margin: 1,
-      borderStyle: 'round',
-      borderColor: 'cyan',
-      backgroundColor: '#1a1a1a',
-      title: '✨ Goodbye',
-      titleAlignment: 'center'
-    }
-  );
-  console.log(goodbyeBox);
+  if (force) {
+    const forceBox = boxen(
+      gradient(['#ff6b6b', '#ee5a24'])(`✋ Terminal closed forcefully!`) + '\n' +
+      chalk.red('Some operations may not have completed.') + '\n\n' +
+      chalk.yellow('💡 Please verify your project files and dependencies.') + '\n' +
+      chalk.cyanBright('You can always rerun the CLI for a fresh setup.'),
+      {
+        padding: 1,
+        margin: 1,
+        borderStyle: 'round',
+        borderColor: 'red',
+        backgroundColor: '#1a1a1a',
+        title: '⚠️ Force Exit',
+        titleAlignment: 'center'
+      }
+    );
+    console.log(forceBox);
+  } else {
+    const goodbyeBox = boxen(
+      gradient(['#667eea', '#764ba2'])(`👋 Thanks for using Package Installer!`) + '\n' +
+      chalk.cyanBright('💡 Remember: Always check your dependencies and README for next steps.') + '\n' +
+      chalk.yellow('⭐ Star the repo if you found it helpful!'),
+      {
+        padding: 1,
+        margin: 1,
+        borderStyle: 'round',
+        borderColor: 'cyan',
+        backgroundColor: '#1a1a1a',
+        title: '✨ Goodbye',
+        titleAlignment: 'center'
+      }
+    );
+    console.log(goodbyeBox);
+  }
   process.exit(0);
-};
+}
 
+const gracefulExit = () => showGoodbyeMessage(false);
+
+process.on('SIGINT', () => showGoodbyeMessage(true));
+process.on('SIGTERM', gracefulExit);
+process.on('SIGQUIT', gracefulExit);
+process.on('SIGUSR1', gracefulExit);
+process.on('SIGUSR2', gracefulExit);
 process.on('SIGINT', gracefulExit);
 process.on('SIGTERM', gracefulExit);
 process.on('SIGQUIT', gracefulExit);
