@@ -93,6 +93,7 @@ export function generateTemplateName(
     ui?: string | null;
     tailwind?: boolean;
     typeChoice?: string;
+    bundler?: string;
   }
 ): string {
   const { src, ui, tailwind, typeChoice } = options;

@@ -1,14 +1,32 @@
-import mongoose, { Document, Schema } from 'mongoose';
+import { eq } from 'drizzle-orm';
+import { db } from '../db/database.js';
+import { users, type User, type NewUser } from '../db/schema.js';
 
-export interface IUser extends Document {
+export interface CreateUserData {
   name: string;
   email: string;
 }
 
-const userSchema = new Schema<IUser>({
-  name: { type: String, required: true },
-  email: { type: String, required: true, unique: true }
-});
+export class UserService {
+  static async createUser(data: CreateUserData): Promise<User> {
+    const [user] = await db.insert(users).values({
+      name: data.name,
+      email: data.email.toLowerCase(),
+    }).returning();
+    return user;
+  }
 
-const User = mongoose.model<IUser>('User', userSchema);
-export default User; 
+  static async findUserById(id: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user;
+  }
+
+  static async findUserByEmail(email: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.email, email.toLowerCase()));
+    return user;
+  }
+
+  static async getAllUsers(): Promise<User[]> {
+    return await db.select().from(users);
+  }
+} 

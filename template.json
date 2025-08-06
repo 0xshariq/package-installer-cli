@@ -18,7 +18,7 @@
             "orms": ["typeorm"]
           },
           "typescript": {
-            "orms": ["drizzle","prisma","typeorm"]
+            "orms": ["drizzle", "prisma", "typeorm"]
           }
         },
         "neondb": {

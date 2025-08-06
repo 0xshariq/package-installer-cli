@@ -1,9 +1,32 @@
-import mongoose from 'mongoose';
+import { EntitySchema } from 'typeorm';
 
-const userSchema = new mongoose.Schema({
-  name: { type: String, required: true },
-  email: { type: String, required: true, unique: true }
-});
-
-const User = mongoose.model('User', userSchema);
-export default User; 
+export const User = new EntitySchema({
+  name: 'User',
+  tableName: 'users',
+  columns: {
+    id: {
+      type: 'uuid',
+      primary: true,
+      generated: 'uuid'
+    },
+    name: {
+      type: 'varchar',
+      length: 100,
+      nullable: false
+    },
+    email: {
+      type: 'varchar',
+      length: 255,
+      nullable: false,
+      unique: true
+    },
+    createdAt: {
+      type: 'timestamp',
+      createDate: true
+    },
+    updatedAt: {
+      type: 'timestamp',
+      updateDate: true
+    }
+  }
+}); 

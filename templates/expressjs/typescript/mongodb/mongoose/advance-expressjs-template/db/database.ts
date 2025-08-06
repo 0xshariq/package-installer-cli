@@ -1,5 +1,4 @@
 import mongoose from 'mongoose';
-import { AppError } from '../src/types/index.js';
 
 const connectDB = async (): Promise<void> => {
   try {

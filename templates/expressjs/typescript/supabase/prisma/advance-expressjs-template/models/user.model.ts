@@ -1,5 +1,62 @@
-import mongoose, { Schema, Document } from 'mongoose';
-import { IUser } from '../types/index.js';
+import { prisma } from '../db/database.js';
+
+export interface CreateUserData {
+  name: string;
+  email: string;
+  isActive?: boolean;
+}
+
+export interface UpdateUserData {
+  name?: string;
+  email?: string;
+  isActive?: boolean;
+}
+
+export class UserService {
+  static async createUser(data: CreateUserData) {
+    return await prisma.user.create({
+      data: {
+        name: data.name,
+        email: data.email.toLowerCase(),
+        isActive: data.isActive ?? true,
+      },
+    });
+  }
+
+  static async findUserById(id: string) {
+    return await prisma.user.findUnique({
+      where: { id },
+    });
+  }
+
+  static async findUserByEmail(email: string) {
+    return await prisma.user.findUnique({
+      where: { email: email.toLowerCase() },
+    });
+  }
+
+  static async updateUser(id: string, data: UpdateUserData) {
+    return await prisma.user.update({
+      where: { id },
+      data: {
+        ...data,
+        email: data.email ? data.email.toLowerCase() : undefined,
+      },
+    });
+  }
+
+  static async deleteUser(id: string) {
+    return await prisma.user.delete({
+      where: { id },
+    });
+  }
+
+  static async getAllUsers() {
+    return await prisma.user.findMany({
+      orderBy: { createdAt: 'desc' },
+    });
+  }
+}
 
 const userSchema = new Schema<IUser>({
   name: {

@@ -1,6 +1,6 @@
 import express from 'express';
 import dotenv from 'dotenv';
-import connectDB from './config/database.js';
+import { connectDB } from './db/database.js';
 import routes from './routes/index.js';
 import { setupSecurityMiddleware } from './middleware/security.js';
 import { errorHandler, notFound } from './middleware/errorHandler.js';

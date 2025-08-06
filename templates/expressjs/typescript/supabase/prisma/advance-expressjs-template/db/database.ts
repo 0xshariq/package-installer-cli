@@ -1,38 +1,28 @@
-import mongoose from 'mongoose';
-import { AppError } from '../src/types/index.js';
+import { PrismaClient } from '@prisma/client';
 
-const connectDB = async (): Promise<void> => {
+const globalForPrisma = globalThis as unknown as {
+  prisma: PrismaClient | undefined;
+};
+
+export const prisma = globalForPrisma.prisma ?? new PrismaClient();
+
+if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
+
+export const connectDB = async (): Promise<void> => {
   try {
-    const mongoURI = process.env.MONGODB_URI;
-    
-    if (!mongoURI) {
-      throw new Error('MONGODB_URI is not defined in environment variables');
-    }
-
-    const conn = await mongoose.connect(mongoURI);
-    
-    console.log(`MongoDB Connected: ${conn.connection.host}`);
-    
-    // Handle connection events
-    mongoose.connection.on('error', (err) => {
-      console.error('MongoDB connection error:', err);
-    });
-
-    mongoose.connection.on('disconnected', () => {
-      console.log('MongoDB disconnected');
-    });
-
-    // Graceful shutdown
-    process.on('SIGINT', async () => {
-      await mongoose.connection.close();
-      console.log('MongoDB connection closed through app termination');
-      process.exit(0);
-    });
-
+    await prisma.$connect();
+    console.log('✅ Supabase Database Connected Successfully with Prisma');
   } catch (error) {
-    console.error('Database connection error:', error);
+    console.error('❌ Database connection failed:', error);
     process.exit(1);
   }
 };
 
-export default connectDB; 
+export const disconnectDB = async (): Promise<void> => {
+  try {
+    await prisma.$disconnect();
+    console.log('📦 Database connection closed');
+  } catch (error) {
+    console.error('Error closing database connection:', error);
+  }
+}; 

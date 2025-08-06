@@ -1,5 +1,64 @@
-import mongoose, { Schema, Document } from 'mongoose';
-import { IUser } from '../types/index.js';
+import { eq, desc } from 'drizzle-orm';
+import { db } from '../db/database.js';
+import { users, type User, type NewUser, insertUserSchema } from '../db/schema.js';
+
+export interface CreateUserData {
+  name: string;
+  email: string;
+  isActive?: boolean;
+}
+
+export interface UpdateUserData {
+  name?: string;
+  email?: string;
+  isActive?: boolean;
+}
+
+export class UserService {
+  static async createUser(data: CreateUserData): Promise<User> {
+    const validatedData = insertUserSchema.parse({
+      name: data.name,
+      email: data.email.toLowerCase(),
+      isActive: data.isActive ?? true,
+    });
+
+    const [user] = await db.insert(users).values(validatedData).returning();
+    return user;
+  }
+
+  static async findUserById(id: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user;
+  }
+
+  static async findUserByEmail(email: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.email, email.toLowerCase()));
+    return user;
+  }
+
+  static async updateUser(id: string, data: UpdateUserData): Promise<User | undefined> {
+    const updateData: Partial<NewUser> = {
+      ...data,
+      email: data.email ? data.email.toLowerCase() : undefined,
+      updatedAt: new Date(),
+    };
+
+    const [user] = await db.update(users)
+      .set(updateData)
+      .where(eq(users.id, id))
+      .returning();
+    return user;
+  }
+
+  static async deleteUser(id: string): Promise<User | undefined> {
+    const [user] = await db.delete(users).where(eq(users.id, id)).returning();
+    return user;
+  }
+
+  static async getAllUsers(): Promise<User[]> {
+    return await db.select().from(users).orderBy(desc(users.createdAt));
+  }
+}
 
 const userSchema = new Schema<IUser>({
   name: {

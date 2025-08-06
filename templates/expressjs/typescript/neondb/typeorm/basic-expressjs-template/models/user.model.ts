@@ -1,14 +1,19 @@
-import mongoose, { Document, Schema } from 'mongoose';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 
-export interface IUser extends Document {
-  name: string;
-  email: string;
-}
+@Entity('users')
+export class User {
+  @PrimaryGeneratedColumn('uuid')
+  id!: string;
 
-const userSchema = new Schema<IUser>({
-  name: { type: String, required: true },
-  email: { type: String, required: true, unique: true }
-});
+  @Column({ type: 'varchar', length: 100 })
+  name!: string;
 
-const User = mongoose.model<IUser>('User', userSchema);
-export default User; 
+  @Column({ type: 'varchar', length: 255, unique: true })
+  email!: string;
+
+  @CreateDateColumn()
+  createdAt!: Date;
+
+  @UpdateDateColumn()
+  updatedAt!: Date;
+} 

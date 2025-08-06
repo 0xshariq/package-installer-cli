@@ -1,21 +1,37 @@
 
 # Package Installer CLI (pi)
 
-## 🆕 What's New
+## 🆕 What's New (v2.0.0)
 
-- **Database Selection for Next.js:**
-  - When creating a Next.js project, you can now select a database (PostgreSQL, MySQL, MongoDB, etc.) and choose an ORM that matches your selection. The CLI will scaffold your project with all necessary dependencies and configuration for your chosen database and ORM.
+- **Express.js Database Support:**
+  - **26+ Express.js Templates** with MongoDB, Supabase (PostgreSQL), NeonDB (PostgreSQL)
+  - **Available ORMs:** Mongoose, Typegoose, TypeORM, Prisma, Drizzle
+  - Both Basic & Advanced templates for each database/ORM combination
+
+- **Next.js Database Integration:**
+  - Database selection with PostgreSQL, MySQL, MongoDB support
+  - ORM selection matching your database choice
+  - Generated projects ready for data-driven development
+
+- **Combination Templates Database Support:**
+  - **React + Express + Shadcn/ui** - Now supports database and ORM selection
+  - **React + NestJS + Shadcn/ui** - Full database integration available
+  - Same database options as standalone Express.js: MongoDB, Supabase, NeonDB
+  - Compatible ORMs: Mongoose, Typegoose, TypeORM, Prisma, Drizzle
   - Example:
     ```bash
-    $ pi my-app
-    🚀 Choose a framework: Next.js
-    🗄️ Choose a database: PostgreSQL
-    🔧 Choose an ORM: Prisma
+    $ pi my-fullstack-app
+    🚀 Choose a framework: reactjs+expressjs+shadcn
+    🗄️ Choose a database: MongoDB
+    🔧 Choose an ORM: Mongoose
+    📋 Choose template: react-advance-express-shadcn-template
     ```
-  - The generated project is ready for data-driven development out of the box.
 
-- **Combination Templates: Database Support Coming Soon!**
-  - For full-stack combination templates (e.g., React + Express + Shadcn/ui), database selection is not yet available, but will be added in a future release. Stay tuned for updates!
+- **Enhanced CLI Experience:**
+  - Updated to version 2.0.0 with comprehensive database keywords
+  - Database and ORM selection available in: Next.js, Express.js, and both Combination Templates
+  - Better error handling and validation
+  - Improved template organization and structure
 
 
 [![npm version](https://img.shields.io/npm/v/package-installer-cli?style=flat-square)](https://www.npmjs.com/package/package-installer-cli)
@@ -24,17 +40,19 @@
 
 **NPM Package:** [https://www.npmjs.com/package/package-installer-cli](https://www.npmjs.com/package/package-installer-cli)
 
-A modern, cross-platform CLI tool to scaffold web applications with beautiful styling, interactive prompts, and comprehensive framework support. Create production-ready projects in seconds with the ultimate developer experience.
+A modern, cross-platform CLI tool to scaffold web applications with comprehensive database support, beautiful styling, and production-ready templates. Create full-stack projects with Express.js + databases, Next.js applications, and more in seconds.
 
 ## ✨ Features
 
 - 🚀 **10+ Frameworks** - Next.js, React, Vue, Angular, Express, Rust, **Remix**, **NestJS**
-- 💻 **Language Support** - JavaScript & TypeScript
-- 🧩 **UI Libraries** - Shadcn/ui, Material-UI, Headless UI
-- 📦 **Bundler Options** - Vite and more
+- 🗄️ **Comprehensive Database Support** - MongoDB, PostgreSQL (Supabase, NeonDB) with multiple ORMs
+- 💻 **Language Support** - JavaScript & TypeScript with full type safety
+- 🧩 **UI Libraries** - Shadcn/ui, Material-UI, Headless UI integration
+- 📦 **Build Tools** - Vite, Webpack, and framework-specific bundlers
+- 🔧 **26+ Express.js Templates** - Every database and ORM combination covered
 - 🎨 **Beautiful Styling** - Gradient colors, styled boxes, enhanced UX
 - 🌍 **Cross-platform** - Works on Windows, macOS, Linux, WSL
-- ⚡ **Fast Scaffolding** - Get started in seconds
+- ⚡ **Production-Ready** - Pre-configured with schemas, connections, and best practices
 - 🔧 **Dual Commands** - Use `pi` or `package-installer`
 - 📁 **Smart Project Names** - Use "." for current directory name
 - 👋 **Graceful Exits** - Proper error handling and goodbye messages
@@ -62,53 +80,58 @@ The Ultimate Tool for Creating Modern Web Applications
 
 ## ✨ Features
 
-- Interactive CLI with beautiful UI
+- Interactive CLI with beautiful UI and comprehensive database support
 - Argument-based project name (supports `pi my-app` or `pi .` for current directory)
 - Framework, language, and UI library selection
-- **Dynamic database & ORM selection** (ORMs shown are specific to the selected database)
+- **Database & ORM selection** for Next.js, Express.js, and Combination Templates
+- **Dynamic ORM filtering** (ORMs shown based on selected database)
 - Automatic dependency installation (`pnpm` or `npm`)
 - Cross-platform path handling
 - Graceful exit and error messaging
 - Combination templates for full-stack setups
+- Production-ready templates with authentication, validation, and testing
 
-## 🆕 New Feature: Database-Specific ORM Selection
+## 🗄️ Database Support
 
-When creating a Next.js project (or other supported frameworks), the CLI will:
-1. Prompt for a database (e.g., PostgreSQL, MySQL, MongoDB)
-2. Show only the ORMs that work with the selected database (as defined in `template.json`)
+Database and ORM selection is available for:
+- **Next.js** - PostgreSQL, MySQL, MongoDB with compatible ORMs
+- **Express.js** - MongoDB, Supabase (PostgreSQL), NeonDB (PostgreSQL) with Mongoose, Typegoose, TypeORM, Prisma, Drizzle
+- **Combination Templates** - Same database options as Express.js for the backend
 
-This ensures you only see relevant ORM options, making setup faster and error-free.
+## 📋 Example Usage
 
-## �️ Database Integration (Next.js Only)
-
-When you scaffold a Next.js project, you can select a database (PostgreSQL, MySQL, MongoDB, etc.) and then choose an ORM that is compatible with your selection. The CLI will automatically set up the project structure and configuration files for your chosen database and ORM, making it easy to start building data-driven applications.
-
-**Example:**
-
+### Express.js with Database
 ```bash
-$ pi my-app
-🚀 Choose a framework: Next.js
-🗄️ Choose a database: PostgreSQL
-🔧 Choose an ORM: Prisma
+$ pi my-backend-app
+🚀 Choose a framework: Express.js
+💻 Choose a language: TypeScript
+🗄️ Choose a database: MongoDB
+🔧 Choose an ORM: Mongoose
+📋 Choose your template: advance-expressjs-template
+✅ Project created with full MongoDB + Mongoose integration!
 ```
 
-The generated project will include all necessary dependencies and configuration for your selected database and ORM.
-
-> **Note:** Database integration is currently available only for Next.js projects. For combination templates (full-stack setups), database support will be added soon!
-
-## �📋 Example Usage
-
+### Next.js with Database
 ```bash
-$ pi my-app
+$ pi my-next-app
 🚀 Choose a framework: Next.js
 💻 Choose a language: TypeScript
 🧩 Do you want to add a UI library? Yes
 ✨ Choose a UI library: Shadcn
-📦 Choose a bundler: Vite (only for reactjs only)
+📦 Choose a bundler: Vite
 📂 Do you want a src directory? Yes
 🎨 Do you want to use Tailwind CSS? Yes
 🗄️ Choose a database: PostgreSQL
 🔧 Choose an ORM: Prisma
+```
+
+### Full-Stack Combination
+```bash
+$ pi my-fullstack-app
+🚀 Choose a framework: reactjs+expressjs+shadcn
+💻 Choose a language: TypeScript
+📋 Choose your template: react-advance-express-shadcn-template
+✅ Pre-configured full-stack setup with React + Express + Shadcn/ui!
 ```
 
 ## 📦 Installation
@@ -187,8 +210,9 @@ $ pi
 └─────────────────────────────────────────────────────────┘
 
 ┌─────────────────────────────────────────────────────────┐
-│ 📦 Version: 1.4.8                                      │
+│ 📦 Version: 2.0.0                                      │
 │ 🌍 Framework Support: 10+ frameworks                    │
+│ 🗄️ Database Support: MongoDB, PostgreSQL (26+ templates) │
 │ ⚡ Quick Start: pi <project-name>                       │
 └─────────────────────────────────────────────────────────┘
 ```
@@ -381,11 +405,15 @@ pi my-fullstack-app  # Will show pre-configured options
 - **Single template** for consistency
 - **TypeScript-only** for type safety
 
-### Express.js
+### Express.js 🟢
 - **Green theme** for backend development
-- **Basic and Advanced** templates
-- **MongoDB integration** in advanced template
-- **Testing setup** with Jest
+- **26+ Template Combinations** - Every database/ORM pairing
+- **Database Support**: MongoDB, Supabase (PostgreSQL), NeonDB (PostgreSQL)
+- **ORM Support**: Mongoose, Typegoose, TypeORM, Prisma, Drizzle
+- **Both Basic & Advanced** templates for each combination
+- **Production-Ready** with authentication, validation, testing
+- **Environment Configuration** templates included
+- **Database Schemas** pre-configured for each ORM
 
 ### Rust 🦀
 - **Yellow theme** for systems programming
@@ -406,13 +434,17 @@ pi my-fullstack-app  # Will show pre-configured options
 ### Creating Different Project Types
 
 ```bash
-# Frontend with Next.js
+# Frontend with Next.js + Database
 pi my-next-app
-# → Next.js + TypeScript + Tailwind + Shadcn/ui
+# → Next.js + TypeScript + Tailwind + Shadcn/ui + PostgreSQL + Prisma
 
-# Backend with Express
+# Backend with Express + MongoDB
 pi my-api
-# → Express.js + TypeScript + MongoDB + JWT
+# → Express.js + TypeScript + MongoDB + Mongoose + JWT + Testing
+
+# Backend with Express + PostgreSQL
+pi my-postgres-api
+# → Express.js + TypeScript + Supabase + Prisma + Authentication
 
 # Full-stack with combination template
 pi my-fullstack

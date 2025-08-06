@@ -1,14 +1,19 @@
-import mongoose, { Document, Schema } from 'mongoose';
+import { prop, getModelForClass } from '@typegoose/typegoose';
+import { TimeStamps } from '@typegoose/typegoose/lib/defaultClasses';
 
-export interface IUser extends Document {
-  name: string;
-  email: string;
+export class User extends TimeStamps {
+  @prop({ required: true, trim: true })
+  public name!: string;
+
+  @prop({ required: true, unique: true, lowercase: true, trim: true })
+  public email!: string;
+
+  // Instance method
+  public getDisplayName(this: User): string {
+    return `${this.name} (${this.email})`;
+  }
 }
 
-const userSchema = new Schema<IUser>({
-  name: { type: String, required: true },
-  email: { type: String, required: true, unique: true }
-});
-
-const User = mongoose.model<IUser>('User', userSchema);
-export default User; 
+// Create and export the model
+export const getUserModel = () => getModelForClass(User);
+export const UserModel = getUserModel(); 

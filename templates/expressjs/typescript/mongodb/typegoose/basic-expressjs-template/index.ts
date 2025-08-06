@@ -1,6 +1,6 @@
 import express from 'express';
-import mongoose from 'mongoose';
 import dotenv from 'dotenv';
+import { connectDB } from './db/database.js';
 import userRoutes from './routes/user.routes.js';
 
 dotenv.config({ path: '.env' });  // Create a .env file in the root directory and add your MongoDB URI

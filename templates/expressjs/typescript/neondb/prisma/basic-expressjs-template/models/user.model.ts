@@ -1,14 +1,38 @@
-import mongoose, { Document, Schema } from 'mongoose';
+// Basic user operations with Prisma
+import { PrismaClient } from '@prisma/client';
 
-export interface IUser extends Document {
+const prisma = new PrismaClient();
+
+export interface CreateUserData {
   name: string;
   email: string;
 }
 
-const userSchema = new Schema<IUser>({
-  name: { type: String, required: true },
-  email: { type: String, required: true, unique: true }
-});
+export class UserService {
+  static async createUser(data: CreateUserData) {
+    return await prisma.user.create({
+      data: {
+        name: data.name,
+        email: data.email.toLowerCase(),
+      },
+    });
+  }
 
-const User = mongoose.model<IUser>('User', userSchema);
-export default User; 
+  static async findUserById(id: string) {
+    return await prisma.user.findUnique({
+      where: { id },
+    });
+  }
+
+  static async findUserByEmail(email: string) {
+    return await prisma.user.findUnique({
+      where: { email: email.toLowerCase() },
+    });
+  }
+
+  static async getAllUsers() {
+    return await prisma.user.findMany({
+      orderBy: { createdAt: 'desc' },
+    });
+  }
+} 
