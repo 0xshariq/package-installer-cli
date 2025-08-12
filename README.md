@@ -151,7 +151,6 @@ package-installer my-app
 ## 💡 Tips
 
 - Use `pi .` to scaffold in the current directory
-- Check the generated `README.md` for next steps
 - Visit framework docs for advanced features
 
 ### Combination Templates 🆕
