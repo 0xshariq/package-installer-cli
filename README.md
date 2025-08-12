@@ -69,10 +69,10 @@ A modern, cross-platform CLI tool to scaffold web applications with comprehensiv
 
 ```bash
 # Using npm
-npm i -g @cli/package-installer
+npm i -g @0xshariq/package-installer
 
 # Using pnpm
-pnpm i -g @cli/package-installer
+pnpm i -g @0xshariq/package-installer
 
 # Using yarn
 
