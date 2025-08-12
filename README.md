@@ -137,7 +137,7 @@ $ pi my-fullstack-app
 ## 📦 Installation
 
 ```bash
-npm install -g package-installer-cli
+npm install -g @0xshariq/package-installer
 ```
 
 ## 🛠️ Usage
