@@ -69,10 +69,10 @@ A modern, cross-platform CLI tool to scaffold web applications with comprehensiv
 
 ```bash
 # Using npm
-npm i -g package-installer-cli
+npm i -g @cli/package-installer
 
 # Using pnpm
-pnpm i -g package-installer-cli
+pnpm i -g @cli/package-installer
 
 # Using yarn
 
@@ -210,7 +210,7 @@ $ pi
 └─────────────────────────────────────────────────────────┘
 
 ┌─────────────────────────────────────────────────────────┐
-│ 📦 Version: 2.0.0                                      │
+│ 📦 Version: 2.0.1                                      │
 │ 🌍 Framework Support: 10+ frameworks                    │
 │ 🗄️ Database Support: MongoDB, PostgreSQL (26+ templates) │
 │ ⚡ Quick Start: pi <project-name>                       │
