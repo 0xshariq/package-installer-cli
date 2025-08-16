@@ -24,10 +24,7 @@ const piGradient = gradient(['#00c6ff', '#0072ff']);
 // Configure main program with enhanced styling
 program
   .name(piGradient('pi'))
-  .description(
-    gradientTitle('📦 Package Installer CLI - A modern, fast, and beautiful CLI tool to scaffold web applications') + '\n' +
-    chalk.hex('#00c6ff')('   ✨ Fast • Modern • Production-Ready • Beautiful')
-  )
+  .description(chalk.hex('#667eea')('📦 Package Installer CLI') + chalk.hex('#95afc0')(' - Modern web application scaffolding tool'))
   .version('2.1.3', chalk.hex('#ff6b6b')('-v, --version'), chalk.hex('#95afc0')('output the current version'))
   .helpOption(chalk.hex('#ff6b6b')('-h, --help'), chalk.hex('#95afc0')('display comprehensive help information'));
 

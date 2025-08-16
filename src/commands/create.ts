@@ -171,8 +171,6 @@ export async function createProject(providedName?: string): Promise<void> {
       console.log(`${chalk.hex('#00d2d3')('Tailwind CSS:')} ${useTailwind ? chalk.green('Yes') : chalk.red('No')}`);
     }
     
-    console.log(`${chalk.hex('#00d2d3')('Template:')} ${chalk.bold.hex('#a29bfe')(templateName)}`);
-    console.log(`${chalk.hex('#00d2d3')('Template Path:')} ${chalk.hex('#95afc0')(templatePath)}`);
     console.log(chalk.hex('#95afc0')('─'.repeat(50)));
 
     // Step 15: Confirmation

@@ -6,7 +6,6 @@ import boxen from 'boxen';
 import fs from 'fs-extra';
 import path from 'path';
 import semver from 'semver';
-import https from 'https';
 
 const execAsync = promisify(exec);
 
@@ -23,6 +22,7 @@ interface PackageInfo {
   needsUpdate: boolean;
   packageManager: string;
   projectType: string;
+}
 
 interface ProjectType {
   name: string;
@@ -39,7 +39,7 @@ const PROJECT_TYPES: ProjectType[] = [
     name: 'Node.js',
     files: ['package.json'],
     packageManager: 'npm/pnpm/yarn',
-    getDependencies: (packageJson) => ({
+    getDependencies: (packageJson, filename) => ({
       ...packageJson.dependencies,
       ...packageJson.devDependencies
     }),
@@ -51,7 +51,7 @@ const PROJECT_TYPES: ProjectType[] = [
     name: 'Rust',
     files: ['Cargo.toml'],
     packageManager: 'cargo',
-    getDependencies: (cargoToml) => {
+    getDependencies: (cargoToml, filename) => {
       const deps: Record<string, string> = {};
       if (cargoToml.dependencies) {
         Object.entries(cargoToml.dependencies).forEach(([key, value]: [string, any]) => {
@@ -187,21 +187,19 @@ export async function checkCommand(packageName?: string) {
     console.log('\n' + chalk.hex('#f39c12')('🔍 Starting package check...'));
     
     if (packageName) {
-      getDependencies: (packageJson, filename) => ({
-        ...packageJson.dependencies,
-        ...packageJson.devDependencies
-      }),
+      await checkSinglePackage(packageName);
+    } else {
       await checkProjectPackages();
     }
   } catch (error: any) {
     console.error(chalk.hex('#ff4757')(`❌ Failed to check packages: ${error.message}`));
     throw error;
-      getDependencies: (cargoToml, filename) => {
+  }
 }
 
 async function checkSinglePackage(packageName: string) {
   const spinner = ora(chalk.hex('#f39c12')(`🔄 Checking ${packageName}...`)).start();
-  getDependencies: (content, filename) => {
+  
   try {
     // Try to detect what kind of package this might be
     const projectType = await detectProjectType();
@@ -288,7 +286,7 @@ async function getDependenciesForProject(projectType: ProjectType): Promise<Reco
           content = await fs.readFile(filePath, 'utf-8');
         }
         
-      return projectType.getDependencies(content, file);
+        return projectType.getDependencies(content, file);
       } catch (error) {
         console.warn(`⚠️  Could not parse ${file}`);
       }
@@ -327,14 +325,8 @@ function parseSimpleToml(content: string): any {
     // Key-value pair
     const kvMatch = trimmed.match(/^([^=]+)=(.+)$/);
     if (kvMatch && currentSection) {
-      const key = kvMatch[1].trim();
-      let value = kvMatch[2].trim();
-      
-      // Remove quotes
-      if ((value.startsWith('"') && value.endsWith('"')) || 
-          (value.startsWith("'") && value.endsWith("'"))) {
-        value = value.slice(1, -1);
-      }
+      const key = kvMatch[1].trim().replace(/"/g, '');
+      const value = kvMatch[2].trim().replace(/"/g, '');
       
       const sections = currentSection.split('.');
       let current = result;
@@ -349,352 +341,244 @@ function parseSimpleToml(content: string): any {
   return result;
 }
 
-async function getPackageInfo(packageName: string, currentVersion?: string, projectType?: ProjectType): Promise<PackageInfo> {
+async function getPackageInfo(
+  packageName: string, 
+  currentVersion?: string, 
+  projectType?: ProjectType | null
+): Promise<PackageInfo> {
+  const type = projectType || PROJECT_TYPES[0];
+  
   try {
-    let registryData: any;
-    let latestVersion = 'unknown';
+    // Clean up version string (remove ^ ~ and similar prefixes)
+    const cleanCurrentVersion = currentVersion?.replace(/[\^~>=<]/, '') || 'unknown';
     
-    // Determine which registry to use
-    const actualProjectType = projectType || PROJECT_TYPES[0];
-    
-    switch (actualProjectType.name) {
-      case 'Node.js':
-        registryData = await fetchFromNpmRegistry(packageName);
-        latestVersion = registryData['dist-tags']?.latest || 'unknown';
-        break;
-      case 'Rust':
-        registryData = await fetchFromCratesRegistry(packageName);
-        latestVersion = registryData.crate?.max_version || 'unknown';
-        break;
-      case 'Python':
-        registryData = await fetchFromPyPiRegistry(packageName);
-        latestVersion = registryData.info?.version || 'unknown';
-        break;
-      default:
-        // For other types, try npm registry as fallback
+    // Enhanced NPM registry support
+    if (type.name === 'Node.js') {
+      const response = await fetch(`https://registry.npmjs.org/${packageName}`);
+      
+      if (!response.ok) {
+        throw new Error(`Package ${packageName} not found in NPM registry`);
+      }
+      
+      const data = await response.json();
+      const latestVersion = data['dist-tags']?.latest || 'unknown';
+      const maintainers = data.maintainers || [];
+      const keywords = data.keywords || [];
+      
+      // Enhanced version comparison
+      let needsUpdate = false;
+      if (cleanCurrentVersion !== 'unknown' && latestVersion !== 'unknown') {
         try {
-          registryData = await fetchFromNpmRegistry(packageName);
-          latestVersion = registryData['dist-tags']?.latest || 'unknown';
-        } catch {
-          registryData = { description: 'Package info not available' };
+          if (semver.valid(cleanCurrentVersion) && semver.valid(latestVersion)) {
+            needsUpdate = semver.lt(cleanCurrentVersion, latestVersion);
+          }
+        } catch (error) {
+          // Fallback to string comparison if semver fails
+          needsUpdate = cleanCurrentVersion !== latestVersion;
         }
+      }
+      
+      return {
+        name: packageName,
+        currentVersion: cleanCurrentVersion,
+        latestVersion,
+        isDeprecated: !!data.deprecated,
+        deprecatedMessage: data.deprecated || undefined,
+        alternatives: data.alternatives || [],
+        homepage: data.homepage || undefined,
+        repository: typeof data.repository === 'string' 
+          ? data.repository 
+          : data.repository?.url || undefined,
+        description: data.description || undefined,
+        needsUpdate,
+        packageManager: type.packageManager,
+        projectType: type.name
+      };
     }
     
-    const currentVersionClean = currentVersion ? currentVersion.replace(/^[\^~>=<]/, '') : 'unknown';
+    // Enhanced support for Rust packages
+    if (type.name === 'Rust') {
+      try {
+        const response = await fetch(`https://crates.io/api/v1/crates/${packageName}`);
+        
+        if (response.ok) {
+          const data = await response.json();
+          const latestVersion = data.crate?.newest_version || 'unknown';
+          
+          return {
+            name: packageName,
+            currentVersion: cleanCurrentVersion,
+            latestVersion,
+            isDeprecated: false, // Crates.io doesn't have deprecated flag in this endpoint
+            homepage: data.crate?.homepage || undefined,
+            repository: data.crate?.repository || undefined,
+            description: data.crate?.description || undefined,
+            needsUpdate: cleanCurrentVersion !== 'unknown' && latestVersion !== 'unknown' 
+              ? cleanCurrentVersion !== latestVersion 
+              : false,
+            packageManager: type.packageManager,
+            projectType: type.name
+          };
+        }
+      } catch (error) {
+        // Fall through to basic info
+      }
+    }
     
-    const packageInfo: PackageInfo = {
+    // Enhanced support for Python packages
+    if (type.name === 'Python') {
+      try {
+        const response = await fetch(`https://pypi.org/pypi/${packageName}/json`);
+        
+        if (response.ok) {
+          const data = await response.json();
+          const latestVersion = data.info?.version || 'unknown';
+          
+          return {
+            name: packageName,
+            currentVersion: cleanCurrentVersion,
+            latestVersion,
+            isDeprecated: false,
+            homepage: data.info?.home_page || undefined,
+            repository: data.info?.project_urls?.Repository || data.info?.project_urls?.Homepage || undefined,
+            description: data.info?.summary || undefined,
+            needsUpdate: cleanCurrentVersion !== 'unknown' && latestVersion !== 'unknown' 
+              ? cleanCurrentVersion !== latestVersion 
+              : false,
+            packageManager: type.packageManager,
+            projectType: type.name
+          };
+        }
+      } catch (error) {
+        // Fall through to basic info
+      }
+    }
+    
+    // For other project types or when registry lookup fails, return basic info
+    return {
       name: packageName,
-      currentVersion: currentVersionClean,
-      latestVersion,
-      isDeprecated: !!registryData.deprecated,
-      deprecatedMessage: registryData.deprecated,
-      homepage: registryData.homepage || registryData.info?.home_page,
-      repository: typeof registryData.repository === 'string' 
-        ? registryData.repository 
-        : registryData.repository?.url || registryData.info?.project_urls?.Repository,
-      description: registryData.description || registryData.info?.summary,
-      needsUpdate: currentVersion && latestVersion !== 'unknown' ? 
-        semver.lt(currentVersionClean, latestVersion) : false,
-      packageManager: actualProjectType.packageManager,
-      projectType: actualProjectType.name
+      currentVersion: cleanCurrentVersion,
+      latestVersion: 'unknown',
+      isDeprecated: false,
+      needsUpdate: false,
+      packageManager: type.packageManager,
+      projectType: type.name,
+      description: `${type.name} package - registry lookup not available`
     };
-
-    // Add alternatives for deprecated packages
-    if (packageInfo.isDeprecated) {
-      packageInfo.alternatives = getAlternatives(packageName, actualProjectType.name);
-    }
-
-    return packageInfo;
+    
   } catch (error: any) {
     throw new Error(`Failed to fetch info for ${packageName}: ${error.message}`);
   }
 }
 
-async function fetchFromNpmRegistry(packageName: string): Promise<any> {
-  return new Promise((resolve, reject) => {
-    const url = `https://registry.npmjs.org/${packageName}`;
-    
-    https.get(url, (res) => {
-      let data = '';
-      
-      res.on('data', (chunk) => {
-        data += chunk;
-      });
-      
-      res.on('end', () => {
-        try {
-          const parsed = JSON.parse(data);
-          if (parsed.error) {
-            reject(new Error(`Package not found: ${packageName}`));
-          } else {
-            resolve(parsed);
-          }
-        } catch (error) {
-          reject(new Error(`Invalid response for ${packageName}`));
-        }
-      });
-    }).on('error', (error) => {
-      reject(error);
-    });
-  });
-}
-
-async function fetchFromCratesRegistry(packageName: string): Promise<any> {
-  return new Promise((resolve, reject) => {
-    const url = `https://crates.io/api/v1/crates/${packageName}`;
-    
-    https.get(url, (res) => {
-      let data = '';
-      
-      res.on('data', (chunk) => {
-        data += chunk;
-      });
-      
-      res.on('end', () => {
-        try {
-          const parsed = JSON.parse(data);
-          if (parsed.errors) {
-            reject(new Error(`Crate not found: ${packageName}`));
-          } else {
-            resolve(parsed);
-          }
-        } catch (error) {
-          reject(new Error(`Invalid response for ${packageName}`));
-        }
-      });
-    }).on('error', (error) => {
-      reject(error);
-    });
-  });
-}
-
-async function fetchFromPyPiRegistry(packageName: string): Promise<any> {
-  return new Promise((resolve, reject) => {
-    const url = `https://pypi.org/pypi/${packageName}/json`;
-    
-    https.get(url, (res) => {
-      let data = '';
-      
-      res.on('data', (chunk) => {
-        data += chunk;
-      });
-      
-      res.on('end', () => {
-        try {
-          const parsed = JSON.parse(data);
-          if (res.statusCode === 404) {
-            reject(new Error(`Package not found: ${packageName}`));
-          } else {
-            resolve(parsed);
-          }
-        } catch (error) {
-          reject(new Error(`Invalid response for ${packageName}`));
-        }
-      });
-    }).on('error', (error) => {
-      reject(error);
-    });
-  });
-}
-
-function getAlternatives(packageName: string, projectType: string): string[] {
-  const alternatives: Record<string, Record<string, string[]>> = {
-    'Node.js': {
-      'request': ['axios', 'node-fetch', 'got'],
-      'moment': ['date-fns', 'dayjs', 'luxon'],
-      'lodash': ['ramda', 'native JavaScript methods'],
-      'bower': ['npm', 'yarn', 'pnpm'],
-      'gulp': ['webpack', 'vite', 'rollup'],
-      'grunt': ['webpack', 'vite', 'rollup'],
-      'node-sass': ['sass', 'dart-sass'],
-      'tslint': ['eslint with @typescript-eslint'],
-      'istanbul': ['nyc', 'c8'],
-      'should': ['jest', 'chai', 'vitest'],
-      'phantomjs': ['puppeteer', 'playwright'],
-      'protractor': ['cypress', 'playwright', 'webdriver.io']
-    },
-    'Rust': {
-      'time': ['chrono'],
-      'rustc-serialize': ['serde'],
-      'hyper': ['reqwest', 'ureq'],
-      'iron': ['warp', 'axum', 'actix-web'],
-      'nickel': ['warp', 'axum', 'actix-web']
-    },
-    'Python': {
-      'requests': ['httpx', 'aiohttp'],
-      'flask': ['fastapi', 'django'],
-      'nose': ['pytest'],
-      'unittest2': ['pytest'],
-      'pycrypto': ['cryptography'],
-      'mysql-python': ['PyMySQL', 'mysql-connector-python'],
-      'PIL': ['Pillow']
-    }
-  };
-
-  return alternatives[projectType]?.[packageName] || [];
-}
-
 function displayPackageInfo(packages: PackageInfo[], projectType?: ProjectType) {
-  // Separate packages by status
-  const deprecated = packages.filter(p => p.isDeprecated);
-  const outdated = packages.filter(p => !p.isDeprecated && p.needsUpdate);
-  const upToDate = packages.filter(p => !p.isDeprecated && !p.needsUpdate);
-
-  const projectName = projectType ? projectType.name : packages[0]?.projectType || 'Unknown';
-
-  console.log('\n' + boxen(
-    chalk.cyan(`📊 ${projectName} Package Status Report`) + '\n' +
-    '═══════════════════════════════════════════════════════════\n' +
-    chalk.green(`✅ Up to date: ${upToDate.length}`) + '\n' +
-    chalk.yellow(`📦 Outdated: ${outdated.length}`) + '\n' +
-    chalk.red(`⚠️  Deprecated: ${deprecated.length}`) + '\n' +
-    '═══════════════════════════════════════════════════════════',
-    {
-      padding: 1,
-      borderStyle: 'round',
-      borderColor: 'cyan'
-    }
-  ));
-
-  // Show deprecated packages
-  if (deprecated.length > 0) {
-    console.log('\n' + chalk.red.bold('⚠️  DEPRECATED PACKAGES'));
-    console.log(chalk.red('═══════════════════════════════════════'));
-    
-    deprecated.forEach(pkg => {
-      console.log(`\n${chalk.red('•')} ${chalk.white.bold(pkg.name)}`);
-      console.log(`  ${chalk.gray('Current:')} ${pkg.currentVersion}`);
-      console.log(`  ${chalk.gray('Project Type:')} ${pkg.projectType}`);
-      if (pkg.deprecatedMessage) {
-        console.log(`  ${chalk.red('Reason:')} ${pkg.deprecatedMessage}`);
-      }
-      if (pkg.alternatives && pkg.alternatives.length > 0) {
-        console.log(`  ${chalk.green('Alternatives:')} ${pkg.alternatives.join(', ')}`);
-      }
-    });
+  if (packages.length === 0) {
+    console.log(chalk.yellow('📦 No packages to display'));
+    return;
   }
 
-  // Show outdated packages
-  if (outdated.length > 0) {
-    console.log('\n' + chalk.yellow.bold('📦 OUTDATED PACKAGES'));
-    console.log(chalk.yellow('═══════════════════════════════════════'));
-    
-    outdated.forEach(pkg => {
-      console.log(`\n${chalk.yellow('•')} ${chalk.white.bold(pkg.name)}`);
-      console.log(`  ${chalk.gray('Current:')} ${pkg.currentVersion}`);
-      console.log(`  ${chalk.green('Latest:')} ${pkg.latestVersion}`);
-      console.log(`  ${chalk.gray('Project Type:')} ${pkg.projectType}`);
-      
-      // Show appropriate install command
-      switch (pkg.projectType) {
-        case 'Node.js':
-          console.log(`  ${chalk.blue('Update:')} npm install ${pkg.name}@${pkg.latestVersion}`);
-          break;
-        case 'Rust':
-          console.log(`  ${chalk.blue('Update:')} cargo add ${pkg.name}@${pkg.latestVersion}`);
-          break;
-        case 'Python':
-          console.log(`  ${chalk.blue('Update:')} pip install ${pkg.name}==${pkg.latestVersion}`);
-          break;
-        case 'Go':
-          console.log(`  ${chalk.blue('Update:')} go get ${pkg.name}@v${pkg.latestVersion}`);
-          break;
-        case 'Ruby':
-          console.log(`  ${chalk.blue('Update:')} bundle add ${pkg.name} --version ${pkg.latestVersion}`);
-          break;
-        case 'PHP':
-          console.log(`  ${chalk.blue('Update:')} composer require ${pkg.name}:${pkg.latestVersion}`);
-          break;
-        default:
-          console.log(`  ${chalk.blue('Latest:')} ${pkg.latestVersion}`);
-      }
-    });
+  console.log('\n' + chalk.hex('#00d2d3')('📊 Package Analysis Results'));
+  console.log(chalk.gray('─'.repeat(60)));
+
+  const outdatedPackages = packages.filter(pkg => pkg.needsUpdate);
+  const deprecatedPackages = packages.filter(pkg => pkg.isDeprecated);
+  const upToDatePackages = packages.filter(pkg => !pkg.needsUpdate && !pkg.isDeprecated);
+
+  // Enhanced Summary with statistics
+  console.log(`\n${chalk.hex('#10ac84')('✅ Total packages checked:')} ${chalk.bold(packages.length.toString())}`);
+  console.log(`${chalk.hex('#10ac84')('✅ Up to date:')} ${chalk.bold(upToDatePackages.length.toString())}`);
+  
+  if (outdatedPackages.length > 0) {
+    console.log(`${chalk.hex('#f39c12')('⚠️  Packages needing updates:')} ${chalk.bold(outdatedPackages.length.toString())}`);
+  }
+  if (deprecatedPackages.length > 0) {
+    console.log(`${chalk.hex('#ff4757')('🚨 Deprecated packages:')} ${chalk.bold(deprecatedPackages.length.toString())}`);
   }
 
-  // Show update commands based on project type
-  if (outdated.length > 0 && projectType) {
-    const updateCommands = getUpdateCommandsForProjectType(projectType);
+  // Show severity breakdown
+  if (projectType) {
+    console.log(`\n${chalk.hex('#00d2d3')('📋 Project Type:')} ${chalk.bold(projectType.name)} (${chalk.cyan(projectType.packageManager)})`);
+  }
+
+  // Show first few packages in detail with enhanced info
+  const packagesToShow = packages.slice(0, 8); // Show more packages
+  
+  packagesToShow.forEach((pkg, index) => {
+    const statusIcon = pkg.isDeprecated ? '🚨' : pkg.needsUpdate ? '⚠️' : '✅';
+    const statusColor = pkg.isDeprecated ? '#ff4757' : pkg.needsUpdate ? '#f39c12' : '#10ac84';
+    const statusText = pkg.isDeprecated ? 'DEPRECATED' : pkg.needsUpdate ? 'UPDATE AVAILABLE' : 'UP TO DATE';
     
+    const versionComparison = pkg.currentVersion !== 'unknown' && pkg.latestVersion !== 'unknown'
+      ? ` ${chalk.gray('→')} ${chalk.hex('#10ac84')(pkg.latestVersion)}`
+      : '';
+
     console.log('\n' + boxen(
-      chalk.blue('🔄 Update Commands') + '\n\n' +
-      updateCommands.map(cmd => 
-        `${chalk.white(cmd.description)}\n${chalk.gray(`  ${cmd.command}`)}`
-      ).join('\n\n'),
+      `${statusIcon} ${chalk.bold(pkg.name)} ${chalk.hex(statusColor)(`[${statusText}]`)}\n` +
+      `${chalk.gray('Current:')} ${chalk.yellow(pkg.currentVersion)}${versionComparison}\n` +
+      `${chalk.gray('Type:')} ${chalk.blue(pkg.projectType)} ${chalk.gray('via')} ${chalk.cyan(pkg.packageManager)}\n` +
+      (pkg.description ? `${chalk.gray('Description:')} ${pkg.description.slice(0, 70)}${pkg.description.length > 70 ? '...' : ''}\n` : '') +
+      (pkg.homepage ? `${chalk.gray('Homepage:')} ${chalk.blue(pkg.homepage)}\n` : '') +
+      (pkg.isDeprecated ? `${chalk.hex('#ff4757')('⚠️ DEPRECATED:')} ${pkg.deprecatedMessage || 'This package is no longer maintained'}\n` : '') +
+      (pkg.alternatives && pkg.alternatives.length > 0 ? `${chalk.gray('Alternatives:')} ${pkg.alternatives.join(', ')}\n` : ''),
       {
         padding: 1,
-        borderStyle: 'single',
-        borderColor: 'blue'
-      }
-    ));
-  }
-
-  // Show summary for single package
-  if (packages.length === 1) {
-    const pkg = packages[0];
-    console.log('\n' + boxen(
-      `${chalk.cyan('Package:')} ${pkg.name}\n` +
-      `${chalk.cyan('Project Type:')} ${pkg.projectType}\n` +
-      `${chalk.cyan('Package Manager:')} ${pkg.packageManager}\n` +
-      `${chalk.cyan('Description:')} ${pkg.description || 'N/A'}\n` +
-      `${chalk.cyan('Current Version:')} ${pkg.currentVersion}\n` +
-      `${chalk.cyan('Latest Version:')} ${pkg.latestVersion}\n` +
-      `${chalk.cyan('Status:')} ${pkg.isDeprecated ? chalk.red('Deprecated') : 
-        pkg.needsUpdate ? chalk.yellow('Outdated') : chalk.green('Up to date')}\n` +
-      (pkg.homepage ? `${chalk.cyan('Homepage:')} ${pkg.homepage}\n` : '') +
-      (pkg.repository ? `${chalk.cyan('Repository:')} ${pkg.repository}` : ''),
-      {
-        padding: 1,
+        margin: 0,
         borderStyle: 'round',
-        borderColor: pkg.isDeprecated ? 'red' : pkg.needsUpdate ? 'yellow' : 'green'
+        borderColor: statusColor,
+        title: `Package ${index + 1}/${packagesToShow.length}`,
+        titleAlignment: 'left'
       }
     ));
-  }
-}
+  });
 
-function getUpdateCommandsForProjectType(projectType: ProjectType): Array<{description: string, command: string}> {
-  switch (projectType.name) {
-    case 'Node.js':
-      return [
-        { description: 'Update all packages:', command: 'npm update' },
-        { description: 'Update with pnpm:', command: 'pnpm update' },
-        { description: 'Update with yarn:', command: 'yarn upgrade' },
-        { description: 'Check for major updates:', command: 'npx npm-check-updates' }
-      ];
-    case 'Rust':
-      return [
-        { description: 'Update all packages:', command: 'cargo update' },
-        { description: 'Update specific package:', command: 'cargo update -p <package>' },
-        { description: 'Check for outdated packages:', command: 'cargo outdated' }
-      ];
-    case 'Python':
-      return [
-        { description: 'Update all packages:', command: 'pip list --outdated | pip install --upgrade' },
-        { description: 'Update with poetry:', command: 'poetry update' },
-        { description: 'Update with pipenv:', command: 'pipenv update' },
-        { description: 'Show outdated packages:', command: 'pip list --outdated' }
-      ];
-    case 'Go':
-      return [
-        { description: 'Update all packages:', command: 'go get -u ./...' },
-        { description: 'Update specific package:', command: 'go get -u <package>' },
-        { description: 'Tidy up dependencies:', command: 'go mod tidy' }
-      ];
-    case 'Ruby':
-      return [
-        { description: 'Update all gems:', command: 'bundle update' },
-        { description: 'Update specific gem:', command: 'bundle update <gem>' },
-        { description: 'Show outdated gems:', command: 'bundle outdated' }
-      ];
-    case 'PHP':
-      return [
-        { description: 'Update all packages:', command: 'composer update' },
-        { description: 'Update specific package:', command: 'composer update <package>' },
-        { description: 'Show outdated packages:', command: 'composer outdated' }
-      ];
-    default:
-      return [
-        { description: 'Update command:', command: projectType.getUpdateCommand() }
-      ];
+  if (packages.length > 8) {
+    console.log(chalk.gray(`\n📦 ... and ${packages.length - 8} more packages (use --verbose to see all)`));
   }
-}
+
+  // Enhanced recommendations section
+  console.log('\n' + chalk.hex('#00d2d3')('💡 Recommendations:'));
+  console.log(chalk.gray('─'.repeat(30)));
+
+  if (deprecatedPackages.length > 0) {
+    console.log(`${chalk.hex('#ff4757')('🚨 URGENT:')} Replace ${deprecatedPackages.length} deprecated package(s) immediately`);
+    deprecatedPackages.slice(0, 3).forEach(pkg => {
+      console.log(`   • ${chalk.red(pkg.name)} ${chalk.gray(pkg.deprecatedMessage ? '- ' + pkg.deprecatedMessage.slice(0, 50) + '...' : '')}`);
+    });
+  }
+
+  if (outdatedPackages.length > 0 && projectType) {
+    console.log(`${chalk.hex('#f39c12')('⚠️  UPDATE:')} Run the following command to update all packages:`);
+    console.log(`   ${chalk.cyan(projectType.getUpdateCommand())}`);
+    
+    // Show individual update commands for major version updates
+    const majorUpdates = outdatedPackages.filter(pkg => {
+      if (pkg.currentVersion === 'unknown' || pkg.latestVersion === 'unknown') return false;
+      try {
+        const currentMajor = semver.major(pkg.currentVersion.replace(/[\^~]/, ''));
+        const latestMajor = semver.major(pkg.latestVersion);
+        return latestMajor > currentMajor;
+      } catch {
+        return false;
+      }
+    });
+
+    if (majorUpdates.length > 0) {
+      console.log(`${chalk.hex('#f39c12')('📈 MAJOR UPDATES:')} ${majorUpdates.length} package(s) have major version updates:`);
+      majorUpdates.slice(0, 3).forEach(pkg => {
+        console.log(`   • ${chalk.yellow(pkg.name)}: ${chalk.gray(pkg.currentVersion)} → ${chalk.green(pkg.latestVersion)} ${chalk.red('(Breaking changes possible)')}`);
+      });
+    }
+  }
+
+  if (upToDatePackages.length === packages.length) {
+    console.log(`${chalk.hex('#10ac84')('🎉 EXCELLENT:')} All packages are up to date! Your project is in great shape.`);
+  }
+
+  // Security and performance tips
+  if (packages.length > 0) {
+    console.log(`\n${chalk.hex('#00d2d3')('🛡️  Security Tips:')}`);
+    console.log(`   • Run ${chalk.cyan('npm audit')} to check for security vulnerabilities`);
+    console.log(`   • Consider using ${chalk.cyan('renovate')} or ${chalk.cyan('dependabot')} for automated updates`);
+    console.log(`   • Review package licenses with ${chalk.cyan('license-checker')} if needed`);
+  }
 }
