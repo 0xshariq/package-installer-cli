@@ -28,17 +28,40 @@ pi check react
 pi --help
 ```
 
+
+## 🚨 What's New (v2.1.x)
+
+- **Multi-language Project Support:**
+  - `check` command now works for Node.js (`package.json`), Rust (`Cargo.toml`), Python (`requirements.txt`, `pyproject.toml`, `Pipfile`, `setup.py`), and more.
+  - Installs and checks dependencies for all major languages/frameworks.
+- **Multi-provider Clone:**
+  - Clone from GitHub, GitLab, BitBucket, SourceHut, or any full git URL.
+  - Automatic detection and setup for all providers.
+- **Automatic Installation:**
+  - Installs dependencies for Node.js, Rust, Python, etc. after clone or create.
+  - Tries pnpm/npm/cargo/pip/poetry/pipenv as needed.
+- **Auto .env Creation:**
+  - Detects .env templates and creates .env files automatically.
+- **Auto Git Initialization:**
+  - Initializes git, adds all files, and makes initial commit for every project.
+- **Beautiful Help & Error Messages:**
+  - Enhanced help for all commands, with examples and color gradients.
+  - Improved error handling and suggestions.
+
 ## ✨ Key Features
 
 - **10+ Frameworks** - Next.js, React, Vue, Angular, Express, Rust, Remix, NestJS
 - **Database Support** - MongoDB, PostgreSQL (Supabase, NeonDB) with multiple ORMs
-- **GitHub Cloning** - Auto dependency installation and git initialization
-- **Package Management** - Version checking and update recommendations
+- **Multi-provider Cloning** - GitHub, GitLab, BitBucket, SourceHut, full URLs
+- **Multi-language Package Management** - Node.js, Rust, Python, and more
+- **Automatic Dependency Installation** - pnpm, npm, cargo, pip, poetry, pipenv
+- **Auto .env Creation** - From templates for all projects
+- **Auto Git Initialization** - Fresh repo and commit for every project
 - **Beautiful UI** - Gradient colors, progress indicators, styled help
 - **Cross-platform** - Windows, macOS, Linux, WSL support
 - **Production Ready** - Pre-configured templates with best practices
 
-## �️ Commands
+## 🛠️ Commands
 
 | Command | Description | Example |
 |---------|-------------|---------|

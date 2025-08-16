@@ -11,53 +11,106 @@ const execAsync = promisify(exec);
 
 export async function cloneRepo(userRepo: string, projectName?: string): Promise<void> {
   try {
-    // Validate repository format (user/repo or full URL)
+    // Validate and process repository format
     let repoUrl = userRepo;
+    let provider = 'github'; // default
     
     if (!userRepo.startsWith('http') && !userRepo.startsWith('git@')) {
-      // If it's just user/repo format, default to GitHub
-      if (!userRepo.includes('/') || userRepo.split('/').length !== 2) {
-        throw new Error('Invalid repository format. Use: user/repo or full git URL\nExamples: facebook/react, gitlab:user/repo, https://gitlab.com/user/repo.git');
+      // Handle provider prefixes
+      if (userRepo.includes(':')) {
+        const [providerPrefix, repo] = userRepo.split(':', 2);
+        switch (providerPrefix.toLowerCase()) {
+          case 'github':
+            provider = 'github';
+            repoUrl = repo;
+            break;
+          case 'gitlab':
+            provider = 'gitlab';
+            repoUrl = repo;
+            break;
+          case 'bitbucket':
+            provider = 'bitbucket';
+            repoUrl = repo;
+            break;
+          case 'sourcehut':
+          case 'sr.ht':
+            provider = 'sourcehut';
+            repoUrl = repo;
+            break;
+          default:
+            // If it's not a recognized provider, treat it as part of the repo name
+            repoUrl = userRepo;
+            break;
+        }
       }
       
-      const [user, repo] = userRepo.split('/');
+      // Validate user/repo format
+      if (!repoUrl.includes('/') || repoUrl.split('/').length !== 2) {
+        throw new Error(`Invalid repository format: "${userRepo}"\n` +
+          'Expected formats:\n' +
+          '  • user/repo (defaults to GitHub)\n' +
+          '  • github:user/repo\n' +
+          '  • gitlab:user/repo\n' +
+          '  • bitbucket:user/repo\n' +
+          '  • sourcehut:user/repo\n' +
+          '  • https://github.com/user/repo.git'
+        );
+      }
+      
+      const [user, repo] = repoUrl.split('/');
       if (!user || !repo) {
         throw new Error('Invalid repository format. Both user and repo names are required');
       }
-      
-      // Handle different providers with prefixes
-      if (userRepo.startsWith('gitlab:')) {
-        repoUrl = userRepo.replace('gitlab:', '');
-      } else if (userRepo.startsWith('bitbucket:')) {
-        repoUrl = userRepo.replace('bitbucket:', '');
-      } else if (userRepo.startsWith('sourcehut:')) {
-        repoUrl = userRepo.replace('sourcehut:', '');
+    } else {
+      // Handle full URLs - extract provider info
+      if (userRepo.includes('gitlab.com')) {
+        provider = 'gitlab';
+      } else if (userRepo.includes('bitbucket.org')) {
+        provider = 'bitbucket';
+      } else if (userRepo.includes('git.sr.ht')) {
+        provider = 'sourcehut';
       }
-      // Default to GitHub if no prefix
     }
 
-    const targetDir = projectName || (userRepo.includes('/') ? userRepo.split('/')[1] : userRepo.split('/').pop()?.replace('.git', ''));
+    const targetDir = projectName || (repoUrl.includes('/') ? repoUrl.split('/')[1] : repoUrl.split('/').pop()?.replace('.git', ''));
     const targetPath = path.resolve(process.cwd(), targetDir || 'cloned-repo');
 
     // Check if directory already exists
     if (await fs.pathExists(targetPath)) {
-      throw new Error(`Directory "${targetDir}" already exists. Please choose a different name.`);
+      throw new Error(`Directory "${targetDir}" already exists. Please choose a different name or remove the existing directory.`);
     }
 
-    console.log('\n' + chalk.hex('#00d2d3')('📦 Starting repository clone...'));
+    console.log('\n' + chalk.hex('#00d2d3')('🌟 Starting repository clone...'));
     console.log(`${chalk.hex('#ffa502')('Repository:')} ${chalk.hex('#00d2d3')(userRepo)}`);
+    console.log(`${chalk.hex('#ffa502')('Provider:')} ${chalk.hex('#9c88ff')(provider.toUpperCase())}`);
     console.log(`${chalk.hex('#ffa502')('Target:')} ${chalk.hex('#95afc0')(targetDir)}`);
     
     const spinner = ora(chalk.hex('#00d2d3')('🔄 Cloning repository...')).start();
 
     try {
-      // Use degit to clone the repository (supports multiple providers)
-      const degitCommand = `degit ${repoUrl}`;
+      // Use degit to clone the repository with provider-specific handling
+      let degitCommand = `degit ${repoUrl}`;
+      
+      // Add provider prefix for non-GitHub providers
+      if (provider !== 'github') {
+        switch (provider) {
+          case 'gitlab':
+            degitCommand = `degit gitlab:${repoUrl}`;
+            break;
+          case 'bitbucket':
+            degitCommand = `degit bitbucket:${repoUrl}`;
+            break;
+          case 'sourcehut':
+            degitCommand = `degit git.sr.ht/${repoUrl}`;
+            break;
+        }
+      }
+      
       await execAsync(`${degitCommand} ${targetDir}`, { 
         cwd: process.cwd()
       });
 
-      spinner.succeed(chalk.hex('#10ac84')(`✅ Repository cloned successfully`));
+      spinner.succeed(chalk.hex('#10ac84')(`✅ Repository cloned successfully from ${provider.toUpperCase()}`));
 
       // Install dependencies if package.json exists
       await installDependenciesForClone(targetPath, targetDir || 'cloned-repo');
@@ -83,10 +136,19 @@ export async function cloneRepo(userRepo: string, projectName?: string): Promise
 
   } catch (error: any) {
     logError('Clone failed', error);
-    console.log('\n📝 Examples:');
-    console.log('  pi clone facebook/react my-react-app');
-    console.log('  pi clone vercel/next.js my-next-app');
-    console.log('  pi create my-app facebook/react');
+    console.log('\n' + chalk.hex('#00d2d3')('📝 Supported formats:'));
+    console.log('  ' + chalk.hex('#95afc0')('GitHub (default):'));
+    console.log('    ' + chalk.hex('#10ac84')('pi clone facebook/react my-app'));
+    console.log('    ' + chalk.hex('#10ac84')('pi clone github:vercel/next.js'));
+    console.log('  ' + chalk.hex('#95afc0')('GitLab:'));
+    console.log('    ' + chalk.hex('#ff6b6b')('pi clone gitlab:user/project'));
+    console.log('  ' + chalk.hex('#95afc0')('BitBucket:'));
+    console.log('    ' + chalk.hex('#9c88ff')('pi clone bitbucket:user/repo'));
+    console.log('  ' + chalk.hex('#95afc0')('SourceHut:'));
+    console.log('    ' + chalk.hex('#ffa502')('pi clone sourcehut:user/repo'));
+    console.log('  ' + chalk.hex('#95afc0')('Full URLs:'));
+    console.log('    ' + chalk.hex('#00d2d3')('pi clone https://github.com/user/repo.git'));
+    console.log('    ' + chalk.hex('#00d2d3')('pi clone https://gitlab.com/user/project.git'));
     throw error;
   }
 }

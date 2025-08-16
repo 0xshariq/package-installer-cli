@@ -59,8 +59,8 @@ export async function promptFrameworkSelection(templateConfig: any): Promise<str
  * Prompts for language selection if multiple languages are available
  */
 export async function promptLanguageSelection(fwConfig: FrameworkConfig, theme: any): Promise<string | undefined> {
-  if (!fwConfig.options?.languages || fwConfig.options.languages.length <= 1) {
-    return fwConfig.options?.languages?.[0];
+  if (!fwConfig.languages || fwConfig.languages.length <= 1) {
+    return fwConfig.languages?.[0];
   }
 
   const { language } = await inquirer.prompt([
@@ -68,7 +68,7 @@ export async function promptLanguageSelection(fwConfig: FrameworkConfig, theme: 
       name: 'language',
       type: 'list',
       message: theme('💻 Choose a language:'),
-      choices: fwConfig.options.languages.map((lang: string) => ({
+      choices: fwConfig.languages.map((lang: string) => ({
         name: `${capitalize(lang)} ${chalk.gray('(Type-safe, Modern syntax)')}`,
         value: lang
       })),
@@ -83,8 +83,12 @@ export async function promptLanguageSelection(fwConfig: FrameworkConfig, theme: 
  */
 export async function promptTemplateSelection(fwConfig: FrameworkConfig, theme: any): Promise<string> {
   const templates = fwConfig.templates;
-  if (!templates) {
+  if (!templates || templates.length === 0) {
     throw new Error('No templates available for this framework');
+  }
+
+  if (templates.length === 1) {
+    return templates[0];
   }
 
   const { selectedTemplate } = await inquirer.prompt([
@@ -92,8 +96,8 @@ export async function promptTemplateSelection(fwConfig: FrameworkConfig, theme: 
       name: 'selectedTemplate',
       type: 'list',
       message: theme('📋 Choose your template:'),
-      choices: Object.keys(templates).map((templateKey: string) => ({
-        name: `${chalk.green(templates[templateKey].name)} ${chalk.gray(`(${templates[templateKey].description})`)}`,
+      choices: templates.map((templateKey: string) => ({
+        name: `${chalk.green(templateKey)} ${chalk.gray('(Pre-configured template)')}`,
         value: templateKey
       })),
     },
@@ -106,11 +110,11 @@ export async function promptTemplateSelection(fwConfig: FrameworkConfig, theme: 
  * Prompts for database selection
  */
 export async function promptDatabaseSelection(fwConfig: FrameworkConfig, theme: any, allowNone: boolean = true): Promise<string | undefined> {
-  if (!frameworkSupportsDatabase(fwConfig)) {
+  if (!fwConfig.databases || Object.keys(fwConfig.databases).length === 0) {
     return undefined;
   }
 
-  const dbKeys = getAvailableDatabases(fwConfig);
+  const dbKeys = Object.keys(fwConfig.databases);
   const choices = allowNone ? [
     { name: `${chalk.blue('None')} ${chalk.gray('(No database setup)')}`, value: 'none' }
   ] : [];
@@ -141,7 +145,11 @@ export async function promptOrmSelection(
   language: string, 
   theme: any
 ): Promise<string | undefined> {
-  const availableOrms = getAvailableOrms(fwConfig, database, language);
+  if (!fwConfig.databases || !fwConfig.databases[database] || !fwConfig.databases[database][language]) {
+    return undefined;
+  }
+
+  const availableOrms = fwConfig.databases[database][language].orms;
   
   if (availableOrms.length === 0) {
     return undefined;
@@ -170,7 +178,7 @@ export async function promptOrmSelection(
  * Prompts for UI library selection
  */
 export async function promptUiSelection(fwConfig: FrameworkConfig, theme: any): Promise<string | null> {
-  if (!fwConfig.options?.uiLibraries || fwConfig.options.uiLibraries.length === 0) {
+  if (!fwConfig.ui || fwConfig.ui.length === 0) {
     return null;
   }
 
@@ -192,7 +200,7 @@ export async function promptUiSelection(fwConfig: FrameworkConfig, theme: any): 
       name: 'ui',
       type: 'list',
       message: theme('✨ Choose a UI library:'),
-      choices: fwConfig.options.uiLibraries.map((u: string) => ({
+      choices: fwConfig.ui.map((u: string) => ({
         name: `${capitalize(u)} ${chalk.gray('(Beautiful, Accessible components)')}`,
         value: u
       })),
@@ -206,12 +214,12 @@ export async function promptUiSelection(fwConfig: FrameworkConfig, theme: any): 
  * Prompts for bundler selection
  */
 export async function promptBundlerSelection(fwConfig: FrameworkConfig, theme: any): Promise<string | undefined> {
-  if (!fwConfig.options?.bundlers || fwConfig.options.bundlers.length === 0) {
+  if (!fwConfig.bundlers || fwConfig.bundlers.length === 0) {
     return undefined;
   }
 
-  if (fwConfig.options.bundlers.length === 1) {
-    return fwConfig.options.bundlers[0];
+  if (fwConfig.bundlers.length === 1) {
+    return fwConfig.bundlers[0];
   }
 
   const { bundler } = await inquirer.prompt([
@@ -219,7 +227,7 @@ export async function promptBundlerSelection(fwConfig: FrameworkConfig, theme: a
       name: 'bundler',
       type: 'list',
       message: theme('📦 Choose a bundler:'),
-      choices: fwConfig.options.bundlers.map((b: string) => ({
+      choices: fwConfig.bundlers.map((b: string) => ({
         name: `${capitalize(b)} ${chalk.gray('(Fast, Modern build tool)')}`,
         value: b
       })),
@@ -295,5 +303,5 @@ export async function promptFrameworkSpecificOptions(framework: string, theme: a
     return typeChoice;
   }
 
-  return '';
+  return 'basic'; // Default fallback
 }

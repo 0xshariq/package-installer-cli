@@ -11,22 +11,18 @@ export interface DatabaseConfig {
 export interface FrameworkConfig {
   type: string;
   description: string;
-  options?: {
-    languages?: string[];
-    uiLibraries?: string[];
-    bundlers?: string[];
-    srcDirectory?: boolean;
-    tailwind?: boolean;
-    databases?: string[];
-    orms?: { [database: string]: string[] };
-  };
-  templates: {
-    [key: string]: {
-      name: string;
-      description: string;
-      path: string;
+  languages?: string[];
+  databases?: {
+    [database: string]: {
+      [language: string]: {
+        orms: string[];
+      };
     };
   };
+  ui?: string[];
+  options?: string[];
+  bundlers?: string[];
+  templates?: string[];
 }
 
 export interface TemplateConfig {

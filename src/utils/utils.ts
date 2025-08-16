@@ -82,9 +82,8 @@ export function validateProjectName(name: string): string | true {
  */
 export function frameworkSupportsDatabase(frameworkConfig: any): boolean {
   return frameworkConfig && 
-         frameworkConfig.options && 
-         frameworkConfig.options.databases && 
-         frameworkConfig.options.databases.length > 0;
+         frameworkConfig.databases && 
+         Object.keys(frameworkConfig.databases).length > 0;
 }
 
 /**
@@ -94,7 +93,7 @@ export function getAvailableDatabases(frameworkConfig: any): string[] {
   if (!frameworkSupportsDatabase(frameworkConfig)) {
     return [];
   }
-  return frameworkConfig.options.databases || [];
+  return Object.keys(frameworkConfig.databases || {});
 }
 
 /**
@@ -105,12 +104,12 @@ export function getAvailableOrms(frameworkConfig: any, database: string, languag
     return [];
   }
 
-  const orms = frameworkConfig.options?.orms?.[database];
-  if (!orms || !Array.isArray(orms)) {
+  const databaseConfig = frameworkConfig.databases?.[database];
+  if (!databaseConfig || !databaseConfig[language]) {
     return [];
   }
 
-  return orms;
+  return databaseConfig[language].orms || [];
 }
 
 /**

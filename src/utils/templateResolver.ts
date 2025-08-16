@@ -133,12 +133,28 @@ export function generateTemplateName(
     }
   }
 
-  // Compose template name for other frameworks
+  // Handle Vue.js naming
+  if (framework === 'vuejs') {
+    if (ui === 'headless-ui' && tailwind) {
+      return 'headless-tailwind-template';
+    } else {
+      return 'no-headless-no-tailwind-template';
+    }
+  }
+
+  // Handle combination templates
+  if (isCombinationTemplate(framework)) {
+    if (fwConfig.templates && fwConfig.templates.length > 0) {
+      // For combination templates, return the selected template directly
+      return fwConfig.templates[0]; // Default to first template, this will be overridden by template selection
+    }
+  }
+
+  // Compose template name for other frameworks (NextJS, ReactJS)
   const parts = [];
   
   // Add src/no-src prefix if applicable
-  if (fwConfig.options?.srcDirectory !== undefined && 
-      framework !== 'angularjs' && 
+  if (framework !== 'angularjs' && 
       framework !== 'nestjs' && 
       !(framework === 'reactjs' && options.bundler === 'vite')) {
     parts.push(src ? 'src' : 'no-src');
@@ -147,10 +163,12 @@ export function generateTemplateName(
   // Add UI library
   if (ui) {
     parts.push(ui);
+  } else if (framework === 'nextjs' || framework === 'reactjs') {
+    parts.push('no-shadcn');
   }
   
   // Add tailwind/no-tailwind suffix if applicable
-  if (fwConfig.options?.tailwind !== undefined && framework !== 'nestjs') {
+  if (framework !== 'nestjs') {
     parts.push(tailwind ? 'tailwind' : 'no-tailwind');
   }
 
