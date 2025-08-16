@@ -137,7 +137,7 @@ export function generateTemplateName(
   const parts = [];
   
   // Add src/no-src prefix if applicable
-  if (fwConfig.options?.includes('src') && 
+  if (fwConfig.options?.srcDirectory !== undefined && 
       framework !== 'angularjs' && 
       framework !== 'nestjs' && 
       !(framework === 'reactjs' && options.bundler === 'vite')) {
@@ -150,7 +150,7 @@ export function generateTemplateName(
   }
   
   // Add tailwind/no-tailwind suffix if applicable
-  if (fwConfig.options?.includes('tailwind') && framework !== 'nestjs') {
+  if (fwConfig.options?.tailwind !== undefined && framework !== 'nestjs') {
     parts.push(tailwind ? 'tailwind' : 'no-tailwind');
   }
 

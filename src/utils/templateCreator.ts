@@ -1,0 +1,155 @@
+import fs from 'fs-extra';
+import path from 'path';
+import { execSync, exec } from 'child_process';
+import { promisify } from 'util';
+import chalk from 'chalk';
+import ora from 'ora';
+
+const execAsync = promisify(exec);
+
+/**
+ * Create a project from a template with progress indicators
+ * @param projectName - Name of the project to create
+ * @param templatePath - Path to the template directory
+ * @returns Promise<string> - Path to the created project
+ */
+export async function createProjectFromTemplate(
+    projectName: string, 
+    templatePath: string
+): Promise<string> {
+    const spinner = ora(chalk.blue('Creating project structure...')).start();
+    
+    try {
+        const projectPath = path.resolve(process.cwd(), projectName);
+        
+        // Check if directory already exists
+        if (await fs.pathExists(projectPath)) {
+            spinner.fail(chalk.red(`Directory ${projectName} already exists`));
+            throw new Error(`Directory ${projectName} already exists`);
+        }
+
+        // Copy template files
+        spinner.text = chalk.blue('Copying template files...');
+        await fs.copy(templatePath, projectPath);
+        
+        spinner.succeed(chalk.green('Project structure created'));
+
+        // Install dependencies if package.json exists
+        const packageJsonPath = path.join(projectPath, 'package.json');
+        if (await fs.pathExists(packageJsonPath)) {
+            await installDependenciesWithProgress(projectPath);
+        }
+
+        return projectPath;
+        
+    } catch (error: any) {
+        spinner.fail(chalk.red('Failed to create project'));
+        throw error;
+    }
+}/**
+ * Install project dependencies with progress indicators
+ * Tries pnpm first, then falls back to npm
+ * Also installs GitHub MCP server and initializes git repository
+ * @param projectPath - Path to the project directory
+ */
+async function installDependenciesWithProgress(projectPath: string): Promise<void> {
+    const installSpinner = ora(chalk.yellow('Installing dependencies...')).start();
+    
+    try {
+        // Try pnpm first, then npm
+        try {
+            installSpinner.text = chalk.yellow('Installing dependencies with pnpm...');
+            execSync('pnpm install', { 
+                cwd: projectPath, 
+                stdio: 'pipe'
+            });
+            
+            // Install GitHub MCP server for git commands
+            installSpinner.text = chalk.blue('Installing GitHub MCP server...');
+            execSync('pnpm add @0xshariq/github-mcp-server@latest', { 
+                cwd: projectPath, 
+                stdio: 'pipe'
+            });
+            
+            installSpinner.succeed(chalk.green('Dependencies installed with pnpm'));
+            
+        } catch {
+            installSpinner.text = chalk.yellow('Installing dependencies with npm...');
+            execSync('npm install', { 
+                cwd: projectPath, 
+                stdio: 'pipe'
+            });
+            
+            // Install GitHub MCP server for git commands
+            installSpinner.text = chalk.blue('Installing GitHub MCP server...');
+            execSync('npm install @0xshariq/github-mcp-server@latest', { 
+                cwd: projectPath, 
+                stdio: 'pipe'
+            });
+            
+            installSpinner.succeed(chalk.green('Dependencies installed with npm'));
+        }
+        
+        // Initialize git repository after dependencies are installed
+        await initializeGitRepositoryForCreate(projectPath);
+        
+    } catch (installError: any) {
+        installSpinner.warn(chalk.yellow('Could not install dependencies automatically'));
+        console.log(chalk.yellow('💡 You can install them manually:'));
+        console.log(chalk.gray(`   cd ${path.basename(projectPath)} && npm install`));
+        
+        // Try to initialize git even if dependencies failed
+        try {
+            await initializeGitRepositoryForCreate(projectPath);
+        } catch (gitError) {
+            console.log(chalk.yellow('⚠️  Could not initialize git repository'));
+        }
+    }
+}
+
+/**
+ * Initialize git repository with fallback commands
+ * @param projectPath - Path to the project directory
+ */
+async function initializeGitRepositoryForCreate(projectPath: string): Promise<void> {
+    const gitSpinner = ora(chalk.cyan('Initializing git repository...')).start();
+    
+    try {
+        // Try to initialize git repository using MCP server commands first
+        try {
+            gitSpinner.text = chalk.cyan('Initializing git with ginit...');
+            await execAsync('ginit', { cwd: projectPath });
+        } catch {
+            gitSpinner.text = chalk.cyan('Initializing git with git init...');
+            await execAsync('git init', { cwd: projectPath });
+        }
+        
+        // Add all files to git
+        try {
+            gitSpinner.text = chalk.cyan('Adding files with gadd...');
+            await execAsync('gadd', { cwd: projectPath });
+        } catch {
+            gitSpinner.text = chalk.cyan('Adding files with git add...');
+            await execAsync('git add .', { cwd: projectPath });
+        }
+        
+        // Make initial commit
+        try {
+            gitSpinner.text = chalk.cyan('Creating initial commit with gcommit...');
+            await execAsync('gcommit "Initial Commit from Package Installer CLI"', { cwd: projectPath });
+        } catch {
+            gitSpinner.text = chalk.cyan('Creating initial commit with git commit...');
+            await execAsync('git commit -m "Initial Commit from Package Installer CLI"', { cwd: projectPath });
+        }
+        
+        gitSpinner.succeed(chalk.green('Git repository initialized with initial commit'));
+        
+    } catch (error: any) {
+        gitSpinner.warn(chalk.yellow('Could not initialize git repository automatically'));
+        console.log(chalk.gray('💡 You can initialize git manually:'));
+        console.log(chalk.gray(`   cd ${path.basename(projectPath)}`));
+        console.log(chalk.gray('   git init'));
+        console.log(chalk.gray('   git add .'));
+        console.log(chalk.gray('   git commit -m "Initial commit"'));
+    }
+}

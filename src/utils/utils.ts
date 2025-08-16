@@ -81,7 +81,10 @@ export function validateProjectName(name: string): string | true {
  * Determines if a framework supports database configuration
  */
 export function frameworkSupportsDatabase(frameworkConfig: any): boolean {
-  return frameworkConfig && frameworkConfig.databases && Object.keys(frameworkConfig.databases).length > 0;
+  return frameworkConfig && 
+         frameworkConfig.options && 
+         frameworkConfig.options.databases && 
+         frameworkConfig.options.databases.length > 0;
 }
 
 /**
@@ -91,7 +94,7 @@ export function getAvailableDatabases(frameworkConfig: any): string[] {
   if (!frameworkSupportsDatabase(frameworkConfig)) {
     return [];
   }
-  return Object.keys(frameworkConfig.databases);
+  return frameworkConfig.options.databases || [];
 }
 
 /**
@@ -102,12 +105,12 @@ export function getAvailableOrms(frameworkConfig: any, database: string, languag
     return [];
   }
 
-  const dbConfig = frameworkConfig.databases[database];
-  if (!dbConfig || !dbConfig[language] || !dbConfig[language].orms) {
+  const orms = frameworkConfig.options?.orms?.[database];
+  if (!orms || !Array.isArray(orms)) {
     return [];
   }
 
-  return dbConfig[language].orms;
+  return orms;
 }
 
 /**
@@ -122,4 +125,34 @@ export function isCombinationTemplate(framework: string): boolean {
  */
 export function getFrameworkDirectoryName(framework: string): string {
   return framework.replace(/\+/g, '-');
+}
+
+/**
+ * Get project name from user input or prompt for it
+ */
+export async function getProjectName(providedName?: string): Promise<string> {
+  if (providedName) {
+    return providedName;
+  }
+  
+  const { default: inquirer } = await import('inquirer');
+  const { projectName } = await inquirer.prompt([
+    {
+      type: 'input',
+      name: 'projectName',
+      message: 'What is your project name?',
+      default: 'my-app',
+      validate: (input: string) => {
+        if (!input.trim()) {
+          return 'Project name cannot be empty';
+        }
+        if (!/^[a-zA-Z0-9-_]+$/.test(input)) {
+          return 'Project name can only contain letters, numbers, hyphens, and underscores';
+        }
+        return true;
+      }
+    }
+  ]);
+  
+  return projectName;
 }

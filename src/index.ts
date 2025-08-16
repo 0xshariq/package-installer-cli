@@ -1,420 +1,278 @@
 #!/usr/bin/env node
 
-/**
- * Package Installer CLI - The Ultimate Tool for Creating Modern Web Applications
- * 
- * This CLI tool allows users to quickly scaffold new projects with various frameworks,
- * languages, and UI libraries. It provides an interactive experience with beautiful
- * styling and comprehensive error handling.
- * 
- * @author Sharique Chaudhary
- * @version 2.0.0
- */
-
-// Core Node.js imports
-import { fileURLToPath } from 'url';
-import path from 'path';
-import * as fs from 'fs';
-
-// Third-party library imports
-import inquirer from 'inquirer';
-import { program, Command } from 'commander';
+import { Command } from 'commander';
 import chalk from 'chalk';
 import gradient from 'gradient-string';
 import boxen from 'boxen';
 
-// Local imports
-import { TemplateConfig, ProjectOptions, FrameworkConfig } from './types.js';
-import { 
-  validateProjectName, 
-  getFrameworkTheme, 
-  frameworkSupportsDatabase,
-  isCombinationTemplate 
-} from './utils.js';
-import { resolveTemplatePath, generateTemplateName } from './templateResolver.js';
-import { 
-  promptFrameworkSelection,
-  promptLanguageSelection,
-  promptTemplateSelection,
-  promptDatabaseSelection,
-  promptOrmSelection,
-  promptUiSelection,
-  promptBundlerSelection,
-  promptSrcDirectory,
-  promptTailwindCss,
-  promptFrameworkSpecificOptions
-} from './prompts.js';
-import { copyTemplateContents, installDependencies } from './projectCreator.js';
-import { 
-  printBanner, 
-  showProjectSummary, 
-  showCombinationTemplateInfo, 
-  showSuccessMessage, 
-  showErrorMessage 
-} from './ui.js';
+// Import command handlers
+import { createProject } from './commands/create.js';
+import { checkCommand } from './commands/check.js';
+import { cloneRepo } from './commands/clone.js';
+import { addCommand } from './commands/add.js';
 
-// =============================================================================
-// CONFIGURATION & CONSTANTS
-// =============================================================================
+// Import utilities
+import { showBanner, logError } from './utils/ui.js';
 
-/**
- * Load package.json to get CLI version and metadata
- */
-const packageJsonPath = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'package.json');
-const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
-const version = packageJson.version;
+// Initialize CLI program
+const program = new Command();
 
-/**
- * ESM-safe __dirname equivalent
- */
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
+// Create beautiful gradient for CLI name
+const gradientTitle = gradient(['#667eea', '#764ba2', '#f093fb']);
+const piGradient = gradient(['#00c6ff', '#0072ff']);
 
-/**
- * Load template configuration from template.json
- */
-const templateConfigPath = path.join(__dirname, '..', 'template.json');
-const templateConfig: TemplateConfig = JSON.parse(fs.readFileSync(templateConfigPath, 'utf8'));
-const frameworks = Object.keys(templateConfig.frameworks);
-
-/**
- * Set up template directory path
- */
-const templatesRoot = path.join(__dirname, '..', 'templates');
-
-// =============================================================================
-// ERROR HANDLING & GRACEFUL EXIT
-// =============================================================================
-
-function showGoodbyeMessage(force = false) {
-  console.log();
-  if (force) {
-    const forceBox = boxen(
-      gradient(['#ff6b6b', '#ee5a24'])(`✋ Terminal closed forcefully!`) + '\n' +
-      chalk.red('Some operations may not have completed.') + '\n\n' +
-      chalk.yellow('💡 Please verify your project files and dependencies.') + '\n' +
-      chalk.cyanBright('You can always rerun the CLI for a fresh setup.'),
-      {
-        padding: 1,
-        margin: 1,
-        borderStyle: 'round',
-        borderColor: 'red',
-        backgroundColor: '#1a1a1a',
-        title: '⚠️ Force Exit',
-        titleAlignment: 'center'
-      }
-    );
-    console.log(forceBox);
-  } else {
-    const goodbyeBox = boxen(
-      gradient(['#667eea', '#764ba2'])(`👋 Thanks for using Package Installer!`) + '\n' +
-      chalk.cyanBright('💡 Remember: Always check your dependencies and README for next steps.') + '\n' +
-      chalk.yellow('⭐ Star the repo if you found it helpful!'),
-      {
-        padding: 1,
-        margin: 1,
-        borderStyle: 'round',
-        borderColor: 'cyan',
-        backgroundColor: '#1a1a1a',
-        title: '✨ Goodbye',
-        titleAlignment: 'center'
-      }
-    );
-    console.log(goodbyeBox);
-  }
-  process.exit(0);
-}
-
-const gracefulExit = () => showGoodbyeMessage(false);
-
-// Process signal handlers
-process.on('SIGINT', () => showGoodbyeMessage(true));
-process.on('SIGTERM', gracefulExit);
-process.on('SIGQUIT', gracefulExit);
-process.on('SIGUSR1', gracefulExit);
-process.on('SIGUSR2', gracefulExit);
-
-// Handle uncaught exceptions
-process.on('uncaughtException', (err) => {
-  showErrorMessage('An unexpected error occurred', err.message || err.toString());
-  gracefulExit();
-});
-
-process.on('unhandledRejection', (reason, promise) => {
-  showErrorMessage('Unhandled promise rejection', String(reason));
-  gracefulExit();
-});
-
-// =============================================================================
-// MAIN CLI LOGIC
-// =============================================================================
-
-/**
- * Main CLI function that orchestrates the entire project creation process
- */
-async function main(projectNameArg?: string) {
-  // Print initial banner
-  printBanner(version, frameworks.length);
-
-  try {
-    // Step 1: Handle project name
-    let filename = projectNameArg;
-    let useCurrentDirectory = false;
-
-    if (filename === '.') {
-      useCurrentDirectory = true;
-      filename = path.basename(process.cwd());
-      console.log(chalk.cyan(`📁 Creating project in current directory: ${chalk.bold(process.cwd())}`));
-    }
-
-    if (!filename) {
-      const { projectName } = await inquirer.prompt([
-        {
-          name: 'projectName',
-          type: 'input',
-          message: chalk.yellow('📁 Enter the project folder name:'),
-          default: 'my-app',
-          transformer: (input: string) => input || chalk.gray('my-app'),
-          validate: validateProjectName,
-          filter: (input) => input && input.trim() ? input.trim() : 'my-app',
-        },
-      ]);
-      filename = projectName;
-      
-      if (filename === '.') {
-        useCurrentDirectory = true;
-        filename = path.basename(process.cwd());
-        console.log(chalk.cyan(`📁 Creating project in current directory: ${chalk.bold(process.cwd())}`));
-      }
-    }
-
-    // Step 2: Framework selection
-    const framework = await promptFrameworkSelection(templateConfig);
-    const theme = getFrameworkTheme(framework);
-    const fwConfig: FrameworkConfig = templateConfig.frameworks[framework];
-
-    // Initialize project options
-    const options: ProjectOptions = {
-      projectName: filename,
-      framework,
-      templateName: ''
-    };
-
-    // Step 3: Language selection
-    options.language = await promptLanguageSelection(fwConfig, theme);
-
-    // Step 4: Handle combination templates
-    const isCombo = isCombinationTemplate(framework);
-    if (isCombo && fwConfig.templates && fwConfig.templates.length > 0) {
-      options.templateName = await promptTemplateSelection(fwConfig, theme);
-    }
-
-    // Step 5: Database selection (for frameworks that support it)
-    if (frameworkSupportsDatabase(fwConfig)) {
-      const allowNone = framework === 'nextjs' || framework === 'nestjs' || framework === 'expressjs';
-      options.database = await promptDatabaseSelection(fwConfig, theme, allowNone);
-      
-      // ORM selection
-      if (options.database && options.language) {
-        options.orm = await promptOrmSelection(fwConfig, options.database, options.language, theme);
-      }
-    }
-
-    // Step 6: UI library selection (skip for combination templates with predefined UI and certain frameworks)
-    if (!isCombo && fwConfig.ui && fwConfig.ui.length > 0 && framework !== 'nestjs' && framework !== 'expressjs') {
-      options.ui = await promptUiSelection(fwConfig, theme);
-    }
-
-    // Step 7: Framework-specific questions
-    let typeChoice = '';
-    if (!isCombo) {
-      if (framework === 'rust' || framework === 'expressjs') {
-        typeChoice = await promptFrameworkSpecificOptions(framework, theme);
-      } else {
-        // Bundler selection
-        if (fwConfig.bundlers && fwConfig.bundlers.length > 0 && framework !== 'nestjs') {
-          options.bundler = await promptBundlerSelection(fwConfig, theme);
-        }
-
-        // Src directory option
-        if (fwConfig.options?.includes('src') && 
-            framework !== 'angularjs' && 
-            framework !== 'nestjs' && 
-            framework !== 'expressjs' &&
-            !(framework === 'reactjs' && options.bundler === 'vite')) {
-          options.src = await promptSrcDirectory(theme);
-        }
-
-        // Tailwind CSS option
-        if (fwConfig.options?.includes('tailwind') && 
-            framework !== 'nestjs' && 
-            framework !== 'expressjs') {
-          options.tailwind = await promptTailwindCss(theme);
-          
-          // Validation for specific framework requirements
-          if (framework === 'vuejs' && !options.tailwind) {
-            showErrorMessage(
-              'Tailwind CSS is required',
-              'Tailwind CSS is required for Headless UI in Vue.js.',
-              'Please select Tailwind CSS to continue with Vue.js setup.'
-            );
-            process.exit(1);
-          }
-          
-          if (framework === 'remixjs' && options.ui === 'shadcn' && !options.tailwind) {
-            showErrorMessage(
-              'Tailwind CSS is required',
-              'Tailwind CSS is required for shadcn/ui in Remix.',
-              'Please select Tailwind CSS to continue with Remix setup.'
-            );
-            process.exit(1);
-          }
-        }
-      }
-    }
-
-    // Step 8: Generate template name
-    if (!options.templateName) {
-      options.templateName = generateTemplateName(framework, fwConfig, {
-        src: options.src,
-        ui: options.ui,
-        tailwind: options.tailwind,
-        typeChoice
-      });
-    }
-
-    // Step 9: Show project summary
-    showProjectSummary(options);
-
-    // Show combination template info if applicable
-    if (isCombo) {
-      showCombinationTemplateInfo(framework, options.database, options.orm);
-    }
-
-    // Step 10: Create the project
-    const templateDir = resolveTemplatePath(options, fwConfig, templatesRoot);
-    const targetPath = useCurrentDirectory ? process.cwd() : path.join(process.cwd(), filename ?? 'my-app');
-
-
-    // Validate template directory exists
-    if (!fs.existsSync(templateDir)) {
-      showErrorMessage(
-        'Template not found',
-        `Template directory: ${templateDir}`,
-        'Please check if the template exists or report this issue.'
-      );
-      return;
-    }
-
-    // Check if target directory already exists
-    if (!useCurrentDirectory && fs.existsSync(targetPath)) {
-      showErrorMessage(
-        'Folder already exists',
-        `Target path: ${targetPath}`,
-        'Please delete the existing folder or use a different name.'
-      );
-      return;
-    }
-
-    // Copy template contents
-    console.log();
-    const ora = await import('ora');
-    const cliSpinners = await import('cli-spinners');
-    const spinner = ora.default({
-      text: theme('🚀 Creating your project...'),
-      spinner: cliSpinners.default.dots12,
-      color: 'cyan'
-    });
-    spinner.start();
-
-    try {
-      copyTemplateContents(templateDir, targetPath);
-      spinner.succeed(theme(`✨ Project ${chalk.bold(filename)} created successfully!`));
-
-      // Install dependencies
-      const dependenciesInstalled = installDependencies(targetPath, theme, framework);
-
-      // Show success message
-      showSuccessMessage(filename ?? 'my-app', targetPath, theme, dependenciesInstalled, framework);
-    } catch (err) {
-      spinner.fail(chalk.red('Failed to create project.'));
-      showErrorMessage(
-        'Failed to create project',
-        err instanceof Error ? err.message : String(err),
-        'Please check your permissions and try again.'
-      );
-    }
-
-  } catch (err: any) {
-    if (err && err.isTtyError) {
-      showErrorMessage(
-        'Terminal does not support interactive prompts',
-        'Please use a terminal that supports interactive prompts.'
-      );
-    } else if (err && (err.message?.includes('User force closed') || err.message?.includes('canceled'))) {
-      gracefulExit();
-    } else {
-      showErrorMessage(
-        'An unexpected error occurred',
-        err instanceof Error ? err.message : String(err),
-        'Please report this issue if it persists.'
-      );
-    }
-    process.exit(1);
-  }
-}
-
-// =============================================================================
-// CLI COMMAND SETUP
-// =============================================================================
-
+// Configure main program with enhanced styling
 program
-  .name('pi')
-  .description(chalk.cyan('🚀 Package Installer CLI - The ultimate tool for creating modern web applications'))
-  .version(chalk.green(version), '-v, --version')
-  .helpOption('-h, --help', chalk.yellow('Display help information'))
-  .argument('[projectName]', chalk.gray('Project name (use "." for current directory)'))
-  .action((projectName) => main(projectName));
+  .name(piGradient('pi'))
+  .description(
+    gradientTitle('📦 Package Installer CLI - A modern, fast, and beautiful CLI tool to scaffold web applications') + '\n' +
+    chalk.hex('#00c6ff')('   ✨ Fast • Modern • Production-Ready • Beautiful')
+  )
+  .version('2.1.3', chalk.hex('#ff6b6b')('-v, --version'), chalk.hex('#95afc0')('output the current version'))
+  .helpOption(chalk.hex('#ff6b6b')('-h, --help'), chalk.hex('#95afc0')('display comprehensive help information'));
 
-// Support package-installer command
-const packageInstallerProgram = new Command('package-installer')
-  .description(chalk.cyan('🚀 Package Installer CLI - The ultimate tool for creating modern web applications'))
-  .version(chalk.green(version), '-v, --version')
-  .helpOption('-h, --help', chalk.yellow('Display help information'))
-  .argument('[projectName]', chalk.gray('Project name (use "." for current directory)'))
-  .action((projectName: string | undefined) => main(projectName));
+/**
+ * Helper function to display command-specific help with beautiful styling
+ */
+function showCommandHelp(
+  commandName: string, 
+  usage: string, 
+  examples: string[], 
+  description?: string,
+  icon?: string
+) {
+  const commandIcon = icon || '📦';
+  const headerGradient = gradient(['#4facfe', '#00f2fe']);
+  
+  console.log('\n' + boxen(
+    headerGradient(`${commandIcon} ${commandName} Command`) + '\n\n' +
+    (description ? chalk.white(description) + '\n\n' : '') +
+    chalk.cyan('Usage:') + '\n' +
+    chalk.white(`  ${usage}`) + '\n\n' +
+    chalk.cyan('Options:') + '\n' +
+    chalk.gray('  -h, --help    Display help for this command') + '\n\n' +
+    chalk.cyan('Examples:') + '\n' +
+    examples.map(example => chalk.gray(`  ${example}`)).join('\n'),
+    {
+      padding: 1,
+      borderStyle: 'round',
+      borderColor: 'cyan',
+      backgroundColor: '#0a0a0a'
+    }
+  ));
+}
 
-program.addCommand(packageInstallerProgram);
+/**
+ * Enhanced error handler with better formatting
+ */
+function handleCommandError(commandName: string, error: Error) {
+  console.log('\n' + boxen(
+    chalk.red('❌ Command Failed') + '\n\n' +
+    chalk.white(`Command: ${commandName}`) + '\n' +
+    chalk.white(`Error: ${error.message}`) + '\n\n' +
+    chalk.gray('💡 Try running with --help for usage information'),
+    {
+      padding: 1,
+      borderStyle: 'round',
+      borderColor: 'red',
+      backgroundColor: '#1a0000'
+    }
+  ));
+  process.exit(1);
+}
 
-// Enhanced help text
-program.addHelpText('after', `
+// CREATE COMMAND - Main project creation from templates
+program
+  .command(chalk.hex('#10ac84')('create'))
+  .description(chalk.hex('#10ac84')('🚀 Create a new project from templates'))
+  .argument('[project-name]', chalk.hex('#95afc0')('Project name (will prompt if not provided)'))
+  .option(chalk.hex('#ff6b6b')('-h, --help'), chalk.hex('#95afc0')('display help for create command'))
+  .action(async (projectName, options) => {
+    if (options.help) {
+      showCommandHelp(
+        'Create',
+        piGradient('pi') + ' ' + chalk.hex('#10ac84')('create') + ' [project-name]',
+        [
+          piGradient('pi') + ' ' + chalk.hex('#10ac84')('create') + ' my-awesome-app    # Create with specific name',
+          piGradient('pi') + ' ' + chalk.hex('#10ac84')('create') + '                   # Interactive mode - will prompt for name',
+          piGradient('pi') + ' ' + chalk.hex('#10ac84')('create') + ' ' + chalk.hex('#ff6b6b')('--help') + '            # Show this help message'
+        ],
+        'Create a new project from our curated collection of modern templates. ' +
+        'Choose from React, Next.js, Express, Nest.js, Rust, and more!',
+        '🚀'
+      );
+      return;
+    }
+    
+    try {
+      showBanner();
+      await createProject(projectName);
+    } catch (error) {
+      handleCommandError('create project', error as Error);
+    }
+  });
 
-${chalk.cyan('📦 Examples:')}
-  ${chalk.gray('$')} pi my-app                    ${chalk.white('Create a new project')}
-  ${chalk.gray('$')} pi .                         ${chalk.white('Use current directory name')}
-  ${chalk.gray('$')} package-installer my-app     ${chalk.white('Full command name')}
+// CHECK COMMAND - Package version checking and suggestions
+program
+  .command(chalk.hex('#f39c12')('check'))
+  .description(chalk.hex('#f39c12')('🔍 Check package versions and get update suggestions'))
+  .argument('[package-name]', chalk.hex('#95afc0')('Specific package to check (optional)'))
+  .option(chalk.hex('#ff6b6b')('-h, --help'), chalk.hex('#95afc0')('display help for check command'))
+  .action(async (packageName, options) => {
+    if (options.help) {
+      showCommandHelp(
+        'Check',
+        piGradient('pi') + ' ' + chalk.hex('#f39c12')('check') + ' [package-name]',
+        [
+          piGradient('pi') + ' ' + chalk.hex('#f39c12')('check') + '                    # Check all packages in current project',
+          piGradient('pi') + ' ' + chalk.hex('#f39c12')('check') + ' react              # Check specific package version',
+          piGradient('pi') + ' ' + chalk.hex('#f39c12')('check') + ' @types/node        # Check scoped packages',
+          piGradient('pi') + ' ' + chalk.hex('#f39c12')('check') + ' ' + chalk.hex('#ff6b6b')('--help') + '             # Show this help message'
+        ],
+        'Check package versions in your project and get suggestions for updates. ' +
+        'Helps you keep your dependencies up-to-date and secure.',
+        '🔍'
+      );
+      return;
+    }
+    
+    try {
+      await checkCommand(packageName);
+    } catch (error) {
+      handleCommandError('check packages', error as Error);
+    }
+  });
 
-${chalk.cyan('🎯 Features:')}
-  ${chalk.green('•')} ${chalk.white('10+ frameworks supported')}
-  ${chalk.green('•')} ${chalk.white('Beautiful UI components (Shadcn, Material-UI, Headless UI)')}
-  ${chalk.green('•')} ${chalk.white('TypeScript & JavaScript & Rust')}
-  ${chalk.green('•')} ${chalk.white('Auto-dependency installation (pnpm, npm, cargo)')}
-  ${chalk.green('•')} ${chalk.white('Database & ORM selection for backend frameworks')}
-  ${chalk.green('•')} ${chalk.white('Combination templates (full-stack setups)')}
-  ${chalk.green('•')} ${chalk.white('Cross-platform support (Windows, macOS, Linux, WSL)')}
-  ${chalk.green('•')} ${chalk.white('Graceful exit and error messaging')}
-  ${chalk.green('•')} ${chalk.white('Smart project name handling (use "." for current directory)')}
-  ${chalk.green('•')} ${chalk.white('Enhanced project summary and styled CLI')}
+// CLONE COMMAND - GitHub repository cloning
+program
+  .command(chalk.hex('#00d2d3')('clone'))
+  .description(chalk.hex('#00d2d3')('📥 Clone a GitHub repository'))
+  .argument('[user/repo]', chalk.hex('#95afc0')('GitHub repository in format "user/repo"'))
+  .argument('[project-name]', chalk.hex('#95afc0')('Custom project name (defaults to repo name)'))
+  .option(chalk.hex('#ff6b6b')('-h, --help'), chalk.hex('#95afc0')('display help for clone command'))
+  .action(async (userRepo, projectName, options) => {
+    if (options.help) {
+      showCommandHelp(
+        'Clone',
+        piGradient('pi') + ' ' + chalk.hex('#00d2d3')('clone') + ' <user/repo> [project-name]',
+        [
+          piGradient('pi') + ' ' + chalk.hex('#00d2d3')('clone') + ' facebook/react my-react-copy    # Clone with custom name',
+          piGradient('pi') + ' ' + chalk.hex('#00d2d3')('clone') + ' vercel/next.js                  # Clone with default name',
+          piGradient('pi') + ' ' + chalk.hex('#00d2d3')('clone') + ' microsoft/TypeScript ts-copy    # Clone TypeScript repo',
+          piGradient('pi') + ' ' + chalk.hex('#00d2d3')('clone') + ' ' + chalk.hex('#ff6b6b')('--help') + '                          # Show this help message'
+        ],
+        'Clone any public GitHub repository quickly and safely. ' +
+        'Automatically installs dependencies and creates .env file from templates.',
+        '📥'
+      );
+      return;
+    }
+    
+    if (!userRepo) {
+      console.log('\n' + chalk.hex('#ff4757')('❌ Error: GitHub repository is required'));
+      console.log(chalk.hex('#95afc0')('   Format: user/repo (e.g., facebook/react)'));
+      console.log(chalk.hex('#95afc0')('   Example: ') + piGradient('pi') + ' ' + chalk.hex('#00d2d3')('clone') + ' facebook/react');
+      return;
+    }
+    
+    try {
+      await cloneRepo(userRepo, projectName);
+    } catch (error) {
+      handleCommandError('clone repository', error as Error);
+    }
+  });
 
-${chalk.cyan('🗄️ Database Integration:')}
-  ${chalk.white('• Next.js: Select database (PostgreSQL, MySQL, MongoDB, etc.) and compatible ORM')}
-  ${chalk.white('• NestJS: MongoDB with Mongoose ORM support')}
-  ${chalk.white('• Express.js: Full database and ORM selection support')}
-  ${chalk.white('• Combination templates: Database and ORM selection for full-stack setups')}
+// ADD COMMAND - Show "Coming Soon" message
+program
+  .command(chalk.hex('#9c88ff')('add'))
+  .description(chalk.hex('#9c88ff')('➕ Add new features to your project'))
+  .argument('[feature]', chalk.hex('#95afc0')('Feature to add (coming soon)'))
+  .option(chalk.hex('#ff6b6b')('-h, --help'), chalk.hex('#95afc0')('display help for add command'))
+  .action(async (feature, options) => {
+    if (options.help) {
+      showCommandHelp(
+        'Add',
+        piGradient('pi') + ' ' + chalk.hex('#9c88ff')('add') + ' [feature]',
+        [
+          piGradient('pi') + ' ' + chalk.hex('#9c88ff')('add') + '                       # Show available features (coming soon)',
+          piGradient('pi') + ' ' + chalk.hex('#9c88ff')('add') + ' auth                  # Add authentication setup (coming soon)',
+          piGradient('pi') + ' ' + chalk.hex('#9c88ff')('add') + ' database              # Add database configuration (coming soon)',
+          piGradient('pi') + ' ' + chalk.hex('#9c88ff')('add') + ' docker               # Add Docker configuration (coming soon)'
+        ],
+        'Add powerful features to your existing project. This feature is currently in development.',
+        '➕'
+      );
+      return;
+    }
+    
+    // Show coming soon message
+    console.log('\n' + boxen(
+      chalk.hex('#ffa502')('🚧 Coming Soon!') + '\n\n' +
+      chalk.white('The "add" command is currently under development.') + '\n' +
+      chalk.hex('#95afc0')('We\'re working hard to bring you awesome features like:') + '\n\n' +
+      chalk.hex('#00d2d3')('• Authentication systems (Auth0, Firebase, Clerk)') + '\n' +
+      chalk.hex('#00d2d3')('• Database integrations (MongoDB, PostgreSQL, MySQL)') + '\n' +
+      chalk.hex('#00d2d3')('• Docker containerization') + '\n' +
+      chalk.hex('#00d2d3')('• Testing frameworks (Jest, Cypress, Playwright)') + '\n' +
+      chalk.hex('#00d2d3')('• CI/CD pipelines') + '\n\n' +
+      chalk.white('Stay tuned for updates! 🎉'),
+      {
+        padding: 1,
+        borderStyle: 'round',
+        borderColor: '#ffa502',
+        backgroundColor: '#1a1a00'
+      }
+    ));
+  });
 
-${chalk.cyan('💡 Tips:')}
-  ${chalk.yellow('•')} ${chalk.gray('Use interactive mode for full customization')}
-  ${chalk.yellow('•')} ${chalk.gray('Check README.md for framework-specific instructions')}
-  ${chalk.yellow('•')} ${chalk.gray('Template configuration is driven by template.json')}
-`);
+// ENHANCED GLOBAL HELP - Beautiful examples and usage information
+program.on('--help', () => {
+  const exampleGradient = gradient(['#43e97b', '#38f9d7']);
+  
+  console.log('\n' + boxen(
+    exampleGradient('🚀 Quick Start Examples') + '\n\n' +
+    chalk.white('Create Projects:') + '\n' +
+    chalk.hex('#95afc0')('  ') + piGradient('pi') + ' ' + chalk.hex('#10ac84')('create') + chalk.hex('#95afc0')(' my-app             # Interactive project creation') + '\n' +
+    chalk.hex('#95afc0')('  ') + piGradient('pi') + ' ' + chalk.hex('#10ac84')('create') + chalk.hex('#95afc0')(' blog-app           # Create with specific name') + '\n\n' +
+    chalk.white('Clone Repositories:') + '\n' +
+    chalk.hex('#95afc0')('  ') + piGradient('pi') + ' ' + chalk.hex('#00d2d3')('clone') + chalk.hex('#95afc0')(' facebook/react      # Clone popular repositories') + '\n' +
+    chalk.hex('#95afc0')('  ') + piGradient('pi') + ' ' + chalk.hex('#00d2d3')('clone') + chalk.hex('#95afc0')(' user/repo my-copy   # Clone with custom name') + '\n\n' +
+    chalk.white('Check & Maintain:') + '\n' +
+    chalk.hex('#95afc0')('  ') + piGradient('pi') + ' ' + chalk.hex('#f39c12')('check') + chalk.hex('#95afc0')('                     # Check all package versions') + '\n' +
+    chalk.hex('#95afc0')('  ') + piGradient('pi') + ' ' + chalk.hex('#f39c12')('check') + chalk.hex('#95afc0')(' react               # Check specific package') + '\n\n' +
+    chalk.white('Add Features:') + '\n' +
+    chalk.hex('#95afc0')('  ') + piGradient('pi') + ' ' + chalk.hex('#9c88ff')('add') + chalk.hex('#95afc0')('                       # Browse available features (coming soon)') + '\n\n' +
+    chalk.hex('#00d2d3')('💡 Pro Tips:') + '\n' +
+    chalk.hex('#95afc0')('  • Use ') + chalk.hex('#ff6b6b')('--help') + chalk.hex('#95afc0')(' with any command for detailed information') + '\n' +
+    chalk.hex('#95afc0')('  • Most arguments are optional - CLI will prompt when needed') + '\n' +
+    chalk.hex('#95afc0')('  • Check our templates: React, Next.js, Express, Nest.js, Rust & more!'),
+    {
+      padding: 1,
+      borderStyle: 'round',
+      borderColor: '#10ac84',
+      backgroundColor: '#001a00'
+    }
+  ));
+});
 
-program.parse(process.argv);
+// ENHANCED DEFAULT BEHAVIOR - Beautiful banner and help when no command provided
+if (process.argv.length === 2) {
+  showBanner();
+  console.log('\n' + boxen(
+    chalk.white('Welcome to Package Installer CLI! 👋') + '\n\n' +
+    chalk.hex('#95afc0')('To get started, try one of these commands:') + '\n\n' +
+    chalk.hex('#10ac84')('  ') + piGradient('pi') + ' ' + chalk.hex('#10ac84')('create           ') + chalk.hex('#95afc0')('# Create a new project') + '\n' +
+    chalk.hex('#00d2d3')('  ') + piGradient('pi') + ' ' + chalk.hex('#00d2d3')('clone user/repo  ') + chalk.hex('#95afc0')('# Clone a GitHub repo') + '\n' +
+    chalk.hex('#ff6b6b')('  ') + piGradient('pi') + ' ' + chalk.hex('#ff6b6b')('--help           ') + chalk.hex('#95afc0')('# See all available commands') + '\n\n' +
+    chalk.hex('#ffa502')('🎯 Quick tip: All commands support --help for detailed usage!'),
+    {
+      padding: 1,
+      borderStyle: 'round',
+      borderColor: '#00c6ff',
+      backgroundColor: '#000a1a'
+    }
+  ));
+}
+
+// Parse command line arguments
+program.parse();

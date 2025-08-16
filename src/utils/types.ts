@@ -9,16 +9,24 @@ export interface DatabaseConfig {
 }
 
 export interface FrameworkConfig {
-  type: 'frontend' | 'backend' | 'fullstack';
+  type: string;
   description: string;
-  languages: string[];
-  databases?: {
-    [database: string]: DatabaseConfig;
+  options?: {
+    languages?: string[];
+    uiLibraries?: string[];
+    bundlers?: string[];
+    srcDirectory?: boolean;
+    tailwind?: boolean;
+    databases?: string[];
+    orms?: { [database: string]: string[] };
   };
-  ui?: string[];
-  options?: string[];
-  bundlers?: string[];
-  templates?: string[];
+  templates: {
+    [key: string]: {
+      name: string;
+      description: string;
+      path: string;
+    };
+  };
 }
 
 export interface TemplateConfig {

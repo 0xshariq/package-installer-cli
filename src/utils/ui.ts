@@ -264,3 +264,27 @@ export function showErrorMessage(title: string, message: string, details?: strin
   );
   console.log(errorBox);
 }
+
+/**
+ * Shows the main banner (alias for printBanner)
+ */
+export function showBanner(): void {
+  printBanner('2.0.3', 10);
+}
+
+/**
+ * Logs errors with proper formatting
+ */
+export function logError(message: string, error: Error): void {
+  console.error(chalk.red(`❌ ${message}: ${error.message}`));
+  if (process.env.DEBUG) {
+    console.error(chalk.gray(error.stack));
+  }
+}
+
+/**
+ * Logs success messages with proper formatting
+ */
+export function logSuccess(message: string): void {
+  console.log(chalk.green(`✅ ${message}`));
+}

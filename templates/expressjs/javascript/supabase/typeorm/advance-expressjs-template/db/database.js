@@ -39,3 +39,4 @@ export const disconnectDB = async () => {
   } catch (error) {
     console.error('Error closing database connection:', error);
   } 
+};

@@ -1,102 +1,571 @@
 
 # Package Installer CLI (pi)
 
-## 🆕 What's New (v2.0.0)
-
-- **Express.js Database Support:**
-  - **26+ Express.js Templates** with MongoDB, Supabase (PostgreSQL), NeonDB (PostgreSQL)
-  - **Available ORMs:** Mongoose, Typegoose, TypeORM, Prisma, Drizzle
-  - Both Basic & Advanced templates for each database/ORM combination
-
-- **Next.js Database Integration:**
-  - Database selection with PostgreSQL, MySQL, MongoDB support
-  - ORM selection matching your database choice
-  - Generated projects ready for data-driven development
-
-- **Combination Templates Database Support:**
-  - **React + Express + Shadcn/ui** - Now supports database and ORM selection
-  - **React + NestJS + Shadcn/ui** - Full database integration available
-  - Same database options as standalone Express.js: MongoDB, Supabase, NeonDB
-  - Compatible ORMs: Mongoose, Typegoose, TypeORM, Prisma, Drizzle
-  - Example:
-    ```bash
-    $ pi my-fullstack-app
-    🚀 Choose a framework: reactjs+expressjs+shadcn
-    🗄️ Choose a database: MongoDB
-    🔧 Choose an ORM: Mongoose
-    📋 Choose template: react-advance-express-shadcn-template
-    ```
-
-- **Enhanced CLI Experience:**
-  - Updated to version 2.0.0 with comprehensive database keywords
-  - Database and ORM selection available in: Next.js, Express.js, and both Combination Templates
-  - Better error handling and validation
-  - Improved template organization and structure
-
-
-[![npm version](https://img.shields.io/npm/v/package-installer-cli?style=flat-square)](https://www.npmjs.com/package/package-installer-cli)
+[![npm version](https://img.shields.io/npm/v/@0xshariq/package-installer?style=flat-square)](https://www.npmjs.com/package/@0xshariq/package-installer)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Node.js Version](https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen.svg)](https://nodejs.org/)
 
-**NPM Package:** [https://www.npmjs.com/package/package-installer-cli](https://www.npmjs.com/package/package-installer-cli)
-
-A modern, cross-platform CLI tool to scaffold web applications with comprehensive database support, beautiful styling, and production-ready templates. Create full-stack projects with Express.js + databases, Next.js applications, and more in seconds.
-
-## ✨ Features
-
-- 🚀 **10+ Frameworks** - Next.js, React, Vue, Angular, Express, Rust, **Remix**, **NestJS**
-- 🗄️ **Comprehensive Database Support** - MongoDB, PostgreSQL (Supabase, NeonDB) with multiple ORMs
-- 💻 **Language Support** - JavaScript & TypeScript with full type safety
-- 🧩 **UI Libraries** - Shadcn/ui, Material-UI, Headless UI integration
-- 📦 **Build Tools** - Vite, Webpack, and framework-specific bundlers
-- 🔧 **26+ Express.js Templates** - Every database and ORM combination covered
-- 🎨 **Beautiful Styling** - Gradient colors, styled boxes, enhanced UX
-- 🌍 **Cross-platform** - Works on Windows, macOS, Linux, WSL
-- ⚡ **Production-Ready** - Pre-configured with schemas, connections, and best practices
-- 🔧 **Dual Commands** - Use `pi` or `package-installer`
-- 📁 **Smart Project Names** - Use "." for current directory name
-- 👋 **Graceful Exits** - Proper error handling and goodbye messages
-- 🎯 **Combination Templates** - Pre-configured full-stack setups
-- 🦀 **Rust Support** - Cargo commands and project structure
-- 🔄 **Auto Dependency Installation** - Smart package manager detection
-- 🏷️ **Framework Types** - Frontend, Backend, Fullstack indicators
-- 🔗 **CORS Integration** - Pre-configured for full-stack templates
-- 📊 **Enhanced Project Summary** - Detailed configuration overview
+A modern CLI tool to scaffold web applications, clone GitHub repositories, and manage projects with automatic git initialization and dependency installation.
 
 ## 🚀 Quick Start
 
-### Global Installation
+```bash
+# Install globally
+npm install -g @0xshariq/package-installer
+
+# Create a new project
+pi create my-awesome-app
+
+# Clone a GitHub repository  
+pi clone facebook/react my-react-copy
+
+# Check package versions
+pi check react
+
+# Show help
+pi --help
+```
+
+## ✨ Key Features
+
+- **10+ Frameworks** - Next.js, React, Vue, Angular, Express, Rust, Remix, NestJS
+- **Database Support** - MongoDB, PostgreSQL (Supabase, NeonDB) with multiple ORMs
+- **GitHub Cloning** - Auto dependency installation and git initialization
+- **Package Management** - Version checking and update recommendations
+- **Beautiful UI** - Gradient colors, progress indicators, styled help
+- **Cross-platform** - Windows, macOS, Linux, WSL support
+- **Production Ready** - Pre-configured templates with best practices
+
+## �️ Commands
+
+| Command | Description | Example |
+|---------|-------------|---------|
+| `create` | Create new project from templates | `pi create my-app` |
+| `clone` | Clone GitHub repository | `pi clone user/repo` |
+| `check` | Check package versions | `pi check react` |
+| `add` | Add features (coming soon) | `pi add auth` |
+
+### Create Command
+```bash
+pi create [project-name]          # Interactive project creation
+pi create my-app                  # Create with specific name
+pi create --help                  # Show help
+```
+
+### Clone Command  
+```bash
+pi clone user/repo                # Clone with default name
+pi clone user/repo my-project     # Clone with custom name
+pi clone --help                   # Show help
+```
+
+### Check Command
+```bash
+pi check                          # Check all packages
+pi check react                    # Check specific package
+pi check --help                   # Show help
+```
+
+## 🗄️ Supported Frameworks & Templates
+
+### Frontend Frameworks
+- **Next.js** - Full-stack React framework with SSR/SSG
+- **React** - Modern UI library with extensive ecosystem
+- **Vue** - Progressive framework with excellent DX
+- **Angular** - Enterprise-grade TypeScript framework
+- **Remix** - Web standards focused full-stack framework
+
+### Backend Frameworks
+- **Express** - 26+ templates with database/ORM combinations
+- **NestJS** - Enterprise Node.js framework with TypeScript
+- **Rust** - High-performance systems programming
+
+### Database Support
+- **MongoDB** - With Mongoose, Typegoose
+- **PostgreSQL** - With Supabase, NeonDB, Prisma, TypeORM, Drizzle
+- **MySQL** - With compatible ORMs
+
+### UI Libraries
+- Shadcn/ui, Material-UI, Headless UI integration
+- Tailwind CSS, CSS Modules support
+- Component library templates
+
+## 🌟 Auto Git Initialization
+
+Every created/cloned project automatically gets:
+- Git repository initialization (`git init`)
+- All files added (`git add .`)
+- Initial commit with message: "Initial Commit from Package Installer CLI"
+- GitHub MCP server installed for enhanced git workflow
+
+## 📋 Example Usage
+
+### Create Express API with MongoDB
+```bash
+$ pi create my-api
+🚀 Framework: Express.js [BACKEND]
+💻 Language: TypeScript  
+🗄️ Database: MongoDB
+🔧 ORM: Mongoose
+✅ Project created with git initialization!
+```
+
+### Clone and Setup Repository
+```bash
+$ pi clone microsoft/TypeScript ts-playground
+📥 Cloning repository...
+🔧 Installing dependencies...
+📄 Creating .env file...
+🌟 Initializing git repository...
+✅ Ready for development!
+```
+
+## 🛠️ Development
 
 ```bash
-# Using npm
-npm i -g @0xshariq/package-installer
+# Clone and setup
+git clone https://github.com/0xshariq/package-installer-cli.git
+cd package-installer-cli
+pnpm install
 
-# Using pnpm
-pnpm i -g @0xshariq/package-installer
+# Build and test
+pnpm build
+node dist/index.js --help
+```
 
-# Using yarn
+## 🤝 Contributing
 
-The Ultimate Tool for Creating Modern Web Applications
+1. Fork the repository
+2. Create feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit changes (`git commit -m 'Add amazing feature'`)
+4. Push to branch (`git push origin feature/amazing-feature`)
+5. Open Pull Request
 
-## ✨ Features
+## 📝 License
 
-- Interactive CLI with beautiful UI and comprehensive database support
-- Argument-based project name (supports `pi my-app` or `pi .` for current directory)
-- Framework, language, and UI library selection
-- **Database & ORM selection** for Next.js, Express.js, and Combination Templates
-- **Dynamic ORM filtering** (ORMs shown based on selected database)
-- Automatic dependency installation (`pnpm` or `npm`)
-- Cross-platform path handling
-- Graceful exit and error messaging
-- Combination templates for full-stack setups
-- Production-ready templates with authentication, validation, and testing
+MIT License - see [LICENSE](LICENSE) file for details.
+
+## 🔗 Links
+
+- **NPM Package**: [https://www.npmjs.com/package/@0xshariq/package-installer](https://www.npmjs.com/package/@0xshariq/package-installer)
+- **GitHub**: [https://github.com/0xshariq/package-installer-cli](https://github.com/0xshariq/package-installer-cli)
+- **Issues**: [https://github.com/0xshariq/package-installer-cli/issues](https://github.com/0xshariq/package-installer-cli/issues)
+
+---
+
+**Made with ❤️ by [Sharique Chaudhary](https://github.com/0xshariq)**
+
+# Clone with custom project name
+pi clone vercel/next.js my-nextjs-copy
+
+# Show detailed help
+pi clone --help
+```
+
+**Features:**
+- Automatic dependency installation (tries pnpm first, then npm)
+- Environment file creation from .env templates
+- Progress indicators with colored status messages
+- Error handling for private/non-existent repos
+- Project structure preservation
+
+### 3. 🔍 Check Command
+
+Check package versions and get update suggestions.
+
+```bash
+# Check all packages in current project
+pi check
+
+# Check specific package
+pi check react
+
+# Check scoped packages
+pi check @types/node
+
+# Show detailed help
+pi check --help
+```
+
+**Features:**
+- Version comparison with latest releases
+- Security vulnerability detection
+- Update recommendations
+- Dependency tree analysis
+
+### 4. ➕ Add Command (Coming Soon)
+
+Add new features to existing projects.
+
+```bash
+# Show available features (coming soon)
+pi add
+
+# Add authentication (coming soon)
+pi add auth
+
+# Show detailed help
+pi add --help
+```
+
+**Planned Features:**
+- Authentication systems (Auth0, Firebase, Clerk)
+- Database integrations (MongoDB, PostgreSQL, MySQL)
+- Docker containerization
+- Testing frameworks (Jest, Cypress, Playwright)
+- CI/CD pipelines
 
 ## 🗄️ Database Support
 
-Database and ORM selection is available for:
-- **Next.js** - PostgreSQL, MySQL, MongoDB with compatible ORMs
-- **Express.js** - MongoDB, Supabase (PostgreSQL), NeonDB (PostgreSQL) with Mongoose, Typegoose, TypeORM, Prisma, Drizzle
-- **Combination Templates** - Same database options as Express.js for the backend
+Comprehensive database and ORM support for modern web applications:
+
+### Express.js Templates (26+ Combinations)
+- **Databases:** MongoDB, Supabase (PostgreSQL), NeonDB (PostgreSQL)
+- **ORMs:** Mongoose, Typegoose, TypeORM, Prisma, Drizzle
+- **Template Types:** Basic & Advanced for each combination
+
+### Next.js Templates
+- **Databases:** PostgreSQL, MySQL, MongoDB
+- **ORMs:** Compatible with selected database
+- **Integration:** Built-in authentication and API routes
+
+### Combination Templates
+- **React + Express + Shadcn/ui** with full database support
+- **React + NestJS + Shadcn/ui** with enterprise features
+- Pre-configured CORS and environment setup
+
+## 📋 Example Usage
+
+### Creating an Express.js API with MongoDB
+
+```bash
+$ pi create my-backend-app
+
+🚀 Choose a framework: Express.js [BACKEND]
+💻 Choose a language: TypeScript
+🗄️ Choose a database: MongoDB
+🔧 Choose an ORM: Mongoose
+📋 Choose your template: advance-expressjs-template
+
+✅ Project created with full MongoDB + Mongoose integration!
+```
+
+### Creating a Next.js App with PostgreSQL
+
+```bash
+$ pi create my-next-app
+
+🚀 Choose a framework: Next.js [FULLSTACK]
+💻 Choose a language: TypeScript
+🧩 Do you want to add a UI library? Yes
+✨ Choose a UI library: Shadcn
+📦 Choose a bundler: Vite
+📂 Do you want a src directory? Yes
+🎨 Do you want to use Tailwind CSS? Yes
+🗄️ Choose a database: PostgreSQL
+🔧 Choose an ORM: Prisma
+
+✅ Created Next.js app with PostgreSQL and Prisma!
+```
+
+### Cloning and Setting Up a Repository
+
+```bash
+$ pi clone microsoft/TypeScript ts-playground
+
+📥 Cloning repository...
+✅ Successfully cloned microsoft/TypeScript
+🔧 Installing dependencies with pnpm...
+✅ Dependencies installed with pnpm
+📄 Creating .env file...
+✅ Created .env file with 3 variables
+🎉 Project "ts-playground" created successfully!
+```
+
+### Creating a Full-Stack Application
+
+```bash
+$ pi create my-fullstack-app
+
+🚀 Choose a framework: reactjs+expressjs+shadcn [FULLSTACK]
+💻 Choose a language: TypeScript
+🗄️ Choose a database: MongoDB
+🔧 Choose an ORM: Mongoose
+📋 Choose your template: react-advance-express-shadcn-template
+
+✅ Pre-configured full-stack setup with React + Express + Shadcn/ui!
+```
+
+## 🎨 Beautiful Interface
+
+The CLI features a modern, elegant interface with:
+
+- **Gradient ASCII Art** - Vibrant multi-color banner
+- **Styled Information Boxes** - Color-coded sections with beautiful borders
+- **Interactive Prompts** - Emoji-enhanced questions with clear options
+- **Progress Indicators** - Animated spinners with detailed status messages
+- **Success Messages** - Comprehensive next steps and usage information
+- **Error Handling** - Graceful error messages with helpful suggestions
+- **Framework Type Indicators** - [FRONTEND], [BACKEND], [FULLSTACK] labels
+- **Command-Specific Help** - Detailed usage examples for each command
+
+### Main Interface Preview
+
+```bash
+┌─────────────────────────────────────────────────────────┐
+│                    ✨ Package Installer CLI             │
+│                                                         │
+```
+
+## 🌟 Framework Support
+
+### Frontend Frameworks
+- **Next.js** [FULLSTACK] - Modern React framework with SSR/SSG
+- **React.js** [FRONTEND] - Popular UI library with extensive ecosystem
+- **Vue.js** [FRONTEND] - Progressive framework with excellent DX
+- **Angular.js** [FRONTEND] - Enterprise-grade framework with TypeScript
+- **Remix** [FRONTEND] - Full-stack web framework focused on web standards
+
+### Backend Frameworks
+- **Express.js** [BACKEND] - Fast, minimalist web framework for Node.js
+- **NestJS** [BACKEND] - Progressive framework for building efficient server-side applications
+- **Rust** [BACKEND] - Systems programming language for high-performance applications
+
+### Full-Stack Solutions
+- **reactjs+expressjs+shadcn** [FULLSTACK] - React frontend with Express backend
+- **reactjs+nestjs+shadcn** [FULLSTACK] - React frontend with NestJS backend
+
+### Framework-Specific Features
+
+#### Express.js 🟢
+- **26+ Template combinations** covering all database/ORM pairings
+- **Database Support:** MongoDB, Supabase (PostgreSQL), NeonDB (PostgreSQL)
+- **ORM Support:** Mongoose, Typegoose, TypeORM, Prisma, Drizzle
+- **Template Types:** Basic & Advanced variants
+- **Production Features:** Authentication, validation, testing, Docker support
+
+#### Next.js ⚫
+- **Full-stack capabilities** with API routes and middleware
+- **Database Integration:** Built-in support for PostgreSQL, MySQL, MongoDB
+- **UI Library Integration:** Seamless Shadcn/ui, Material-UI setup
+- **Bundler Options:** Webpack, Turbopack support
+- **Styling Options:** Tailwind CSS, CSS Modules, Styled Components
+
+#### Rust 🦀
+- **Cargo Integration:** Uses `cargo` commands instead of npm
+- **Template Variants:** Basic and Advanced project structures
+- **Performance Focus:** Optimized for high-performance applications
+- **System Integration:** Native OS integration capabilities
+
+#### NestJS 🟣
+- **Enterprise Ready:** Built-in features for scalable applications
+- **TypeScript First:** Full type safety throughout the stack
+- **Modular Architecture:** Dependency injection and decorators
+- **Built-in Features:** Guards, interceptors, pipes, and more
+
+## 🔧 Advanced Usage
+
+### Environment Variables
+
+The CLI automatically creates `.env` files from available templates:
+
+```bash
+# If your cloned repo has .env.example, .env.local, etc.
+pi clone user/repo my-project
+
+# Output:
+✅ Created .env file with 5 variables:
+DATABASE_URL=
+API_SECRET=
+NEXT_PUBLIC_APP_URL=
+JWT_SECRET=
+SMTP_PASSWORD=
+```
+
+### Smart Dependency Installation
+
+The CLI intelligently chooses the best package manager:
+
+```bash
+# Tries pnpm first (faster), falls back to npm
+🔧 Installing dependencies with pnpm...
+✅ Dependencies installed with pnpm
+
+# If pnpm is not available:
+🔧 Installing dependencies with npm...
+✅ Dependencies installed with npm
+```
+
+### Project Name Strategies
+
+```bash
+# Use current directory name
+pi create .
+
+# Kebab-case (recommended)
+pi create my-awesome-project
+
+# With numbers and special characters
+pi create project-2024-v2
+```
+
+### Custom Repository Cloning
+
+```bash
+# Clone popular repositories
+pi clone facebook/react
+pi clone microsoft/TypeScript
+pi clone vercel/next.js
+
+# Clone with custom names
+pi clone tailwindlabs/tailwindcss my-css-framework
+pi clone prisma/prisma my-orm-study
+```
+
+## 🛠️ Development
+
+### Local Development Setup
+
+```bash
+# Clone the repository
+git clone https://github.com/0xshariq/package-installer-cli.git
+cd package-installer-cli
+
+# Install dependencies
+pnpm install
+
+# Build the project
+pnpm build
+
+# Run locally
+node dist/index.js
+
+# Test specific commands
+node dist/index.js create my-test-app
+node dist/index.js clone microsoft/TypeScript test-clone
+```
+
+### Project Structure
+
+```
+package-installer-cli/
+├── src/
+│   ├── index.ts                    # Main CLI with enhanced styling and commands
+│   ├── commands/
+│   │   ├── create.ts               # Project creation from templates
+│   │   ├── clone.ts                # GitHub repository cloning
+│   │   ├── check.ts                # Package version checking
+│   │   └── add.ts                  # Feature addition (coming soon)
+│   └── utils/
+│       ├── cloneUtils.ts           # GitHub cloning utilities
+│       ├── ui.ts                   # Beautiful CLI interfaces and styling
+│       ├── utils.ts                # Common utilities and themes
+│       └── types.ts                # TypeScript type definitions
+├── templates/                      # Template directories
+│   ├── nextjs/
+│   ├── reactjs/
+│   ├── expressjs/                  # 26+ Express templates
+│   ├── rust/                       # Rust project templates
+│   └── combination/                # Full-stack templates
+├── template.json                   # Framework configurations
+├── dist/                          # Compiled JavaScript
+└── package.json
+```
+
+### Key Implementation Features
+
+- **Commander.js Integration** - Robust command-line argument parsing
+- **Beautiful Styling** - Chalk, gradient-string, and boxen for enhanced UX
+- **Error Handling** - Graceful error messages with helpful suggestions
+- **Cross-Platform Support** - Works on Windows, macOS, Linux, WSL
+- **TypeScript Support** - Full type safety throughout the codebase
+- **Modular Architecture** - Separated commands and utilities
+- **Progress Indicators** - Ora spinners with detailed status messages
+
+## 🚨 Troubleshooting
+
+### Common Issues
+
+**Command not found: pi**
+```bash
+# Solution: Reinstall globally
+npm uninstall -g @0xshariq/package-installer
+npm install -g @0xshariq/package-installer
+```
+
+**Permission denied errors**
+```bash
+# Solution: Use proper permissions or sudo (Unix-like systems)
+sudo npm install -g @0xshariq/package-installer
+```
+
+**Network errors during cloning**
+```bash
+# Solution: Check internet connection and repository accessibility
+pi clone --help  # Check command format
+```
+
+**Dependency installation fails**
+```bash
+# Solution: Manual installation
+cd your-project
+npm install
+# or
+pnpm install
+```
+
+## 🤝 Contributing
+
+We welcome contributions! Here's how to get started:
+
+### Development Guidelines
+
+1. **Fork** the repository on GitHub
+2. **Clone** your fork locally
+3. **Create** a feature branch (`git checkout -b feature/amazing-feature`)
+4. **Install** dependencies (`pnpm install`)
+5. **Make** your changes with proper TypeScript types
+6. **Build** and test (`pnpm build && node dist/index.js --help`)
+7. **Commit** with descriptive messages (`git commit -m 'Add amazing feature'`)
+8. **Push** to your branch (`git push origin feature/amazing-feature`)
+9. **Open** a Pull Request with detailed description
+
+### Code Standards
+
+- **TypeScript First** - Use proper types and interfaces
+- **Error Handling** - Add comprehensive error handling
+- **Styling** - Follow existing color schemes and UI patterns
+- **Documentation** - Update README for new features
+- **Testing** - Test on multiple platforms (Windows, macOS, Linux)
+- **Comments** - Add JSDoc comments for functions and classes
+
+## 📝 License
+
+MIT License - see [LICENSE](LICENSE) file for details.
+
+## 🙏 Acknowledgments
+
+- **Open Source Community** - For the amazing tools and libraries
+- **Contributors** - Everyone who has contributed to this project
+- **Framework Creators** - Teams behind React, Next.js, Express, etc.
+- **Modern CLI Tools** - Inspired by `create-next-app`, `create-react-app`, and similar tools
+- **Typography & Design** - Beautiful ASCII art and gradient styling libraries
+
+## 🔗 Links
+
+- **NPM Package:** [https://www.npmjs.com/package/@0xshariq/package-installer](https://www.npmjs.com/package/@0xshariq/package-installer)
+- **GitHub Repository:** [https://github.com/0xshariq/package-installer-cli](https://github.com/0xshariq/package-installer-cli)
+- **Issues & Bug Reports:** [https://github.com/0xshariq/package-installer-cli/issues](https://github.com/0xshariq/package-installer-cli/issues)
+- **Author:** [Sharique Chaudhary](https://github.com/0xshariq)
+
+---
+
+**Made with ❤️ by [Sharique Chaudhary](https://github.com/0xshariq)**
+
+*Star this repository if you find it helpful! ⭐*
+
+**🚀 Ready to build something amazing? Start with `pi create my-awesome-project`**
+```
 
 ## 📋 Example Usage
 
