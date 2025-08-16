@@ -25,7 +25,7 @@ const piGradient = gradient(['#00c6ff', '#0072ff']);
 program
   .name(piGradient('pi'))
   .description(chalk.hex('#667eea')('📦 Package Installer CLI') + chalk.hex('#95afc0')(' - Modern web application scaffolding tool'))
-  .version('2.1.3', chalk.hex('#ff6b6b')('-v, --version'), chalk.hex('#95afc0')('output the current version'))
+  .version('2.1.0', chalk.hex('#ff6b6b')('-v, --version'), chalk.hex('#95afc0')('output the current version'))
   .helpOption(chalk.hex('#ff6b6b')('-h, --help'), chalk.hex('#95afc0')('display comprehensive help information'));
 
 /**
