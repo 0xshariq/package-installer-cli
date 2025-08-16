@@ -5,7 +5,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Node.js Version](https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen.svg)](https://nodejs.org/)
 
-A modern CLI tool to scaffold web applications, clone GitHub repositories, and manage projects with automatic git initialization and dependency installation.
+A modern CLI tool to scaffold web applications, clone repositories from GitHub/GitLab/BitBucket/SourceHut, and manage projects with automatic git initialization and dependency installation.
 
 ## 🚀 Quick Start
 
@@ -16,8 +16,10 @@ npm install -g @0xshariq/package-installer
 # Create a new project
 pi create my-awesome-app
 
-# Clone a GitHub repository  
-pi clone facebook/react my-react-copy
+# Clone repositories from multiple providers
+pi clone facebook/react my-react-copy    # GitHub
+pi clone gitlab:user/project             # GitLab  
+pi clone bitbucket:user/repo             # BitBucket
 
 # Check package versions
 pi check react
@@ -41,7 +43,7 @@ pi --help
 | Command | Description | Example |
 |---------|-------------|---------|
 | `create` | Create new project from templates | `pi create my-app` |
-| `clone` | Clone GitHub repository | `pi clone user/repo` |
+| `clone` | Clone from GitHub, GitLab, BitBucket, SourceHut | `pi clone user/repo` |
 | `check` | Check package versions | `pi check react` |
 | `add` | Add features (coming soon) | `pi add auth` |
 
@@ -54,10 +56,42 @@ pi create --help                  # Show help
 
 ### Clone Command  
 ```bash
-pi clone user/repo                # Clone with default name
-pi clone user/repo my-project     # Clone with custom name
+# GitHub (default)
+pi clone user/repo                # Clone from GitHub with default name
+pi clone user/repo my-project     # Clone from GitHub with custom name
+
+# GitLab
+pi clone gitlab:user/repo         # Clone from GitLab
+pi clone gitlab:user/repo my-app  # Clone from GitLab with custom name
+
+# BitBucket
+pi clone bitbucket:user/repo      # Clone from BitBucket  
+pi clone bitbucket:user/repo app  # Clone from BitBucket with custom name
+
+# SourceHut
+pi clone sourcehut:user/repo      # Clone from SourceHut
+pi clone sourcehut:user/repo app  # Clone from SourceHut with custom name
+
+# Full URLs also supported
+pi clone https://github.com/user/repo.git
+pi clone https://gitlab.com/user/repo.git
+pi clone https://bitbucket.org/user/repo.git
+pi clone https://git.sr.ht/~user/repo
+
 pi clone --help                   # Show help
 ```
+
+**Supported Git Providers:**
+- **GitHub** - `user/repo` (default) or `github.com/user/repo`
+- **GitLab** - `gitlab:user/repo` or `gitlab.com/user/repo` 
+- **BitBucket** - `bitbucket:user/repo` or `bitbucket.org/user/repo`
+- **SourceHut** - `sourcehut:user/repo` or `git.sr.ht/~user/repo`
+
+All cloned repositories automatically get:
+- Dependencies installed (pnpm/npm)
+- Environment file created from templates (.env.example → .env)
+- Git repository re-initialized with fresh commit
+- GitHub MCP server installed for enhanced git workflow
 
 ### Check Command
 ```bash

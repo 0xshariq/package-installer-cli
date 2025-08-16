@@ -19,12 +19,12 @@ export function printBanner(version: string, frameworkCount: number): void {
   // Create gradient text with more vibrant colors
   const gradientText = gradient(['#667eea', '#764ba2', '#f093fb', '#f5576c', '#4facfe', '#00f2fe', '#43e97b', '#38f9d7']);
 
-  // Enhanced ASCII art with better spacing
-  const banner = figlet.textSync('Package\nInstaller', {
+  // Enhanced ASCII art with single line title
+  const banner = figlet.textSync('Package Installer', {
     font: 'ANSI Shadow',
     horizontalLayout: 'default',
     verticalLayout: 'default',
-    width: 80
+    width: 120
   });
 
   // Create a beautiful banner box

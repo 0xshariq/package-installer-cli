@@ -11,18 +11,33 @@ const execAsync = promisify(exec);
 
 export async function cloneRepo(userRepo: string, projectName?: string): Promise<void> {
   try {
-    // Validate GitHub repo format (user/repo)
-    if (!userRepo.includes('/') || userRepo.split('/').length !== 2) {
-      throw new Error('Invalid repository format. Use: user/repo (e.g., facebook/react)');
+    // Validate repository format (user/repo or full URL)
+    let repoUrl = userRepo;
+    
+    if (!userRepo.startsWith('http') && !userRepo.startsWith('git@')) {
+      // If it's just user/repo format, default to GitHub
+      if (!userRepo.includes('/') || userRepo.split('/').length !== 2) {
+        throw new Error('Invalid repository format. Use: user/repo or full git URL\nExamples: facebook/react, gitlab:user/repo, https://gitlab.com/user/repo.git');
+      }
+      
+      const [user, repo] = userRepo.split('/');
+      if (!user || !repo) {
+        throw new Error('Invalid repository format. Both user and repo names are required');
+      }
+      
+      // Handle different providers with prefixes
+      if (userRepo.startsWith('gitlab:')) {
+        repoUrl = userRepo.replace('gitlab:', '');
+      } else if (userRepo.startsWith('bitbucket:')) {
+        repoUrl = userRepo.replace('bitbucket:', '');
+      } else if (userRepo.startsWith('sourcehut:')) {
+        repoUrl = userRepo.replace('sourcehut:', '');
+      }
+      // Default to GitHub if no prefix
     }
 
-    const [user, repo] = userRepo.split('/');
-    if (!user || !repo) {
-      throw new Error('Invalid repository format. Both user and repo names are required');
-    }
-
-    const targetDir = projectName || repo;
-    const targetPath = path.resolve(process.cwd(), targetDir);
+    const targetDir = projectName || (userRepo.includes('/') ? userRepo.split('/')[1] : userRepo.split('/').pop()?.replace('.git', ''));
+    const targetPath = path.resolve(process.cwd(), targetDir || 'cloned-repo');
 
     // Check if directory already exists
     if (await fs.pathExists(targetPath)) {
@@ -36,8 +51,8 @@ export async function cloneRepo(userRepo: string, projectName?: string): Promise
     const spinner = ora(chalk.hex('#00d2d3')('🔄 Cloning repository...')).start();
 
     try {
-      // Use degit to clone the repository (cleaner than git clone)
-      const degitCommand = `degit ${userRepo}`;
+      // Use degit to clone the repository (supports multiple providers)
+      const degitCommand = `degit ${repoUrl}`;
       await execAsync(`${degitCommand} ${targetDir}`, { 
         cwd: process.cwd()
       });
@@ -45,16 +60,16 @@ export async function cloneRepo(userRepo: string, projectName?: string): Promise
       spinner.succeed(chalk.hex('#10ac84')(`✅ Repository cloned successfully`));
 
       // Install dependencies if package.json exists
-      await installDependenciesForClone(targetPath, targetDir);
+      await installDependenciesForClone(targetPath, targetDir || 'cloned-repo');
       
       // Create .env file from templates
       await createEnvFile(targetPath);
 
       // Initialize git repository
-      await initializeGitRepository(targetPath, targetDir);
+      await initializeGitRepository(targetPath, targetDir || 'cloned-repo');
 
       // Show success message
-      showCloneSuccessMessage(targetDir, userRepo);
+      showCloneSuccessMessage(targetDir || 'cloned-repo', userRepo);
 
     } catch (error: any) {
       spinner.fail(chalk.red('Failed to clone repository'));

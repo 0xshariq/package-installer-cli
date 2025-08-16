@@ -83,10 +83,10 @@ function handleCommandError(commandName: string, error: Error) {
 
 // CREATE COMMAND - Main project creation from templates
 program
-  .command(chalk.hex('#10ac84')('create'))
+  .command('create')
   .description(chalk.hex('#10ac84')('🚀 Create a new project from templates'))
   .argument('[project-name]', chalk.hex('#95afc0')('Project name (will prompt if not provided)'))
-  .option(chalk.hex('#ff6b6b')('-h, --help'), chalk.hex('#95afc0')('display help for create command'))
+  .option('-h, --help', chalk.hex('#95afc0')('display help for create command'))
   .action(async (projectName, options) => {
     if (options.help) {
       showCommandHelp(
@@ -114,10 +114,10 @@ program
 
 // CHECK COMMAND - Package version checking and suggestions
 program
-  .command(chalk.hex('#f39c12')('check'))
+  .command('check')
   .description(chalk.hex('#f39c12')('🔍 Check package versions and get update suggestions'))
   .argument('[package-name]', chalk.hex('#95afc0')('Specific package to check (optional)'))
-  .option(chalk.hex('#ff6b6b')('-h, --help'), chalk.hex('#95afc0')('display help for check command'))
+  .option('-h, --help', chalk.hex('#95afc0')('display help for check command'))
   .action(async (packageName, options) => {
     if (options.help) {
       showCommandHelp(
@@ -145,23 +145,24 @@ program
 
 // CLONE COMMAND - GitHub repository cloning
 program
-  .command(chalk.hex('#00d2d3')('clone'))
-  .description(chalk.hex('#00d2d3')('📥 Clone a GitHub repository'))
-  .argument('[user/repo]', chalk.hex('#95afc0')('GitHub repository in format "user/repo"'))
+  .command('clone')
+  .description(chalk.hex('#00d2d3')('📥 Clone repositories from GitHub, GitLab, BitBucket & SourceHut'))
+  .argument('[user/repo]', chalk.hex('#95afc0')('Repository in format "user/repo" or "provider:user/repo"'))
   .argument('[project-name]', chalk.hex('#95afc0')('Custom project name (defaults to repo name)'))
-  .option(chalk.hex('#ff6b6b')('-h, --help'), chalk.hex('#95afc0')('display help for clone command'))
+  .option('-h, --help', chalk.hex('#95afc0')('display help for clone command'))
   .action(async (userRepo, projectName, options) => {
     if (options.help) {
       showCommandHelp(
         'Clone',
         piGradient('pi') + ' ' + chalk.hex('#00d2d3')('clone') + ' <user/repo> [project-name]',
         [
-          piGradient('pi') + ' ' + chalk.hex('#00d2d3')('clone') + ' facebook/react my-react-copy    # Clone with custom name',
-          piGradient('pi') + ' ' + chalk.hex('#00d2d3')('clone') + ' vercel/next.js                  # Clone with default name',
-          piGradient('pi') + ' ' + chalk.hex('#00d2d3')('clone') + ' microsoft/TypeScript ts-copy    # Clone TypeScript repo',
-          piGradient('pi') + ' ' + chalk.hex('#00d2d3')('clone') + ' ' + chalk.hex('#ff6b6b')('--help') + '                          # Show this help message'
+          piGradient('pi') + ' ' + chalk.hex('#00d2d3')('clone') + ' facebook/react my-react-copy      # Clone from GitHub with custom name',
+          piGradient('pi') + ' ' + chalk.hex('#00d2d3')('clone') + ' gitlab:user/project               # Clone from GitLab',
+          piGradient('pi') + ' ' + chalk.hex('#00d2d3')('clone') + ' bitbucket:user/repo               # Clone from BitBucket',
+          piGradient('pi') + ' ' + chalk.hex('#00d2d3')('clone') + ' sourcehut:user/repo               # Clone from SourceHut',
+          piGradient('pi') + ' ' + chalk.hex('#00d2d3')('clone') + ' ' + chalk.hex('#ff6b6b')('--help') + '                            # Show this help message'
         ],
-        'Clone any public GitHub repository quickly and safely. ' +
+        'Clone any public repository from GitHub, GitLab, BitBucket, or SourceHut. ' +
         'Automatically installs dependencies and creates .env file from templates.',
         '📥'
       );
@@ -169,9 +170,12 @@ program
     }
     
     if (!userRepo) {
-      console.log('\n' + chalk.hex('#ff4757')('❌ Error: GitHub repository is required'));
-      console.log(chalk.hex('#95afc0')('   Format: user/repo (e.g., facebook/react)'));
-      console.log(chalk.hex('#95afc0')('   Example: ') + piGradient('pi') + ' ' + chalk.hex('#00d2d3')('clone') + ' facebook/react');
+      console.log('\n' + chalk.hex('#ff4757')('❌ Error: Repository is required'));
+      console.log(chalk.hex('#95afc0')('   Format: user/repo or provider:user/repo'));
+      console.log(chalk.hex('#95afc0')('   Examples:'));
+      console.log(chalk.hex('#95afc0')('     • ') + piGradient('pi') + ' ' + chalk.hex('#00d2d3')('clone') + ' facebook/react');
+      console.log(chalk.hex('#95afc0')('     • ') + piGradient('pi') + ' ' + chalk.hex('#00d2d3')('clone') + ' gitlab:user/project');
+      console.log(chalk.hex('#95afc0')('     • ') + piGradient('pi') + ' ' + chalk.hex('#00d2d3')('clone') + ' bitbucket:user/repo');
       return;
     }
     
@@ -184,10 +188,10 @@ program
 
 // ADD COMMAND - Show "Coming Soon" message
 program
-  .command(chalk.hex('#9c88ff')('add'))
+  .command('add')
   .description(chalk.hex('#9c88ff')('➕ Add new features to your project'))
   .argument('[feature]', chalk.hex('#95afc0')('Feature to add (coming soon)'))
-  .option(chalk.hex('#ff6b6b')('-h, --help'), chalk.hex('#95afc0')('display help for add command'))
+  .option('-h, --help', chalk.hex('#95afc0')('display help for add command'))
   .action(async (feature, options) => {
     if (options.help) {
       showCommandHelp(
