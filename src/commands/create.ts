@@ -6,6 +6,8 @@ import chalk from 'chalk';
 import inquirer from 'inquirer';
 import path from 'path';
 import fs from 'fs';
+import gradient from 'gradient-string';
+import boxen from 'boxen';
 import { validateProjectName, getFrameworkTheme, isCombinationTemplate } from '../utils/utils.js';
 import { 
   promptFrameworkSelection,
@@ -24,9 +26,52 @@ import { createProjectFromTemplate } from '../utils/templateCreator.js';
 import { ProjectOptions, TemplateConfig } from '../utils/types.js';
 
 /**
+ * Display help for create command
+ */
+export function showCreateHelp(): void {
+  const piGradient = gradient(['#00c6ff', '#0072ff']);
+  const headerGradient = gradient(['#4facfe', '#00f2fe']);
+  
+  console.log('\n' + boxen(
+    headerGradient('🚀 Create Command Help') + '\n\n' +
+    chalk.white('Create a new project from our curated collection of modern templates.') + '\n' +
+    chalk.white('Choose from React, Next.js, Express, Nest.js, Rust, and more!') + '\n\n' +
+    chalk.cyan('Usage:') + '\n' +
+    chalk.white(`  ${piGradient('pi')} ${chalk.hex('#10ac84')('create')} [project-name]`) + '\n\n' +
+    chalk.cyan('Options:') + '\n' +
+    chalk.gray('  -h, --help    Display help for this command') + '\n\n' +
+    chalk.cyan('Examples:') + '\n' +
+    chalk.gray(`  ${piGradient('pi')} ${chalk.hex('#10ac84')('create')} my-awesome-app    # Create with specific name`) + '\n' +
+    chalk.gray(`  ${piGradient('pi')} ${chalk.hex('#10ac84')('create')}                   # Interactive mode - will prompt for name`) + '\n' +
+    chalk.gray(`  ${piGradient('pi')} ${chalk.hex('#10ac84')('create')} ${chalk.hex('#ff6b6b')('--help')}            # Show this help message`) + '\n\n' +
+    chalk.hex('#00d2d3')('💡 Available Templates:') + '\n' +
+    chalk.hex('#95afc0')('  • React (Vite) - JavaScript/TypeScript variants') + '\n' +
+    chalk.hex('#95afc0')('  • Next.js - App Router with multiple configurations') + '\n' +
+    chalk.hex('#95afc0')('  • Express - RESTful APIs with authentication') + '\n' +
+    chalk.hex('#95afc0')('  • Nest.js - Enterprise-grade Node.js framework') + '\n' +
+    chalk.hex('#95afc0')('  • Angular - Modern Angular applications') + '\n' +
+    chalk.hex('#95afc0')('  • Vue.js - Progressive Vue.js applications') + '\n' +
+    chalk.hex('#95afc0')('  • Rust - Systems programming templates') + '\n' +
+    chalk.hex('#95afc0')('  • Django - Python web framework'),
+    {
+      padding: 1,
+      borderStyle: 'round',
+      borderColor: 'cyan',
+      backgroundColor: '#0a0a0a'
+    }
+  ));
+}
+
+/**
  * Main create project function with comprehensive prompt system
  */
 export async function createProject(providedName?: string): Promise<void> {
+  // Check for help flag
+  if (providedName === '--help' || providedName === '-h') {
+    showCreateHelp();
+    return;
+  }
+
   try {
     console.log('\n' + chalk.hex('#10ac84')('🚀 Welcome to Package Installer CLI!'));
     console.log(chalk.hex('#95afc0')('Let\'s create something amazing together...\n'));

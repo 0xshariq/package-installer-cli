@@ -91,10 +91,6 @@ export const SUPPORTED_FEATURES: { [key: string]: FeatureConfig } = {
     supportedLanguages: ['nodejs'],
     files: {}
   }
-        action: 'create'
-      }
-    }
-  }
 };
 
 /**

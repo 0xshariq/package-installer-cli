@@ -4,6 +4,9 @@ import { Command } from 'commander';
 import chalk from 'chalk';
 import gradient from 'gradient-string';
 import boxen from 'boxen';
+import { readFileSync } from 'fs';
+import { dirname, join } from 'path';
+import { fileURLToPath } from 'url';
 
 // Import command handlers
 import { createProject } from './commands/create.js';
@@ -12,7 +15,21 @@ import { cloneRepo } from './commands/clone.js';
 import { addCommand } from './commands/add.js';
 
 // Import utilities
-import { showBanner, logError } from './utils/ui.js';
+import { printBanner, logError, showBanner } from './utils/ui.js';
+
+// Get current file directory for ESM
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+// Load package.json to get version
+let packageJsonPath = join(__dirname, '../package.json');
+// Check if we're running from dist folder
+if (__dirname.includes('/dist/')) {
+  packageJsonPath = join(__dirname, '../../package.json');
+}
+
+const packageJson = JSON.parse(readFileSync(packageJsonPath, 'utf8'));
+const VERSION = packageJson.version;
 
 // Initialize CLI program
 const program = new Command();
@@ -23,41 +40,13 @@ const piGradient = gradient(['#00c6ff', '#0072ff']);
 
 // Configure main program with enhanced styling
 program
-  .name(piGradient('pi'))
+  .name('pi')
   .description(chalk.hex('#667eea')('📦 Package Installer CLI') + chalk.hex('#95afc0')(' - Modern web application scaffolding tool'))
-  .version('2.1.0', chalk.hex('#ff6b6b')('-v, --version'), chalk.hex('#95afc0')('output the current version'))
-  .helpOption(chalk.hex('#ff6b6b')('-h, --help'), chalk.hex('#95afc0')('display comprehensive help information'));
-
-/**
- * Helper function to display command-specific help with beautiful styling
- */
-function showCommandHelp(
-  commandName: string, 
-  usage: string, 
-  examples: string[], 
-  description?: string,
-  icon?: string
-) {
-  const commandIcon = icon || '📦';
-  const headerGradient = gradient(['#4facfe', '#00f2fe']);
-  
-  console.log('\n' + boxen(
-    headerGradient(`${commandIcon} ${commandName} Command`) + '\n\n' +
-    (description ? chalk.white(description) + '\n\n' : '') +
-    chalk.cyan('Usage:') + '\n' +
-    chalk.white(`  ${usage}`) + '\n\n' +
-    chalk.cyan('Options:') + '\n' +
-    chalk.gray('  -h, --help    Display help for this command') + '\n\n' +
-    chalk.cyan('Examples:') + '\n' +
-    examples.map(example => chalk.gray(`  ${example}`)).join('\n'),
-    {
-      padding: 1,
-      borderStyle: 'round',
-      borderColor: 'cyan',
-      backgroundColor: '#0a0a0a'
-    }
-  ));
-}
+  .version(VERSION)
+  .configureHelp({
+    sortSubcommands: true,
+    subcommandTerm: (cmd) => cmd.name(),
+  });
 
 /**
  * Enhanced error handler with better formatting
@@ -83,24 +72,38 @@ program
   .command('create')
   .description(chalk.hex('#10ac84')('🚀 Create a new project from templates'))
   .argument('[project-name]', chalk.hex('#95afc0')('Project name (will prompt if not provided)'))
-  .option('-h, --help', chalk.hex('#95afc0')('display help for create command'))
-  .action(async (projectName, options) => {
-    if (options.help) {
-      showCommandHelp(
-        'Create',
-        piGradient('pi') + ' ' + chalk.hex('#10ac84')('create') + ' [project-name]',
-        [
-          piGradient('pi') + ' ' + chalk.hex('#10ac84')('create') + ' my-awesome-app    # Create with specific name',
-          piGradient('pi') + ' ' + chalk.hex('#10ac84')('create') + '                   # Interactive mode - will prompt for name',
-          piGradient('pi') + ' ' + chalk.hex('#10ac84')('create') + ' ' + chalk.hex('#ff6b6b')('--help') + '            # Show this help message'
-        ],
-        'Create a new project from our curated collection of modern templates. ' +
-        'Choose from React, Next.js, Express, Nest.js, Rust, and more!',
-        '🚀'
-      );
-      return;
-    }
+  .configureHelp({
+    helpWidth: 120,
+  })
+  .on('--help', () => {
+    const piGradient = gradient(['#00c6ff', '#0072ff']);
+    const headerGradient = gradient(['#4facfe', '#00f2fe']);
     
+    console.log('\n' + boxen(
+      headerGradient('🚀 Create Command') + '\n\n' +
+      chalk.white('Create a new project from our curated collection of modern templates.') + '\n' +
+      chalk.white('Choose from React, Next.js, Express, Nest.js, Rust, and more!') + '\n\n' +
+      chalk.cyan('Examples:') + '\n' +
+      chalk.gray(`  ${piGradient('pi')} ${chalk.hex('#10ac84')('create')} my-awesome-app    # Create with specific name`) + '\n' +
+      chalk.gray(`  ${piGradient('pi')} ${chalk.hex('#10ac84')('create')}                   # Interactive mode - will prompt for name`) + '\n\n' +
+      chalk.hex('#00d2d3')('💡 Available Templates:') + '\n' +
+      chalk.hex('#95afc0')('  • React (Vite) - JavaScript/TypeScript variants') + '\n' +
+      chalk.hex('#95afc0')('  • Next.js - App Router with multiple configurations') + '\n' +
+      chalk.hex('#95afc0')('  • Express - RESTful APIs with authentication') + '\n' +
+      chalk.hex('#95afc0')('  • Nest.js - Enterprise-grade Node.js framework') + '\n' +
+      chalk.hex('#95afc0')('  • Angular - Modern Angular applications') + '\n' +
+      chalk.hex('#95afc0')('  • Vue.js - Progressive Vue.js applications') + '\n' +
+      chalk.hex('#95afc0')('  • Rust - Systems programming templates') + '\n' +
+      chalk.hex('#95afc0')('  • Django - Python web framework'),
+      {
+        padding: 1,
+        borderStyle: 'round',
+        borderColor: 'cyan',
+        backgroundColor: '#0a0a0a'
+      }
+    ));
+  })
+  .action(async (projectName) => {
     try {
       showBanner();
       await createProject(projectName);
@@ -114,25 +117,33 @@ program
   .command('check')
   .description(chalk.hex('#f39c12')('🔍 Check package versions and get update suggestions'))
   .argument('[package-name]', chalk.hex('#95afc0')('Specific package to check (optional)'))
-  .option('-h, --help', chalk.hex('#95afc0')('display help for check command'))
-  .action(async (packageName, options) => {
-    if (options.help) {
-      showCommandHelp(
-        'Check',
-        piGradient('pi') + ' ' + chalk.hex('#f39c12')('check') + ' [package-name]',
-        [
-          piGradient('pi') + ' ' + chalk.hex('#f39c12')('check') + '                    # Check all packages in current project',
-          piGradient('pi') + ' ' + chalk.hex('#f39c12')('check') + ' react              # Check specific package version',
-          piGradient('pi') + ' ' + chalk.hex('#f39c12')('check') + ' @types/node        # Check scoped packages',
-          piGradient('pi') + ' ' + chalk.hex('#f39c12')('check') + ' ' + chalk.hex('#ff6b6b')('--help') + '             # Show this help message'
-        ],
-        'Check package versions in your project and get suggestions for updates. ' +
-        'Helps you keep your dependencies up-to-date and secure.',
-        '🔍'
-      );
-      return;
-    }
+  .on('--help', () => {
+    const piGradient = gradient(['#00c6ff', '#0072ff']);
+    const headerGradient = gradient(['#4facfe', '#00f2fe']);
     
+    console.log('\n' + boxen(
+      headerGradient('🔍 Check Command') + '\n\n' +
+      chalk.white('Check package versions in your project and get suggestions for updates.') + '\n' +
+      chalk.white('Helps you keep your dependencies up-to-date and secure.') + '\n\n' +
+      chalk.cyan('Examples:') + '\n' +
+      chalk.gray(`  ${piGradient('pi')} ${chalk.hex('#f39c12')('check')}                    # Check all packages in current project`) + '\n' +
+      chalk.gray(`  ${piGradient('pi')} ${chalk.hex('#f39c12')('check')} react              # Check specific package version`) + '\n' +
+      chalk.gray(`  ${piGradient('pi')} ${chalk.hex('#f39c12')('check')} @types/node        # Check scoped packages`) + '\n\n' +
+      chalk.hex('#00d2d3')('💡 Supported Package Managers:') + '\n' +
+      chalk.hex('#95afc0')('  • npm, pnpm, yarn (Node.js)') + '\n' +
+      chalk.hex('#95afc0')('  • pip, pipenv, poetry (Python)') + '\n' +
+      chalk.hex('#95afc0')('  • cargo (Rust)') + '\n' +
+      chalk.hex('#95afc0')('  • go modules (Go)') + '\n' +
+      chalk.hex('#95afc0')('  • composer (PHP)'),
+      {
+        padding: 1,
+        borderStyle: 'round',
+        borderColor: 'cyan',
+        backgroundColor: '#0a0a0a'
+      }
+    ));
+  })
+  .action(async (packageName) => {
     try {
       await checkCommand(packageName);
     } catch (error) {
@@ -146,26 +157,33 @@ program
   .description(chalk.hex('#00d2d3')('📥 Clone repositories from GitHub, GitLab, BitBucket & SourceHut'))
   .argument('[user/repo]', chalk.hex('#95afc0')('Repository in format "user/repo" or "provider:user/repo"'))
   .argument('[project-name]', chalk.hex('#95afc0')('Custom project name (defaults to repo name)'))
-  .option('-h, --help', chalk.hex('#95afc0')('display help for clone command'))
-  .action(async (userRepo, projectName, options) => {
-    if (options.help) {
-      showCommandHelp(
-        'Clone',
-        piGradient('pi') + ' ' + chalk.hex('#00d2d3')('clone') + ' <user/repo> [project-name]',
-        [
-          piGradient('pi') + ' ' + chalk.hex('#00d2d3')('clone') + ' facebook/react my-react-copy      # Clone from GitHub with custom name',
-          piGradient('pi') + ' ' + chalk.hex('#00d2d3')('clone') + ' gitlab:user/project               # Clone from GitLab',
-          piGradient('pi') + ' ' + chalk.hex('#00d2d3')('clone') + ' bitbucket:user/repo               # Clone from BitBucket',
-          piGradient('pi') + ' ' + chalk.hex('#00d2d3')('clone') + ' sourcehut:user/repo               # Clone from SourceHut',
-          piGradient('pi') + ' ' + chalk.hex('#00d2d3')('clone') + ' ' + chalk.hex('#ff6b6b')('--help') + '                            # Show this help message'
-        ],
-        'Clone any public repository from GitHub, GitLab, BitBucket, or SourceHut. ' +
-        'Automatically installs dependencies and creates .env file from templates.',
-        '📥'
-      );
-      return;
-    }
+  .on('--help', () => {
+    const piGradient = gradient(['#00c6ff', '#0072ff']);
+    const headerGradient = gradient(['#4facfe', '#00f2fe']);
     
+    console.log('\n' + boxen(
+      headerGradient('📥 Clone Command') + '\n\n' +
+      chalk.white('Clone any public repository from GitHub, GitLab, BitBucket, or SourceHut.') + '\n' +
+      chalk.white('Automatically installs dependencies and creates .env file from templates.') + '\n\n' +
+      chalk.cyan('Examples:') + '\n' +
+      chalk.gray(`  ${piGradient('pi')} ${chalk.hex('#00d2d3')('clone')} facebook/react my-react-copy      # Clone from GitHub with custom name`) + '\n' +
+      chalk.gray(`  ${piGradient('pi')} ${chalk.hex('#00d2d3')('clone')} gitlab:user/project               # Clone from GitLab`) + '\n' +
+      chalk.gray(`  ${piGradient('pi')} ${chalk.hex('#00d2d3')('clone')} bitbucket:user/repo               # Clone from BitBucket`) + '\n' +
+      chalk.gray(`  ${piGradient('pi')} ${chalk.hex('#00d2d3')('clone')} sourcehut:user/repo               # Clone from SourceHut`) + '\n\n' +
+      chalk.hex('#00d2d3')('💡 Supported Platforms:') + '\n' +
+      chalk.hex('#95afc0')('  • GitHub (default): user/repo') + '\n' +
+      chalk.hex('#95afc0')('  • GitLab: gitlab:user/repo') + '\n' +
+      chalk.hex('#95afc0')('  • BitBucket: bitbucket:user/repo') + '\n' +
+      chalk.hex('#95afc0')('  • SourceHut: sourcehut:user/repo'),
+      {
+        padding: 1,
+        borderStyle: 'round',
+        borderColor: 'cyan',
+        backgroundColor: '#0a0a0a'
+      }
+    ));
+  })
+  .action(async (userRepo, projectName) => {
     if (!userRepo) {
       console.log('\n' + chalk.hex('#ff4757')('❌ Error: Repository is required'));
       console.log(chalk.hex('#95afc0')('   Format: user/repo or provider:user/repo'));
@@ -189,25 +207,32 @@ program
   .description(chalk.hex('#9c88ff')('➕ Add new features to your project'))
   .argument('[feature]', chalk.hex('#95afc0')('Feature to add (auth, docker) or --list to show all'))
   .option('-l, --list', chalk.hex('#95afc0')('list all available features'))
-  .option('-h, --help', chalk.hex('#95afc0')('display help for add command'))
-  .action(async (feature, options) => {
-    if (options.help) {
-      showCommandHelp(
-        'Add',
-        piGradient('pi') + ' ' + chalk.hex('#9c88ff')('add') + ' [feature]',
-        [
-          piGradient('pi') + ' ' + chalk.hex('#9c88ff')('add') + '                       # Interactive feature selection',
-          piGradient('pi') + ' ' + chalk.hex('#9c88ff')('add') + ' --list               # List all available features',
-          piGradient('pi') + ' ' + chalk.hex('#9c88ff')('add') + ' auth                 # Add authentication',
-          piGradient('pi') + ' ' + chalk.hex('#9c88ff')('add') + ' docker               # Add Docker configuration',
-          piGradient('pi') + ' ' + chalk.hex('#9c88ff')('add') + ' ' + chalk.hex('#ff6b6b')('--help') + '             # Show this help message'
-        ],
-        'Add powerful features to your existing project like authentication and Docker support.',
-        '➕'
-      );
-      return;
-    }
+  .on('--help', () => {
+    const piGradient = gradient(['#00c6ff', '#0072ff']);
+    const headerGradient = gradient(['#4facfe', '#00f2fe']);
     
+    console.log('\n' + boxen(
+      headerGradient('➕ Add Command') + '\n\n' +
+      chalk.white('Add powerful features to your existing project like authentication and Docker support.') + '\n\n' +
+      chalk.cyan('Examples:') + '\n' +
+      chalk.gray(`  ${piGradient('pi')} ${chalk.hex('#9c88ff')('add')}                       # Interactive feature selection`) + '\n' +
+      chalk.gray(`  ${piGradient('pi')} ${chalk.hex('#9c88ff')('add')} --list               # List all available features`) + '\n' +
+      chalk.gray(`  ${piGradient('pi')} ${chalk.hex('#9c88ff')('add')} auth                 # Add authentication`) + '\n' +
+      chalk.gray(`  ${piGradient('pi')} ${chalk.hex('#9c88ff')('add')} docker               # Add Docker configuration`) + '\n\n' +
+      chalk.hex('#00d2d3')('💡 Available Features:') + '\n' +
+      chalk.hex('#95afc0')('  • auth - Authentication (Clerk, Auth0, NextAuth)') + '\n' +
+      chalk.hex('#95afc0')('  • docker - Docker containerization') + '\n\n' +
+      chalk.hex('#ffa502')('🎯 Supported Frameworks:') + '\n' +
+      chalk.hex('#95afc0')('  Next.js, React, Express, NestJS, Vue.js, Angular, Remix, Rust'),
+      {
+        padding: 1,
+        borderStyle: 'round',
+        borderColor: 'cyan',
+        backgroundColor: '#0a0a0a'
+      }
+    ));
+  })
+  .action(async (feature, options) => {
     if (options.list) {
       feature = '--list';
     }

@@ -3,6 +3,7 @@ import { promisify } from 'util';
 import chalk from 'chalk';
 import ora from 'ora';
 import boxen from 'boxen';
+import gradient from 'gradient-string';
 import fs from 'fs-extra';
 import path from 'path';
 import semver from 'semver';
@@ -182,7 +183,47 @@ const PROJECT_TYPES: ProjectType[] = [
   }
 ];
 
+/**
+ * Display help for check command
+ */
+export function showCheckHelp(): void {
+  const piGradient = gradient(['#00c6ff', '#0072ff']);
+  const headerGradient = gradient(['#4facfe', '#00f2fe']);
+  
+  console.log('\n' + boxen(
+    headerGradient('🔍 Check Command Help') + '\n\n' +
+    chalk.white('Check package versions in your project and get suggestions for updates.') + '\n' +
+    chalk.white('Helps you keep your dependencies up-to-date and secure.') + '\n\n' +
+    chalk.cyan('Usage:') + '\n' +
+    chalk.white(`  ${piGradient('pi')} ${chalk.hex('#f39c12')('check')} [package-name]`) + '\n\n' +
+    chalk.cyan('Options:') + '\n' +
+    chalk.gray('  -h, --help    Display help for this command') + '\n\n' +
+    chalk.cyan('Examples:') + '\n' +
+    chalk.gray(`  ${piGradient('pi')} ${chalk.hex('#f39c12')('check')}                    # Check all packages in current project`) + '\n' +
+    chalk.gray(`  ${piGradient('pi')} ${chalk.hex('#f39c12')('check')} react              # Check specific package version`) + '\n' +
+    chalk.gray(`  ${piGradient('pi')} ${chalk.hex('#f39c12')('check')} @types/node        # Check scoped packages`) + '\n' +
+    chalk.gray(`  ${piGradient('pi')} ${chalk.hex('#f39c12')('check')} ${chalk.hex('#ff6b6b')('--help')}             # Show this help message`) + '\n\n' +
+    chalk.hex('#00d2d3')('💡 Supported Package Managers:') + '\n' +
+    chalk.hex('#95afc0')('  • npm, pnpm, yarn (Node.js)') + '\n' +
+    chalk.hex('#95afc0')('  • pip, pipenv, poetry (Python)') + '\n' +
+    chalk.hex('#95afc0')('  • cargo (Rust)') + '\n' +
+    chalk.hex('#95afc0')('  • go modules (Go)') + '\n' +
+    chalk.hex('#95afc0')('  • composer (PHP)'),
+    {
+      padding: 1,
+      borderStyle: 'round',
+      borderColor: 'cyan',
+      backgroundColor: '#0a0a0a'
+    }
+  ));
+}
+
 export async function checkCommand(packageName?: string) {
+  // Check for help flag
+  if (packageName === '--help' || packageName === '-h') {
+    showCheckHelp();
+    return;
+  }
   try {
     console.log('\n' + chalk.hex('#f39c12')('🔍 Starting package check...'));
     

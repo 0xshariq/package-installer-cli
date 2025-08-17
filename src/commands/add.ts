@@ -1,8 +1,50 @@
 import chalk from 'chalk';
 import inquirer from 'inquirer';
+import gradient from 'gradient-string';
+import boxen from 'boxen';
 import { addFeature, listAvailableFeatures, SUPPORTED_FEATURES, detectProjectStack } from '../utils/featureInstaller.js';
 
+/**
+ * Display help for add command
+ */
+export function showAddHelp(): void {
+  const piGradient = gradient(['#00c6ff', '#0072ff']);
+  const headerGradient = gradient(['#4facfe', '#00f2fe']);
+  
+  console.log('\n' + boxen(
+    headerGradient('➕ Add Command Help') + '\n\n' +
+    chalk.white('Add powerful features to your existing project like authentication and Docker support.') + '\n\n' +
+    chalk.cyan('Usage:') + '\n' +
+    chalk.white(`  ${piGradient('pi')} ${chalk.hex('#9c88ff')('add')} [feature]`) + '\n\n' +
+    chalk.cyan('Options:') + '\n' +
+    chalk.gray('  -l, --list    List all available features') + '\n' +
+    chalk.gray('  -h, --help    Display help for this command') + '\n\n' +
+    chalk.cyan('Examples:') + '\n' +
+    chalk.gray(`  ${piGradient('pi')} ${chalk.hex('#9c88ff')('add')}                       # Interactive feature selection`) + '\n' +
+    chalk.gray(`  ${piGradient('pi')} ${chalk.hex('#9c88ff')('add')} --list               # List all available features`) + '\n' +
+    chalk.gray(`  ${piGradient('pi')} ${chalk.hex('#9c88ff')('add')} auth                 # Add authentication`) + '\n' +
+    chalk.gray(`  ${piGradient('pi')} ${chalk.hex('#9c88ff')('add')} docker               # Add Docker configuration`) + '\n' +
+    chalk.gray(`  ${piGradient('pi')} ${chalk.hex('#9c88ff')('add')} ${chalk.hex('#ff6b6b')('--help')}             # Show this help message`) + '\n\n' +
+    chalk.hex('#00d2d3')('💡 Available Features:') + '\n' +
+    chalk.hex('#95afc0')('  • auth - Authentication (Clerk, Auth0, NextAuth)') + '\n' +
+    chalk.hex('#95afc0')('  • docker - Docker containerization') + '\n\n' +
+    chalk.hex('#ffa502')('🎯 Supported Frameworks:') + '\n' +
+    chalk.hex('#95afc0')('  Next.js, React, Express, NestJS, Vue.js, Angular, Remix, Rust'),
+    {
+      padding: 1,
+      borderStyle: 'round',
+      borderColor: 'cyan',
+      backgroundColor: '#0a0a0a'
+    }
+  ));
+}
+
 export async function addCommand(feature?: string) {
+  // Check for help flag
+  if (feature === '--help' || feature === '-h') {
+    showAddHelp();
+    return;
+  }
   try {
     // Handle --list flag
     if (feature === '--list' || feature === '-l') {

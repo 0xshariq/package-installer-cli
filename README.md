@@ -1,225 +1,288 @@
 # 📦 Package Installer CLI
 
-> The Ultimate Tool for Creating Modern Web Applications
-
-[![npm version](https://badge.fury.io/js/%40 0xshariq%2Fpackage-installer.svg)](https://badge.fury.io/js/%400xshariq%2Fpackage-installer)
+[![npm version](https://img.shields.io/npm/v/@0xshariq/package-installer.svg)](https://www.npmjs.com/package/@0xshariq/package-installer)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Node.js](https://img.shields.io/badge/Node.js-18%2B-green.svg)](https://nodejs.org/)
+[![Node.js](https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen.svg)](https://nodejs.org/)
 
-**Package Installer CLI** is a modern, fast, and beautiful command-line tool that helps you quickly scaffold production-ready web applications with your favorite frameworks, databases, and styling libraries.
+A **cross-platform, interactive CLI** to scaffold modern web application templates with support for multiple frameworks, languages, UI libraries, bundlers, databases, and ORMs. Create production-ready projects in seconds!
 
-## ✨ Features
+## 🚀 Features
 
-- 🚀 **Multi-Framework Support**: React, Next.js, Express, Nest.js, Rust, Vue.js, Angular, and more
-- 🌐 **Multi-Language**: JavaScript, TypeScript support across all frameworks
-- 🗄️ **Database Integration**: MongoDB, PostgreSQL, Supabase with ORM support (Mongoose, Prisma)
-- 🎨 **UI Libraries**: shadcn/ui, Tailwind CSS, Material-UI, Headless UI
-- 📦 **Package Management**: npm, pnpm, yarn support with auto-detection
-- 🔍 **Package Checking**: Multi-language dependency analysis (Node.js, Rust, Python, Go, Ruby, PHP)
-- 🌟 **Git Integration**: Automatic repository cloning from GitHub, GitLab, BitBucket, SourceHut
-- ⚡ **Fast Setup**: Instant project creation with automatic dependency installation
-- 🎯 **Production Ready**: Best practices and optimized configurations out of the box
+- **🎨 Multiple Frameworks**: React, Next.js, Express, NestJS, Angular, Vue, Rust, Django
+- **🔤 Language Support**: TypeScript & JavaScript variants for all frameworks
+- **🎭 UI Libraries**: Tailwind CSS, Material-UI, shadcn/ui, and more
+- **📦 Smart Bundlers**: Vite, Webpack, built-in framework bundlers
+- **🗄️ Database Integration**: PostgreSQL, MongoDB, MySQL, SQLite
+- **🔧 ORM Support**: Prisma, TypeORM, Mongoose, Sequelize
+- **🔐 Authentication**: Ready-to-use auth with Clerk, Auth0, NextAuth
+- **🐳 Docker Ready**: One-click Docker configuration
+- **📋 Auto-Installation**: Automatic dependency installation
+- **🎯 Interactive Prompts**: Guided project setup experience
+- **⚡ Lightning Fast**: Optimized template generation
+- **🌈 Beautiful CLI**: Gorgeous terminal interface with gradients and emojis
 
-## 🚀 Quick Start
+## 📥 Installation
 
-### Installation
+### Global Installation (Recommended)
 
 ```bash
-# Install globally
+# Using npm
 npm install -g @0xshariq/package-installer
 
-# Or use with npx
-npx @0xshariq/package-installer
+# Using yarn
+yarn global add @0xshariq/package-installer
+
+# Using pnpm
+pnpm add -g @0xshariq/package-installer
 ```
 
-## 📋 Available Commands
-
-### 🏗️ Create Command
-Create a new project from curated templates:
+### One-Time Usage
 
 ```bash
-pi create [project-name]    # Create new project
-pi create my-app           # Create with specific name
-pi create                  # Interactive mode
+# Using npx
+npx @0xshariq/package-installer create my-app
+
+# Using yarn
+yarn create @0xshariq/package-installer my-app
+
+# Using pnpm
+pnpm create @0xshariq/package-installer my-app
 ```
 
-### 🔍 Check Command
-Analyze and check package versions across multiple languages:
+## 🎯 Quick Start
 
+### Display Beautiful Banner & Help
 ```bash
-pi check                   # Check all project dependencies
-pi check react            # Check specific package
-pi check --help           # Show help
+pi                    # Shows beautiful banner and quick start guide
+pi --help            # Complete command reference
+pi --version         # Show current version
 ```
 
-**Supported project types:**
-- **Node.js**: `package.json` (npm/pnpm/yarn)
-- **Rust**: `Cargo.toml` (cargo)
-- **Python**: `requirements.txt`, `pyproject.toml`, `Pipfile` (pip/poetry/pipenv)
-- **Go**: `go.mod` (go get)
-- **Ruby**: `Gemfile` (gem/bundler)
-- **PHP**: `composer.json` (composer)
-
-### 🌐 Clone Command
-Clone repositories from multiple Git providers:
-
+### Create New Projects
 ```bash
-pi clone <repo-url>              # Clone any Git repository
-pi clone github:user/repo        # GitHub shorthand
-pi clone gitlab:user/repo        # GitLab shorthand
-pi clone bitbucket:user/repo     # BitBucket shorthand
-pi clone sourcehut:user/repo     # SourceHut shorthand
+pi create my-app                    # Interactive project creation
+pi create blog-app                  # Create with specific name
+pi create --help                    # Detailed create command help
 ```
 
-### ➕ Add Command
-Add dependencies to your project:
-
+### Clone & Setup Repositories
 ```bash
-pi add <package-name>      # Add package to current project
-pi add react react-dom    # Add multiple packages
+pi clone facebook/react             # Clone from GitHub
+pi clone user/repo my-copy          # Clone with custom name
+pi clone gitlab:user/project        # Clone from GitLab
+pi clone bitbucket:user/repo        # Clone from BitBucket
+pi clone sourcehut:user/repo        # Clone from SourceHut
+pi clone --help                     # Detailed clone command help
 ```
 
-## 🛠️ Supported Frameworks
+### Check Package Versions
+```bash
+pi check                            # Check all packages in current project
+pi check react                     # Check specific package version
+pi check @types/node                # Check scoped packages
+pi check --help                     # Detailed check command help
+```
+
+### Add Features to Existing Projects
+```bash
+pi add                              # Interactive feature selection
+pi add --list                       # List all available features
+pi add auth                         # Add authentication
+pi add docker                       # Add Docker configuration
+pi add --help                       # Detailed add command help
+```
+
+## 🎨 Supported Templates
 
 ### Frontend Frameworks
-- **React** (Vite) - JavaScript/TypeScript
-- **Next.js** - Full-stack React framework
-- **Vue.js** - Progressive framework
-- **Angular** - Enterprise web applications
+
+| Framework | Languages | Features |
+|-----------|-----------|----------|
+| **React (Vite)** | TypeScript, JavaScript | Tailwind CSS, Material-UI, shadcn/ui |
+| **Next.js** | TypeScript, JavaScript | App Router, Tailwind CSS, shadcn/ui, src directory |
+| **Angular** | TypeScript | Material-UI, Tailwind CSS, modern CLI setup |
+| **Vue.js** | TypeScript, JavaScript | Composition API, Vite, modern tooling |
 
 ### Backend Frameworks
-- **Express.js** - Fast Node.js web framework
-- **Nest.js** - Progressive Node.js framework
-- **Rust** - Systems programming language
 
-### Full-Stack Combinations
-- **React + Express** - Complete MERN/PERN stack
-- **Next.js + Database** - Modern full-stack applications
+| Framework | Languages | Features |
+|-----------|-----------|----------|
+| **Express** | TypeScript, JavaScript | RESTful APIs, middleware, testing setup |
+| **NestJS** | TypeScript | Decorators, modules, built-in validation |
+| **Django** | Python | REST framework, modern Python setup |
 
-## 🎨 UI & Styling Options
+### System Programming
 
-- **shadcn/ui** - Modern React components
-- **Tailwind CSS** - Utility-first CSS framework
-- **Material-UI** - React component library
-- **Headless UI** - Unstyled, accessible components
+| Language | Features |
+|----------|----------|
+| **Rust** | Basic & Advanced templates, Cargo workspace |
 
-## 🗄️ Database & ORM Support
+## 🛠️ Template Features
 
-### Databases
-- **MongoDB** - NoSQL document database
-- **PostgreSQL** - Advanced relational database
-- **Supabase** - Open source Firebase alternative
+### 🎨 UI & Styling Options
+- **Tailwind CSS**: Utility-first CSS framework
+- **Material-UI**: React component library
+- **shadcn/ui**: Modern component system
+- **Custom styling**: Framework-specific solutions
 
-### ORMs
-- **Mongoose** - MongoDB object modeling
-- **Prisma** - Next-generation ORM
-- **TypeORM** - TypeScript ORM
+### 📦 Project Structure Options
+- **Source Directory**: `src/` folder organization
+- **Root Level**: Direct project root structure
+- **Monorepo**: Workspace and multi-package setups
 
-## 📦 Package Managers
+### 🗄️ Database & ORM Integration
+- **PostgreSQL + Prisma**: Modern database toolkit
+- **MongoDB + Mongoose**: NoSQL document database
+- **MySQL + Sequelize**: Traditional relational database
+- **SQLite**: Lightweight local database
 
-- **npm** - Default Node.js package manager
-- **pnpm** - Fast, disk space efficient package manager
-- **yarn** - Secure, reliable, and fast package manager
+### 🔐 Authentication Providers
+- **Clerk**: Modern auth with social logins
+- **Auth0**: Enterprise authentication
+- **NextAuth.js**: Next.js native authentication
+- **Custom**: Roll your own auth solution
 
-Auto-detection and fallback support ensures compatibility across all environments.
+## 📋 Command Reference
 
-## 🔧 Configuration Options
+### Main Commands
 
-### Project Structure
 ```bash
-src/              # Source directory (optional)
-components/       # React components (with shadcn/ui)
-pages/           # Next.js pages
-api/             # API routes
-styles/          # CSS/Tailwind styles
+# Create a new project
+pi create [project-name]            # Interactive project creation
+pi create my-app                    # Create with specific name
+
+# Clone repositories  
+pi clone <user/repo> [project-name] # Clone from any Git provider
+pi clone facebook/react             # Clone popular repositories
+pi clone gitlab:user/project        # Specify provider explicitly
+
+# Check packages
+pi check [package-name]             # Version checking and suggestions
+pi check                            # Check all project packages
+pi check react                     # Check specific package
+
+# Add features
+pi add [feature]                    # Add features to existing projects
+pi add --list                       # List all available features
+pi add auth                         # Add authentication
+pi add docker                       # Add Docker support
+
+# Help and info
+pi --help                           # Show all commands
+pi --version                        # Show current version
+pi <command> --help                 # Command-specific help
 ```
 
-### Environment Setup
-- **TypeScript** configuration
-- **ESLint** and **Prettier** setup
-- **Tailwind CSS** configuration
-- **Environment variables** template
-- **Git** initialization with .gitignore
+### Global Options
 
-## 📈 What's New in v2.0
-
-### 🔍 Enhanced Package Checking
-- **Multi-language support**: Node.js, Rust, Python, Go, Ruby, PHP
-- **Registry integration**: NPM, Crates.io, PyPI with real-time data
-- **Security recommendations**: Audit tools and automation suggestions
-- **Major version detection**: Breaking change warnings
-- **Detailed analytics**: Comprehensive package health reports
-
-### 🌐 Multi-Provider Git Cloning
-- **GitHub, GitLab, BitBucket, SourceHut** support
-- **Provider shortcuts**: `github:user/repo` syntax
-- **Auto dependency installation** after cloning
-- **Git initialization** with best practices
-
-### ⚡ Performance Improvements
-- **Faster template copying** with optimized file operations
-- **Parallel dependency installation** 
-- **Smart caching** for repeated operations
-- **Progress indicators** for all long-running tasks
-
-## 🚀 Advanced Usage
-
-### Custom Templates
 ```bash
-# Create with specific configuration
-pi create my-app
-# Select: Next.js → TypeScript → shadcn/ui → Tailwind → MongoDB → Prisma
+-h, --help                          # Display help information
+-v, --version                       # Display version number
 ```
 
-### Environment Workflows
-```bash
-# Development workflow
-pi create dev-project
-cd dev-project
-npm run dev
+## 🔧 Advanced Usage
 
-# Production deployment
-npm run build
-npm start
+### Interactive Mode
+All commands support interactive mode when arguments are omitted:
+
+```bash
+pi create           # Will prompt for project name and all options
+pi clone            # Will prompt for repository URL and options
+pi add              # Will show feature selection menu
 ```
 
-### Multi-Project Management
-```bash
-# Check all projects
-find . -name "package.json" -exec dirname {} \; | xargs -I {} pi check -d {}
+### Provider-Specific Cloning
+Specify the Git provider explicitly for non-GitHub repositories:
 
-# Clone and setup multiple repos
-pi clone github:org/frontend
-pi clone github:org/backend
-pi clone github:org/shared-components
+```bash
+pi clone gitlab:user/project        # GitLab
+pi clone bitbucket:user/repo        # BitBucket  
+pi clone sourcehut:user/repo        # SourceHut
+pi clone github:user/repo           # GitHub (default)
 ```
 
-## 📚 Examples
+### Automated Workflows
+Perfect for automation and CI/CD:
 
-### Create a Next.js Project with Database
 ```bash
-pi create ecommerce-app
-# Select: Next.js → TypeScript → shadcn/ui → Tailwind → PostgreSQL → Prisma
+# Non-interactive project creation (future feature)
+pi create my-app --framework=nextjs --language=typescript --ui=tailwind --no-interactive
+
+# Batch operations
+pi clone facebook/react && cd react && pi add docker
 ```
 
-### Rust Project Setup
-```bash
-pi create rust-api
-# Select: Rust → Advanced template
+## 🎯 Pro Tips
+
+- **Use `--help`** with any command for detailed usage information
+- **Most arguments are optional** - CLI will prompt when needed  
+- **Auto-completion**: Tab completion works for most shells
+- **Environment variables**: Set `DEBUG=1` for detailed error logs
+- **Template variety**: Check our 50+ templates covering popular stacks
+- **Package management**: Supports npm, yarn, and pnpm automatically
+
+## 🏗️ Project Structure
+
+After creating a project, you'll get a modern, well-organized structure:
+
+```
+my-awesome-app/
+├── src/                    # Source code (if src option selected)
+│   ├── components/         # Reusable components
+│   ├── pages/              # Route components
+│   ├── utils/              # Utility functions
+│   └── types/              # TypeScript definitions
+├── public/                 # Static assets
+├── tests/                  # Test files
+├── .env.example            # Environment variables template
+├── .gitignore              # Git ignore rules
+├── package.json            # Dependencies and scripts
+├── README.md               # Project documentation
+├── tsconfig.json           # TypeScript configuration
+└── tailwind.config.js      # Tailwind CSS config (if selected)
 ```
 
-### Full-Stack React Application
+## 🔄 Auto-Installation Features
+
+Package Installer CLI automatically:
+
+- **Installs dependencies** using your preferred package manager (npm/yarn/pnpm)
+- **Creates .env files** from .env.example templates
+- **Sets up Git repository** with initial commit
+- **Configures development scripts** and build processes
+- **Installs development dependencies** for linting and testing
+
+## 🐛 Troubleshooting
+
+### Common Issues
+
+**Installation Issues:**
 ```bash
-pi create fullstack-app
-# Select: React + Express → TypeScript → MongoDB → Mongoose
+# Clear npm cache and reinstall
+npm cache clean --force
+npm install -g @0xshariq/package-installer
+
+# Permission issues (Linux/macOS)
+sudo npm install -g @0xshariq/package-installer
 ```
 
-### Check Project Health
+**Template Issues:**
 ```bash
-cd my-project
-pi check                    # Check all dependencies
-pi check --verbose          # Detailed analysis
-pi check react             # Check specific package
+# Enable debug mode for detailed logs
+DEBUG=1 pi create my-app
+
+# Check Node.js version (requires >= 18.0.0)
+node --version
+```
+
+**Command Not Found:**
+```bash
+# Make sure global bin directory is in PATH
+npm config get prefix
+echo $PATH
+
+# Alternative: use npx
+npx @0xshariq/package-installer create my-app
 ```
 
 ## 🤝 Contributing
@@ -227,41 +290,44 @@ pi check react             # Check specific package
 We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
 
 ### Development Setup
+
 ```bash
+# Clone the repository
 git clone https://github.com/0xshariq/package-installer-cli.git
 cd package-installer-cli
-pnpm install
-pnpm run dev
+
+# Install dependencies
+npm install
+
+# Build the project
+npm run build
+
+# Test locally
+node dist/index.js create test-project
+
+# Run in development mode
+npm run dev
 ```
 
-### Running Tests
-```bash
-pnpm test                   # Run all tests
-pnpm test:watch            # Watch mode
-pnpm test:coverage         # Coverage report
-```
+## 📝 Changelog
+
+See [CHANGELOG.md](CHANGELOG.md) for a detailed list of changes and updates.
+
+## 🎉 Credits
+
+Built with ❤️ by [@0xshariq](https://github.com/0xshariq)
 
 ## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🙏 Acknowledgments
-
-- [Vite](https://vitejs.dev/) - Lightning fast build tool
-- [Next.js](https://nextjs.org/) - The React framework for production
-- [shadcn/ui](https://ui.shadcn.com/) - Beautifully designed components
-- [Tailwind CSS](https://tailwindcss.com/) - A utility-first CSS framework
-- [Prisma](https://prisma.io/) - Next-generation ORM
-
 ## 🔗 Links
 
-- [GitHub Repository](https://github.com/0xshariq/package-installer-cli)
-- [NPM Package](https://www.npmjs.com/package/@0xshariq/package-installer)
-- [Documentation](https://github.com/0xshariq/package-installer-cli/wiki)
-- [Issues](https://github.com/0xshariq/package-installer-cli/issues)
+- **NPM Package**: [@0xshariq/package-installer](https://www.npmjs.com/package/@0xshariq/package-installer)
+- **GitHub Repository**: [package-installer-cli](https://github.com/0xshariq/package-installer-cli)
+- **Issues & Feedback**: [GitHub Issues](https://github.com/0xshariq/package-installer-cli/issues)
+- **Website**: [https://package-installer-website.vercel.app/](https://package-installer-website.vercel.app/)
 
 ---
 
-<div align="center">
-Made with ❤️ by <a href="https://github.com/0xshariq">Shariq</a>
-</div>
+**Happy coding! 🚀** Create something amazing with Package Installer CLI.

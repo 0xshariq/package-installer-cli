@@ -10,63 +10,82 @@ import path from 'path';
 import * as fs from 'fs';
 import { ProjectOptions } from './types.js';
 
+
 /**
  * Displays the CLI banner with beautiful styling
  */
 export function printBanner(version: string, frameworkCount: number): void {
   console.clear();
 
-  // Create gradient text with more vibrant colors
-  const gradientText = gradient(['#667eea', '#764ba2', '#f093fb', '#f5576c', '#4facfe', '#00f2fe', '#43e97b', '#38f9d7']);
+  // Create a beautiful rainbow gradient
+  const rainbowGradient = gradient(['#ff6b6b', '#ffa500', '#ffff00', '#32cd32', '#00bfff', '#8a2be2', '#ff1493']);
+  const titleGradient = gradient(['#00d4aa', '#00a8ff', '#7c4dff']);
+  const subtitleGradient = gradient(['#ffa726', '#ff7043']);
 
-  // Enhanced ASCII art with single line title
-  const banner = figlet.textSync('Package Installer CLI', {
-    font: 'Small',
-    horizontalLayout: 'default',
-    verticalLayout: 'default',
-    width: 120
-  });
+  // Create ASCII art for "Package Installer" - full name
+  const titleArt = [
+    '██████╗  █████╗  ██████╗██╗  ██╗ █████╗  ██████╗ ███████╗',
+    '██╔══██╗██╔══██╗██╔════╝██║ ██╔╝██╔══██╗██╔════╝ ██╔════╝',
+    '██████╔╝███████║██║     █████╔╝ ███████║██║  ███╗█████╗  ',
+    '██╔═══╝ ██╔══██║██║     ██╔═██╗ ██╔══██║██║   ██║██╔══╝  ',
+    '██║     ██║  ██║╚██████╗██║  ██╗██║  ██║╚██████╔╝███████╗',
+    '╚═╝     ╚═╝  ╚═╝ ╚═════╝╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝ ╚══════╝',
+    '',
+    '██╗███╗   ██╗███████╗████████╗ █████╗ ██╗     ██╗     ███████╗██████╗ ',
+    '██║████╗  ██║██╔════╝╚══██╔══╝██╔══██╗██║     ██║     ██╔════╝██╔══██╗',
+    '██║██╔██╗ ██║███████╗   ██║   ███████║██║     ██║     █████╗  ██████╔╝',
+    '██║██║╚██╗██║╚════██║   ██║   ██╔══██║██║     ██║     ██╔══╝  ██╔══██╗',
+    '██║██║ ╚████║███████║   ██║   ██║  ██║███████╗███████╗███████╗██║  ██║',
+    '╚═╝╚═╝  ╚═══╝╚══════╝   ╚═╝   ╚═╝  ╚═╝╚══════╝╚══════╝╚══════╝╚═╝  ╚═╝',
+  ].join('\n');
 
-  // Create a beautiful banner box
-  const bannerBox = boxen(
-    gradientText(banner) + '\n' +
-    chalk.cyanBright('🚀 The Ultimate Tool for Creating Modern Web Applications') + '\n' +
-    chalk.gray('✨ Fast • Modern • Production-Ready • Beautiful'),
+  // Create the main title
+  const subtitle = '🚀 The Ultimate Tool for Creating Modern Web Applications';
+  const tagline = '✨ Fast • Modern • Production-Ready • Beautiful';
+
+  // Create the banner content
+  const bannerContent = 
+    titleGradient(titleArt) + '\n\n' +
+    subtitleGradient(subtitle) + '\n' +
+    chalk.hex('#95afc0')(tagline);
+
+  // Display banner with enhanced box
+  console.log('\n' + boxen(
+    bannerContent,
     {
-      padding: 2,
-      margin: 1,
-      borderStyle: 'round',
+      padding: { top: 1, bottom: 1, left: 3, right: 3 },
+      margin: { top: 1, bottom: 1, left: 2, right: 2 },
+      borderStyle: 'double',
       borderColor: 'cyan',
-      backgroundColor: '#1a1a1a',
-      title: '✨ Package Installer CLI',
-      titleAlignment: 'center'
+      backgroundColor: 'black',
+      align: 'center'
     }
-  );
+  ));
 
-  console.log(bannerBox);
-
-  // Version and info
-  const infoBox = boxen(
-    chalk.white(`📦 Version: ${chalk.cyanBright(version)}`) + '\n' +
-    chalk.white(`🌍 Framework Support: ${chalk.greenBright(frameworkCount + '+')} frameworks`) + '\n' +
-    chalk.white(`⚡ Quick Start: ${chalk.yellowBright('pi <project-name>')}`),
+  // Version and framework info
+  const statsGradient = gradient(['#667eea', '#764ba2']);
+  const versionBox = boxen(
+    statsGradient(`📦 Version: ${version}`) + '  •  ' + 
+    statsGradient(`🎯 Frameworks: ${frameworkCount}+`) + '  •  ' + 
+    statsGradient(`⚡ Ready to scaffold!`),
     {
-      padding: 1,
-      margin: { top: 1, bottom: 1 },
+      padding: { top: 0, bottom: 0, left: 2, right: 2 },
+      margin: { top: 0, bottom: 1, left: 0, right: 0 },
       borderStyle: 'round',
-      borderColor: 'blue',
-      backgroundColor: '#1a1a1a'
+      borderColor: 'magenta',
+      backgroundColor: 'black',
+      align: 'center'
     }
   );
 
-  console.log(infoBox);
+  console.log(versionBox);
 }
 
 /**
  * Displays project configuration summary
  */
 export function showProjectSummary(options: ProjectOptions): void {
-  const { framework, language, bundler, src, tailwind, ui, database, orm, templateName } = options;
+  const { framework, language, bundler, src, tailwind, ui, database, orm } = options;
   
   console.log(chalk.cyan('\n📋 Project Configuration Summary:'));
   console.log(chalk.gray('═'.repeat(60)));
@@ -100,9 +119,7 @@ export function showProjectSummary(options: ProjectOptions): void {
       console.log(`  ${chalk.bold('ORM:')} ${chalk.blue(orm.charAt(0).toUpperCase() + orm.slice(1))}`);
     }
   }
-  
-  console.log(`  ${chalk.bold('Template:')} ${chalk.yellow(templateName)}`);
-  
+
   if (framework.includes('+')) {
     console.log(`  ${chalk.bold('Type:')} ${chalk.green('Combination Template (Pre-configured)')}`);
   }
@@ -269,7 +286,7 @@ export function showErrorMessage(title: string, message: string, details?: strin
  * Shows the main banner (alias for printBanner)
  */
 export function showBanner(): void {
-  printBanner('2.0.3', 10);
+  printBanner('2.2.0', 10);
 }
 
 /**
