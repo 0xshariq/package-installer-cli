@@ -1,45 +1,111 @@
 import chalk from 'chalk';
-import boxen from 'boxen';
-import gradient from 'gradient-string';
-
-function createGradientText(text: string) {
-  return gradient(['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FECA57'])(text);
-}
+import inquirer from 'inquirer';
+import { addFeature, listAvailableFeatures, SUPPORTED_FEATURES, detectProjectStack } from '../utils/featureInstaller.js';
 
 export async function addCommand(feature?: string) {
   try {
-    console.log('\n' + boxen(
-      createGradientText('🔧 Add Features') + '\n\n' +
-      chalk.yellow('This command is coming soon!') + '\n\n' +
-      chalk.white('Planned features:') + '\n' +
-      chalk.gray('• Add UI components (shadcn/ui, Material-UI)') + '\n' +
-      chalk.gray('• Add database integration') + '\n' +
-      chalk.gray('• Add authentication') + '\n' +
-      chalk.gray('• Add testing framework') + '\n' +
-      chalk.gray('• Add CI/CD configuration') + '\n' +
-      chalk.gray('• Add Docker configuration') + '\n\n' +
-      chalk.blue('💡 Feature request:') + '\n' +
-      chalk.gray('   Please submit feature requests on GitHub'),
-      {
-        padding: 1,
-        borderStyle: 'round',
-        borderColor: 'yellow',
-        backgroundColor: '#0f1419'
-      }
-    ));
-
-    if (feature) {
-      console.log(chalk.gray(`\n🔍 Requested feature: ${feature}`));
-      console.log(chalk.gray('   This will be implemented in a future version'));
+    // Handle --list flag
+    if (feature === '--list' || feature === '-l') {
+      listAvailableFeatures();
+      return;
     }
 
-    console.log('\n' + chalk.cyan('Available commands:'));
-    console.log(chalk.gray('  pi create [project-name] [user/repo]  - Create a new project'));
-    console.log(chalk.gray('  pi clone <user/repo> [project-name]   - Clone a GitHub repository'));
-    console.log(chalk.gray('  pi check [package-name]              - Check package versions'));
-    console.log(chalk.gray('  pi add [feature]                     - Add features (coming soon)'));
+    // Detect project framework and language first
+    console.log(chalk.hex('#9c88ff')('🔍 Analyzing project structure...'));
+    const projectInfo = await detectProjectStack(process.cwd());
+    
+    if (!projectInfo.framework || !projectInfo.language) {
+      console.log(chalk.red('❌ Could not detect project framework or language'));
+      console.log(chalk.hex('#95afc0')('💡 Make sure you are in a valid project directory'));
+      console.log(chalk.hex('#95afc0')('   Supported: Next.js, React, Express, NestJS, Vue.js, Angular, Remix, Rust'));
+      return;
+    }
+
+    console.log(chalk.green(`✅ Detected ${projectInfo.framework} project (${projectInfo.projectLanguage || 'typescript'})`));
+
+    if (!feature) {
+      // Show available features and let user choose
+      listAvailableFeatures();
+      
+      const availableFeatures = Object.keys(SUPPORTED_FEATURES)
+        .filter(key => {
+          const featureConfig = SUPPORTED_FEATURES[key];
+          const frameworkSupported = featureConfig.supportedFrameworks.includes(projectInfo.framework!) ||
+            featureConfig.supportedFrameworks.some(fw => projectInfo.framework!.startsWith(fw));
+          const languageSupported = featureConfig.supportedLanguages.includes(projectInfo.language!);
+          return frameworkSupported && languageSupported;
+        });
+
+      if (availableFeatures.length === 0) {
+        console.log(chalk.yellow(`⚠️  No features available for ${projectInfo.framework} projects`));
+        return;
+      }
+
+      const choices = availableFeatures.map(key => {
+        const config = SUPPORTED_FEATURES[key];
+        const isComingSoon = Object.keys(config.files).length === 0;
+        const status = isComingSoon ? chalk.hex('#95afc0')(' (Coming Soon)') : '';
+        return {
+          name: `${config.name} - ${config.description}${status}`,
+          value: key,
+          disabled: isComingSoon ? 'Coming Soon' : false
+        };
+      });
+
+      const { selectedFeature } = await inquirer.prompt([
+        {
+          type: 'list',
+          name: 'selectedFeature',
+          message: chalk.hex('#9c88ff')('✨ Which feature would you like to add?'),
+          choices
+        }
+      ]);
+      
+      feature = selectedFeature;
+    }
+
+    // Validate feature exists
+    if (!feature || !SUPPORTED_FEATURES[feature]) {
+      console.log(chalk.red(`❌ Unknown feature: ${feature || 'undefined'}`));
+      console.log(chalk.hex('#95afc0')('💡 Available features:'));
+      Object.keys(SUPPORTED_FEATURES).forEach(key => {
+        const isComingSoon = Object.keys(SUPPORTED_FEATURES[key].files).length === 0;
+        const status = isComingSoon ? chalk.hex('#95afc0')(' (Coming Soon)') : '';
+        console.log(chalk.hex('#95afc0')(`   • ${key}${status}`));
+      });
+      return;
+    }
+
+    // Check if feature is coming soon
+    const featureConfig = SUPPORTED_FEATURES[feature];
+    if (Object.keys(featureConfig.files).length === 0) {
+      console.log(chalk.hex('#ffa502')(`🚧 ${featureConfig.name} is coming soon!`));
+      console.log(chalk.hex('#95afc0')('Stay tuned for updates.'));
+      return;
+    }
+
+    // Handle special auth provider selection
+    let authProvider: string | undefined;
+    if (feature === 'auth') {
+      const { provider } = await inquirer.prompt([
+        {
+          type: 'list',
+          name: 'provider',
+          message: chalk.hex('#9c88ff')('🔐 Choose authentication provider:'),
+          choices: [
+            { name: 'Clerk - Modern authentication with built-in UI components', value: 'clerk' },
+            { name: 'Auth0 - Enterprise-grade authentication platform', value: 'auth0' }
+          ]
+        }
+      ]);
+      authProvider = provider;
+    }
+
+    // Add the selected feature
+    await addFeature(feature, process.cwd(), { authProvider });
 
   } catch (error: any) {
-    throw new Error(`Failed to execute add command: ${error.message}`);
+    console.error(chalk.red(`❌ Failed to add feature: ${error.message}`));
+    process.exit(1);
   }
 }

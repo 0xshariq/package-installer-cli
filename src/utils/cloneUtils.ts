@@ -253,51 +253,8 @@ async function initializeGitRepository(targetPath: string, targetDir: string): P
 }
 
 async function installDependenciesForClone(projectPath: string, projectName: string): Promise<void> {
-  const packageJsonPath = path.join(projectPath, 'package.json');
-  
-  if (!(await fs.pathExists(packageJsonPath))) {
-    console.log(chalk.hex('#ffa502')('ℹ️  No package.json found, skipping dependency installation'));
-    return;
-  }
-
-  const installSpinner = ora(chalk.hex('#f39c12')('📦 Installing dependencies...')).start();
-  
-  try {
-    // Try pnpm first, then npm
-    try {
-      installSpinner.text = chalk.hex('#f39c12')('Installing dependencies with pnpm...');
-      await execAsync('pnpm install', { 
-        cwd: projectPath 
-      });
-      
-      // Install GitHub MCP server
-      installSpinner.text = chalk.hex('#00d2d3')('Installing GitHub MCP server...');
-      await execAsync('pnpm add @0xshariq/github-mcp-server@latest', { 
-        cwd: projectPath 
-      });
-      
-      installSpinner.succeed(chalk.hex('#10ac84')('✅ Dependencies installed with pnpm'));
-      
-    } catch {
-      installSpinner.text = chalk.hex('#f39c12')('Installing dependencies with npm...');
-      await execAsync('npm install', { 
-        cwd: projectPath 
-      });
-      
-      // Install GitHub MCP server
-      installSpinner.text = chalk.hex('#00d2d3')('Installing GitHub MCP server...');
-      await execAsync('npm install @0xshariq/github-mcp-server@latest', { 
-        cwd: projectPath 
-      });
-      
-      installSpinner.succeed(chalk.hex('#10ac84')('✅ Dependencies installed with npm'));
-    }
-    
-  } catch (installError: any) {
-    installSpinner.warn(chalk.hex('#ffa502')('⚠️  Could not install dependencies automatically'));
-    console.log(chalk.hex('#95afc0')('💡 You can install them manually:'));
-    console.log(chalk.hex('#95afc0')(`   cd ${projectName} && npm install`));
-  }
+  const { installProjectDependencies } = await import('./dependencyInstaller.js');
+  await installProjectDependencies(projectPath, projectName, true); // Install MCP server for cloned projects
 }
 
 function showCloneSuccessMessage(projectName: string, githubRepo: string): void {

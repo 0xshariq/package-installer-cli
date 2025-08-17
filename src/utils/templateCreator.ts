@@ -34,11 +34,8 @@ export async function createProjectFromTemplate(
         
         spinner.succeed(chalk.green('Project structure created'));
 
-        // Install dependencies if package.json exists
-        const packageJsonPath = path.join(projectPath, 'package.json');
-        if (await fs.pathExists(packageJsonPath)) {
-            await installDependenciesWithProgress(projectPath);
-        }
+        // Install dependencies if any configuration files exist
+        await installDependenciesForCreate(projectPath);
 
         return projectPath;
         
@@ -48,55 +45,21 @@ export async function createProjectFromTemplate(
     }
 }/**
  * Install project dependencies with progress indicators
- * Tries pnpm first, then falls back to npm
- * Also installs GitHub MCP server and initializes git repository
+ * Uses the multi-language dependency installer
  * @param projectPath - Path to the project directory
  */
-async function installDependenciesWithProgress(projectPath: string): Promise<void> {
-    const installSpinner = ora(chalk.yellow('Installing dependencies...')).start();
-    
+async function installDependenciesForCreate(projectPath: string): Promise<void> {
     try {
-        // Try pnpm first, then npm
-        try {
-            installSpinner.text = chalk.yellow('Installing dependencies with pnpm...');
-            execSync('pnpm install', { 
-                cwd: projectPath, 
-                stdio: 'pipe'
-            });
-            
-            // Install GitHub MCP server for git commands
-            installSpinner.text = chalk.blue('Installing GitHub MCP server...');
-            execSync('pnpm add @0xshariq/github-mcp-server@latest', { 
-                cwd: projectPath, 
-                stdio: 'pipe'
-            });
-            
-            installSpinner.succeed(chalk.green('Dependencies installed with pnpm'));
-            
-        } catch {
-            installSpinner.text = chalk.yellow('Installing dependencies with npm...');
-            execSync('npm install', { 
-                cwd: projectPath, 
-                stdio: 'pipe'
-            });
-            
-            // Install GitHub MCP server for git commands
-            installSpinner.text = chalk.blue('Installing GitHub MCP server...');
-            execSync('npm install @0xshariq/github-mcp-server@latest', { 
-                cwd: projectPath, 
-                stdio: 'pipe'
-            });
-            
-            installSpinner.succeed(chalk.green('Dependencies installed with npm'));
-        }
+        const { installProjectDependencies } = await import('./dependencyInstaller.js');
+        await installProjectDependencies(projectPath, path.basename(projectPath), true); // Install MCP server for created projects
         
         // Initialize git repository after dependencies are installed
         await initializeGitRepositoryForCreate(projectPath);
         
     } catch (installError: any) {
-        installSpinner.warn(chalk.yellow('Could not install dependencies automatically'));
-        console.log(chalk.yellow('💡 You can install them manually:'));
-        console.log(chalk.gray(`   cd ${path.basename(projectPath)} && npm install`));
+        console.log(chalk.yellow('⚠️  Could not install dependencies automatically'));
+        console.log(chalk.gray('💡 You can install them manually:'));
+        console.log(chalk.gray(`   cd ${path.basename(projectPath)}`));
         
         // Try to initialize git even if dependencies failed
         try {

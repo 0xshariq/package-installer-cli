@@ -1,4 +1,3 @@
-import type { Metadata } from 'next'
 import {
   ClerkProvider,
   SignInButton,
@@ -20,16 +19,12 @@ const geistMono = Geist_Mono({
   subsets: ['latin'],
 })
 
-export const metadata: Metadata = {
+export const metadata = {
   title: {templateTitle},
   description: {templateDescription},
 }
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode
-}>) {
+export default function RootLayout({ children }) {
   return (
     <ClerkProvider>
       <html lang="en">
