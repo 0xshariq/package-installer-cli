@@ -4,9 +4,111 @@
 
 import fs from 'fs-extra';
 import path from 'path';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
 import chalk from 'chalk';
 import ora from 'ora';
 import { SupportedLanguage, detectProjectLanguage, installAdditionalPackages } from './dependencyInstaller.js';
+
+// Get the directory of this file for proper path resolution
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+/**
+ * Get the CLI installation root directory
+ */
+function getCliRootPath(): string {
+  let cliRoot: string;
+  
+  if (__dirname.includes('/dist/')) {
+    // Running from compiled version (dist/utils/featureInstaller.js)
+    cliRoot = path.join(__dirname, '../..');
+  } else {
+    // Running from source (src/utils/featureInstaller.ts)
+    cliRoot = path.join(__dirname, '../..');
+  }
+  
+  // Check if we're in a global npm installation
+  // Global installations typically have the structure: /usr/local/lib/node_modules/@scope/package/
+  if (__dirname.includes('node_modules')) {
+    const nodeModulesIndex = __dirname.lastIndexOf('node_modules');
+    if (nodeModulesIndex !== -1) {
+      // Navigate to the package root from node_modules
+      const afterNodeModules = __dirname.substring(nodeModulesIndex + 'node_modules'.length);
+      const packageParts = afterNodeModules.split(path.sep).filter(Boolean);
+      
+      if (packageParts.length >= 2) {
+        // For scoped packages: @scope/package
+        if (packageParts[0].startsWith('@')) {
+          cliRoot = path.join(__dirname.substring(0, nodeModulesIndex + 'node_modules'.length), packageParts[0], packageParts[1]);
+        } else {
+          // For regular packages: package
+          cliRoot = path.join(__dirname.substring(0, nodeModulesIndex + 'node_modules'.length), packageParts[0]);
+        }
+      }
+    }
+  }
+  
+  return cliRoot;
+}
+
+/**
+ * Get the path to a feature template
+ */
+function getFeaturePath(
+  featureName: string, 
+  framework: string, 
+  projectLanguage: 'javascript' | 'typescript' = 'typescript',
+  authProvider: string = 'clerk'
+): string {
+  // Get the features directory from the CLI installation root
+  const cliRoot = getCliRootPath();
+  const featuresRoot = path.join(cliRoot, 'features');
+  
+  // Verify the features directory exists
+  if (!fs.existsSync(featuresRoot)) {
+    console.warn(chalk.yellow(`⚠️  Features directory not found at: ${featuresRoot}`));
+    console.warn(chalk.yellow(`   CLI root detected as: ${cliRoot}`));
+    console.warn(chalk.yellow(`   __dirname is: ${__dirname}`));
+    throw new Error(`Features directory not found. Please ensure the CLI is properly installed.`);
+  }
+  
+  if (featureName === 'auth') {
+    // Handle combo templates - use the backend framework for auth
+    if (framework.includes('+')) {
+      const parts = framework.split('+');
+      const backendFramework = parts.find(part => 
+        ['expressjs', 'nestjs'].includes(part)
+      ) || parts[1]; // fallback to second part
+      
+      return path.join(featuresRoot, featureName, authProvider, backendFramework, projectLanguage);
+    }
+    
+    // For regular frameworks
+    return path.join(featuresRoot, featureName, authProvider, framework, projectLanguage);
+  }
+  
+  // For docker - language is not important, just framework
+  if (featureName === 'docker') {
+    // Handle combo templates
+    if (framework.includes('+')) {
+      return path.join(featuresRoot, featureName, framework);
+    }
+    
+    // For regular frameworks - no language subdirectory for docker
+    return path.join(featuresRoot, featureName, framework);
+  }
+  
+  // For other features - use a consistent structure
+  if (framework.includes('+')) {
+    // For combo templates, try the first framework
+    const baseFramework = framework.split('+')[0];
+    return path.join(featuresRoot, featureName, baseFramework);
+  }
+  
+  // For regular frameworks
+  return path.join(featuresRoot, featureName, framework);
+}
 
 export interface FeatureConfig {
   name: string;
@@ -274,8 +376,8 @@ function getFrameworkFiles(featureName: string, framework: string): { [filePath:
         break;
       case 'reactjs+expressjs+shadcn':
         // Use backend auth for combo templates
-        baseFiles['server/index.ts'] = { action: 'overwrite' };
-        baseFiles['server/types/index.ts'] = { action: 'create' };
+        baseFiles['backend/index.ts'] = { action: 'overwrite' };
+        baseFiles['backend/types/index.ts'] = { action: 'create' };
         break;
     }
   } else if (featureName === 'docker') {
@@ -345,7 +447,15 @@ function getFeatureTemplatePath(
   projectLanguage: 'javascript' | 'typescript' = 'typescript',
   authProvider: string = 'clerk'
 ): string {
-  const featuresRoot = path.join(process.cwd(), 'features');
+  // Get the features directory relative to the CLI installation
+  // From src/utils/featureInstaller.ts -> ../../features
+  let featuresRoot = path.join(__dirname, '../../features');
+  
+  // Check if we're running from dist folder (compiled)
+  if (__dirname.includes('/dist/')) {
+    // From dist/utils/featureInstaller.js -> ../../features
+    featuresRoot = path.join(__dirname, '../../features');
+  }
   
   if (featureName === 'auth') {
     // Handle combo templates - use the backend framework for auth
@@ -362,12 +472,18 @@ function getFeatureTemplatePath(
     return path.join(featuresRoot, featureName, authProvider, framework, projectLanguage);
   }
   
-  // For docker with combo templates
-  if (framework.includes('+') && featureName === 'docker') {
+  // For docker - language is not important, just framework
+  if (featureName === 'docker') {
+    // Handle combo templates
+    if (framework.includes('+')) {
+      return path.join(featuresRoot, featureName, framework);
+    }
+    
+    // For regular frameworks - no language subdirectory for docker
     return path.join(featuresRoot, featureName, framework);
   }
   
-  // For regular frameworks
+  // For other features
   const baseFramework = framework.split('+')[0];
   return path.join(featuresRoot, featureName, baseFramework);
 }
