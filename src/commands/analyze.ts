@@ -6,6 +6,9 @@ import chalk from 'chalk';
 import ora from 'ora';
 import fs from 'fs-extra';
 import path from 'path';
+import figlet from 'figlet';
+import gradientString from 'gradient-string';
+import boxen from 'boxen';
 import { detectProjectLanguage } from '../utils/dependencyInstaller.js';
 import { 
   createBanner, 
@@ -56,8 +59,39 @@ export function showAnalyzeHelp(): void {
  * Main analyze command function
  */
 export async function analyzeCommand(): Promise<void> {
-  // Create beautiful banner
-  createBanner('Project Analytics');
+  // Create beautiful banner with full name
+  console.clear();
+  
+  // Create figlet text for "Package Installer"
+  const figletText = figlet.textSync('Package\nInstaller', {
+    font: 'ANSI Shadow',
+    horizontalLayout: 'fitted',
+    width: 80
+  });
+  
+  // Apply blue gradient
+  const gradientText = gradientString('#00d2d3', '#0084ff', '#2196f3')(figletText);
+  
+  // Create a box around it
+  const banner = boxen(gradientText, {
+    padding: 1,
+    margin: 1,
+    borderStyle: 'double',
+    borderColor: 'blue',
+    backgroundColor: '#1a1a1a'
+  });
+  
+  console.log(banner);
+  
+  // Add tagline
+  const tagline = chalk.hex('#00d2d3')('🔍 Advanced Project Analytics Dashboard');
+  const version = chalk.hex('#95afc0')('v2.3.0');
+  const author = chalk.hex('#ffa502')('by @0xshariq');
+  
+  const centered = `${tagline} ${version} ${author}`;
+  const padding = Math.max(0, Math.floor(((process.stdout.columns || 80) - centered.length) / 2));
+  console.log(' '.repeat(padding) + centered);
+  console.log();
   
   const spinner = ora(chalk.hex('#9c88ff')('🔍 Gathering analytics data...')).start();
   
