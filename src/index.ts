@@ -1,21 +1,15 @@
 #!/usr/bin/env node
 
 import { Command } from 'commander';
-import chalk from 'ch// CREATE COMMAND - Main project creation functionality
-program
-  .command('create')
-  .description(chalk.hex('#10ac84')('🚀 ') + chalk.hex('#00b894')('Create a new project from templates'));
+import chalk from 'chalk';
 import gradient from 'gradient-string';
 import boxen from 'boxen';
 import { readFileSync } from 'fs';
 import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 
-// Import command handl// CLEAN COMMAND - Clean development artifacts
-program
-  .command('clean')
-  .alias('cleanup')
-  .description(chalk.hex('#ffa502')('🧹 ') + chalk.hex('#ff7675')('Clean development artifacts and caches'))mport { createProject } from './commands/create.js';
+// Import command handlers
+import { createProject } from './commands/create.js';
 import { checkCommand } from './commands/check.js';
 import { cloneRepo } from './commands/clone.js';
 import { addCommand } from './commands/add.js';
@@ -91,7 +85,7 @@ program
   .on('--help', () => {
     const piGradient = gradient(['#00c6ff', '#0072ff']);
     const headerGradient = gradient(['#4facfe', '#00f2fe']);
-    
+
     console.log('\n' + boxen(
       headerGradient('🚀 Create Command') + '\n\n' +
       chalk.white('Create a new project from our curated collection of modern templates.') + '\n' +
@@ -133,7 +127,7 @@ program
   .on('--help', () => {
     const piGradient = gradient(['#00c6ff', '#0072ff']);
     const headerGradient = gradient(['#4facfe', '#00f2fe']);
-    
+
     console.log('\n' + boxen(
       headerGradient('🔍 Check Command') + '\n\n' +
       chalk.white('Check package versions in your project and get suggestions for updates.') + '\n' +
@@ -173,7 +167,7 @@ program
   .on('--help', () => {
     const piGradient = gradient(['#00c6ff', '#0072ff']);
     const headerGradient = gradient(['#4facfe', '#00f2fe']);
-    
+
     console.log('\n' + boxen(
       headerGradient('📥 Clone Command') + '\n\n' +
       chalk.white('Clone any public repository from GitHub, GitLab, BitBucket, or SourceHut.') + '\n' +
@@ -206,7 +200,7 @@ program
       console.log(chalk.hex('#95afc0')('     • ') + piGradient('pi') + ' ' + chalk.hex('#00d2d3')('clone') + ' bitbucket:user/repo');
       return;
     }
-    
+
     try {
       await cloneRepo(userRepo, projectName);
     } catch (error) {
@@ -223,7 +217,7 @@ program
   .on('--help', () => {
     const piGradient = gradient(['#00c6ff', '#0072ff']);
     const headerGradient = gradient(['#4facfe', '#00f2fe']);
-    
+
     console.log('\n' + boxen(
       headerGradient('➕ Add Command') + '\n\n' +
       chalk.white('Add powerful features to your existing project like authentication and Docker support.') + '\n\n' +
@@ -249,7 +243,7 @@ program
     if (options.list) {
       feature = '--list';
     }
-    
+
     try {
       await addCommand(feature);
     } catch (error) {
@@ -372,17 +366,17 @@ program.on('--help', () => {
   const analyzeGradient = gradient(['#9c88ff', '#667eea']);
   const updateGradient = gradient(['#ff6b6b', '#ff9a9e']);
   const addGradient = gradient(['#ffa502', '#ff7675']);
-  
+
   console.log('\n' + boxen(
     exampleGradient('🚀 Complete Command Reference & Examples') + '\n\n' +
-    
+
     chalk.hex('#00d2d3')('📋 CORE COMMANDS (Available Now)') + '\n' +
     chalk.hex('#95afc0')('  ') + piGradient('pi') + ' ' + createGradient('create') + chalk.hex('#95afc0')('                  # Interactive project creation') + '\n' +
     chalk.hex('#95afc0')('  ') + piGradient('pi') + ' ' + createGradient('create') + chalk.hex('#95afc0')(' my-nextjs-app    # Create with specific name') + '\n' +
     chalk.hex('#95afc0')('  ') + piGradient('pi') + ' ' + analyzeGradient('analyze') + chalk.hex('#95afc0')('                 # Show project analytics dashboard') + '\n' +
     chalk.hex('#95afc0')('  ') + piGradient('pi') + ' ' + updateGradient('update') + chalk.hex('#95afc0')('                  # Update packages interactively') + '\n' +
     chalk.hex('#95afc0')('  ') + piGradient('pi') + ' ' + updateGradient('update') + chalk.hex('#95afc0')(' lodash react     # Update specific packages') + '\n\n' +
-    
+
     chalk.hex('#ffa502')('🔧 UTILITY COMMANDS (Coming Soon)') + '\n' +
     chalk.hex('#95afc0')('  ') + piGradient('pi') + ' ' + addGradient('add') + chalk.hex('#95afc0')('                     # Add features to existing project') + '\n' +
     chalk.hex('#95afc0')('  ') + piGradient('pi') + ' ' + addGradient('add') + chalk.hex('#95afc0')(' auth               # Add authentication features') + '\n' +
@@ -391,21 +385,21 @@ program.on('--help', () => {
     chalk.hex('#95afc0')('  ') + piGradient('pi') + ' ' + commandGradient('check') + chalk.hex('#95afc0')(' react             # Check specific package') + '\n' +
     chalk.hex('#95afc0')('  ') + piGradient('pi') + ' ' + commandGradient('clean') + chalk.hex('#95afc0')('                   # Clean project artifacts') + '\n' +
     chalk.hex('#95afc0')('  ') + piGradient('pi') + ' ' + commandGradient('clean') + chalk.hex('#95afc0')(' --node-modules    # Clean node_modules only') + '\n\n' +
-    
+
     chalk.hex('#ff6b6b')('🌍 REPOSITORY & DEPLOYMENT') + '\n' +
     chalk.hex('#95afc0')('  ') + piGradient('pi') + ' ' + commandGradient('clone') + chalk.hex('#95afc0')('                   # Clone repositories interactively') + '\n' +
     chalk.hex('#95afc0')('  ') + piGradient('pi') + ' ' + commandGradient('clone') + chalk.hex('#95afc0')(' facebook/react    # Clone popular repositories') + '\n' +
     chalk.hex('#95afc0')('  ') + piGradient('pi') + ' ' + commandGradient('clone') + chalk.hex('#95afc0')(' user/repo my-app  # Clone with custom name') + '\n' +
     chalk.hex('#95afc0')('  ') + piGradient('pi') + ' ' + commandGradient('deploy') + chalk.hex('#95afc0')('                  # Deploy to cloud platforms') + '\n' +
     chalk.hex('#95afc0')('  ') + piGradient('pi') + ' ' + commandGradient('deploy') + chalk.hex('#95afc0')(' --vercel          # Deploy to Vercel') + '\n\n' +
-    
+
     chalk.hex('#9c88ff')('🩺 DEVELOPMENT & DEBUGGING') + '\n' +
     chalk.hex('#95afc0')('  ') + piGradient('pi') + ' ' + commandGradient('doctor') + chalk.hex('#95afc0')('                  # Diagnose project issues') + '\n' +
     chalk.hex('#95afc0')('  ') + piGradient('pi') + ' ' + commandGradient('doctor') + chalk.hex('#95afc0')(' --fix             # Auto-fix common issues') + '\n' +
     chalk.hex('#95afc0')('  ') + piGradient('pi') + ' ' + commandGradient('env') + chalk.hex('#95afc0')('                     # Check development environment') + '\n' +
     chalk.hex('#95afc0')('  ') + piGradient('pi') + ' ' + commandGradient('env') + chalk.hex('#95afc0')(' --setup           # Setup optimal dev environment') + '\n' +
     chalk.hex('#95afc0')('  ') + piGradient('pi') + ' ' + commandGradient('upgrade') + chalk.hex('#95afc0')('                # Upgrade CLI to latest version') + '\n\n' +
-    
+
     chalk.hex('#00d2d3')('💡 Pro Tips & Best Practices:') + '\n' +
     chalk.hex('#95afc0')('  • Use ') + chalk.hex('#ff6b6b')('--help') + chalk.hex('#95afc0')(' with any command for detailed options') + '\n' +
     chalk.hex('#95afc0')('  • Most commands are interactive - just run ') + piGradient('pi command') + '\n' +
