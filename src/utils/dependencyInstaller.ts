@@ -338,11 +338,12 @@ export async function installProjectDependencies(projectPath: string, projectNam
   // Install GitHub MCP server for Node.js projects if requested
   if (installMCP && detectedLanguages.includes('nodejs')) {
     try {
-      const spinner = ora(chalk.hex('#00d2d3')('Installing GitHub MCP server...')).start();
+      const mcpSpinner = ora(chalk.hex('#00d2d3')('Installing GitHub MCP server...')).start();
       await installAdditionalPackages('nodejs', ['@0xshariq/github-mcp-server'], projectPath, false);
-      spinner.succeed(chalk.green('✅ GitHub MCP server installed for git operations'));
+      mcpSpinner.succeed(chalk.green('✅ GitHub MCP server installed for git operations'));
     } catch (error) {
-      spinner.warn(chalk.yellow('⚠️  Could not install GitHub MCP server'));
+      const mcpSpinner = ora().start();
+      mcpSpinner.warn(chalk.yellow('⚠️  Could not install GitHub MCP server'));
     }
   }
   

@@ -16,6 +16,10 @@ import { addCommand } from './commands/add.js';
 import { upgradeCliCommand } from './commands/upgrade.js';
 import { analyzeCommand } from './commands/analyze.js';
 import { deployCommand } from './commands/deploy.js';
+import { updateCommand } from './commands/update.js';
+import { cleanCommand } from './commands/clean.js';
+import { environmentCommand } from './commands/env.js';
+import { doctorCommand } from './commands/doctor.js';
 
 // Import utilities
 import { printBanner, logError, showBanner } from './utils/ui.js';
@@ -277,6 +281,85 @@ program
     }
   });
 
+// UPDATE COMMAND - Comprehensive package updater
+program
+  .command('update')
+  .description(chalk.hex('#00d2d3')('🔄 Update packages across multiple languages'))
+  .argument('[packages...]', chalk.hex('#95afc0')('Specific packages to update (optional)'))
+  .option('--language <lang>', 'Update packages for specific language')
+  .option('--all', 'Update all packages for detected languages')
+  .option('--dry-run', 'Preview updates without making changes')
+  .option('--force', 'Force updates even if version constraints might break')
+  .option('--global', 'Update global packages')
+  .option('--dev', 'Include development dependencies')
+  .action(async (packages, options) => {
+    try {
+      showBanner();
+      await updateCommand(packages, options);
+    } catch (error) {
+      handleCommandError('update packages', error as Error);
+    }
+  });
+
+// CLEAN COMMAND - Clean development artifacts
+program
+  .command('clean')
+  .alias('cleanup')
+  .description(chalk.hex('#ffa502')('🧹 Clean development artifacts and caches'))
+  .option('--node-modules', 'Clean node_modules directories')
+  .option('--build', 'Clean build/dist directories')
+  .option('--cache', 'Clean package manager caches')
+  .option('--logs', 'Clean log files')
+  .option('--all', 'Clean everything (safe)')
+  .option('--deep', 'Deep clean (includes lock files)')
+  .option('--dry-run', 'Preview what would be cleaned')
+  .action(async (options) => {
+    try {
+      showBanner();
+      await cleanCommand(options);
+    } catch (error) {
+      handleCommandError('clean', error as Error);
+    }
+  });
+
+// ENVIRONMENT COMMAND - Environment analysis
+program
+  .command('env')
+  .alias('environment')
+  .description(chalk.hex('#10ac84')('🌍 Analyze development environment'))
+  .option('--check', 'Check for missing or outdated tools')
+  .option('--versions', 'Show versions of all detected tools')
+  .option('--paths', 'Show installation paths')
+  .option('--export', 'Export environment info to file')
+  .option('--minimal', 'Show minimal environment info')
+  .action(async (options) => {
+    try {
+      showBanner();
+      await environmentCommand(options);
+    } catch (error) {
+      handleCommandError('environment', error as Error);
+    }
+  });
+
+// DOCTOR COMMAND - Diagnose and fix issues
+program
+  .command('doctor')
+  .alias('diagnose')
+  .description(chalk.hex('#ff6b6b')('🩺 Diagnose and fix development issues'))
+  .option('--fix', 'Automatically fix detected issues')
+  .option('--check-deps', 'Check for dependency issues')
+  .option('--check-config', 'Check configuration files')
+  .option('--check-tools', 'Check development tools')
+  .option('--verbose', 'Show detailed diagnostic information')
+  .action(async (options) => {
+    try {
+      showBanner();
+      await doctorCommand(options);
+    } catch (error) {
+      handleCommandError('doctor', error as Error);
+    }
+  });
+
 // DEPLOY COMMAND - Future deployment features
 program
   .command('deploy')
@@ -306,14 +389,17 @@ program.on('--help', () => {
     chalk.hex('#95afc0')('  ') + piGradient('pi') + ' ' + chalk.hex('#00d2d3')('clone') + chalk.hex('#95afc0')(' user/repo my-copy   # Clone with custom name') + '\n\n' +
     chalk.white('Check & Maintain:') + '\n' +
     chalk.hex('#95afc0')('  ') + piGradient('pi') + ' ' + chalk.hex('#f39c12')('check') + chalk.hex('#95afc0')('                     # Check all package versions') + '\n' +
-    chalk.hex('#95afc0')('  ') + piGradient('pi') + ' ' + chalk.hex('#f39c12')('check') + chalk.hex('#95afc0')(' react               # Check specific package') + '\n\n' +
+    chalk.hex('#95afc0')('  ') + piGradient('pi') + ' ' + chalk.hex('#00d2d3')('update') + chalk.hex('#95afc0')(' --all               # Update all packages') + '\n' +
+    chalk.hex('#95afc0')('  ') + piGradient('pi') + ' ' + chalk.hex('#ffa502')('clean') + chalk.hex('#95afc0')(' --build              # Clean build artifacts') + '\n' +
+    chalk.hex('#95afc0')('  ') + piGradient('pi') + ' ' + chalk.hex('#ff6b6b')('doctor') + chalk.hex('#95afc0')(' --fix               # Diagnose and fix issues') + '\n\n' +
     chalk.white('Add Features:') + '\n' +
     chalk.hex('#95afc0')('  ') + piGradient('pi') + ' ' + chalk.hex('#9c88ff')('add') + chalk.hex('#95afc0')('                       # Browse available features') + '\n' +
     chalk.hex('#95afc0')('  ') + piGradient('pi') + ' ' + chalk.hex('#9c88ff')('add') + chalk.hex('#95afc0')(' auth                 # Add authentication') + '\n' +
     chalk.hex('#95afc0')('  ') + piGradient('pi') + ' ' + chalk.hex('#9c88ff')('add') + chalk.hex('#95afc0')(' docker               # Add Docker config') + '\n\n' +
-    chalk.white('Manage & Deploy:') + '\n' +
+    chalk.white('Analyze & Debug:') + '\n' +
+    chalk.hex('#95afc0')('  ') + piGradient('pi') + ' ' + chalk.hex('#667eea')('analyze') + chalk.hex('#95afc0')('                  # Advanced project analytics') + '\n' +
+    chalk.hex('#95afc0')('  ') + piGradient('pi') + ' ' + chalk.hex('#10ac84')('env') + chalk.hex('#95afc0')(' --check              # Check development environment') + '\n' +
     chalk.hex('#95afc0')('  ') + piGradient('pi') + ' ' + chalk.hex('#ff6b6b')('upgrade-cli') + chalk.hex('#95afc0')('              # Update CLI to latest version') + '\n' +
-    chalk.hex('#95afc0')('  ') + piGradient('pi') + ' ' + chalk.hex('#667eea')('analyze') + chalk.hex('#95afc0')('                  # View usage analytics dashboard') + '\n' +
     chalk.hex('#95afc0')('  ') + piGradient('pi') + ' ' + chalk.hex('#ff9a9e')('deploy') + chalk.hex('#95afc0')('                   # Deploy project (coming soon)') + '\n\n' +
     chalk.hex('#00d2d3')('💡 Pro Tips:') + '\n' +
     chalk.hex('#95afc0')('  • Use ') + chalk.hex('#ff6b6b')('--help') + chalk.hex('#95afc0')(' with any command for detailed information') + '\n' +

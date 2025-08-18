@@ -66,7 +66,7 @@ async function installDependenciesForCreate(projectPath: string): Promise<void> 
         
         try {
             const { files: foundFiles } = await findProjectFiles(projectPath);
-            const packageJsonFiles = foundFiles.filter(file => path.basename(file) === 'package.json');
+            const packageJsonFiles = foundFiles.filter((file: string) => path.basename(file) === 'package.json');
             
             if (packageJsonFiles.length > 0) {
                 console.log(chalk.gray('💡 Found package.json files in:'));

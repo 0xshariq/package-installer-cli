@@ -1,297 +1,467 @@
 /**
- * Analyze command - Terminal dashboard showing CLI usage analytics
+ * Analyze command - Advanced terminal dashboard showing CLI usage analytics
  */
 
 import chalk from 'chalk';
-import gradient from 'gradient-string';
-import boxen from 'boxen';
-import fs from 'fs';
+import ora from 'ora';
+import fs from 'fs-extra';
 import path from 'path';
-import os from 'os';
+import { detectProjectLanguage } from '../utils/dependencyInstaller.js';
+import { 
+  createBanner, 
+  displayProjectStats, 
+  displayRecentProjects, 
+  displayCommandsGrid,
+  displaySystemInfo,
+  gatherProjectStats,
+  scanForRecentProjects,
+  displaySuccessMessage
+} from '../utils/dashboard.js';
 
 /**
  * Display help for analyze command
  */
 export function showAnalyzeHelp(): void {
-  const piGradient = gradient(['#00c6ff', '#0072ff']);
-  const headerGradient = gradient(['#667eea', '#764ba2']);
+  console.clear();
   
-  console.log('\n' + boxen(
-    headerGradient('📊 Analyze Command Help') + '\n\n' +
-    chalk.white('Display a beautiful terminal dashboard with CLI usage analytics.') + '\n' +
-    chalk.white('See which frameworks are popular and make data-driven decisions!') + '\n\n' +
-    chalk.cyan('Usage:') + '\n' +
-    chalk.white(`  ${piGradient('pi')} ${chalk.hex('#10ac84')('analyze')}`) + '\n\n' +
-    chalk.cyan('Options:') + '\n' +
-    chalk.gray('  -h, --help    Display help for this command') + '\n\n' +
-    chalk.cyan('Examples:') + '\n' +
-    chalk.gray(`  ${piGradient('pi')} ${chalk.hex('#10ac84')('analyze')}              # Show analytics dashboard`) + '\n' +
-    chalk.gray(`  ${piGradient('pi')} ${chalk.hex('#10ac84')('analyze')} ${chalk.hex('#ff6b6b')('--help')}     # Show this help message`) + '\n\n' +
-    chalk.hex('#00d2d3')('💡 Dashboard Features:') + '\n' +
-    chalk.hex('#95afc0')('  • Framework usage statistics') + '\n' +
-    chalk.hex('#95afc0')('  • Most popular project types') + '\n' +
-    chalk.hex('#95afc0')('  • Feature installation trends') + '\n' +
-    chalk.hex('#95afc0')('  • Personalized recommendations'),
-    {
-      padding: 1,
-      borderStyle: 'round',
-      borderColor: 'magenta',
-      backgroundColor: '#0a0a0a'
-    }
-  ));
-}
-
-/**
- * Interface for analytics data
- */
-interface AnalyticsData {
-  totalProjects: number;
-  frameworkStats: Record<string, number>;
-  languageStats: Record<string, number>;
-  featureStats: Record<string, number>;
-  lastUsed: string;
-  installCount: number;
-}
-
-/**
- * Get analytics data from local storage or return defaults
- */
-function getAnalyticsData(): AnalyticsData {
-  const analyticsFile = path.join(os.homedir(), '.pi-cli-analytics.json');
+  console.log(chalk.hex('#9c88ff')('📊 ANALYZE COMMAND HELP\n'));
   
-  try {
-    if (fs.existsSync(analyticsFile)) {
-      const data = fs.readFileSync(analyticsFile, 'utf8');
-      return JSON.parse(data);
-    }
-  } catch (error) {
-    // If file doesn't exist or is corrupted, return defaults
-  }
+  console.log(chalk.hex('#00d2d3')('Usage:'));
+  console.log(chalk.white('  pkg-cli analyze [options]'));
+  console.log(chalk.white('  pkg-cli stats [options]') + chalk.gray(' (alias)\n'));
   
-  // Return mock data for demonstration
-  return {
-    totalProjects: 15,
-    frameworkStats: {
-      'Next.js': 6,
-      'Express': 4,
-      'React (Vite)': 3,
-      'Angular': 1,
-      'Rust': 1
-    },
-    languageStats: {
-      'TypeScript': 9,
-      'JavaScript': 5,
-      'Rust': 1
-    },
-    featureStats: {
-      'Auth (Clerk)': 4,
-      'Tailwind CSS': 8,
-      'ShadCN/UI': 5,
-      'Docker': 3,
-      'Material UI': 1
-    },
-    lastUsed: new Date().toISOString(),
-    installCount: 28
-  };
-}
-
-/**
- * Create a progress bar
- */
-function createProgressBar(current: number, total: number, width: number = 20): string {
-  const percentage = Math.round((current / total) * 100);
-  const filledWidth = Math.round((current / total) * width);
-  const emptyWidth = width - filledWidth;
+  console.log(chalk.hex('#00d2d3')('Description:'));
+  console.log(chalk.white('  Display comprehensive project analytics and system dashboard'));
+  console.log(chalk.white('  Shows project statistics, recent projects, system info, and more\n'));
   
-  const filled = chalk.hex('#10ac84')('█'.repeat(filledWidth));
-  const empty = chalk.hex('#2d3748')('░'.repeat(emptyWidth));
+  console.log(chalk.hex('#00d2d3')('Options:'));
+  console.log(chalk.white('  --current') + chalk.gray('     Analyze only the current project in detail'));
+  console.log(chalk.white('  --system') + chalk.gray('      Show system information only'));
+  console.log(chalk.white('  --projects') + chalk.gray('    Show recent projects only'));
+  console.log(chalk.white('  --commands') + chalk.gray('    Show available commands only'));
+  console.log(chalk.white('  -h, --help') + chalk.gray('     Show this help message\n'));
   
-  return `${filled}${empty} ${chalk.hex('#00d2d3')(percentage + '%')}`;
-}
-
-/**
- * Display framework statistics
- */
-function displayFrameworkStats(frameworkStats: Record<string, number>): void {
-  const totalProjects = Object.values(frameworkStats).reduce((sum, count) => sum + count, 0);
-  const sortedFrameworks = Object.entries(frameworkStats)
-    .sort(([, a], [, b]) => b - a);
-  
-  console.log(boxen(
-    chalk.hex('#667eea')('🚀 Framework Usage Statistics') + '\n\n' +
-    sortedFrameworks.map(([framework, count]) => {
-      const bar = createProgressBar(count, totalProjects);
-      return `${chalk.white(framework.padEnd(15))} ${bar} ${chalk.hex('#ffa502')(`(${count} projects)`)}`;
-    }).join('\n'),
-    {
-      padding: 1,
-      borderStyle: 'round',
-      borderColor: '#667eea',
-      backgroundColor: '#1a1a2e'
-    }
-  ));
-}
-
-/**
- * Display language statistics
- */
-function displayLanguageStats(languageStats: Record<string, number>): void {
-  const totalProjects = Object.values(languageStats).reduce((sum, count) => sum + count, 0);
-  const sortedLanguages = Object.entries(languageStats)
-    .sort(([, a], [, b]) => b - a);
-  
-  console.log(boxen(
-    chalk.hex('#f093fb')('💻 Programming Language Usage') + '\n\n' +
-    sortedLanguages.map(([language, count]) => {
-      const bar = createProgressBar(count, totalProjects);
-      return `${chalk.white(language.padEnd(15))} ${bar} ${chalk.hex('#ffa502')(`(${count} projects)`)}`;
-    }).join('\n'),
-    {
-      padding: 1,
-      borderStyle: 'round',
-      borderColor: '#f093fb',
-      backgroundColor: '#2d1b40'
-    }
-  ));
-}
-
-/**
- * Display feature statistics
- */
-function displayFeatureStats(featureStats: Record<string, number>): void {
-  const totalFeatures = Object.values(featureStats).reduce((sum, count) => sum + count, 0);
-  const sortedFeatures = Object.entries(featureStats)
-    .sort(([, a], [, b]) => b - a);
-  
-  console.log(boxen(
-    chalk.hex('#4facfe')('⚡ Popular Features & Add-ons') + '\n\n' +
-    sortedFeatures.map(([feature, count]) => {
-      const bar = createProgressBar(count, totalFeatures);
-      return `${chalk.white(feature.padEnd(15))} ${bar} ${chalk.hex('#ffa502')(`(${count} installs)`)}`;
-    }).join('\n'),
-    {
-      padding: 1,
-      borderStyle: 'round',
-      borderColor: '#4facfe',
-      backgroundColor: '#0a1a2e'
-    }
-  ));
-}
-
-/**
- * Display overview statistics
- */
-function displayOverview(data: AnalyticsData): void {
-  const lastUsedDate = new Date(data.lastUsed).toLocaleDateString();
-  const avgFeaturesPerProject = (data.installCount / data.totalProjects).toFixed(1);
-  
-  console.log(boxen(
-    gradient(['#ff6b6b', '#feca57'])('📈 CLI Usage Overview') + '\n\n' +
-    `${chalk.hex('#00d2d3')('Total Projects Created:')} ${chalk.hex('#10ac84')(data.totalProjects)}` + '\n' +
-    `${chalk.hex('#00d2d3')('Total Feature Installs:')} ${chalk.hex('#10ac84')(data.installCount)}` + '\n' +
-    `${chalk.hex('#00d2d3')('Avg Features per Project:')} ${chalk.hex('#10ac84')(avgFeaturesPerProject)}` + '\n' +
-    `${chalk.hex('#00d2d3')('Last Activity:')} ${chalk.hex('#ffa502')(lastUsedDate)}`,
-    {
-      padding: 1,
-      borderStyle: 'round',
-      borderColor: '#ff6b6b',
-      backgroundColor: '#2d1b1b'
-    }
-  ));
-}
-
-/**
- * Display recommendations
- */
-function displayRecommendations(data: AnalyticsData): void {
-  const recommendations = [];
-  
-  // Generate dynamic recommendations based on usage patterns
-  const topFramework = Object.entries(data.frameworkStats)
-    .sort(([, a], [, b]) => b - a)[0]?.[0];
-  
-  if (topFramework === 'Next.js') {
-    recommendations.push('🎯 Consider trying our new Next.js templates with App Router');
-    recommendations.push('💡 Explore ShadCN/UI components for faster development');
-  } else if (topFramework === 'Express') {
-    recommendations.push('🎯 Try our TypeScript Express template for better type safety');
-    recommendations.push('💡 Add Docker support for easier deployment');
-  }
-  
-  if (data.featureStats['Auth (Clerk)'] > data.featureStats['Auth (Auth0)'] || 0) {
-    recommendations.push('🔐 Clerk authentication is popular - check our latest templates');
-  }
-  
-  if (data.languageStats['TypeScript'] > data.languageStats['JavaScript']) {
-    recommendations.push('⚡ Great choice using TypeScript! Try our advanced TS templates');
-  }
-  
-  recommendations.push('📦 New templates added regularly - run "pi create" to see latest');
-  
-  console.log(boxen(
-    chalk.hex('#00d2d3')('💡 Personalized Recommendations') + '\n\n' +
-    recommendations.map((rec, index) => `${rec}`).join('\n'),
-    {
-      padding: 1,
-      borderStyle: 'round',
-      borderColor: '#00d2d3',
-      backgroundColor: '#0a2a2a'
-    }
-  ));
+  console.log(chalk.hex('#00d2d3')('Examples:'));
+  console.log(chalk.gray('  # Show complete analytics dashboard'));
+  console.log(chalk.white('  pkg-cli analyze\n'));
+  console.log(chalk.gray('  # Analyze current project in detail'));
+  console.log(chalk.white('  pkg-cli analyze --current\n'));
+  console.log(chalk.gray('  # Show system information only'));
+  console.log(chalk.white('  pkg-cli analyze --system\n'));
+  console.log(chalk.gray('  # Show recent projects'));
+  console.log(chalk.white('  pkg-cli analyze --projects\n'));
 }
 
 /**
  * Main analyze command function
  */
 export async function analyzeCommand(): Promise<void> {
-  // Check for help flag
-  if (process.argv.includes('--help') || process.argv.includes('-h')) {
-    showAnalyzeHelp();
+  // Create beautiful banner
+  createBanner('Project Analytics');
+  
+  const spinner = ora(chalk.hex('#9c88ff')('🔍 Gathering analytics data...')).start();
+  
+  try {
+    // Gather all data
+    const [stats, recentProjects] = await Promise.all([
+      gatherProjectStats(),
+      scanForRecentProjects()
+    ]);
+    
+    spinner.stop();
+    
+    // Display comprehensive dashboard
+    displayProjectStats(stats);
+    displayRecentProjects(recentProjects);
+    displayCommandsGrid();
+    displaySystemInfo();
+    
+    displaySuccessMessage(
+      'Analytics dashboard generated successfully!',
+      [
+        'Use analyze --current to analyze only the current project',
+        'Use analyze --projects to see recent projects',
+        'Use analyze --system for system information only'
+      ]
+    );
+    
+  } catch (error: any) {
+    spinner.fail(chalk.red('❌ Failed to generate analytics'));
+    console.error(chalk.red(`Error: ${error.message}`));
+    process.exit(1);
+  }
+}
+
+/**
+ * Analyze the current project in detail
+ */
+export async function analyzeCurrentProject(): Promise<void> {
+  const projectPath = process.cwd();
+  const projectName = path.basename(projectPath);
+  
+  console.log(chalk.hex('#00d2d3')(`\n🔍 ANALYZING PROJECT: ${chalk.white(projectName)}\n`));
+  
+  // Detect languages and frameworks
+  const languages = await detectProjectLanguage(projectPath);
+  
+  if (languages.length === 0) {
+    console.log(chalk.yellow('⚠️  No recognizable project structure found'));
     return;
   }
   
-  console.log('\n' + gradient(['#667eea', '#764ba2'])('📊 Package Installer CLI Analytics Dashboard'));
-  console.log(chalk.hex('#95afc0')('Analyzing your development patterns and usage statistics...\n'));
+  // Analyze project structure
+  const analysis = await analyzeProjectStructure(projectPath, languages);
+  
+  // Display results
+  displayProjectAnalysis(projectName, analysis);
+}
+
+/**
+ * Analyze project structure and dependencies
+ */
+async function analyzeProjectStructure(projectPath: string, languages: string[]): Promise<any> {
+  const analysis: any = {
+    languages,
+    files: {},
+    dependencies: {},
+    structure: {},
+    metrics: {},
+    recommendations: []
+  };
+  
+  // Analyze each language ecosystem
+  for (const language of languages) {
+    switch (language) {
+      case 'nodejs':
+        analysis.files.nodejs = await analyzeNodejsProject(projectPath);
+        break;
+      case 'rust':
+        analysis.files.rust = await analyzeRustProject(projectPath);
+        break;
+      case 'python':
+        analysis.files.python = await analyzePythonProject(projectPath);
+        break;
+    }
+  }
+  
+  // Analyze directory structure
+  analysis.structure = await analyzeDirectoryStructure(projectPath);
+  
+  // Calculate metrics
+  analysis.metrics = await calculateProjectMetrics(projectPath);
+  
+  // Generate recommendations
+  analysis.recommendations = generateRecommendations(analysis);
+  
+  return analysis;
+}
+
+/**
+ * Analyze Node.js project specifics
+ */
+async function analyzeNodejsProject(projectPath: string): Promise<any> {
+  const packageJsonPath = path.join(projectPath, 'package.json');
+  const analysis: any = {
+    hasPackageJson: false,
+    packageManager: 'npm',
+    scripts: {},
+    dependencies: { production: 0, development: 0 },
+    framework: 'unknown'
+  };
+  
+  if (await fs.pathExists(packageJsonPath)) {
+    analysis.hasPackageJson = true;
+    const packageJson = await fs.readJson(packageJsonPath);
+    
+    // Detect package manager
+    if (await fs.pathExists(path.join(projectPath, 'pnpm-lock.yaml'))) {
+      analysis.packageManager = 'pnpm';
+    } else if (await fs.pathExists(path.join(projectPath, 'yarn.lock'))) {
+      analysis.packageManager = 'yarn';
+    }
+    
+    // Count dependencies
+    if (packageJson.dependencies) {
+      analysis.dependencies.production = Object.keys(packageJson.dependencies).length;
+    }
+    if (packageJson.devDependencies) {
+      analysis.dependencies.development = Object.keys(packageJson.devDependencies).length;
+    }
+    
+    // Detect framework
+    const deps = { ...packageJson.dependencies, ...packageJson.devDependencies };
+    if (deps['next']) analysis.framework = 'Next.js';
+    else if (deps['react']) analysis.framework = 'React';
+    else if (deps['vue']) analysis.framework = 'Vue.js';
+    else if (deps['@angular/core']) analysis.framework = 'Angular';
+    else if (deps['express']) analysis.framework = 'Express';
+    else if (deps['@nestjs/core']) analysis.framework = 'NestJS';
+    
+    // Get scripts
+    analysis.scripts = packageJson.scripts || {};
+  }
+  
+  return analysis;
+}
+
+/**
+ * Analyze Rust project specifics
+ */
+async function analyzeRustProject(projectPath: string): Promise<any> {
+  const cargoTomlPath = path.join(projectPath, 'Cargo.toml');
+  const analysis: any = {
+    hasCargoToml: false,
+    isWorkspace: false,
+    dependencies: { normal: 0, dev: 0, build: 0 },
+    edition: '2021'
+  };
+  
+  if (await fs.pathExists(cargoTomlPath)) {
+    analysis.hasCargoToml = true;
+    
+    try {
+      const cargoContent = await fs.readFile(cargoTomlPath, 'utf-8');
+      
+      if (cargoContent.includes('[workspace]')) {
+        analysis.isWorkspace = true;
+      }
+      
+      // Count dependency sections
+      const depMatches = cargoContent.match(/\[dependencies\]/g);
+      const devDepMatches = cargoContent.match(/\[dev-dependencies\]/g);
+      const buildDepMatches = cargoContent.match(/\[build-dependencies\]/g);
+      
+      if (depMatches) analysis.dependencies.normal = 1;
+      if (devDepMatches) analysis.dependencies.dev = 1;
+      if (buildDepMatches) analysis.dependencies.build = 1;
+      
+      // Detect edition
+      const editionMatch = cargoContent.match(/edition\s*=\s*"(\d+)"/);
+      if (editionMatch) {
+        analysis.edition = editionMatch[1];
+      }
+    } catch (error) {
+      // Ignore parsing errors
+    }
+  }
+  
+  return analysis;
+}
+
+/**
+ * Analyze Python project specifics
+ */
+async function analyzePythonProject(projectPath: string): Promise<any> {
+  const analysis: any = {
+    hasRequirements: false,
+    hasPyproject: false,
+    hasPoetry: false,
+    packageManager: 'pip',
+    dependencies: 0
+  };
+  
+  const requirementsPath = path.join(projectPath, 'requirements.txt');
+  const pyprojectPath = path.join(projectPath, 'pyproject.toml');
+  const poetryLockPath = path.join(projectPath, 'poetry.lock');
+  
+  analysis.hasRequirements = await fs.pathExists(requirementsPath);
+  analysis.hasPyproject = await fs.pathExists(pyprojectPath);
+  analysis.hasPoetry = await fs.pathExists(poetryLockPath);
+  
+  if (analysis.hasPoetry) {
+    analysis.packageManager = 'poetry';
+  } else if (analysis.hasPyproject) {
+    analysis.packageManager = 'pip + pyproject.toml';
+  }
+  
+  // Count dependencies from requirements.txt
+  if (analysis.hasRequirements) {
+    try {
+      const requirements = await fs.readFile(requirementsPath, 'utf-8');
+      analysis.dependencies = requirements.split('\n').filter(line => 
+        line.trim() && !line.startsWith('#')
+      ).length;
+    } catch (error) {
+      // Ignore errors
+    }
+  }
+  
+  return analysis;
+}
+
+/**
+ * Analyze directory structure
+ */
+async function analyzeDirectoryStructure(projectPath: string): Promise<any> {
+  const structure = {
+    totalFiles: 0,
+    directories: 0,
+    hasTests: false,
+    hasDocs: false,
+    hasConfig: false,
+    sourceStructure: 'unknown'
+  };
   
   try {
-    const analyticsData = getAnalyticsData();
+    const entries = await fs.readdir(projectPath, { withFileTypes: true });
     
-    // Display all sections with spacing
-    displayOverview(analyticsData);
-    console.log();
-    
-    displayFrameworkStats(analyticsData.frameworkStats);
-    console.log();
-    
-    displayLanguageStats(analyticsData.languageStats);
-    console.log();
-    
-    displayFeatureStats(analyticsData.featureStats);
-    console.log();
-    
-    displayRecommendations(analyticsData);
-    
-    console.log('\n' + boxen(
-      chalk.hex('#10ac84')('🎉 Dashboard Complete!') + '\n\n' +
-      chalk.white('This analytics dashboard helps us understand which frameworks') + '\n' +
-      chalk.white('and features are most popular, allowing us to prioritize') + '\n' +
-      chalk.white('development efforts and add the most requested templates.') + '\n\n' +
-      chalk.hex('#00d2d3')('📈 Benefits:') + '\n' +
-      chalk.hex('#95afc0')('  • See your development patterns') + '\n' +
-      chalk.hex('#95afc0')('  • Get personalized recommendations') + '\n' +
-      chalk.hex('#95afc0')('  • Discover popular frameworks') + '\n' +
-      chalk.hex('#95afc0')('  • Help shape future CLI features'),
-      {
-        padding: 1,
-        borderStyle: 'round',
-        borderColor: '#10ac84',
-        backgroundColor: '#001a00'
+    for (const entry of entries) {
+      if (entry.isDirectory()) {
+        structure.directories++;
+        
+        if (['test', 'tests', '__tests__', 'spec'].includes(entry.name.toLowerCase())) {
+          structure.hasTests = true;
+        }
+        if (['docs', 'doc', 'documentation'].includes(entry.name.toLowerCase())) {
+          structure.hasDocs = true;
+        }
+        if (entry.name === 'src') {
+          structure.sourceStructure = 'src-based';
+        }
+      } else {
+        structure.totalFiles++;
+        
+        if (['.gitignore', '.env', 'tsconfig.json', '.eslintrc', 'webpack.config.js'].includes(entry.name)) {
+          structure.hasConfig = true;
+        }
       }
-    ));
-    
+    }
   } catch (error) {
-    console.log(chalk.red('❌ Failed to load analytics data'));
-    console.log(chalk.hex('#95afc0')('This might be your first time using the analyze command.'));
-    console.log(chalk.hex('#95afc0')('Create some projects first, then check back!'));
+    // Ignore errors
+  }
+  
+  return structure;
+}
+
+/**
+ * Calculate project metrics
+ */
+async function calculateProjectMetrics(projectPath: string): Promise<any> {
+  const metrics = {
+    totalSize: 0,
+    codeFiles: 0,
+    configFiles: 0,
+    lastModified: new Date(0)
+  };
+  
+  try {
+    const stats = await fs.stat(projectPath);
+    metrics.totalSize = stats.size;
+    metrics.lastModified = stats.mtime;
+    
+    await walkDirectory(projectPath, (filePath: string, stat: fs.Stats) => {
+      const ext = path.extname(filePath).toLowerCase();
+      const codeExtensions = ['.js', '.ts', '.jsx', '.tsx', '.py', '.rs', '.go', '.java', '.php', '.rb'];
+      const configExtensions = ['.json', '.yml', '.yaml', '.toml', '.ini', '.conf'];
+      
+      if (codeExtensions.includes(ext)) {
+        metrics.codeFiles++;
+      } else if (configExtensions.includes(ext)) {
+        metrics.configFiles++;
+      }
+      
+      if (stat.mtime > metrics.lastModified) {
+        metrics.lastModified = stat.mtime;
+      }
+    });
+  } catch (error) {
+    // Ignore errors
+  }
+  
+  return metrics;
+}
+
+/**
+ * Walk directory recursively
+ */
+async function walkDirectory(dir: string, callback: (filePath: string, stat: fs.Stats) => void): Promise<void> {
+  try {
+    const entries = await fs.readdir(dir, { withFileTypes: true });
+    
+    for (const entry of entries) {
+      const fullPath = path.join(dir, entry.name);
+      
+      if (entry.isDirectory() && ['node_modules', '.git', 'dist', 'build', '.next'].includes(entry.name)) {
+        continue;
+      }
+      
+      const stat = await fs.stat(fullPath);
+      callback(fullPath, stat);
+      
+      if (entry.isDirectory()) {
+        await walkDirectory(fullPath, callback);
+      }
+    }
+  } catch (error) {
+    // Ignore permission errors
+  }
+}
+
+/**
+ * Generate recommendations based on analysis
+ */
+function generateRecommendations(analysis: any): string[] {
+  const recommendations: string[] = [];
+  
+  if (analysis.files.nodejs) {
+    const nodejs = analysis.files.nodejs;
+    
+    if (!nodejs.hasPackageJson) {
+      recommendations.push('Initialize package.json with `npm init`');
+    }
+    
+    if (nodejs.dependencies.production > 50) {
+      recommendations.push('Consider reviewing dependencies - large dependency count detected');
+    }
+    
+    if (!nodejs.scripts.test) {
+      recommendations.push('Add test script to package.json for better project maintainability');
+    }
+  }
+  
+  if (!analysis.structure.hasTests) {
+    recommendations.push('Add tests to improve code quality and reliability');
+  }
+  
+  if (!analysis.structure.hasDocs) {
+    recommendations.push('Consider adding documentation (README.md, docs folder)');
+  }
+  
+  if (!analysis.structure.hasConfig) {
+    recommendations.push('Add configuration files (.gitignore, .env.example, etc.)');
+  }
+  
+  return recommendations;
+}
+
+/**
+ * Display comprehensive project analysis
+ */
+function displayProjectAnalysis(projectName: string, analysis: any): void {
+  const Table = require('cli-table3');
+  
+  const overviewTable = new Table({
+    head: [chalk.hex('#00d2d3')('Property'), chalk.hex('#10ac84')('Value')],
+    colWidths: [25, 55],
+    style: { head: [], border: ['cyan'] }
+  });
+  
+  overviewTable.push(
+    [chalk.white('📁 Project Name'), chalk.green(projectName)],
+    [chalk.white('🔧 Languages'), chalk.blue(analysis.languages.join(', '))],
+    [chalk.white('📊 Total Files'), chalk.yellow(analysis.structure.totalFiles)],
+    [chalk.white('📂 Directories'), chalk.magenta(analysis.structure.directories)],
+    [chalk.white('📝 Code Files'), chalk.cyan(analysis.metrics.codeFiles)],
+    [chalk.white('⚙️  Config Files'), chalk.hex('#ffa502')(analysis.metrics.configFiles)]
+  );
+  
+  console.log(overviewTable.toString());
+  
+  if (analysis.recommendations.length > 0) {
+    console.log('\n' + chalk.hex('#ffa502')('💡 RECOMMENDATIONS:\n'));
+    analysis.recommendations.forEach((rec: string, index: number) => {
+      console.log(chalk.gray(`${index + 1}. ${rec}`));
+    });
+    console.log();
   }
 }

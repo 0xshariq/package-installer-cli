@@ -179,9 +179,7 @@ export async function createProject(providedName?: string): Promise<void> {
 
     // Step 8: UI library selection
     const selectedUi = await promptUiSelection(fwConfig, theme);
-    userCache.ui = selectedUi;
-    
-    // Step 9: Bundler selection
+        userCache.ui = selectedUi || undefined;    // Step 9: Bundler selection
     const selectedBundler = await promptBundlerSelection(fwConfig, theme);
     userCache.bundler = selectedBundler;
     
