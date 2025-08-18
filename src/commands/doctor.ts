@@ -18,8 +18,8 @@ export function showDoctorHelp(): void {
   console.log(chalk.hex('#9c88ff')('🩺 DOCTOR COMMAND HELP\n'));
   
   console.log(chalk.hex('#00d2d3')('Usage:'));
-  console.log(chalk.white('  pkg-cli doctor [options]'));
-  console.log(chalk.white('  pkg-cli diagnose [options]') + chalk.gray(' (alias)\n'));
+  console.log(chalk.white('  pi doctor [options]'));
+  console.log(chalk.white('  pi diagnose [options]') + chalk.gray(' (alias)\n'));
   
   console.log(chalk.hex('#00d2d3')('Description:'));
   console.log(chalk.white('  Diagnose and fix common development environment issues'));
@@ -35,11 +35,11 @@ export function showDoctorHelp(): void {
   
   console.log(chalk.hex('#00d2d3')('Examples:'));
   console.log(chalk.gray('  # Run complete diagnosis'));
-  console.log(chalk.white('  pkg-cli doctor\n'));
+  console.log(chalk.white('  pi doctor\n'));
   console.log(chalk.gray('  # Automatically fix issues'));
-  console.log(chalk.white('  pkg-cli doctor --fix\n'));
+  console.log(chalk.white('  pi doctor --fix\n'));
   console.log(chalk.gray('  # Check dependencies only'));
-  console.log(chalk.white('  pkg-cli doctor --check-deps\n'));
+  console.log(chalk.white('  pi doctor --check-deps\n'));
 }
 
 /**

@@ -286,7 +286,7 @@ export function showErrorMessage(title: string, message: string, details?: strin
  * Shows the main banner (alias for printBanner)
  */
 export function showBanner(): void {
-  printBanner('2.2.0', 10);
+  printBanner('2.3.0', 10);
 }
 
 /**

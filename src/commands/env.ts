@@ -18,8 +18,8 @@ export function showEnvironmentHelp(): void {
   console.log(chalk.hex('#9c88ff')('🌍 ENVIRONMENT COMMAND HELP\n'));
   
   console.log(chalk.hex('#00d2d3')('Usage:'));
-  console.log(chalk.white('  pkg-cli env [options]'));
-  console.log(chalk.white('  pkg-cli environment [options]') + chalk.gray(' (alias)\n'));
+  console.log(chalk.white('  pi env [options]'));
+  console.log(chalk.white('  pi environment [options]') + chalk.gray(' (alias)\n'));
   
   console.log(chalk.hex('#00d2d3')('Description:'));
   console.log(chalk.white('  Analyze development environment and check tool versions'));
@@ -35,11 +35,11 @@ export function showEnvironmentHelp(): void {
   
   console.log(chalk.hex('#00d2d3')('Examples:'));
   console.log(chalk.gray('  # Show complete environment info'));
-  console.log(chalk.white('  pkg-cli env\n'));
+  console.log(chalk.white('  pi env\n'));
   console.log(chalk.gray('  # Check for outdated tools'));
-  console.log(chalk.white('  pkg-cli env --check\n'));
+  console.log(chalk.white('  pi env --check\n'));
   console.log(chalk.gray('  # Export to file'));
-  console.log(chalk.white('  pkg-cli env --export\n'));
+  console.log(chalk.white('  pi env --export\n'));
 }
 
 /**

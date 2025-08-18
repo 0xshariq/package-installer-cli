@@ -27,8 +27,8 @@ export function showAnalyzeHelp(): void {
   console.log(chalk.hex('#9c88ff')('📊 ANALYZE COMMAND HELP\n'));
   
   console.log(chalk.hex('#00d2d3')('Usage:'));
-  console.log(chalk.white('  pkg-cli analyze [options]'));
-  console.log(chalk.white('  pkg-cli stats [options]') + chalk.gray(' (alias)\n'));
+  console.log(chalk.white('  pi analyze [options]'));
+  console.log(chalk.white('  pi stats [options]') + chalk.gray(' (alias)\n'));
   
   console.log(chalk.hex('#00d2d3')('Description:'));
   console.log(chalk.white('  Display comprehensive project analytics and system dashboard'));
@@ -43,13 +43,13 @@ export function showAnalyzeHelp(): void {
   
   console.log(chalk.hex('#00d2d3')('Examples:'));
   console.log(chalk.gray('  # Show complete analytics dashboard'));
-  console.log(chalk.white('  pkg-cli analyze\n'));
+  console.log(chalk.white('  pi analyze\n'));
   console.log(chalk.gray('  # Analyze current project in detail'));
-  console.log(chalk.white('  pkg-cli analyze --current\n'));
+  console.log(chalk.white('  pi analyze --current\n'));
   console.log(chalk.gray('  # Show system information only'));
-  console.log(chalk.white('  pkg-cli analyze --system\n'));
+  console.log(chalk.white('  pi analyze --system\n'));
   console.log(chalk.gray('  # Show recent projects'));
-  console.log(chalk.white('  pkg-cli analyze --projects\n'));
+  console.log(chalk.white('  pi analyze --projects\n'));
 }
 
 /**

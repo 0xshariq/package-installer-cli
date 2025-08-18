@@ -281,25 +281,8 @@ program
     }
   });
 
-// UPDATE COMMAND - Comprehensive package updater
-program
-  .command('update')
-  .description(chalk.hex('#00d2d3')('🔄 Update packages across multiple languages'))
-  .argument('[packages...]', chalk.hex('#95afc0')('Specific packages to update (optional)'))
-  .option('--language <lang>', 'Update packages for specific language')
-  .option('--all', 'Update all packages for detected languages')
-  .option('--dry-run', 'Preview updates without making changes')
-  .option('--force', 'Force updates even if version constraints might break')
-  .option('--global', 'Update global packages')
-  .option('--dev', 'Include development dependencies')
-  .action(async (packages, options) => {
-    try {
-      showBanner();
-      await updateCommand(packages, options);
-    } catch (error) {
-      handleCommandError('update packages', error as Error);
-    }
-  });
+// UPDATE COMMAND - Update project dependencies
+program.addCommand(updateCommand);
 
 // CLEAN COMMAND - Clean development artifacts
 program

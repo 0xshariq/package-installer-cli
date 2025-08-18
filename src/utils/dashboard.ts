@@ -58,10 +58,12 @@ export function createBanner(title: string = 'Package Installer CLI'): void {
   
   // Add tagline
   const tagline = chalk.hex('#00d2d3')('🚀 The Ultimate Developer Productivity Tool');
-  const version = chalk.hex('#95afc0')('v2.0.0');
+  const version = chalk.hex('#95afc0')('v2.3.0');
   const author = chalk.hex('#ffa502')('by @0xshariq');
   
-  console.log(chalk.center(`${tagline} ${version} ${author}`, process.stdout.columns || 80));
+  const centered = `${tagline} ${version} ${author}`;
+  const padding = Math.max(0, Math.floor(((process.stdout.columns || 80) - centered.length) / 2));
+  console.log(' '.repeat(padding) + centered);
   console.log();
 }
 
@@ -231,7 +233,7 @@ export function displayCommandsGrid(): void {
     },
     {
       name: 'upgrade',
-      description: 'Upgrade CLI to latest version',
+      description: 'Upgrade this CLI to latest version',
       icon: '⬆️',
       color: '#5f27cd'
     }
@@ -254,7 +256,7 @@ export function displayCommandsGrid(): void {
     commandTable.push([
       chalk.hex(cmd.color)(cmd.icon + ' ' + cmd.name),
       chalk.white(cmd.description),
-      chalk.gray(`pkg-cli ${cmd.name}`)
+      chalk.gray(`pi ${cmd.name}`)
     ]);
   });
   
@@ -418,7 +420,7 @@ export async function gatherProjectStats(workspacePath: string = process.cwd()):
   
   try {
     // Check for cache file
-    const cacheFile = path.join(process.env.HOME || '', '.pkg-cli-cache.json');
+    const cacheFile = path.join(process.env.HOME || '', '.pi-cache.json');
     if (await fs.pathExists(cacheFile)) {
       const cache = await fs.readJson(cacheFile);
       stats.cacheHits = cache.usageCount || 0;

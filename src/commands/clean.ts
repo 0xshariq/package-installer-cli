@@ -17,8 +17,8 @@ export function showCleanHelp(): void {
   console.log(chalk.hex('#9c88ff')('🧹 CLEAN COMMAND HELP\n'));
   
   console.log(chalk.hex('#00d2d3')('Usage:'));
-  console.log(chalk.white('  pkg-cli clean [options]'));
-  console.log(chalk.white('  pkg-cli cleanup [options]') + chalk.gray(' (alias)\n'));
+  console.log(chalk.white('  pi clean [options]'));
+  console.log(chalk.white('  pi cleanup [options]') + chalk.gray(' (alias)\n'));
   
   console.log(chalk.hex('#00d2d3')('Description:'));
   console.log(chalk.white('  Clean development artifacts, caches, and temporary files'));
@@ -36,13 +36,13 @@ export function showCleanHelp(): void {
   
   console.log(chalk.hex('#00d2d3')('Examples:'));
   console.log(chalk.gray('  # Clean build directories'));
-  console.log(chalk.white('  pkg-cli clean --build\n'));
+  console.log(chalk.white('  pi clean --build\n'));
   console.log(chalk.gray('  # Clean node_modules'));
-  console.log(chalk.white('  pkg-cli clean --node-modules\n'));
+  console.log(chalk.white('  pi clean --node-modules\n'));
   console.log(chalk.gray('  # Preview clean operation'));
-  console.log(chalk.white('  pkg-cli clean --all --dry-run\n'));
+  console.log(chalk.white('  pi clean --all --dry-run\n'));
   console.log(chalk.gray('  # Deep clean with lock files'));
-  console.log(chalk.white('  pkg-cli clean --deep\n'));
+  console.log(chalk.white('  pi clean --deep\n'));
 }
 
 /**

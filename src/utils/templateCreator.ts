@@ -60,34 +60,20 @@ async function installDependenciesForCreate(projectPath: string): Promise<void> 
         // Only show manual installation message if auto-installation failed
         console.log(chalk.yellow('⚠️  Auto-installation failed. You can install dependencies manually:'));
         
-        // Find all package.json locations to show proper commands
+        // Find package.json files in the project
         const fs = await import('fs-extra');
-        const { findProjectFiles } = await import('./dependencyInstaller.js');
+        const path = await import('path');
         
         try {
-            const { files: foundFiles } = await findProjectFiles(projectPath);
-            const packageJsonFiles = foundFiles.filter((file: string) => path.basename(file) === 'package.json');
-            
-            if (packageJsonFiles.length > 0) {
-                console.log(chalk.gray('💡 Found package.json files in:'));
-                for (const packageJsonPath of packageJsonFiles) {
-                    const packageDir = path.dirname(packageJsonPath);
-                    const relativePath = path.relative(projectPath, packageDir);
-                    const displayPath = relativePath || 'root directory';
-                    
-                    console.log(chalk.gray(`   📦 ${displayPath}:`));
-                    console.log(chalk.gray(`      cd ${path.basename(projectPath)}${relativePath ? '/' + relativePath : ''}`));
-                    console.log(chalk.gray(`      npm install (or pnpm install/yarn)`));
-                }
-            } else {
-                // Fallback to basic instructions
-                console.log(chalk.gray(`   cd ${path.basename(projectPath)}`));
-                console.log(chalk.gray(`   npm install (or pnpm install/yarn)`));
+            const packageJsonPath = path.join(projectPath, 'package.json');
+            if (await fs.pathExists(packageJsonPath)) {
+                console.log(chalk.cyan(`  cd ${path.basename(projectPath)}`));
+                console.log(chalk.cyan('  npm install'));
             }
-        } catch (searchError) {
-            // Fallback to basic instructions if search fails
+        } catch (error) {
+            console.log(chalk.gray('� Install dependencies manually:'));
             console.log(chalk.gray(`   cd ${path.basename(projectPath)}`));
-            console.log(chalk.gray(`   npm install (or pnpm install/yarn)`));
+            console.log(chalk.gray('   npm install (or pnpm install/yarn)'));
         }
         
         // Try to initialize git even if dependencies failed

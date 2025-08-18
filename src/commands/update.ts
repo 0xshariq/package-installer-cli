@@ -1,6 +1,6 @@
 import { Command } from 'commander';
 import chalk from 'chalk';
-import ora from 'ora';
+import ora, { type Ora } from 'ora';
 import { detectProjectLanguage, installAdditionalPackages } from '../utils/dependencyInstaller.js';
 import { displaySuccessMessage, displayErrorMessage, createBanner } from '../utils/dashboard.js';
 import { exec } from 'child_process';
@@ -127,7 +127,7 @@ async function updatePackagesForLanguage(
 async function updateNodejsPackages(
   projectPath: string,
   options: any,
-  spinner: ora.Ora
+  spinner: Ora
 ): Promise<void> {
   const packageJsonPath = path.join(projectPath, 'package.json');
   
@@ -168,7 +168,7 @@ async function updateAllNodejsPackages(
   packageManager: string,
   projectPath: string,
   options: any,
-  spinner: ora.Ora
+  spinner: Ora
 ): Promise<void> {
   let updateCommand = '';
   
@@ -234,7 +234,7 @@ async function updateSpecificNodejsPackages(
   packageManager: string,
   packages: string[],
   options: any,
-  spinner: ora.Ora
+  spinner: Ora
 ): Promise<void> {
   const packageList = packages.join(' ');
   let updateCommand = '';
@@ -278,7 +278,7 @@ async function updateSpecificNodejsPackages(
 async function updateGlobalNodejsPackages(
   packageManager: string,
   options: any,
-  spinner: ora.Ora
+  spinner: Ora
 ): Promise<void> {
   spinner.text = chalk.hex('#f39c12')('Checking global packages...');
   
@@ -323,7 +323,7 @@ async function updateGlobalNodejsPackages(
 async function updateRustPackages(
   projectPath: string,
   options: any,
-  spinner: ora.Ora
+  spinner: Ora
 ): Promise<void> {
   const cargoTomlPath = path.join(projectPath, 'Cargo.toml');
   
@@ -365,7 +365,7 @@ async function updateRustPackages(
 async function updatePythonPackages(
   projectPath: string,
   options: any,
-  spinner: ora.Ora
+  spinner: Ora
 ): Promise<void> {
   const hasRequirements = await fs.pathExists(path.join(projectPath, 'requirements.txt'));
   const hasPyproject = await fs.pathExists(path.join(projectPath, 'pyproject.toml'));
@@ -418,7 +418,7 @@ async function updatePythonPackages(
 async function updateGoPackages(
   projectPath: string,
   options: any,
-  spinner: ora.Ora
+  spinner: Ora
 ): Promise<void> {
   const hasGoMod = await fs.pathExists(path.join(projectPath, 'go.mod'));
   
@@ -452,7 +452,7 @@ async function updateGoPackages(
 async function updatePhpPackages(
   projectPath: string,
   options: any,
-  spinner: ora.Ora
+  spinner: Ora
 ): Promise<void> {
   const hasComposer = await fs.pathExists(path.join(projectPath, 'composer.json'));
   
@@ -485,7 +485,7 @@ async function updatePhpPackages(
 async function updateRubyPackages(
   projectPath: string,
   options: any,
-  spinner: ora.Ora
+  spinner: Ora
 ): Promise<void> {
   const hasGemfile = await fs.pathExists(path.join(projectPath, 'Gemfile'));
   
@@ -521,8 +521,8 @@ function showUpdateHelp(): void {
   console.log(chalk.hex('#9c88ff')('🔄 PACKAGE UPDATE COMMAND HELP\n'));
   
   console.log(chalk.hex('#00d2d3')('Usage:'));
-  console.log(chalk.white('  pkg-cli update [options]'));
-  console.log(chalk.white('  pkg-cli u [options]') + chalk.gray(' (alias)\n'));
+  console.log(chalk.white('  pi update [options]'));
+  console.log(chalk.white('  pi u [options]') + chalk.gray(' (alias)\n'));
   
   console.log(chalk.hex('#00d2d3')('Description:'));
   console.log(chalk.white('  Update packages to their latest versions across different ecosystems'));
@@ -540,17 +540,17 @@ function showUpdateHelp(): void {
   
   console.log(chalk.hex('#00d2d3')('Examples:'));
   console.log(chalk.gray('  # Update all packages in current project'));
-  console.log(chalk.white('  pkg-cli update\n'));
+  console.log(chalk.white('  pi update\n'));
   console.log(chalk.gray('  # Update specific packages'));
-  console.log(chalk.white('  pkg-cli update --packages react vue axios\n'));
+  console.log(chalk.white('  pi update --packages react vue axios\n'));
   console.log(chalk.gray('  # Update only development dependencies'));
-  console.log(chalk.white('  pkg-cli update --dev\n'));
+  console.log(chalk.white('  pi update --dev\n'));
   console.log(chalk.gray('  # Check for updates without applying them'));
-  console.log(chalk.white('  pkg-cli update --dry-run\n'));
+  console.log(chalk.white('  pi update --dry-run\n'));
   console.log(chalk.gray('  # Update global packages'));
-  console.log(chalk.white('  pkg-cli update --global\n'));
+  console.log(chalk.white('  pi update --global\n'));
   console.log(chalk.gray('  # Allow major version updates (potentially breaking)'));
-  console.log(chalk.white('  pkg-cli update --major\n'));
+  console.log(chalk.white('  pi update --major\n'));
   
   console.log(chalk.hex('#ffa502')('⚠️  Warning:'));
   console.log(chalk.yellow('  Major updates (--major) may introduce breaking changes.'));
