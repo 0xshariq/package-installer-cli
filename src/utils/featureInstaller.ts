@@ -618,9 +618,9 @@ async function processNextjsLayout(content: string, projectPath: string): Promis
 }
 
 /**
- * Install required packages for a feature
+ * Separate function for feature installation packages
  */
-async function installFeaturePackages(
+export async function installFeaturePackagesOnly(
   featureName: string,
   language: SupportedLanguage,
   framework: string,
@@ -653,6 +653,19 @@ async function installFeaturePackages(
       console.warn(chalk.yellow('⚠️  Could not install GitHub MCP server'));
     }
   }
+}
+
+/**
+ * Install required packages for a feature (backward compatibility)
+ */
+async function installFeaturePackages(
+  featureName: string,
+  language: SupportedLanguage,
+  framework: string,
+  projectPath: string,
+  authProvider: string = 'clerk'
+): Promise<void> {
+  return installFeaturePackagesOnly(featureName, language, framework, projectPath, authProvider);
 }
 
 export async function addFeature(

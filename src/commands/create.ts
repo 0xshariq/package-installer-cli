@@ -24,6 +24,15 @@ import {
 import { resolveTemplatePath, generateTemplateName } from '../utils/templateResolver.js';
 import { createProjectFromTemplate } from '../utils/templateCreator.js';
 import { ProjectOptions, TemplateConfig } from '../utils/types.js';
+import { 
+  loadUserCache, 
+  saveUserCache, 
+  getCacheDefault, 
+  clearUserCache, 
+  showUserCache,
+  generateProjectNameSuggestions,
+  UserCacheData 
+} from '../utils/userCache.js';
 
 /**
  * Display help for create command
@@ -43,7 +52,13 @@ export function showCreateHelp(): void {
     chalk.cyan('Examples:') + '\n' +
     chalk.gray(`  ${piGradient('pi')} ${chalk.hex('#10ac84')('create')} my-awesome-app    # Create with specific name`) + '\n' +
     chalk.gray(`  ${piGradient('pi')} ${chalk.hex('#10ac84')('create')}                   # Interactive mode - will prompt for name`) + '\n' +
+    chalk.gray(`  ${piGradient('pi')} ${chalk.hex('#10ac84')('create')} ${chalk.hex('#ff6b6b')('--show-cache')}       # Show cached preferences`) + '\n' +
+    chalk.gray(`  ${piGradient('pi')} ${chalk.hex('#10ac84')('create')} ${chalk.hex('#ff6b6b')('--clear-cache')}      # Clear cached preferences`) + '\n' +
     chalk.gray(`  ${piGradient('pi')} ${chalk.hex('#10ac84')('create')} ${chalk.hex('#ff6b6b')('--help')}            # Show this help message`) + '\n\n' +
+    chalk.hex('#00d2d3')('💡 Smart Caching:') + '\n' +
+    chalk.hex('#95afc0')('  • Remembers your preferences from previous sessions') + '\n' +
+    chalk.hex('#95afc0')('  • Suggests framework-specific project names') + '\n' +
+    chalk.hex('#95afc0')('  • Shows project count and usage statistics') + '\n\n' +
     chalk.hex('#00d2d3')('💡 Available Templates:') + '\n' +
     chalk.hex('#95afc0')('  • React (Vite) - JavaScript/TypeScript variants') + '\n' +
     chalk.hex('#95afc0')('  • Next.js - App Router with multiple configurations') + '\n' +
@@ -66,25 +81,49 @@ export function showCreateHelp(): void {
  * Main create project function with comprehensive prompt system
  */
 export async function createProject(providedName?: string): Promise<void> {
-  // Check for help flag
+  // Check for special flags
   if (providedName === '--help' || providedName === '-h') {
     showCreateHelp();
     return;
   }
+  
+  if (providedName === '--clear-cache') {
+    await clearUserCache();
+    return;
+  }
+  
+  if (providedName === '--show-cache') {
+    await showUserCache();
+    return;
+  }
 
   try {
+    // Load user cache for personalized defaults
+    const userCache = await loadUserCache();
+    const isFirstTime = !userCache.projectCount || userCache.projectCount === 0;
+    
     console.log('\n' + chalk.hex('#10ac84')('🚀 Welcome to Package Installer CLI!'));
-    console.log(chalk.hex('#95afc0')('Let\'s create something amazing together...\n'));
+    
+    if (!isFirstTime && userCache.projectCount) {
+      console.log(chalk.hex('#95afc0')(`Great to see you again! This will be project #${userCache.projectCount + 1}...`));
+      if (userCache.framework) {
+        console.log(chalk.hex('#95afc0')(`Your preferred framework: ${chalk.bold(userCache.framework)}`));
+      }
+    } else {
+      console.log(chalk.hex('#95afc0')('Let\'s create something amazing together...'));
+    }
+    console.log('');
 
-    // Step 1: Get project name
+    // Step 1: Get project name with intelligent suggestions
     let projectName = providedName;
     if (!projectName) {
+      const suggestions = generateProjectNameSuggestions(userCache);
       const { name } = await inquirer.prompt([
         {
           type: 'input',
           name: 'name',
-          message: chalk.hex('#10ac84')('� What is your project name?'),
-          default: 'my-awesome-project',
+          message: chalk.hex('#10ac84')('📛 What is your project name?'),
+          default: suggestions[0],
           validate: (input: string) => {
             const validation = validateProjectName(input.trim());
             return validation === true ? true : chalk.hex('#ff4757')(validation);
@@ -93,6 +132,9 @@ export async function createProject(providedName?: string): Promise<void> {
       ]);
       projectName = name.trim();
     }
+
+    // Save project name preference
+    userCache.projectName = projectName;
 
     // Step 2: Load template configuration
     const templatesRoot = path.join(process.cwd(), 'templates');
@@ -105,23 +147,28 @@ export async function createProject(providedName?: string): Promise<void> {
     const templateConfig: TemplateConfig = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
     console.log(chalk.hex('#00d2d3')('📋 Loading available templates...\n'));
 
-    // Step 3: Framework selection
-    const selectedFramework = await promptFrameworkSelection(templateConfig);
+    // Step 3: Framework selection with cached preference
+    const selectedFramework = await promptFrameworkSelectionWithCache(templateConfig, userCache);
+    userCache.framework = selectedFramework;
+    
     const fwConfig = templateConfig.frameworks[selectedFramework];
     const theme = getFrameworkTheme(selectedFramework);
     
     console.log(`\n${theme('✨ Great choice!')} Let's configure your ${chalk.bold(selectedFramework)} project...\n`);
 
-    // Step 4: Language selection (if applicable)
-    const selectedLanguage = await promptLanguageSelection(fwConfig, theme);
+    // Step 4: Language selection with cache
+    const selectedLanguage = await promptLanguageSelectionWithCache(fwConfig, theme, userCache);
+    userCache.language = selectedLanguage;
     
-    // Step 5: Database selection (for supported frameworks)
-    const selectedDatabase = await promptDatabaseSelection(fwConfig, theme);
+    // Step 5: Database selection with cache
+    const selectedDatabase = await promptDatabaseSelectionWithCache(fwConfig, theme, userCache);
+    userCache.database = selectedDatabase;
     
     // Step 6: ORM selection (if database is selected)
     let selectedOrm: string | undefined;
     if (selectedDatabase && selectedDatabase !== 'none') {
       selectedOrm = await promptOrmSelection(fwConfig, selectedDatabase, selectedLanguage!, theme);
+      userCache.orm = selectedOrm;
     }
 
     // Step 7: Template selection (for combination templates)
@@ -132,9 +179,11 @@ export async function createProject(providedName?: string): Promise<void> {
 
     // Step 8: UI library selection
     const selectedUi = await promptUiSelection(fwConfig, theme);
+    userCache.ui = selectedUi;
     
     // Step 9: Bundler selection
     const selectedBundler = await promptBundlerSelection(fwConfig, theme);
+    userCache.bundler = selectedBundler;
     
     // Step 10: Src directory option
     let useSrc: boolean | undefined;
@@ -143,12 +192,14 @@ export async function createProject(providedName?: string): Promise<void> {
         selectedFramework !== 'nestjs' && 
         !(selectedFramework === 'reactjs' && selectedBundler === 'vite')) {
       useSrc = await promptSrcDirectory(theme);
+      userCache.srcDirectory = useSrc;
     }
     
     // Step 11: Tailwind CSS option
     let useTailwind: boolean | undefined;
     if (fwConfig.options?.includes('tailwind') && selectedFramework !== 'nestjs') {
       useTailwind = await promptTailwindCss(theme);
+      userCache.tailwindCss = useTailwind;
     }
     
     // Step 12: Framework-specific options
@@ -238,13 +289,16 @@ export async function createProject(providedName?: string): Promise<void> {
       throw new Error(`Template not found at: ${templatePath}`);
     }
 
-    // Step 17: Create project
+    // Step 17: Save user preferences cache
+    await saveUserCache(userCache);
+
+    // Step 18: Create project
     console.log('\n' + chalk.hex('#10ac84')('🔨 Creating your project...'));
     console.log(chalk.hex('#95afc0')('This might take a moment...\n'));
     
     const projectPath = await createProjectFromTemplate(projectName!, templatePath);
     
-    // Step 18: Success message
+    // Step 19: Success message
     console.log('\n' + chalk.hex('#10ac84')('✨ Project created successfully!'));
     console.log(chalk.hex('#95afc0')('Welcome to your new project!\n'));
     
@@ -277,4 +331,79 @@ export async function createProject(providedName?: string): Promise<void> {
     
     process.exit(1);
   }
+}
+
+/**
+ * Cache-aware framework selection prompt
+ */
+async function promptFrameworkSelectionWithCache(templateConfig: TemplateConfig, cache: UserCacheData) {
+  const frameworks = Object.keys(templateConfig.frameworks);
+  const cachedFramework = cache.framework && frameworks.includes(cache.framework) ? cache.framework : frameworks[0];
+  
+  if (cache.framework && frameworks.includes(cache.framework)) {
+    console.log(chalk.hex('#95afc0')(`💾 Using cached framework preference: ${chalk.bold(cache.framework)}`));
+    
+    const { useCache } = await inquirer.prompt([
+      {
+        type: 'confirm',
+        name: 'useCache',
+        message: chalk.hex('#00d2d3')(`Use ${cache.framework} again?`),
+        default: true
+      }
+    ]);
+    
+    if (useCache) {
+      return cache.framework;
+    }
+  }
+  
+  return promptFrameworkSelection(templateConfig);
+}
+
+/**
+ * Cache-aware language selection prompt
+ */
+async function promptLanguageSelectionWithCache(fwConfig: any, theme: any, cache: UserCacheData) {
+  if (cache.language && fwConfig.languages && fwConfig.languages.includes(cache.language)) {
+    console.log(chalk.hex('#95afc0')(`💾 Using cached language preference: ${chalk.bold(cache.language)}`));
+    
+    const { useCache } = await inquirer.prompt([
+      {
+        type: 'confirm',
+        name: 'useCache',
+        message: chalk.hex('#00d2d3')(`Use ${cache.language} again?`),
+        default: true
+      }
+    ]);
+    
+    if (useCache) {
+      return cache.language;
+    }
+  }
+  
+  return promptLanguageSelection(fwConfig, theme);
+}
+
+/**
+ * Cache-aware database selection prompt
+ */
+async function promptDatabaseSelectionWithCache(fwConfig: any, theme: any, cache: UserCacheData) {
+  if (cache.database && fwConfig.databases && fwConfig.databases.includes(cache.database)) {
+    console.log(chalk.hex('#95afc0')(`💾 Using cached database preference: ${chalk.bold(cache.database)}`));
+    
+    const { useCache } = await inquirer.prompt([
+      {
+        type: 'confirm',
+        name: 'useCache',
+        message: chalk.hex('#00d2d3')(`Use ${cache.database} database again?`),
+        default: true
+      }
+    ]);
+    
+    if (useCache) {
+      return cache.database;
+    }
+  }
+  
+  return promptDatabaseSelection(fwConfig, theme);
 }

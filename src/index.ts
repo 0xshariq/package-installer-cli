@@ -13,6 +13,9 @@ import { createProject } from './commands/create.js';
 import { checkCommand } from './commands/check.js';
 import { cloneRepo } from './commands/clone.js';
 import { addCommand } from './commands/add.js';
+import { upgradeCliCommand } from './commands/upgrade.js';
+import { analyzeCommand } from './commands/analyze.js';
+import { deployCommand } from './commands/deploy.js';
 
 // Import utilities
 import { printBanner, logError, showBanner } from './utils/ui.js';
@@ -244,6 +247,51 @@ program
     }
   });
 
+// UPGRADE-CLI COMMAND - Update CLI to latest version
+program
+  .command('upgrade-cli')
+  .description(chalk.hex('#ff6b6b')('🚀 Update Package Installer CLI to the latest version'))
+  .on('--help', () => {
+    // Help is handled in the command file
+  })
+  .action(async () => {
+    try {
+      await upgradeCliCommand();
+    } catch (error) {
+      handleCommandError('upgrade CLI', error as Error);
+    }
+  });
+
+// ANALYZE COMMAND - Terminal dashboard with analytics
+program
+  .command('analyze')
+  .description(chalk.hex('#667eea')('📊 Show CLI usage analytics and framework statistics'))
+  .on('--help', () => {
+    // Help is handled in the command file
+  })
+  .action(async () => {
+    try {
+      await analyzeCommand();
+    } catch (error) {
+      handleCommandError('show analytics', error as Error);
+    }
+  });
+
+// DEPLOY COMMAND - Future deployment features
+program
+  .command('deploy')
+  .description(chalk.hex('#ff9a9e')('🚀 Deploy your project (Coming Soon)'))
+  .on('--help', () => {
+    // Help is handled in the command file
+  })
+  .action(async () => {
+    try {
+      await deployCommand();
+    } catch (error) {
+      handleCommandError('deploy project', error as Error);
+    }
+  });
+
 // ENHANCED GLOBAL HELP - Beautiful examples and usage information
 program.on('--help', () => {
   const exampleGradient = gradient(['#43e97b', '#38f9d7']);
@@ -263,6 +311,10 @@ program.on('--help', () => {
     chalk.hex('#95afc0')('  ') + piGradient('pi') + ' ' + chalk.hex('#9c88ff')('add') + chalk.hex('#95afc0')('                       # Browse available features') + '\n' +
     chalk.hex('#95afc0')('  ') + piGradient('pi') + ' ' + chalk.hex('#9c88ff')('add') + chalk.hex('#95afc0')(' auth                 # Add authentication') + '\n' +
     chalk.hex('#95afc0')('  ') + piGradient('pi') + ' ' + chalk.hex('#9c88ff')('add') + chalk.hex('#95afc0')(' docker               # Add Docker config') + '\n\n' +
+    chalk.white('Manage & Deploy:') + '\n' +
+    chalk.hex('#95afc0')('  ') + piGradient('pi') + ' ' + chalk.hex('#ff6b6b')('upgrade-cli') + chalk.hex('#95afc0')('              # Update CLI to latest version') + '\n' +
+    chalk.hex('#95afc0')('  ') + piGradient('pi') + ' ' + chalk.hex('#667eea')('analyze') + chalk.hex('#95afc0')('                  # View usage analytics dashboard') + '\n' +
+    chalk.hex('#95afc0')('  ') + piGradient('pi') + ' ' + chalk.hex('#ff9a9e')('deploy') + chalk.hex('#95afc0')('                   # Deploy project (coming soon)') + '\n\n' +
     chalk.hex('#00d2d3')('💡 Pro Tips:') + '\n' +
     chalk.hex('#95afc0')('  • Use ') + chalk.hex('#ff6b6b')('--help') + chalk.hex('#95afc0')(' with any command for detailed information') + '\n' +
     chalk.hex('#95afc0')('  • Most arguments are optional - CLI will prompt when needed') + '\n' +

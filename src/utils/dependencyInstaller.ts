@@ -109,24 +109,92 @@ export const DEPENDENCY_INSTALLERS: Record<SupportedLanguage, DependencyInstalle
 };
 
 /**
- * Detect project language based on configuration files
+ * Recursively find package.json files and other config files
+ */
+async function findProjectFiles(projectPath: string, maxDepth: number = 2): Promise<{files: string[], directories: string[]}> {
+  const foundFiles: string[] = [];
+  const foundDirectories: string[] = [];
+  
+  async function searchDirectory(currentPath: string, currentDepth: number) {
+    if (currentDepth > maxDepth) return;
+    
+    try {
+      const files = await fs.readdir(currentPath);
+      
+      for (const file of files) {
+        const filePath = path.join(currentPath, file);
+        const stat = await fs.stat(filePath);
+        
+        if (stat.isDirectory()) {
+          // Skip common directories that shouldn't contain main config files
+          if (!['node_modules', '.git', 'dist', 'build', '.next', '.nuxt', 'coverage', '.vscode'].includes(file)) {
+            foundDirectories.push(filePath);
+            await searchDirectory(filePath, currentDepth + 1);
+          }
+        } else {
+          // Check if this is a config file we're interested in
+          const configFiles = ['package.json', 'package-lock.json', 'yarn.lock', 'pnpm-lock.yaml', 
+                              'Cargo.toml', 'requirements.txt', 'pyproject.toml', 'Gemfile', 
+                              'composer.json', 'go.mod'];
+          
+          if (configFiles.includes(file)) {
+            foundFiles.push(filePath);
+          }
+        }
+      }
+    } catch (error) {
+      // Ignore permission errors or other file system issues
+    }
+  }
+  
+  await searchDirectory(projectPath, 0);
+  return { files: foundFiles, directories: foundDirectories };
+}
+
+/**
+ * Detect project language based on configuration files (including nested ones)
  */
 export async function detectProjectLanguage(projectPath: string): Promise<SupportedLanguage[]> {
   const detectedLanguages: SupportedLanguage[] = [];
   
   try {
-    const files = await fs.readdir(projectPath);
-    const fileSet = new Set(files);
+    // First check root directory for immediate detection
+    const rootFiles = await fs.readdir(projectPath);
+    const rootFileSet = new Set(rootFiles);
     
+    // Check for root level config files first
     for (const [language, installers] of Object.entries(DEPENDENCY_INSTALLERS)) {
       for (const installer of installers) {
         const hasConfigFile = installer.configFiles.some(configFile => 
-          fileSet.has(configFile)
+          rootFileSet.has(configFile)
         );
         
         if (hasConfigFile && !detectedLanguages.includes(language as SupportedLanguage)) {
           detectedLanguages.push(language as SupportedLanguage);
           break;
+        }
+      }
+    }
+    
+    // If no languages detected in root, search nested directories
+    if (detectedLanguages.length === 0) {
+      console.log(chalk.hex('#f39c12')('🔍 No config files found in root, searching subdirectories...'));
+      
+      const { files: foundFiles } = await findProjectFiles(projectPath);
+      
+      for (const filePath of foundFiles) {
+        const fileName = path.basename(filePath);
+        
+        for (const [language, installers] of Object.entries(DEPENDENCY_INSTALLERS)) {
+          for (const installer of installers) {
+            const hasConfigFile = installer.configFiles.includes(fileName);
+            
+            if (hasConfigFile && !detectedLanguages.includes(language as SupportedLanguage)) {
+              detectedLanguages.push(language as SupportedLanguage);
+              console.log(chalk.hex('#00d2d3')(`📁 Found ${fileName} in ${path.dirname(filePath)}`));
+              break;
+            }
+          }
         }
       }
     }
@@ -213,6 +281,9 @@ async function installDependenciesForLanguage(
 /**
  * Install dependencies for all detected languages in the project
  */
+/**
+ * Install dependencies for all detected languages in the project
+ */
 export async function installProjectDependencies(projectPath: string, projectName?: string, installMCP: boolean = true): Promise<void> {
   const detectedLanguages = await detectProjectLanguage(projectPath);
   
@@ -223,20 +294,51 @@ export async function installProjectDependencies(projectPath: string, projectNam
   
   console.log(chalk.hex('#00d2d3')(`🔍 Detected languages: ${detectedLanguages.map(l => chalk.bold(l)).join(', ')}`));
   
-  const spinner = ora(chalk.hex('#f39c12')('📦 Preparing to install dependencies...')).start();
+  // Find all package.json files for Node.js projects
+  if (detectedLanguages.includes('nodejs')) {
+    const { files: foundFiles } = await findProjectFiles(projectPath);
+    const packageJsonFiles = foundFiles.filter(file => path.basename(file) === 'package.json');
+    
+    if (packageJsonFiles.length > 0) {
+      console.log(chalk.hex('#00d2d3')(`📦 Found ${packageJsonFiles.length} package.json file(s)`));
+      
+      for (const packageJsonPath of packageJsonFiles) {
+        const packageDir = path.dirname(packageJsonPath);
+        const relativePath = path.relative(projectPath, packageDir);
+        const displayPath = relativePath || 'root';
+        
+        const spinner = ora(chalk.hex('#f39c12')(`Installing dependencies in ${displayPath}...`)).start();
+        
+        try {
+          const success = await installDependenciesForLanguage('nodejs', packageDir, spinner);
+          if (success) {
+            spinner.succeed(chalk.green(`✅ Dependencies installed in ${displayPath}`));
+          } else {
+            spinner.fail(chalk.red(`❌ Failed to install dependencies in ${displayPath}`));
+          }
+        } catch (error) {
+          spinner.fail(chalk.red(`❌ Error installing dependencies in ${displayPath}: ${error}`));
+        }
+      }
+    }
+  }
   
-  let installationResults: { language: SupportedLanguage; success: boolean }[] = [];
-  
-  // Install dependencies for each detected language
-  for (const language of detectedLanguages) {
+  // Handle other languages that might not be Node.js
+  const nonNodeLanguages = detectedLanguages.filter(lang => lang !== 'nodejs');
+  for (const language of nonNodeLanguages) {
+    const spinner = ora(chalk.hex('#f39c12')(`Installing ${language} dependencies...`)).start();
     const success = await installDependenciesForLanguage(language, projectPath, spinner);
-    installationResults.push({ language, success });
+    if (success) {
+      spinner.succeed(chalk.green(`✅ ${language} dependencies installed`));
+    } else {
+      spinner.fail(chalk.red(`❌ Failed to install ${language} dependencies`));
+    }
   }
   
   // Install GitHub MCP server for Node.js projects if requested
   if (installMCP && detectedLanguages.includes('nodejs')) {
     try {
-      spinner.text = chalk.hex('#00d2d3')('Installing GitHub MCP server...');
+      const spinner = ora(chalk.hex('#00d2d3')('Installing GitHub MCP server...')).start();
       await installAdditionalPackages('nodejs', ['@0xshariq/github-mcp-server'], projectPath, false);
       spinner.succeed(chalk.green('✅ GitHub MCP server installed for git operations'));
     } catch (error) {
@@ -244,29 +346,7 @@ export async function installProjectDependencies(projectPath: string, projectNam
     }
   }
   
-  // Summary of installation results
-  const successfulInstalls = installationResults.filter(r => r.success);
-  const failedInstalls = installationResults.filter(r => !r.success);
-  
-  if (successfulInstalls.length > 0) {
-    console.log(chalk.green(`✅ Dependencies installed for: ${successfulInstalls.map(r => r.language).join(', ')}`));
-  }
-  
-  if (failedInstalls.length > 0) {
-    console.log(chalk.yellow(`⚠️  Manual installation needed for: ${failedInstalls.map(r => r.language).join(', ')}`));
-    
-    if (projectName) {
-      console.log(chalk.hex('#95afc0')('💡 You can install them manually:'));
-      console.log(chalk.hex('#95afc0')(`   cd ${projectName}`));
-      
-      for (const failed of failedInstalls) {
-        const installers = DEPENDENCY_INSTALLERS[failed.language];
-        if (installers.length > 0) {
-          console.log(chalk.hex('#95afc0')(`   ${installers[0].command} # for ${failed.language}`));
-        }
-      }
-    }
-  }
+  console.log(chalk.hex('#10ac84')('\n🎉 Dependency installation completed!'));
 }
 
 /**
