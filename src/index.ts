@@ -1,19 +1,25 @@
 #!/usr/bin/env node
 
 import { Command } from 'commander';
-import chalk from 'chalk';
+import chalk from 'ch// CREATE COMMAND - Main project creation functionality
+program
+  .command('create')
+  .description(chalk.hex('#10ac84')('🚀 ') + chalk.hex('#00b894')('Create a new project from templates'));
 import gradient from 'gradient-string';
 import boxen from 'boxen';
 import { readFileSync } from 'fs';
 import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 
-// Import command handlers
-import { createProject } from './commands/create.js';
+// Import command handl// CLEAN COMMAND - Clean development artifacts
+program
+  .command('clean')
+  .alias('cleanup')
+  .description(chalk.hex('#ffa502')('🧹 ') + chalk.hex('#ff7675')('Clean development artifacts and caches'))mport { createProject } from './commands/create.js';
 import { checkCommand } from './commands/check.js';
 import { cloneRepo } from './commands/clone.js';
 import { addCommand } from './commands/add.js';
-import { upgradeCliCommand } from './commands/upgrade.js';
+import { upgradeCliCommand } from './commands/upgrade-cli.js';
 import { analyzeCommand } from './commands/analyze.js';
 import { deployCommand } from './commands/deploy.js';
 import { updateCommand } from './commands/update.js';
@@ -122,7 +128,7 @@ program
 // CHECK COMMAND - Package version checking and suggestions
 program
   .command('check')
-  .description(chalk.hex('#f39c12')('🔍 Check package versions and get update suggestions'))
+  .description(chalk.hex('#f39c12')('🔍 ') + chalk.hex('#ffa500')('Check package versions and get update suggestions'))
   .argument('[package-name]', chalk.hex('#95afc0')('Specific package to check (optional)'))
   .on('--help', () => {
     const piGradient = gradient(['#00c6ff', '#0072ff']);
@@ -161,7 +167,7 @@ program
 // CLONE COMMAND - GitHub repository cloning
 program
   .command('clone')
-  .description(chalk.hex('#00d2d3')('📥 Clone repositories from GitHub, GitLab, BitBucket & SourceHut'))
+  .description(chalk.hex('#00d2d3')('📥 ') + chalk.hex('#00cec9')('Clone repositories from GitHub, GitLab, BitBucket & SourceHut'))
   .argument('[user/repo]', chalk.hex('#95afc0')('Repository in format "user/repo" or "provider:user/repo"'))
   .argument('[project-name]', chalk.hex('#95afc0')('Custom project name (defaults to repo name)'))
   .on('--help', () => {
@@ -211,7 +217,7 @@ program
 // ADD COMMAND - Add features to existing projects
 program
   .command('add')
-  .description(chalk.hex('#9c88ff')('➕ Add new features to your project'))
+  .description(chalk.hex('#9c88ff')('➕ ') + chalk.hex('#4facfe')('Add new features to your project'))
   .argument('[feature]', chalk.hex('#95afc0')('Feature to add (auth, docker) or --list to show all'))
   .option('-l, --list', chalk.hex('#95afc0')('list all available features'))
   .on('--help', () => {
@@ -254,7 +260,7 @@ program
 // UPGRADE-CLI COMMAND - Update CLI to latest version
 program
   .command('upgrade-cli')
-  .description(chalk.hex('#ff6b6b')('🚀 Update Package Installer CLI to the latest version'))
+  .description(chalk.hex('#ff6b6b')('🚀 ') + chalk.hex('#fd79a8')('Update Package Installer CLI to the latest version'))
   .on('--help', () => {
     // Help is handled in the command file
   })
@@ -269,7 +275,7 @@ program
 // ANALYZE COMMAND - Terminal dashboard with analytics
 program
   .command('analyze')
-  .description(chalk.hex('#667eea')('📊 Show CLI usage analytics and framework statistics'))
+  .description(chalk.hex('#667eea')('📊 ') + chalk.hex('#4facfe')('Show CLI usage analytics and framework statistics'))
   .on('--help', () => {
     // Help is handled in the command file
   })
@@ -288,7 +294,7 @@ program.addCommand(updateCommand);
 program
   .command('clean')
   .alias('cleanup')
-  .description(chalk.hex('#ffa502')('🧹 Clean development artifacts and caches'))
+  .description(chalk.hex('#ffa502')('🧹 Clean development artifacts and caches (Coming Soon)'))
   .option('--node-modules', 'Clean node_modules directories')
   .option('--build', 'Clean build/dist directories')
   .option('--cache', 'Clean package manager caches')
@@ -309,7 +315,7 @@ program
 program
   .command('env')
   .alias('environment')
-  .description(chalk.hex('#10ac84')('🌍 Analyze development environment'))
+  .description(chalk.hex('#10ac84')('🌍 ') + chalk.hex('#00b894')('Analyze development environment'))
   .option('--check', 'Check for missing or outdated tools')
   .option('--versions', 'Show versions of all detected tools')
   .option('--paths', 'Show installation paths')
@@ -328,7 +334,7 @@ program
 program
   .command('doctor')
   .alias('diagnose')
-  .description(chalk.hex('#ff6b6b')('🩺 Diagnose and fix development issues'))
+  .description(chalk.hex('#ff6b6b')('🩺 ') + chalk.hex('#e17055')('Diagnose and fix development issues'))
   .option('--fix', 'Automatically fix detected issues')
   .option('--check-deps', 'Check for dependency issues')
   .option('--check-config', 'Check configuration files')
@@ -346,7 +352,7 @@ program
 // DEPLOY COMMAND - Future deployment features
 program
   .command('deploy')
-  .description(chalk.hex('#ff9a9e')('🚀 Deploy your project (Coming Soon)'))
+  .description(chalk.hex('#ff9a9e')('🚀 ') + chalk.hex('#fd79a8')('Deploy your project (Coming Soon)'))
   .on('--help', () => {
     // Help is handled in the command file
   })
@@ -361,33 +367,51 @@ program
 // ENHANCED GLOBAL HELP - Beautiful examples and usage information
 program.on('--help', () => {
   const exampleGradient = gradient(['#43e97b', '#38f9d7']);
+  const commandGradient = gradient(['#667eea', '#764ba2']);
+  const createGradient = gradient(['#10ac84', '#00d2d3']);
+  const analyzeGradient = gradient(['#9c88ff', '#667eea']);
+  const updateGradient = gradient(['#ff6b6b', '#ff9a9e']);
+  const addGradient = gradient(['#ffa502', '#ff7675']);
   
   console.log('\n' + boxen(
-    exampleGradient('🚀 Quick Start Examples') + '\n\n' +
-    chalk.white('Create Projects:') + '\n' +
-    chalk.hex('#95afc0')('  ') + piGradient('pi') + ' ' + chalk.hex('#10ac84')('create') + chalk.hex('#95afc0')(' my-app             # Interactive project creation') + '\n' +
-    chalk.hex('#95afc0')('  ') + piGradient('pi') + ' ' + chalk.hex('#10ac84')('create') + chalk.hex('#95afc0')(' blog-app           # Create with specific name') + '\n\n' +
-    chalk.white('Clone Repositories:') + '\n' +
-    chalk.hex('#95afc0')('  ') + piGradient('pi') + ' ' + chalk.hex('#00d2d3')('clone') + chalk.hex('#95afc0')(' facebook/react      # Clone popular repositories') + '\n' +
-    chalk.hex('#95afc0')('  ') + piGradient('pi') + ' ' + chalk.hex('#00d2d3')('clone') + chalk.hex('#95afc0')(' user/repo my-copy   # Clone with custom name') + '\n\n' +
-    chalk.white('Check & Maintain:') + '\n' +
-    chalk.hex('#95afc0')('  ') + piGradient('pi') + ' ' + chalk.hex('#f39c12')('check') + chalk.hex('#95afc0')('                     # Check all package versions') + '\n' +
-    chalk.hex('#95afc0')('  ') + piGradient('pi') + ' ' + chalk.hex('#00d2d3')('update') + chalk.hex('#95afc0')(' --all               # Update all packages') + '\n' +
-    chalk.hex('#95afc0')('  ') + piGradient('pi') + ' ' + chalk.hex('#ffa502')('clean') + chalk.hex('#95afc0')(' --build              # Clean build artifacts') + '\n' +
-    chalk.hex('#95afc0')('  ') + piGradient('pi') + ' ' + chalk.hex('#ff6b6b')('doctor') + chalk.hex('#95afc0')(' --fix               # Diagnose and fix issues') + '\n\n' +
-    chalk.white('Add Features:') + '\n' +
-    chalk.hex('#95afc0')('  ') + piGradient('pi') + ' ' + chalk.hex('#9c88ff')('add') + chalk.hex('#95afc0')('                       # Browse available features') + '\n' +
-    chalk.hex('#95afc0')('  ') + piGradient('pi') + ' ' + chalk.hex('#9c88ff')('add') + chalk.hex('#95afc0')(' auth                 # Add authentication') + '\n' +
-    chalk.hex('#95afc0')('  ') + piGradient('pi') + ' ' + chalk.hex('#9c88ff')('add') + chalk.hex('#95afc0')(' docker               # Add Docker config') + '\n\n' +
-    chalk.white('Analyze & Debug:') + '\n' +
-    chalk.hex('#95afc0')('  ') + piGradient('pi') + ' ' + chalk.hex('#667eea')('analyze') + chalk.hex('#95afc0')('                  # Advanced project analytics') + '\n' +
-    chalk.hex('#95afc0')('  ') + piGradient('pi') + ' ' + chalk.hex('#10ac84')('env') + chalk.hex('#95afc0')(' --check              # Check development environment') + '\n' +
-    chalk.hex('#95afc0')('  ') + piGradient('pi') + ' ' + chalk.hex('#ff6b6b')('upgrade-cli') + chalk.hex('#95afc0')('              # Update CLI to latest version') + '\n' +
-    chalk.hex('#95afc0')('  ') + piGradient('pi') + ' ' + chalk.hex('#ff9a9e')('deploy') + chalk.hex('#95afc0')('                   # Deploy project (coming soon)') + '\n\n' +
-    chalk.hex('#00d2d3')('💡 Pro Tips:') + '\n' +
-    chalk.hex('#95afc0')('  • Use ') + chalk.hex('#ff6b6b')('--help') + chalk.hex('#95afc0')(' with any command for detailed information') + '\n' +
-    chalk.hex('#95afc0')('  • Most arguments are optional - CLI will prompt when needed') + '\n' +
-    chalk.hex('#95afc0')('  • Check our templates: React, Next.js, Express, Nest.js, Rust & more!'),
+    exampleGradient('🚀 Complete Command Reference & Examples') + '\n\n' +
+    
+    chalk.hex('#00d2d3')('📋 CORE COMMANDS (Available Now)') + '\n' +
+    chalk.hex('#95afc0')('  ') + piGradient('pi') + ' ' + createGradient('create') + chalk.hex('#95afc0')('                  # Interactive project creation') + '\n' +
+    chalk.hex('#95afc0')('  ') + piGradient('pi') + ' ' + createGradient('create') + chalk.hex('#95afc0')(' my-nextjs-app    # Create with specific name') + '\n' +
+    chalk.hex('#95afc0')('  ') + piGradient('pi') + ' ' + analyzeGradient('analyze') + chalk.hex('#95afc0')('                 # Show project analytics dashboard') + '\n' +
+    chalk.hex('#95afc0')('  ') + piGradient('pi') + ' ' + updateGradient('update') + chalk.hex('#95afc0')('                  # Update packages interactively') + '\n' +
+    chalk.hex('#95afc0')('  ') + piGradient('pi') + ' ' + updateGradient('update') + chalk.hex('#95afc0')(' lodash react     # Update specific packages') + '\n\n' +
+    
+    chalk.hex('#ffa502')('🔧 UTILITY COMMANDS (Coming Soon)') + '\n' +
+    chalk.hex('#95afc0')('  ') + piGradient('pi') + ' ' + addGradient('add') + chalk.hex('#95afc0')('                     # Add features to existing project') + '\n' +
+    chalk.hex('#95afc0')('  ') + piGradient('pi') + ' ' + addGradient('add') + chalk.hex('#95afc0')(' auth               # Add authentication features') + '\n' +
+    chalk.hex('#95afc0')('  ') + piGradient('pi') + ' ' + addGradient('add') + chalk.hex('#95afc0')(' docker             # Add Docker configuration') + '\n' +
+    chalk.hex('#95afc0')('  ') + piGradient('pi') + ' ' + commandGradient('check') + chalk.hex('#95afc0')('                   # Check package versions') + '\n' +
+    chalk.hex('#95afc0')('  ') + piGradient('pi') + ' ' + commandGradient('check') + chalk.hex('#95afc0')(' react             # Check specific package') + '\n' +
+    chalk.hex('#95afc0')('  ') + piGradient('pi') + ' ' + commandGradient('clean') + chalk.hex('#95afc0')('                   # Clean project artifacts') + '\n' +
+    chalk.hex('#95afc0')('  ') + piGradient('pi') + ' ' + commandGradient('clean') + chalk.hex('#95afc0')(' --node-modules    # Clean node_modules only') + '\n\n' +
+    
+    chalk.hex('#ff6b6b')('🌍 REPOSITORY & DEPLOYMENT') + '\n' +
+    chalk.hex('#95afc0')('  ') + piGradient('pi') + ' ' + commandGradient('clone') + chalk.hex('#95afc0')('                   # Clone repositories interactively') + '\n' +
+    chalk.hex('#95afc0')('  ') + piGradient('pi') + ' ' + commandGradient('clone') + chalk.hex('#95afc0')(' facebook/react    # Clone popular repositories') + '\n' +
+    chalk.hex('#95afc0')('  ') + piGradient('pi') + ' ' + commandGradient('clone') + chalk.hex('#95afc0')(' user/repo my-app  # Clone with custom name') + '\n' +
+    chalk.hex('#95afc0')('  ') + piGradient('pi') + ' ' + commandGradient('deploy') + chalk.hex('#95afc0')('                  # Deploy to cloud platforms') + '\n' +
+    chalk.hex('#95afc0')('  ') + piGradient('pi') + ' ' + commandGradient('deploy') + chalk.hex('#95afc0')(' --vercel          # Deploy to Vercel') + '\n\n' +
+    
+    chalk.hex('#9c88ff')('🩺 DEVELOPMENT & DEBUGGING') + '\n' +
+    chalk.hex('#95afc0')('  ') + piGradient('pi') + ' ' + commandGradient('doctor') + chalk.hex('#95afc0')('                  # Diagnose project issues') + '\n' +
+    chalk.hex('#95afc0')('  ') + piGradient('pi') + ' ' + commandGradient('doctor') + chalk.hex('#95afc0')(' --fix             # Auto-fix common issues') + '\n' +
+    chalk.hex('#95afc0')('  ') + piGradient('pi') + ' ' + commandGradient('env') + chalk.hex('#95afc0')('                     # Check development environment') + '\n' +
+    chalk.hex('#95afc0')('  ') + piGradient('pi') + ' ' + commandGradient('env') + chalk.hex('#95afc0')(' --setup           # Setup optimal dev environment') + '\n' +
+    chalk.hex('#95afc0')('  ') + piGradient('pi') + ' ' + commandGradient('upgrade') + chalk.hex('#95afc0')('                # Upgrade CLI to latest version') + '\n\n' +
+    
+    chalk.hex('#00d2d3')('💡 Pro Tips & Best Practices:') + '\n' +
+    chalk.hex('#95afc0')('  • Use ') + chalk.hex('#ff6b6b')('--help') + chalk.hex('#95afc0')(' with any command for detailed options') + '\n' +
+    chalk.hex('#95afc0')('  • Most commands are interactive - just run ') + piGradient('pi command') + '\n' +
+    chalk.hex('#95afc0')('  • Support for React, Next.js, Vue, Angular, Express, Rust & more!') + '\n' +
+    chalk.hex('#95afc0')('  • Templates include TypeScript, Tailwind CSS, shadcn/ui options') + '\n' +
+    chalk.hex('#95afc0')('  • Multi-language package updates (Node.js, Rust, Python, Go)'),
     {
       padding: 1,
       borderStyle: 'round',
@@ -402,11 +426,16 @@ if (process.argv.length === 2) {
   showBanner();
   console.log('\n' + boxen(
     chalk.white('Welcome to Package Installer CLI! 👋') + '\n\n' +
-    chalk.hex('#95afc0')('To get started, try one of these commands:') + '\n\n' +
-    chalk.hex('#10ac84')('  ') + piGradient('pi') + ' ' + chalk.hex('#10ac84')('create           ') + chalk.hex('#95afc0')('# Create a new project') + '\n' +
-    chalk.hex('#00d2d3')('  ') + piGradient('pi') + ' ' + chalk.hex('#00d2d3')('clone user/repo  ') + chalk.hex('#95afc0')('# Clone a GitHub repo') + '\n' +
-    chalk.hex('#ff6b6b')('  ') + piGradient('pi') + ' ' + chalk.hex('#ff6b6b')('--help           ') + chalk.hex('#95afc0')('# See all available commands') + '\n\n' +
-    chalk.hex('#ffa502')('🎯 Quick tip: All commands support --help for detailed usage!'),
+    chalk.hex('#00d2d3')('🚀 Ready to build something amazing?') + '\n\n' +
+    chalk.hex('#95afc0')('Start with these popular commands:') + '\n\n' +
+    chalk.hex('#10ac84')('  ') + piGradient('pi') + ' ' + gradient(['#10ac84', '#00d2d3'])('create') + chalk.hex('#95afc0')('           # Create new project (React, Next.js, Vue, etc.)') + '\n' +
+    chalk.hex('#9c88ff')('  ') + piGradient('pi') + ' ' + gradient(['#9c88ff', '#667eea'])('analyze') + chalk.hex('#95afc0')('          # Show project analytics dashboard') + '\n' +
+    chalk.hex('#ff6b6b')('  ') + piGradient('pi') + ' ' + gradient(['#ff6b6b', '#ff9a9e'])('update') + chalk.hex('#95afc0')('           # Update packages to latest versions') + '\n' +
+    chalk.hex('#00d2d3')('  ') + piGradient('pi') + ' ' + gradient(['#00d2d3', '#0084ff'])('clone') + chalk.hex('#95afc0')(' user/repo   # Clone and setup GitHub repositories') + '\n\n' +
+    chalk.hex('#ffa502')('Need help? Try these:') + '\n\n' +
+    chalk.hex('#ff6b6b')('  ') + piGradient('pi') + ' ' + chalk.hex('#ff6b6b')('--help') + chalk.hex('#95afc0')('           # See all available commands') + '\n' +
+    chalk.hex('#95afc0')('  ') + piGradient('pi') + ' ' + chalk.hex('#95afc0')('command --help') + chalk.hex('#95afc0')('   # Get detailed help for any command') + '\n\n' +
+    chalk.hex('#00d2d3')('💡 Pro tip: All commands are interactive - just run them and follow prompts!'),
     {
       padding: 1,
       borderStyle: 'round',

@@ -12,7 +12,7 @@ const execAsync = promisify(exec);
 
 export const updateCommand = new Command('update')
   .alias('u')
-  .description('Update packages to their latest versions')
+  .description('🔄 Update packages to their latest versions')
   .option('-p, --packages <packages...>', 'Specific packages to update (space separated)')
   .option('-d, --dev', 'Update only development dependencies')
   .option('-g, --global', 'Update global packages')
