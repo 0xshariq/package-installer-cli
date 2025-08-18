@@ -1,6 +1,6 @@
 {
   "name": "@0xshariq/package-installer",
-  "version": "2.2.0",
+  "version": "2.3.0",
   "description": "A cross-platform, interactive CLI to scaffold modern web app templates with framework, language, UI, bundler, database, and ORM support.",
   "main": "./dist/index.js",
   "type": "module",
