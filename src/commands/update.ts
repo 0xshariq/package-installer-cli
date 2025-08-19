@@ -15,49 +15,41 @@ import path from 'path';
 
 const execAsync = promisify(exec);
 
-export const updateCommand = new Command('update')
-  .alias('u')
-  .description('🔄 Update packages to their latest versions')
-  .option('-p, --packages <packages...>', 'Specific packages to update (space separated)')
-  .option('-d, --dev', 'Update only development dependencies')
-  .option('-g, --global', 'Update global packages')
-  .option('--major', 'Allow major version updates (potentially breaking)')
-  .option('--dry-run', 'Show what would be updated without actually updating')
-  .option('-f, --force', 'Force update even if there are potential conflicts')
-  .option('--interactive', 'Interactive mode to select which packages to update')
-  .option('-h, --help', 'Show help for update command')
-  .action(async (options) => {
-    if (options.help) {
-      showUpdateHelp();
-      return;
-    }
+/**
+ * Main update command function
+ */
+export async function updateCommand(options: any): Promise<void> {
+  if (options.help) {
+    showUpdateHelp();
+    return;
+  }
 
-    createBanner('Package Updater');
+  createBanner('Package Updater');
+  
+  const projectPath = process.cwd();
+  const spinner = ora(chalk.hex('#9c88ff')('🔍 Analyzing project structure...')).start();
+  
+  try {
+    // Use cached project analysis for faster performance
+    const cachedProject = await scanProjectWithCache(projectPath);
+    let languages: string[];
     
-    const projectPath = process.cwd();
-    const spinner = ora(chalk.hex('#9c88ff')('🔍 Analyzing project structure...')).start();
+    if (cachedProject.fromCache) {
+      languages = [cachedProject.language];
+      spinner.text = chalk.hex('#9c88ff')('⚡ Using cached project analysis...');
+    } else {
+      // Detect project languages fresh
+      languages = await detectProjectLanguage(projectPath);
+    }
     
-    try {
-      // Use cached project analysis for faster performance
-      const cachedProject = await scanProjectWithCache(projectPath);
-      let languages: string[];
-      
-      if (cachedProject.fromCache) {
-        languages = [cachedProject.language];
-        spinner.text = chalk.hex('#9c88ff')('⚡ Using cached project analysis...');
-      } else {
-        // Detect project languages fresh
-        languages = await detectProjectLanguage(projectPath);
-      }
-      
-      if (languages.length === 0) {
-        spinner.fail(chalk.red('❌ No recognizable project found in current directory'));
-        displayErrorMessage(
-          'Could not detect any supported project types',
-          [
-            'Make sure you are in a project directory',
-            'Supported: Node.js, Rust, Python, Go, PHP, Ruby projects',
-            'Look for files like package.json, Cargo.toml, requirements.txt, etc.'
+    if (languages.length === 0) {
+      spinner.fail(chalk.red('❌ No recognizable project found in current directory'));
+      displayErrorMessage(
+        'Could not detect any supported project types',
+        [
+          'Make sure you are in a project directory',
+          'Supported: Node.js, Rust, Python, Go, PHP, Ruby projects',
+          'Look for files like package.json, Cargo.toml, requirements.txt, etc.'
           ]
         );
         return;
@@ -90,7 +82,18 @@ export const updateCommand = new Command('update')
         ]
       );
     }
-  });
+  } catch (error: any) {
+    spinner.fail(chalk.red('❌ Failed to update packages'));
+    displayErrorMessage(
+      error.message,
+      [
+        'Try running the command with --dry-run to see what would be updated',
+        'Use --force flag to override conflict warnings', 
+        'Check your internet connection and package registry access'
+      ]
+    );
+  }
+}
 
 /**
  * Update packages for a specific language/ecosystem

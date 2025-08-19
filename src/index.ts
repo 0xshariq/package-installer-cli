@@ -16,7 +16,6 @@ import { addCommand } from './commands/add.js';
 import { upgradeCliCommand } from './commands/upgrade-cli.js';
 import { analyzeCommand } from './commands/analyze.js';
 import { deployCommand } from './commands/deploy.js';
-import { updateCommand } from './commands/update.js';
 import { cleanCommand } from './commands/clean.js';
 import { environmentCommand } from './commands/env.js';
 import { doctorCommand } from './commands/doctor.js';
@@ -283,7 +282,25 @@ program
   });
 
 // UPDATE COMMAND - Update project dependencies
-program.addCommand(updateCommand);
+program
+  .command('update')
+  .alias('u')
+  .description(chalk.hex('#ff6b6b')('🔄 ') + chalk.hex('#fd79a8')('Update packages to their latest versions'))
+  .option('-p, --packages <packages...>', 'Specific packages to update (space separated)')
+  .option('-d, --dev', 'Update only development dependencies')
+  .option('-g, --global', 'Update global packages')
+  .option('--major', 'Allow major version updates (potentially breaking)')
+  .option('--dry-run', 'Show what would be updated without actually updating')
+  .option('-f, --force', 'Force update even if there are potential conflicts')
+  .option('--interactive', 'Interactive mode to select which packages to update')
+  .action(async (options) => {
+    try {
+      const { updateCommand: updateFunc } = await import('./commands/update.js');
+      await updateFunc(options);
+    } catch (error) {
+      handleCommandError('update', error as Error);
+    }
+  });
 
 // CLEAN COMMAND - Clean development artifacts
 program
