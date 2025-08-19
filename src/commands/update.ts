@@ -3,6 +3,11 @@ import chalk from 'chalk';
 import ora, { type Ora } from 'ora';
 import { detectProjectLanguage, installAdditionalPackages } from '../utils/dependencyInstaller.js';
 import { displaySuccessMessage, displayErrorMessage, createBanner } from '../utils/dashboard.js';
+import { 
+  getCachedPackageVersion, 
+  cachePackageVersion,
+  scanProjectWithCache 
+} from '../utils/cacheManager.js';
 import { exec } from 'child_process';
 import { promisify } from 'util';
 import fs from 'fs-extra';
@@ -33,8 +38,17 @@ export const updateCommand = new Command('update')
     const spinner = ora(chalk.hex('#9c88ff')('🔍 Analyzing project structure...')).start();
     
     try {
-      // Detect project languages
-      const languages = await detectProjectLanguage(projectPath);
+      // Use cached project analysis for faster performance
+      const cachedProject = await scanProjectWithCache(projectPath);
+      let languages: string[];
+      
+      if (cachedProject.fromCache) {
+        languages = [cachedProject.language];
+        spinner.text = chalk.hex('#9c88ff')('⚡ Using cached project analysis...');
+      } else {
+        // Detect project languages fresh
+        languages = await detectProjectLanguage(projectPath);
+      }
       
       if (languages.length === 0) {
         spinner.fail(chalk.red('❌ No recognizable project found in current directory'));

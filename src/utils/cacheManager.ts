@@ -2,7 +2,7 @@
  * Cache Manager - Centralized caching operations for Package Installer CLI
  */
 
-import { cacheManager, ProjectCache, AnalysisCache } from './cache.js';
+import { cacheManager, ProjectCache, AnalysisCache, TemplateCacheFiles } from './cache.js';
 import fs from 'fs-extra';
 import path from 'path';
 import chalk from 'chalk';
@@ -82,23 +82,25 @@ export async function cachePackageVersion(
 }
 
 /**
- * Get cached node_modules information
+ * Get cached template files
  */
-export async function getCachedNodeModules(projectPath: string) {
-  return await cacheManager.getNodeModules(projectPath);
+export async function getCachedTemplateFiles(templateName: string): Promise<TemplateCacheFiles | null> {
+  return await cacheManager.getTemplateFiles(templateName);
 }
 
 /**
- * Cache node_modules scan results
+ * Cache template files
  */
-export async function cacheNodeModulesData(
-  projectPath: string,
-  packages: string[],
+export async function cacheTemplateFiles(
+  templateName: string,
+  templatePath: string,
+  files: Record<string, string>,
   size: number
 ): Promise<void> {
-  await cacheManager.setNodeModules({
-    projectPath,
-    packages,
+  await cacheManager.setTemplateFiles({
+    templateName,
+    templatePath,
+    files,
     size
   });
 }
@@ -147,16 +149,9 @@ export function getTemplateStats() {
 }
 
 /**
- * Fast directory size calculation with caching
+ * Fast directory size calculation for templates
  */
-export async function getDirectorySize(dirPath: string, useCache = true): Promise<number> {
-  if (useCache) {
-    const cached = await getCachedNodeModules(dirPath);
-    if (cached) {
-      return cached.size;
-    }
-  }
-
+export async function getDirectorySize(dirPath: string): Promise<number> {
   try {
     let totalSize = 0;
     
@@ -168,8 +163,10 @@ export async function getDirectorySize(dirPath: string, useCache = true): Promis
       } else if (stats.isDirectory()) {
         const items = await fs.readdir(currentPath);
         
-        // Skip node_modules subdirectories for performance
-        const filteredItems = items.filter(item => item !== 'node_modules' || currentPath === dirPath);
+        // Skip common directories that shouldn't be cached
+        const filteredItems = items.filter(item => 
+          !['node_modules', '.git', 'dist', 'build', '.next', '.nuxt'].includes(item)
+        );
         
         await Promise.all(
           filteredItems.map(item => calculateSize(path.join(currentPath, item)))
@@ -297,7 +294,7 @@ export async function scanProjectWithCache(projectPath: string): Promise<{
   // Perform actual scan
   const name = path.basename(projectPath);
   const dependencies = await getProjectDependencies(projectPath, false);
-  const size = await getDirectorySize(projectPath, false);
+  const size = await getDirectorySize(projectPath);
   
   // Detect language and framework (simplified detection)
   let language = 'Unknown';
@@ -374,7 +371,7 @@ export async function displayCacheStats(): Promise<void> {
  * Clear cache command
  */
 export async function clearCache(type?: string): Promise<void> {
-  const validTypes = ['projects', 'analysis', 'packages', 'templates', 'nodeModules', 'system', 'all'];
+  const validTypes = ['projects', 'analysis', 'packages', 'templates', 'templateFiles', 'system', 'all'];
   
   if (type && !validTypes.includes(type)) {
     console.log(chalk.red(`❌ Invalid cache type. Valid types: ${validTypes.join(', ')}`));

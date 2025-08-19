@@ -20,7 +20,6 @@ import { updateCommand } from './commands/update.js';
 import { cleanCommand } from './commands/clean.js';
 import { environmentCommand } from './commands/env.js';
 import { doctorCommand } from './commands/doctor.js';
-import { createCacheCommand } from './commands/cache.js';
 
 // Import utilities
 import { printBanner, logError, showBanner } from './utils/ui.js';
@@ -346,7 +345,22 @@ program
   });
 
 // CACHE COMMAND - Manage CLI cache system
-program.addCommand(createCacheCommand());
+program
+  .command('cache')
+  .description(chalk.hex('#00d2d3')('🗄️ ') + chalk.hex('#0084ff')('Manage CLI cache system'))
+  .option('stats', 'Show detailed cache statistics')
+  .option('clear [type]', 'Clear cache data (types: projects, analysis, packages, templates, system, all)')
+  .option('info', 'Show cache configuration')
+  .option('optimize', 'Optimize cache performance')
+  .action(async (options) => {
+    try {
+      showBanner();
+      const { createCacheCommand } = await import('./commands/cache.js');
+      await createCacheCommand().parseAsync(['cache', ...process.argv.slice(3)], { from: 'user' });
+    } catch (error) {
+      handleCommandError('cache', error as Error);
+    }
+  });
 
 // DEPLOY COMMAND - Future deployment features
 program
@@ -382,14 +396,12 @@ program.on('--help', () => {
     chalk.hex('#95afc0')('  ') + piGradient('pi') + ' ' + updateGradient('update') + chalk.hex('#95afc0')('                  # Update packages interactively') + '\n' +
     chalk.hex('#95afc0')('  ') + piGradient('pi') + ' ' + updateGradient('update') + chalk.hex('#95afc0')(' lodash react     # Update specific packages') + '\n\n' +
 
-    chalk.hex('#ffa502')('🔧 UTILITY COMMANDS (Coming Soon)') + '\n' +
+    chalk.hex('#ffa502')('🔧 UTILITY COMMANDS') + '\n' +
     chalk.hex('#95afc0')('  ') + piGradient('pi') + ' ' + addGradient('add') + chalk.hex('#95afc0')('                     # Add features to existing project') + '\n' +
     chalk.hex('#95afc0')('  ') + piGradient('pi') + ' ' + addGradient('add') + chalk.hex('#95afc0')(' auth               # Add authentication features') + '\n' +
     chalk.hex('#95afc0')('  ') + piGradient('pi') + ' ' + addGradient('add') + chalk.hex('#95afc0')(' docker             # Add Docker configuration') + '\n' +
     chalk.hex('#95afc0')('  ') + piGradient('pi') + ' ' + commandGradient('check') + chalk.hex('#95afc0')('                   # Check package versions') + '\n' +
     chalk.hex('#95afc0')('  ') + piGradient('pi') + ' ' + commandGradient('check') + chalk.hex('#95afc0')(' react             # Check specific package') + '\n' +
-    chalk.hex('#95afc0')('  ') + piGradient('pi') + ' ' + commandGradient('clean') + chalk.hex('#95afc0')('                   # Clean project artifacts') + '\n' +
-    chalk.hex('#95afc0')('  ') + piGradient('pi') + ' ' + commandGradient('clean') + chalk.hex('#95afc0')(' --node-modules    # Clean node_modules only') + '\n\n' +
 
     chalk.hex('#ff6b6b')('🌍 REPOSITORY & DEPLOYMENT') + '\n' +
     chalk.hex('#95afc0')('  ') + piGradient('pi') + ' ' + commandGradient('clone') + chalk.hex('#95afc0')('                   # Clone repositories interactively') + '\n' +

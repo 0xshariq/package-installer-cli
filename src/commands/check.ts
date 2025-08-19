@@ -7,6 +7,11 @@ import gradient from 'gradient-string';
 import fs from 'fs-extra';
 import path from 'path';
 import semver from 'semver';
+import { 
+  getCachedPackageVersion, 
+  cachePackageVersion,
+  scanProjectWithCache 
+} from '../utils/cacheManager.js';
 
 const execAsync = promisify(exec);
 

@@ -110,7 +110,7 @@ export function createCacheCommand(): Command {
       console.log(chalk.gray('   • analysis     - Project analysis results'));
       console.log(chalk.gray('   • packages     - Package version information'));
       console.log(chalk.gray('   • templates    - Template usage statistics'));
-      console.log(chalk.gray('   • nodeModules  - Node.js dependency scans'));
+      console.log(chalk.gray('   • templateFiles - Cached template file contents'));
       console.log(chalk.gray('   • system       - System environment info'));
     });
 

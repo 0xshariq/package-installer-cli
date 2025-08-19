@@ -12,7 +12,7 @@ export interface CacheData {
   analysis: AnalysisCache[];
   packages: PackageCache[];
   templates: TemplateCache[];
-  nodeModules: NodeModulesCache[];
+  templateFiles: TemplateCacheFiles[];
   system: SystemCache | null;
   metadata: CacheMetadata;
 }
@@ -52,12 +52,12 @@ export interface TemplateCache {
   usageCount: number;
 }
 
-export interface NodeModulesCache {
-  projectPath: string;
-  packages: string[];
+export interface TemplateCacheFiles {
+  templateName: string;
+  templatePath: string;
+  files: Record<string, string>; // filename -> content
+  lastCached: string;
   size: number;
-  lastScanned: string;
-  hash: string;
 }
 
 export interface SystemCache {
@@ -122,7 +122,7 @@ export class CacheManager {
       analysis: [],
       packages: [],
       templates: [],
-      nodeModules: [],
+      templateFiles: [],
       system: null,
       metadata: {
         version: '1.0.0',
@@ -299,19 +299,19 @@ export class CacheManager {
   }
 
   /**
-   * NODE_MODULES CACHE METHODS
+   * TEMPLATE FILE CACHE METHODS
    */
 
   /**
-   * Get cached node_modules data
+   * Get cached template files
    */
-  async getNodeModules(projectPath: string): Promise<NodeModulesCache | null> {
-    const nodeModules = this.cache.nodeModules.find(nm => nm.projectPath === projectPath);
+  async getTemplateFiles(templateName: string): Promise<TemplateCacheFiles | null> {
+    const template = this.cache.templateFiles.find(t => t.templateName === templateName);
     
-    if (nodeModules && !this.isExpired(nodeModules.lastScanned, 12)) { // 12 hours cache
+    if (template && !this.isExpired(template.lastCached, 168)) { // 7 days cache
       this.cache.metadata.totalHits++;
       await this.save();
-      return nodeModules;
+      return template;
     }
 
     this.cache.metadata.totalMisses++;
@@ -319,26 +319,23 @@ export class CacheManager {
   }
 
   /**
-   * Cache node_modules data
+   * Cache template files
    */
-  async setNodeModules(nodeModulesData: Omit<NodeModulesCache, 'lastScanned' | 'hash'>): Promise<void> {
-    const hash = this.generateHash({ projectPath: nodeModulesData.projectPath, packages: nodeModulesData.packages });
-    
-    const nodeModules: NodeModulesCache = {
-      ...nodeModulesData,
-      lastScanned: new Date().toISOString(),
-      hash
+  async setTemplateFiles(templateData: Omit<TemplateCacheFiles, 'lastCached'>): Promise<void> {
+    const template: TemplateCacheFiles = {
+      ...templateData,
+      lastCached: new Date().toISOString()
     };
 
     // Remove existing entry
-    this.cache.nodeModules = this.cache.nodeModules.filter(nm => nm.projectPath !== nodeModules.projectPath);
+    this.cache.templateFiles = this.cache.templateFiles.filter(t => t.templateName !== template.templateName);
     
     // Add new entry
-    this.cache.nodeModules.unshift(nodeModules);
+    this.cache.templateFiles.unshift(template);
     
-    // Keep only recent 20 node_modules caches
-    if (this.cache.nodeModules.length > 20) {
-      this.cache.nodeModules = this.cache.nodeModules.slice(0, 20);
+    // Keep only recent 10 templates
+    if (this.cache.templateFiles.length > 10) {
+      this.cache.templateFiles = this.cache.templateFiles.slice(0, 10);
     }
 
     await this.save();
@@ -434,7 +431,7 @@ export class CacheManager {
   /**
    * Clear specific cache type
    */
-  async clearCache(type?: 'projects' | 'analysis' | 'packages' | 'templates' | 'nodeModules' | 'system' | 'all'): Promise<void> {
+  async clearCache(type?: 'projects' | 'analysis' | 'packages' | 'templates' | 'templateFiles' | 'system' | 'all'): Promise<void> {
     switch (type) {
       case 'projects':
         this.cache.projects = [];
@@ -448,8 +445,8 @@ export class CacheManager {
       case 'templates':
         this.cache.templates = [];
         break;
-      case 'nodeModules':
-        this.cache.nodeModules = [];
+      case 'templateFiles':
+        this.cache.templateFiles = [];
         break;
       case 'system':
         this.cache.system = null;

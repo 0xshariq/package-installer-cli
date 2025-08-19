@@ -28,14 +28,18 @@ import {
   loadUserCache, 
   saveUserCache, 
   getCacheDefault, 
-  UserPreferences 
-} from '../utils/userCache.js';
-import { updateTemplateUsage } from '../utils/cacheManager.js';
+  UserPreferences,
   clearUserCache, 
   showUserCache,
   generateProjectNameSuggestions,
   UserCacheData 
 } from '../utils/userCache.js';
+import { 
+  updateTemplateUsage, 
+  getCachedTemplateFiles, 
+  cacheTemplateFiles, 
+  getDirectorySize 
+} from '../utils/cacheManager.js';
 
 /**
  * Display help for create command
@@ -293,11 +297,32 @@ export async function createProject(providedName?: string): Promise<void> {
     // Step 17: Save user preferences cache
     await saveUserCache(userCache);
 
-    // Step 18: Create project
+    // Step 18: Create project with caching
     console.log('\n' + chalk.hex('#10ac84')('🔨 Creating your project...'));
-    console.log(chalk.hex('#95afc0')('This might take a moment...\n'));
+    console.log(chalk.hex('#95afc0')('Checking template cache...\n'));
     
-    const projectPath = await createProjectFromTemplate(projectName!, templatePath);
+    // Check if template is cached
+    const cachedTemplate = await getCachedTemplateFiles(templateName);
+    let projectPath: string;
+    
+    if (cachedTemplate) {
+      console.log(chalk.green('⚡ Using cached template files for faster creation...'));
+      projectPath = await createProjectFromCachedTemplate(projectName!, cachedTemplate);
+    } else {
+      console.log(chalk.yellow('📦 Template not cached, copying from source...'));
+      projectPath = await createProjectFromTemplate(projectName!, templatePath);
+      
+      // Cache the template for future use
+      try {
+        const templateSize = await getDirectorySize(templatePath);
+        const templateFiles = await readTemplateFiles(templatePath);
+        await cacheTemplateFiles(templateName, templatePath, templateFiles, templateSize);
+        console.log(chalk.green('✅ Template cached for future use'));
+      } catch (error) {
+        // Cache failure shouldn't stop project creation
+        console.log(chalk.yellow('⚠️  Template caching failed, but project created successfully'));
+      }
+    }
     
     // Track template usage in cache
     const templateFeatures = [];
@@ -422,4 +447,82 @@ async function promptDatabaseSelectionWithCache(fwConfig: any, theme: any, cache
   }
   
   return promptDatabaseSelection(fwConfig, theme);
+}
+
+/**
+ * Read all template files into memory for caching
+ */
+async function readTemplateFiles(templatePath: string): Promise<Record<string, string>> {
+  const files: Record<string, string> = {};
+  
+  const readDirectory = async (dirPath: string, relativePath = ''): Promise<void> => {
+    const items = await fs.readdir(dirPath);
+    
+    for (const item of items) {
+      const fullPath = path.join(dirPath, item);
+      const itemRelativePath = path.join(relativePath, item);
+      const stat = await fs.stat(fullPath);
+      
+      if (stat.isDirectory()) {
+        // Skip directories that shouldn't be cached
+        if (!['node_modules', '.git', 'dist', 'build'].includes(item)) {
+          await readDirectory(fullPath, itemRelativePath);
+        }
+      } else if (stat.isFile()) {
+        // Only cache text files under 1MB
+        if (stat.size < 1024 * 1024) {
+          try {
+            const content = await fs.readFile(fullPath, 'utf-8');
+            files[itemRelativePath] = content;
+          } catch (error) {
+            // Skip binary files or files that can't be read as text
+            files[itemRelativePath] = '[BINARY_FILE]';
+          }
+        }
+      }
+    }
+  };
+  
+  await readDirectory(templatePath);
+  return files;
+}
+
+/**
+ * Create project from cached template files
+ */
+async function createProjectFromCachedTemplate(
+  projectName: string,
+  cachedTemplate: any
+): Promise<string> {
+  const projectPath = path.resolve(process.cwd(), projectName);
+  
+  // Check if directory already exists
+  if (await fs.pathExists(projectPath)) {
+    throw new Error(`Directory ${projectName} already exists`);
+  }
+  
+  // Create project directory
+  await fs.ensureDir(projectPath);
+  
+  // Write all cached files
+  for (const [filePath, content] of Object.entries(cachedTemplate.files)) {
+    const fullFilePath = path.join(projectPath, filePath as string);
+    
+    // Skip binary files
+    if (content === '[BINARY_FILE]') {
+      continue;
+    }
+    
+    // Ensure directory exists
+    await fs.ensureDir(path.dirname(fullFilePath));
+    
+    // Write file
+    await fs.writeFile(fullFilePath, content as string, 'utf-8');
+  }
+  
+  // Install dependencies
+  const { installDependenciesForCreate } = await import('../utils/templateCreator.js');
+  await installDependenciesForCreate(projectPath);
+  
+  return projectPath;
 }

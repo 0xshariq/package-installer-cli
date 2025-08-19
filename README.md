@@ -84,7 +84,7 @@ Package Installer CLI includes a comprehensive caching system for lightning-fast
 - **Project Analysis Caching** - Stores project metadata and analysis results
 - **Template Usage Tracking** - Recommends popular templates based on usage
 - **Package Version Caching** - Caches npm package version checks
-- **Node Modules Scanning** - Fast dependency scanning with cache
+- **Template File Caching** - Caches frequently used templates for instant creation
 - **System Environment Caching** - Stores development tool information
 
 ### 📊 Cache Management
@@ -95,6 +95,7 @@ pi cache
 # Clear specific cache types
 pi cache clear projects    # Clear project analysis cache
 pi cache clear packages    # Clear package version cache
+pi cache clear templates   # Clear template file cache
 pi cache clear all         # Clear all caches
 
 # View detailed cache stats
@@ -105,7 +106,8 @@ pi cache info
 ```
 
 ### 🎯 Performance Benefits
-- **2-5x faster** project analysis with cached data
+- **5-10x faster** project creation with cached templates
+- **2-3x faster** project analysis with cached data
 - **Instant template recommendations** based on usage patterns
 - **Reduced API calls** for package version checks
 - **Smart cache invalidation** ensures data freshness
