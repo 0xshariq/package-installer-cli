@@ -417,6 +417,44 @@ ls -la
 2. **GitHub Issues:** [Report bugs and feature requests](https://github.com/0xshariq/package-installer-cli/issues)
 3. **Repository:** [Visit the GitHub repository](https://github.com/0xshariq/package-installer-cli)
 
+---
+
+## Related Tools
+
+### GitHub MCP Server
+
+The Package Installer CLI works seamlessly with the **GitHub MCP Server** for enhanced Git workflow automation and repository management.
+
+**Repository**: [https://github.com/0xshariq/github-mcp-server/](https://github.com/0xshariq/github-mcp-server/)
+
+**Features:**
+- **Automated Git Operations**: Streamline commit, push, and pull workflows
+- **Repository Management**: Clone, fork, and manage GitHub repositories
+- **Branch Operations**: Create, switch, and merge branches effortlessly  
+- **Issue & PR Management**: Handle GitHub issues and pull requests
+- **Integration Support**: Perfect companion for Package Installer CLI projects
+
+**Installation:**
+```bash
+npm install -g @0xshariq/github-mcp-server
+```
+
+**Usage with Package Installer CLI:**
+```bash
+# Create project with Package Installer CLI
+pi create my-nextjs-app
+
+# Use GitHub MCP Server for Git operations
+ginit
+gadd
+gcommit "Initial Commit"
+gpush
+```
+
+The GitHub MCP Server enhances your development workflow by providing automated Git operations for projects created with the Package Installer CLI.
+
+---
+
 ## Best Practices
 
 ### Project Creation

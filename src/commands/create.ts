@@ -283,35 +283,7 @@ export async function createProject(providedName?: string): Promise<void> {
       return;
     }
 
-    // Step 16: Verify template exists
-    if (!fs.existsSync(templatePath)) {
-      throw new Error(`Template not found at: ${templatePath}`);
-    }
-
-    // Step 17: Save user preferences cache
-    await saveUserCache(userCache);
-
-    // Step 18: Create project
-    console.log('\n' + chalk.hex('#10ac84')('🔨 Creating your project...'));
-    console.log(chalk.hex('#95afc0')('This might take a moment...\n'));
-    
-    const projectPath = await createProjectFromTemplate(projectName!, templatePath);
-    
-    // Step 19: Success message
-    console.log('\n' + chalk.hex('#10ac84')('✨ Project created successfully!'));
-    console.log(chalk.hex('#95afc0')('Welcome to your new project!\n'));
-    
-    // Project details
-    console.log(chalk.hex('#00d2d3')('📁 Project Details:'));
-    console.log(`   ${chalk.hex('#ffa502')('Name:')} ${chalk.hex('#10ac84')(projectName)}`);
-    console.log(`   ${chalk.hex('#ffa502')('Framework:')} ${chalk.hex('#ff6b6b')(selectedFramework)}`);
-    if (selectedLanguage) {
-      console.log(`   ${chalk.hex('#ffa502')('Language:')} ${chalk.hex('#9c88ff')(selectedLanguage)}`);
-    }
-    console.log(`   ${chalk.hex('#ffa502')('Template:')} ${chalk.hex('#a29bfe')(templateName)}`);
-    console.log(`   ${chalk.hex('#ffa502')('Location:')} ${chalk.hex('#95afc0')(projectPath)}\n`);
-    
-    // Step 20: Ask for additional features
+    // Step 16: Ask for additional features before creating the project
     console.log(chalk.hex('#00d2d3')('🔧 Would you like to add any features to your project?'));
     
     const { addFeatures } = await inquirer.prompt([
@@ -322,19 +294,21 @@ export async function createProject(providedName?: string): Promise<void> {
         default: false
       }
     ]);
-    
+
+    let selectedFeatures: string[] = [];
+    let featureConfigs: any = {};
+
     if (addFeatures) {
-      // Get available features for this framework
       const supportedFeatures = await scanAvailableFeatures();
-      const availableFeatures = Object.keys(supportedFeatures)
-        .filter(key => {
-          const featureConfig = supportedFeatures[key];
-          const frameworkSupported = featureConfig.supportedFrameworks.includes(selectedFramework) ||
-            featureConfig.supportedFrameworks.some(fw => selectedFramework.startsWith(fw));
-          const languageSupported = featureConfig.supportedLanguages.includes('nodejs'); // Most templates are nodejs
-          const hasImplementation = Object.keys(featureConfig.files).length > 0;
-          return frameworkSupported && languageSupported && hasImplementation;
-        });
+      
+      // Filter features that support the selected framework
+      const availableFeatures = Object.keys(supportedFeatures).filter(key => {
+        const config = supportedFeatures[key];
+        const hasImplementation = Object.keys(config.files).length > 0;
+        const frameworkSupported = config.supportedFrameworks.includes(selectedFramework) ||
+          config.supportedFrameworks.some(fw => selectedFramework.startsWith(fw));
+        return hasImplementation && frameworkSupported;
+      });
 
       if (availableFeatures.length > 0) {
         const featureChoices = availableFeatures.map(key => {
@@ -345,21 +319,19 @@ export async function createProject(providedName?: string): Promise<void> {
           };
         });
 
-        const { selectedFeatures } = await inquirer.prompt([
+        const { features } = await inquirer.prompt([
           {
             type: 'checkbox',
-            name: 'selectedFeatures',
+            name: 'features',
             message: chalk.hex('#9c88ff')('Select features to add:'),
             choices: featureChoices
           }
         ]);
 
-        // Add selected features
+        selectedFeatures = features;
+
+        // Collect configuration for each selected feature
         for (const feature of selectedFeatures) {
-          console.log(`\n${chalk.hex('#00d2d3')(`🔧 Adding ${supportedFeatures[feature].name}...`)}`);
-          
-          // Handle auth provider selection
-          let authProvider;
           if (feature === 'auth') {
             const { provider } = await inquirer.prompt([
               {
@@ -373,24 +345,60 @@ export async function createProject(providedName?: string): Promise<void> {
                 ]
               }
             ]);
-            authProvider = provider;
+            featureConfigs[feature] = { authProvider: provider };
           }
-
-          try {
-            await addFeature(feature, projectPath, { authProvider });
-            console.log(chalk.hex('#10ac84')(`✅ ${supportedFeatures[feature].name} added successfully!`));
-          } catch (error: any) {
-            console.log(chalk.hex('#ff4757')(`❌ Failed to add ${supportedFeatures[feature].name}: ${error.message}`));
-          }
-        }
-        
-        if (selectedFeatures.length > 0) {
-          console.log(`\n${chalk.hex('#10ac84')('🎉 All selected features have been added!')}`);
         }
       } else {
-        console.log(chalk.hex('#95afc0')('💡 No additional features available for this framework yet.'));
+        console.log(chalk.yellow(`⚠️  No features available for ${selectedFramework} projects yet.`));
       }
     }
+
+    // Step 17: Verify template exists
+    if (!fs.existsSync(templatePath)) {
+      throw new Error(`Template not found at: ${templatePath}`);
+    }
+
+    // Step 18: Save user preferences cache
+    await saveUserCache(userCache);
+
+    // Step 19: Create project
+    console.log('\n' + chalk.hex('#10ac84')('🔨 Creating your project...'));
+    console.log(chalk.hex('#95afc0')('This might take a moment...\n'));
+    
+    const projectPath = await createProjectFromTemplate(projectName!, templatePath);
+    
+    // Step 20: Add selected features to the project
+    if (selectedFeatures.length > 0) {
+      console.log('\n' + chalk.hex('#00d2d3')('🔧 Adding selected features...'));
+      
+      // Get the feature names again for display
+      const supportedFeatures = await scanAvailableFeatures();
+      
+      for (const feature of selectedFeatures) {
+        console.log(`\n${chalk.hex('#00d2d3')(`🔧 Adding ${supportedFeatures[feature]?.name || feature}...`)}`);
+        
+        try {
+          await addFeature(feature, projectPath, featureConfigs[feature] || {});
+          console.log(chalk.green(`✅ ${feature} added successfully!`));
+        } catch (error: any) {
+          console.error(chalk.red(`❌ Failed to add ${feature}: ${error.message}`));
+        }
+      }
+    }
+
+    // Step 21: Success message
+    console.log('\n' + chalk.hex('#10ac84')('✨ Project created successfully!'));
+    console.log(chalk.hex('#95afc0')('Welcome to your new project!\n'));
+    
+    // Project details
+    console.log(chalk.hex('#00d2d3')('📁 Project Details:'));
+    console.log(`   ${chalk.hex('#ffa502')('Name:')} ${chalk.hex('#10ac84')(projectName)}`);
+    console.log(`   ${chalk.hex('#ffa502')('Framework:')} ${chalk.hex('#ff6b6b')(selectedFramework)}`);
+    if (selectedLanguage) {
+      console.log(`   ${chalk.hex('#ffa502')('Language:')} ${chalk.hex('#9c88ff')(selectedLanguage)}`);
+    }
+    console.log(`   ${chalk.hex('#ffa502')('Template:')} ${chalk.hex('#a29bfe')(templateName)}`);
+    console.log(`   ${chalk.hex('#ffa502')('Location:')} ${chalk.hex('#95afc0')(projectPath)}\n`);
     
     // Next steps
     console.log(chalk.hex('#00d2d3')('🚀 Next Steps:'));

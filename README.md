@@ -147,11 +147,31 @@ We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) f
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🔗 Links
+## 🔗 Links & Related Tools
 
 - **NPM Package**: [@0xshariq/package-installer](https://www.npmjs.com/package/@0xshariq/package-installer)
 - **GitHub Repository**: [package-installer-cli](https://github.com/0xshariq/package-installer-cli)
 - **Issues & Feedback**: [GitHub Issues](https://github.com/0xshariq/package-installer-cli/issues)
+
+### 🤖 GitHub MCP Server
+
+**Enhanced Git workflow automation for Package Installer CLI projects**
+
+- **Repository**: [https://github.com/0xshariq/github-mcp-server/](https://github.com/0xshariq/github-mcp-server/)
+- **Features**: Automated Git operations, repository management, branch handling, and issue/PR management
+- **Perfect Companion**: Seamlessly integrates with projects created using Package Installer CLI
+
+```bash
+# Install GitHub MCP Server
+npm install -g @0xshariq/github-mcp-server
+
+# Example workflow
+pi create my-project          # Create with Package Installer CLI
+ginit                         # Initialize Git with MCP Server
+gadd file.txt                 # Automated add files
+gcommit "Initial"             # Automated commit
+gpush origin main             # Push to repository
+```
 
 ---
 
