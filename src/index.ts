@@ -365,15 +365,12 @@ program
 program
   .command('cache')
   .description(chalk.hex('#00d2d3')('🗄️ ') + chalk.hex('#0084ff')('Manage CLI cache system'))
-  .option('stats', 'Show detailed cache statistics')
-  .option('clear [type]', 'Clear cache data (types: projects, analysis, packages, templates, system, all)')
-  .option('info', 'Show cache configuration')
-  .option('optimize', 'Optimize cache performance')
-  .action(async (options) => {
+  .argument('[subcommand]', 'Cache subcommand (stats, clear, info, optimize)')
+  .argument('[type]', 'Type for clear command (projects, analysis, packages, templates, system, all)')
+  .action(async (subcommand, type) => {
     try {
-      showBanner();
-      const { createCacheCommand } = await import('./commands/cache.js');
-      await createCacheCommand().parseAsync(['cache', ...process.argv.slice(3)], { from: 'user' });
+      const { cacheCommand } = await import('./commands/cache.js');
+      await cacheCommand(subcommand, type);
     } catch (error) {
       handleCommandError('cache', error as Error);
     }

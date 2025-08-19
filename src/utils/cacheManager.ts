@@ -2,7 +2,7 @@
  * Cache Manager - Centralized caching operations for Package Installer CLI
  */
 
-import { cacheManager as cacheManagerInstance, ProjectCache, AnalysisCache, TemplateCacheFiles } from './cache.js';
+import { cacheManager as cacheManagerInstance, ProjectCache, AnalysisCache, TemplateCacheFiles } from './cacheUtils.js';
 import fs from 'fs-extra';
 import path from 'path';
 import chalk from 'chalk';
