@@ -35,14 +35,14 @@ The following options are available for all commands:
 | `create` | Create new project from templates | ✅ Available |
 | `analyze` | Analyze project structure and dependencies | ✅ Available |
 | `update` | Update project dependencies to latest versions | ✅ Available |
-| `add` | Add packages to the current project | 🚧 Coming Soon |
-| `check` | Check project health and dependencies | 🚧 Coming Soon |
+| `add` | Add features to existing projects | ✅ Available |
+| `check` | Check project health and dependencies | ✅ Available |
+| `clone` | Clone and setup repositories | ✅ Available |
+| `doctor` | Diagnose and fix project issues | ✅ Available |
+| `upgrade-cli` | Upgrade CLI to latest version | ✅ Available |
 | `clean` | Clean project artifacts and dependencies | 🚧 Coming Soon |
-| `clone` | Clone and setup repository templates | 🚧 Coming Soon |
-| `deploy` | Deploy project to cloud platforms | 🚧 Coming Soon |
-| `doctor` | Diagnose and fix project issues | 🚧 Coming Soon |
+| `deploy` | Deploy projects to platforms | 🚧 Coming Soon |
 | `env` | Manage environment variables | 🚧 Coming Soon |
-| `upgrade` | Upgrade CLI to latest version | 🚧 Coming Soon |
 
 ## Core Commands
 
@@ -140,6 +140,206 @@ pi update --dry-run
 - Interactive selection interface
 - Global and local package updates (Coming Soon)
 - Dry-run mode for preview (Coming Soon)
+
+### add Command
+
+**Purpose:** Add features and packages to existing projects, including authentication, Docker, and framework-specific enhancements.
+
+**Syntax:**
+```bash
+pi add [feature-name]
+```
+
+**Usage Examples:**
+```bash
+# Interactive feature selection
+pi add
+
+# Add authentication features
+pi add auth
+
+# Add Docker configuration
+pi add docker
+
+# Add testing framework
+pi add testing
+
+# Add linting tools
+pi add eslint
+```
+
+**Available Features:**
+- **Authentication:** OAuth, JWT, social logins
+- **Docker:** Containerization setup
+- **Testing:** Jest, Vitest, Cypress
+- **Linting:** ESLint, Prettier
+- **CI/CD:** GitHub Actions, GitLab CI
+- **Database:** MongoDB, PostgreSQL setup
+
+**Status:** ✅ Available
+
+### check Command
+
+**Purpose:** Check project health, dependencies, package versions, and get update suggestions with security vulnerability scanning.
+
+**Syntax:**
+```bash
+pi check [package-name]
+```
+
+**Usage Examples:**
+```bash
+# Check all packages in current project
+pi check
+
+# Check specific package
+pi check react
+
+# Check for security vulnerabilities
+pi check --security
+
+# Check outdated packages only
+pi check --outdated
+
+# Export report to file
+pi check --export report.json
+```
+
+**Features:**
+- **Dependency Analysis:** Shows current vs latest versions
+- **Security Scanning:** Identifies vulnerable packages
+- **Health Check:** Project structure validation
+- **Update Suggestions:** Recommends safe updates
+- **Export Reports:** JSON, CSV formats
+
+**Status:** ✅ Available
+
+### clone Command
+
+**Purpose:** Clone and setup repositories from GitHub, GitLab, BitBucket, and other Git providers with automatic dependency installation.
+
+**Syntax:**
+```bash
+pi clone [repository-url]
+```
+
+**Usage Examples:**
+```bash
+# Interactive repository cloning
+pi clone
+
+# Clone GitHub repository (user/repo format)
+pi clone facebook/react
+
+# Clone with custom project name
+pi clone facebook/react my-react-study
+
+# Clone from different providers
+pi clone gitlab:user/project
+pi clone bitbucket:user/repo
+
+# Clone specific branch
+pi clone user/repo --branch develop
+
+# Clone without installing dependencies
+pi clone user/repo --no-install
+```
+
+**Supported Providers:**
+- **GitHub** (default)
+- **GitLab** 
+- **BitBucket**
+- **SourceHut**
+- **Custom Git URLs**
+
+**Features:**
+- **Auto-setup:** Dependency installation after cloning
+- **Multi-provider:** Support for all major Git hosts
+- **Branch selection:** Clone specific branches
+- **Project renaming:** Custom local names
+
+**Status:** ✅ Available
+
+### doctor Command
+
+**Purpose:** Diagnose and fix common project issues, including dependency conflicts, configuration problems, and environment issues.
+
+**Syntax:**
+```bash
+pi doctor [options]
+```
+
+**Usage Examples:**
+```bash
+# Run comprehensive project diagnostics
+pi doctor
+
+# Auto-fix detected issues
+pi doctor --fix
+
+# Check specific aspect
+pi doctor --dependencies
+pi doctor --environment
+pi doctor --permissions
+
+# Generate detailed report
+pi doctor --report
+```
+
+**Diagnostic Features:**
+- **Dependency Analysis:** Detect conflicts and missing packages
+- **Environment Check:** Node.js, npm, git configuration
+- **Permission Issues:** File and folder access problems
+- **Configuration Validation:** ESLint, TypeScript, build configs
+- **Port Conflicts:** Development server issues
+- **Cache Problems:** Clear corrupted caches
+
+**Auto-fix Capabilities:**
+- **Package Installation:** Install missing dependencies
+- **Cache Clearing:** Remove corrupted caches
+- **Permission Fixes:** Correct file permissions
+- **Config Updates:** Fix common configuration issues
+
+**Status:** ✅ Available
+
+### upgrade-cli Command
+
+**Purpose:** Upgrade Package Installer CLI to the latest version with automatic uninstall/reinstall for clean updates.
+
+**Syntax:**
+```bash
+pi upgrade-cli
+```
+
+**Usage Examples:**
+```bash
+# Upgrade CLI to latest version
+pi upgrade-cli
+
+# Show upgrade help
+pi upgrade-cli --help
+```
+
+**Upgrade Process:**
+1. **Version Check:** Compares current vs latest version
+2. **Package Manager Detection:** Detects npm, yarn, or pnpm
+3. **Clean Uninstall:** Removes current version completely
+4. **Fresh Install:** Installs latest version from scratch
+5. **Verification:** Confirms successful upgrade
+
+**Features:**
+- **Smart Detection:** Automatically detects your package manager
+- **Clean Upgrade:** Uninstalls old version before installing new
+- **Version Verification:** Confirms upgrade success
+- **Error Recovery:** Provides manual instructions on failure
+- **Progress Feedback:** Real-time upgrade status
+
+**Supported Package Managers:**
+- **npm:** `npm uninstall -g && npm install -g @latest`
+- **yarn:** `yarn global remove && yarn global add @latest`
+- **pnpm:** `pnpm remove -g && pnpm add -g @latest`
+
+**Status:** ✅ Available
 
 ## Advanced Features
 

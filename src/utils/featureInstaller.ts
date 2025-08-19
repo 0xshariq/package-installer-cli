@@ -124,11 +124,195 @@ export interface FeatureConfig {
   };
 }
 
-// Supported features configuration
+/**
+ * Dynamically scan and load all available features from the features directory
+ */
+export async function scanAvailableFeatures(): Promise<Record<string, FeatureConfig>> {
+  const features: Record<string, FeatureConfig> = {};
+  
+  try {
+    // Get features directory path
+    const featuresRoot = path.join(getCliRootPath(), 'features');
+    
+    if (!await fs.pathExists(featuresRoot)) {
+      console.warn(chalk.yellow('⚠️  Features directory not found'));
+      return SUPPORTED_FEATURES; // Fallback to static features
+    }
+    
+    const featureNames = await fs.readdir(featuresRoot, { withFileTypes: true });
+    
+    for (const featureDir of featureNames) {
+      if (featureDir.isDirectory()) {
+        const featureName = featureDir.name;
+        const featurePath = path.join(featuresRoot, featureName);
+        
+        // Analyze feature structure to determine configuration
+        const featureConfig = await analyzeFeatureStructure(featureName, featurePath);
+        if (featureConfig) {
+          features[featureName] = featureConfig;
+        }
+      }
+    }
+    
+    // Merge with static features for any missing ones
+    Object.keys(SUPPORTED_FEATURES).forEach(key => {
+      if (!features[key]) {
+        features[key] = SUPPORTED_FEATURES[key];
+      }
+    });
+    
+  } catch (error) {
+    console.warn(chalk.yellow(`⚠️  Error scanning features: ${error}`));
+    return SUPPORTED_FEATURES; // Fallback to static features
+  }
+  
+  return features;
+}
+
+/**
+ * Analyze a feature directory structure to determine its configuration
+ */
+async function analyzeFeatureStructure(featureName: string, featurePath: string): Promise<FeatureConfig | null> {
+  try {
+    const supportedFrameworks: string[] = [];
+    const supportedLanguages: SupportedLanguage[] = [];
+    const hasImplementation = await hasFeatureImplementation(featurePath);
+    
+    // Scan for framework support
+    const items = await fs.readdir(featurePath, { withFileTypes: true });
+    
+    for (const item of items) {
+      if (item.isDirectory()) {
+        const itemName = item.name;
+        
+        // Check if it's a framework or auth provider
+        if (['nextjs', 'reactjs', 'expressjs', 'nestjs', 'vuejs', 'angularjs', 'remixjs', 'rust'].includes(itemName)) {
+          supportedFrameworks.push(itemName);
+          
+          // Check for language support within the framework
+          const frameworkPath = path.join(featurePath, itemName);
+          const langDirs = await fs.readdir(frameworkPath, { withFileTypes: true });
+          
+          for (const langDir of langDirs) {
+            if (langDir.isDirectory()) {
+              const langName = langDir.name;
+              if (['javascript', 'typescript'].includes(langName)) {
+                if (!supportedLanguages.includes('nodejs')) {
+                  supportedLanguages.push('nodejs');
+                }
+              }
+            }
+          }
+        } else if (['clerk', 'auth0', 'next-auth', 'supabase'].includes(itemName)) {
+          // This is an auth provider, check its framework support
+          const providerPath = path.join(featurePath, itemName);
+          const providerItems = await fs.readdir(providerPath, { withFileTypes: true });
+          
+          for (const providerItem of providerItems) {
+            if (providerItem.isDirectory() && 
+                ['nextjs', 'reactjs', 'expressjs', 'nestjs', 'vuejs', 'angularjs', 'remixjs'].includes(providerItem.name)) {
+              if (!supportedFrameworks.includes(providerItem.name)) {
+                supportedFrameworks.push(providerItem.name);
+              }
+              
+              // Check language support
+              const frameworkPath = path.join(providerPath, providerItem.name);
+              if (await fs.pathExists(frameworkPath)) {
+                const langDirs = await fs.readdir(frameworkPath, { withFileTypes: true });
+                for (const langDir of langDirs) {
+                  if (langDir.isDirectory() && ['javascript', 'typescript'].includes(langDir.name)) {
+                    if (!supportedLanguages.includes('nodejs')) {
+                      supportedLanguages.push('nodejs');
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    
+    // If no specific language folders found, default to nodejs for JS/TS frameworks
+    if (supportedLanguages.length === 0 && supportedFrameworks.length > 0) {
+      supportedLanguages.push('nodejs');
+    }
+    
+    // Generate feature description
+    const descriptions: Record<string, string> = {
+      'auth': 'Add authentication to your project (Clerk, Auth0, NextAuth)',
+      'docker': 'Add Docker containerization to your project',
+      'api-routes': 'Add API routes and endpoints',
+      'ui': 'Add UI components and styling',
+      'storage': 'Add database and storage solutions',
+      'payments': 'Add payment processing (Stripe, Razorpay)',
+      'gitignore': 'Add comprehensive .gitignore files'
+    };
+    
+    return {
+      name: featureName.charAt(0).toUpperCase() + featureName.slice(1),
+      description: descriptions[featureName] || `Add ${featureName} to your project`,
+      supportedFrameworks,
+      supportedLanguages,
+      files: hasImplementation ? { 'placeholder': { action: 'create' } } : {}
+    };
+    
+  } catch (error) {
+    console.warn(chalk.yellow(`⚠️  Error analyzing feature ${featureName}: ${error}`));
+    return null;
+  }
+}
+
+/**
+ * Check if a feature has actual implementation files
+ */
+async function hasFeatureImplementation(featurePath: string): Promise<boolean> {
+  try {
+    // Recursively check for actual implementation files
+    const hasFiles = await checkForImplementationFiles(featurePath);
+    return hasFiles;
+  } catch (error) {
+    return false;
+  }
+}
+
+/**
+ * Recursively check for implementation files
+ */
+async function checkForImplementationFiles(dirPath: string): Promise<boolean> {
+  try {
+    const items = await fs.readdir(dirPath, { withFileTypes: true });
+    
+    for (const item of items) {
+      if (item.isFile()) {
+        const fileName = item.name;
+        // Check for actual implementation files (not just config files)
+        if (fileName.endsWith('.ts') || fileName.endsWith('.tsx') || 
+            fileName.endsWith('.js') || fileName.endsWith('.jsx') ||
+            fileName.endsWith('.vue') || fileName.includes('layout') ||
+            fileName.includes('middleware') || fileName.includes('auth') ||
+            fileName === 'Dockerfile' || fileName === 'docker-compose.yml') {
+          return true;
+        }
+      } else if (item.isDirectory()) {
+        const hasFilesInSubDir = await checkForImplementationFiles(path.join(dirPath, item.name));
+        if (hasFilesInSubDir) {
+          return true;
+        }
+      }
+    }
+    
+    return false;
+  } catch (error) {
+    return false;
+  }
+}
+
+// Supported features configuration (fallback for dynamic scanning)
 export const SUPPORTED_FEATURES: { [key: string]: FeatureConfig } = {
   auth: {
     name: 'Authentication',
-    description: 'Add authentication to your project (Clerk or Auth0)',
+    description: 'Add authentication to your project (Clerk, NextAuth or Auth0)',
     supportedFrameworks: ['nextjs', 'expressjs', 'reactjs', 'vuejs', 'remixjs'],
     supportedLanguages: ['nodejs'],
     files: {
@@ -156,7 +340,7 @@ export const SUPPORTED_FEATURES: { [key: string]: FeatureConfig } = {
   },
   testing: {
     name: 'Testing Setup',
-    description: 'Add testing configuration (Jest, Vitest, or framework-specific)',
+    description: 'Add testing configuration (Jest, Vitest, or framework-specific) - Coming Soon',
     supportedFrameworks: ['nextjs', 'expressjs', 'reactjs', 'vuejs', 'angularjs'],
     supportedLanguages: ['nodejs'],
     files: {
@@ -167,9 +351,23 @@ export const SUPPORTED_FEATURES: { [key: string]: FeatureConfig } = {
   },
   ui: {
     name: 'UI Components',
-    description: 'Add UI component library ( Ant Design, Mantine-UI) - Coming Soon',
+    description: 'Add UI component library ( Ant Design, Mantine-UI and ScrollX UI) - Coming Soon',
     supportedFrameworks: ['nextjs', 'reactjs', 'vuejs'],
     supportedLanguages: ['nodejs'],
+    files: {}
+  },
+  storage: {
+    name: "Storage (For Files,Images and Videos)",
+    description: "Add storage solutions (AWS S3, Google Cloud Storage, Cloudinary and ImageKit - Coming Soon",
+    supportedFrameworks: ["nextjs","reactjs","vuejs","angularjs"],
+    supportedLanguages: ['nodejs'],
+    files: {}
+  },
+  payments: {
+    name: 'Payments',
+    description: "Ready Made Payment Configuration ( Stripe and Razorpay ) - Coming Soon",
+    supportedFrameworks: ["nextjs","reactjs","vuejs","angularjs"],
+    supportedLanguages: ["nodejs"],
     files: {}
   },
   api: {
@@ -346,7 +544,7 @@ function getFrameworkPackages(
 /**
  * Get framework-specific files for a feature
  */
-function getFrameworkFiles(featureName: string, framework: string): { [filePath: string]: FeatureConfig['files'][string] } {
+function getFrameworkFiles(featureName: string, framework: string, hasSrcFolder: boolean = false): { [filePath: string]: FeatureConfig['files'][string] } {
   const baseFiles: { [filePath: string]: FeatureConfig['files'][string] } = {};
   
   if (featureName === 'auth') {
@@ -356,8 +554,14 @@ function getFrameworkFiles(featureName: string, framework: string): { [filePath:
     // Framework-specific files
     switch (framework) {
       case 'nextjs':
-        baseFiles['middleware.ts'] = { action: 'overwrite' };
-        baseFiles['app/layout.tsx'] = { action: 'overwrite' };
+        // Place middleware.ts in src folder if it exists, otherwise at root
+        if (hasSrcFolder) {
+          baseFiles['src/middleware.ts'] = { action: 'overwrite' };
+          baseFiles['src/app/layout.tsx'] = { action: 'overwrite' };
+        } else {
+          baseFiles['middleware.ts'] = { action: 'overwrite' };
+          baseFiles['app/layout.tsx'] = { action: 'overwrite' };
+        }
         break;
       case 'expressjs':
         baseFiles['index.ts'] = { action: 'overwrite' };
@@ -406,7 +610,7 @@ function shouldSkipFile(filePath: string, framework: string, projectPath: string
   }
   
   // Skip Next.js specific files for non-Next.js frameworks
-  if ((filePath === 'app/layout.tsx' || filePath === 'middleware.ts') && 
+  if ((filePath === 'app/layout.tsx' || filePath === 'src/app/layout.tsx' || filePath === 'middleware.ts' || filePath === 'src/middleware.ts') && 
       !framework.includes('nextjs')) {
     return true;
   }
@@ -677,7 +881,7 @@ export async function addFeature(
   
   try {
     // Detect project stack
-    const { framework, language, projectLanguage, isComboTemplate, packageManager } = await detectProjectStack(projectPath);
+    const { framework, language, projectLanguage, isComboTemplate, packageManager, hasSrcFolder } = await detectProjectStack(projectPath);
     
     if (!framework || !language) {
       spinner.fail(chalk.red('❌ Could not detect project framework or language'));
@@ -742,7 +946,7 @@ export async function addFeature(
     }
     
     // Get framework-specific files
-    const frameworkFiles = getFrameworkFiles(featureName, framework);
+    const frameworkFiles = getFrameworkFiles(featureName, framework, hasSrcFolder);
     
     // Process feature files
     const fileSpinner = ora(chalk.hex('#00d2d3')('📝 Adding feature files...')).start();
@@ -887,12 +1091,19 @@ async function initializeGitStandard(projectPath: string): Promise<void> {
 /**
  * List all available features
  */
-export function listAvailableFeatures(): void {
+export async function listAvailableFeatures(): Promise<void> {
   console.log('\n' + chalk.hex('#9c88ff')('✨ Available Features:'));
   console.log(chalk.hex('#95afc0')('─'.repeat(50)));
   
-  for (const [name, config] of Object.entries(SUPPORTED_FEATURES)) {
-    console.log(`${chalk.hex('#10ac84')('• ' + config.name)} ${chalk.hex('#95afc0')('(' + name + ')')}`);
+  const availableFeatures = await scanAvailableFeatures();
+  
+  for (const [name, config] of Object.entries(availableFeatures)) {
+    const hasImplementation = Object.keys(config.files).length > 0;
+    const status = hasImplementation ? 
+      chalk.hex('#10ac84')('✅ Ready') : 
+      chalk.hex('#ff6b6b')('🚧 Coming Soon');
+    
+    console.log(`${chalk.hex('#10ac84')('• ' + config.name)} ${chalk.hex('#95afc0')('(' + name + ')')} ${status}`);
     console.log(`  ${chalk.hex('#95afc0')(config.description)}`);
     console.log(`  ${chalk.hex('#ffa502')('Frameworks:')} ${config.supportedFrameworks.join(', ')}`);
     console.log('');

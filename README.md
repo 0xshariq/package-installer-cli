@@ -57,13 +57,21 @@ pi update
 
 ## 📋 Commands Overview
 
-| Command | Description |
-|---------|-------------|
-| `pi create` | Create new project from templates |
-| `pi analyze` | Analyze project structure and dependencies |
-| `pi update` | Update project dependencies to latest versions |
-| `pi --help` | Show help information |
-| `pi --version` | Display CLI version |
+| Command | Description | Status |
+|---------|-------------|--------|
+| `pi create` | Create new project from templates | ✅ Available |
+| `pi analyze` | Analyze project structure and dependencies | ✅ Available |
+| `pi update` | Update project dependencies to latest versions | ✅ Available |
+| `pi add` | Add features to existing projects | ✅ Available |
+| `pi check` | Check project health and dependencies | ✅ Available |
+| `pi clone` | Clone and setup repositories | ✅ Available |
+| `pi doctor` | Diagnose and fix project issues | ✅ Available |
+| `pi upgrade-cli` | Upgrade CLI to latest version | ✅ Available |
+| `pi clean` | Clean development artifacts | 🚧 Coming Soon |
+| `pi deploy` | Deploy projects to platforms | 🚧 Coming Soon |
+| `pi env` | Manage environment variables | 🚧 Coming Soon |
+| `pi --help` | Show help information | ✅ Available |
+| `pi --version` | Display CLI version | ✅ Available |
 
 For detailed command documentation, see [docs/commands.md](docs/commands.md).
 

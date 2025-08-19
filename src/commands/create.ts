@@ -33,6 +33,7 @@ import {
   generateProjectNameSuggestions,
   UserCacheData 
 } from '../utils/userCache.js';
+import { scanAvailableFeatures, addFeature } from '../utils/featureInstaller.js';
 
 /**
  * Display help for create command
@@ -309,6 +310,87 @@ export async function createProject(providedName?: string): Promise<void> {
     }
     console.log(`   ${chalk.hex('#ffa502')('Template:')} ${chalk.hex('#a29bfe')(templateName)}`);
     console.log(`   ${chalk.hex('#ffa502')('Location:')} ${chalk.hex('#95afc0')(projectPath)}\n`);
+    
+    // Step 20: Ask for additional features
+    console.log(chalk.hex('#00d2d3')('🔧 Would you like to add any features to your project?'));
+    
+    const { addFeatures } = await inquirer.prompt([
+      {
+        type: 'confirm',
+        name: 'addFeatures',
+        message: chalk.hex('#9c88ff')('Add features like authentication, Docker, etc.?'),
+        default: false
+      }
+    ]);
+    
+    if (addFeatures) {
+      // Get available features for this framework
+      const supportedFeatures = await scanAvailableFeatures();
+      const availableFeatures = Object.keys(supportedFeatures)
+        .filter(key => {
+          const featureConfig = supportedFeatures[key];
+          const frameworkSupported = featureConfig.supportedFrameworks.includes(selectedFramework) ||
+            featureConfig.supportedFrameworks.some(fw => selectedFramework.startsWith(fw));
+          const languageSupported = featureConfig.supportedLanguages.includes('nodejs'); // Most templates are nodejs
+          const hasImplementation = Object.keys(featureConfig.files).length > 0;
+          return frameworkSupported && languageSupported && hasImplementation;
+        });
+
+      if (availableFeatures.length > 0) {
+        const featureChoices = availableFeatures.map(key => {
+          const config = supportedFeatures[key];
+          return {
+            name: `${config.name} - ${config.description}`,
+            value: key
+          };
+        });
+
+        const { selectedFeatures } = await inquirer.prompt([
+          {
+            type: 'checkbox',
+            name: 'selectedFeatures',
+            message: chalk.hex('#9c88ff')('Select features to add:'),
+            choices: featureChoices
+          }
+        ]);
+
+        // Add selected features
+        for (const feature of selectedFeatures) {
+          console.log(`\n${chalk.hex('#00d2d3')(`🔧 Adding ${supportedFeatures[feature].name}...`)}`);
+          
+          // Handle auth provider selection
+          let authProvider;
+          if (feature === 'auth') {
+            const { provider } = await inquirer.prompt([
+              {
+                type: 'list',
+                name: 'provider',
+                message: chalk.hex('#9c88ff')('Choose authentication provider:'),
+                choices: [
+                  { name: 'Clerk', value: 'clerk' },
+                  { name: 'NextAuth.js', value: 'next-auth' },
+                  { name: 'Auth0', value: 'auth0' }
+                ]
+              }
+            ]);
+            authProvider = provider;
+          }
+
+          try {
+            await addFeature(feature, projectPath, { authProvider });
+            console.log(chalk.hex('#10ac84')(`✅ ${supportedFeatures[feature].name} added successfully!`));
+          } catch (error: any) {
+            console.log(chalk.hex('#ff4757')(`❌ Failed to add ${supportedFeatures[feature].name}: ${error.message}`));
+          }
+        }
+        
+        if (selectedFeatures.length > 0) {
+          console.log(`\n${chalk.hex('#10ac84')('🎉 All selected features have been added!')}`);
+        }
+      } else {
+        console.log(chalk.hex('#95afc0')('💡 No additional features available for this framework yet.'));
+      }
+    }
     
     // Next steps
     console.log(chalk.hex('#00d2d3')('🚀 Next Steps:'));

@@ -398,7 +398,7 @@ program.on('--help', () => {
     chalk.hex('#95afc0')('  ') + piGradient('pi') + ' ' + commandGradient('doctor') + chalk.hex('#95afc0')(' --fix             # Auto-fix common issues') + '\n' +
     chalk.hex('#95afc0')('  ') + piGradient('pi') + ' ' + commandGradient('env') + chalk.hex('#95afc0')('                     # Check development environment') + '\n' +
     chalk.hex('#95afc0')('  ') + piGradient('pi') + ' ' + commandGradient('env') + chalk.hex('#95afc0')(' --setup           # Setup optimal dev environment') + '\n' +
-    chalk.hex('#95afc0')('  ') + piGradient('pi') + ' ' + commandGradient('upgrade') + chalk.hex('#95afc0')('                # Upgrade CLI to latest version') + '\n\n' +
+    chalk.hex('#95afc0')('  ') + piGradient('pi') + ' ' + commandGradient('upgrade-cli') + chalk.hex('#95afc0')('            # Upgrade CLI to latest version') + '\n\n' +
 
     chalk.hex('#00d2d3')('💡 Pro Tips & Best Practices:') + '\n' +
     chalk.hex('#95afc0')('  • Use ') + chalk.hex('#ff6b6b')('--help') + chalk.hex('#95afc0')(' with any command for detailed options') + '\n' +
