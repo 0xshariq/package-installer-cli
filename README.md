@@ -12,10 +12,14 @@ A **cross-platform, interactive CLI** to scaffold modern web application templat
 - **🔤 Language Support**: TypeScript & JavaScript variants
 - **🎭 UI Libraries**: Tailwind CSS, Material-UI, shadcn/ui
 - **📦 Smart Bundlers**: Vite, built-in framework bundlers
-- ** Auto-Installation**: Automatic dependency installation
+- **🔐 Authentication**: Clerk, Auth0, NextAuth.js integration
+- **🐳 Docker Support**: Ready-to-use containerization
+- **🧪 Feature Add-ons**: Extensible project enhancement system
+- **📊 Project Analytics**: Real-time dashboard and insights
+- **⚡ Auto-Installation**: Automatic dependency installation
 - **🎯 Interactive Prompts**: Guided project setup experience
-- **⚡ Lightning Fast**: Optimized template generation
-- **🌈 Beautiful CLI**: Gorgeous terminal interface
+- **🌈 Beautiful CLI**: Gorgeous terminal interface with gradients
+- **📈 Multi-language Updates**: Support for 6+ programming languages
 
 ## 📥 Installation
 
@@ -48,11 +52,26 @@ pi create
 # Create with specific name
 pi create my-awesome-app
 
-# Analyze current project
+# Add features to existing project
+pi add auth clerk                 # Add Clerk authentication
+pi add auth next-auth            # Add NextAuth.js authentication
+pi add docker                   # Add Docker containerization
+
+# Analyze current project with real-time data
 pi analyze
 
-# Update project dependencies
-pi update
+# Update project dependencies (multi-language support)
+pi update react lodash          # Update specific Node.js packages
+pi update                       # Interactive update menu
+
+# Check project health
+pi check
+
+# Clone and setup repositories
+pi clone https://github.com/user/repo
+
+# Upgrade CLI itself
+pi upgrade-cli
 ```
 
 ## 📋 Commands Overview
@@ -89,12 +108,27 @@ For detailed command documentation, see [docs/commands.md](docs/commands.md).
 ### System Programming
 - **Rust** - Basic & Advanced project templates
 
-## 🛠️ Template Features
+## 🛠️ Template Features & Add-ons
 
+### Built-in Template Features
 - **UI & Styling**: Tailwind CSS, Material-UI, shadcn/ui
-- **Project Structure**: Source directory or root level organization
+- **Project Structure**: Source directory or root level organization  
 - **Development Tools**: ESLint, Prettier, TypeScript support
 - **Build Tools**: Vite, framework-specific bundlers
+
+### Add-on Features (Dynamic Detection)
+- **🔐 Authentication**: Clerk, Auth0, NextAuth.js with automatic provider detection
+- **🐳 Docker**: Complete containerization with docker-compose
+- **📡 API Routes**: RESTful API scaffolding
+- **💾 Storage**: Database integration (Coming Soon)
+- **💳 Payments**: Stripe & Razorpay integration (Coming Soon)
+- **🎨 UI Components**: Additional component libraries (Coming Soon)
+
+### Smart Feature Integration
+- **Automatic src/ folder detection**: Features adapt to your project structure
+- **Framework-specific implementations**: Each feature supports multiple frameworks
+- **Provider selection**: Choose your preferred service (e.g., Clerk vs NextAuth)
+- **Real-time feature scanning**: CLI automatically detects available features
 
 ## 🏗️ Project Structure
 
@@ -113,14 +147,29 @@ my-awesome-app/
 └── tailwind.config.js      # Tailwind CSS config (if selected)
 ```
 
-## 🔄 Auto-Installation Features
+## 🔄 Smart Features
 
+### Auto-Installation Features
 Package Installer CLI automatically:
-
 - **Installs dependencies** using your preferred package manager (npm/yarn/pnpm)
 - **Sets up Git repository** with initial commit
 - **Configures development scripts** and build processes
 - **Creates well-structured project layout**
+
+### Real-time Project Analysis
+- **Live project scanning**: Detects actual project statistics, not dummy data
+- **Framework detection**: Automatically identifies project frameworks
+- **Dependency analysis**: Real-time dependency health checks
+- **Feature usage tracking**: Monitors used technologies and libraries
+- **Performance insights**: Project size, build times, and optimization suggestions
+
+### Multi-language Package Updates
+- **Node.js**: npm, pnpm, yarn package managers
+- **Rust**: cargo dependencies
+- **Python**: pip and poetry support
+- **Go**: go modules management
+- **PHP**: composer packages
+- **Ruby**: bundler gems
 
 ## 🐛 Troubleshooting
 

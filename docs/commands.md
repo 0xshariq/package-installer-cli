@@ -65,11 +65,30 @@ pi create my-awesome-app
 ```
 
 **Features:**
-- Interactive template selection
-- Framework and language options
-- Automatic dependency installation
-- Git repository initialization
-- User preference caching
+- **Interactive template selection** with framework and language options
+- **Integrated feature selection** during project creation
+- **Automatic dependency installation** using preferred package manager
+- **Git repository initialization** with initial commit
+- **User preference caching** for faster subsequent project creation
+- **Feature integration prompts** for authentication, Docker, and more
+
+**Enhanced Project Creation Workflow:**
+1. **Template Selection**: Choose framework, language, and styling options
+2. **Feature Integration**: Select additional features (auth, Docker, etc.) during creation
+3. **Behind-the-scenes execution**: CLI runs `pi add` commands automatically
+4. **Complete Setup**: Project created with all selected features pre-configured
+
+**Feature Integration During Creation:**
+- **🔐 Authentication**: Choose from Clerk, Auth0, NextAuth during project setup
+- **🐳 Docker**: Add containerization during initial creation
+- **📡 API Routes**: Include API scaffolding (Coming Soon)
+- **💳 Payments**: Add payment integration (Coming Soon)
+- **All available features**: Dynamically detected from features directory
+
+**Smart Integration:**
+- **Framework-aware**: Only shows compatible features for selected framework
+- **Automatic setup**: Features are configured correctly for the chosen template structure
+- **Reduced steps**: No need to run separate `pi add` commands after project creation
 
 **Supported Templates:**
 - **Next.js:** JavaScript/TypeScript with various configurations
@@ -81,7 +100,7 @@ pi create my-awesome-app
 
 ### analyze Command
 
-**Purpose:** Analyze project structure, dependencies, and provide development insights.
+**Purpose:** Analyze project structure, dependencies, and provide development insights with real-time data collection and beautiful terminal dashboard.
 
 **Syntax:**
 ```bash
@@ -90,14 +109,31 @@ pi analyze
 
 **Usage Examples:**
 ```bash
-# Analyze current directory
+# Analyze current directory with real-time project scanning
 pi analyze
 ```
 
-**Features:**
-- Project language detection
-- Dependency analysis and recommendations
-- Project structure overview
+**Real-time Features:**
+- **Live Project Scanning**: Scans actual projects in common directories (Desktop, Documents, Projects, Code)
+- **Accurate Statistics**: Shows real project counts, not dummy data
+- **Framework Detection**: Automatically identifies frameworks from package.json and project files
+- **Language Breakdown**: Real language usage statistics from scanned projects
+- **Feature Detection**: Identifies actual technologies used (Tailwind, TypeScript, Vite, etc.)
+- **Cache Analytics**: Shows real CLI usage statistics from cache file
+
+**Beautiful Dashboard:**
+- **Figlet Banner**: "Package Installer" banner with blue gradient styling
+- **Professional Tables**: CLI-table3 with styled project statistics
+- **Gradient Text**: Color-coded information with gradients throughout
+- **System Information**: OS, Node.js version, CLI version display
+- **Command Grid**: Styled command overview with status indicators
+
+**Technical Analysis:**
+- **Project Language Detection**: TypeScript, JavaScript, Rust, Python, Go, PHP, Ruby
+- **Framework Identification**: Next.js, React, Express, Angular, Vue, Rust
+- **Dependency Health**: Real dependency analysis and recommendations
+- **Performance Insights**: Project size analysis and optimization suggestions
+- **Recent Projects**: Shows 5 most recently modified projects with real timestamps
 - Performance insights
 - System information display
 - Interactive dashboard with tables and charts
@@ -143,11 +179,11 @@ pi update --dry-run
 
 ### add Command
 
-**Purpose:** Add features and packages to existing projects, including authentication, Docker, and framework-specific enhancements.
+**Purpose:** Add features and packages to existing projects, including authentication, Docker, and framework-specific enhancements. Features are dynamically detected from the CLI's features directory.
 
 **Syntax:**
 ```bash
-pi add [feature-name]
+pi add [feature-name] [provider]
 ```
 
 **Usage Examples:**
@@ -155,26 +191,41 @@ pi add [feature-name]
 # Interactive feature selection
 pi add
 
-# Add authentication features
-pi add auth
+# List all available features
+pi add --list
+
+# Add authentication with specific provider
+pi add auth clerk              # Add Clerk authentication
+pi add auth next-auth          # Add NextAuth.js authentication  
+pi add auth auth0              # Add Auth0 authentication
 
 # Add Docker configuration
 pi add docker
 
-# Add testing framework
-pi add testing
-
-# Add linting tools
-pi add eslint
+# Add other features (auto-detected)
+pi add payments               # Coming Soon
+pi add storage                # Coming Soon
+pi add api-routes             # Coming Soon
 ```
 
-**Available Features:**
-- **Authentication:** OAuth, JWT, social logins
-- **Docker:** Containerization setup
-- **Testing:** Jest, Vitest, Cypress
-- **Linting:** ESLint, Prettier
-- **CI/CD:** GitHub Actions, GitLab CI
-- **Database:** MongoDB, PostgreSQL setup
+**Dynamic Feature Detection:**
+- **Real-time scanning**: CLI automatically scans the features directory
+- **Framework compatibility**: Shows only compatible features for your project
+- **Provider options**: Supports multiple providers per feature (e.g., auth providers)
+- **Status indicators**: ✅ Ready vs 🚧 Coming Soon
+
+**Available Features (Auto-detected):**
+- **🔐 Authentication**: Clerk, Auth0, NextAuth.js with automatic src/ folder handling
+- **🐳 Docker**: Complete containerization with docker-compose
+- **📡 API Routes**: RESTful API scaffolding (Coming Soon)
+- **💾 Storage**: Database integration (Coming Soon)  
+- **💳 Payments**: Stripe & Razorpay integration (Coming Soon)
+- **🎨 UI**: Additional component libraries (Coming Soon)
+
+**Smart Integration:**
+- **Src folder detection**: Automatically places files in src/ or root based on project structure
+- **Framework-specific**: Each feature adapts to your project's framework (Next.js, React, etc.)
+- **Middleware placement**: Next.js middleware.ts placed correctly based on src/ structure
 
 **Status:** ✅ Available
 
