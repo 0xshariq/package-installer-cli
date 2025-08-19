@@ -5,7 +5,7 @@
 import chalk from 'chalk';
 import inquirer from 'inquirer';
 import path from 'path';
-import fs from 'fs';
+import fs from 'fs-extra';
 import gradient from 'gradient-string';
 import boxen from 'boxen';
 import { validateProjectName, getFrameworkTheme, isCombinationTemplate } from '../utils/utils.js';
@@ -28,10 +28,6 @@ import {
   loadUserCache, 
   saveUserCache, 
   getCacheDefault, 
-  UserPreferences,
-  clearUserCache, 
-  showUserCache,
-  generateProjectNameSuggestions,
   UserCacheData 
 } from '../utils/userCache.js';
 import { 
@@ -324,19 +320,40 @@ export async function createProject(providedName?: string): Promise<void> {
       }
     }
     
+    // Create options object for template features tracking
+    const templateOptions = {
+      uiLibrary: selectedUi,
+      hasTailwind: useTailwind,
+      database: selectedDatabase,
+      orm: selectedOrm,
+      bundler: selectedBundler,
+      useSrc: useSrc
+    };
+    
     // Track template usage in cache
     const templateFeatures = [];
-    if (options.uiLibrary) templateFeatures.push(options.uiLibrary);
-    if (options.hasTailwind) templateFeatures.push('Tailwind CSS');
-    if (options.database) templateFeatures.push(options.database);
-    if (options.orm) templateFeatures.push(options.orm);
-    if (options.bundler) templateFeatures.push(options.bundler);
+    if (templateOptions.uiLibrary) templateFeatures.push(templateOptions.uiLibrary);
+    if (templateOptions.hasTailwind) templateFeatures.push('Tailwind CSS');
+    if (templateOptions.database && templateOptions.database !== 'none') templateFeatures.push(templateOptions.database);
+    if (templateOptions.orm) templateFeatures.push(templateOptions.orm);
+    if (templateOptions.bundler) templateFeatures.push(templateOptions.bundler);
+    if (templateOptions.useSrc) templateFeatures.push('src directory');
     
     await updateTemplateUsage(
       templateName,
       selectedFramework,
       selectedLanguage || 'JavaScript',
       templateFeatures
+    );
+    
+    // Cache project details after creation
+    await cacheProjectData(
+      projectPath,
+      projectName!,
+      selectedLanguage || 'JavaScript',
+      selectedFramework,
+      [], // Dependencies will be filled by dependency installer
+      await getDirectorySize(projectPath)
     );
     
     // Step 19: Success message
@@ -350,7 +367,6 @@ export async function createProject(providedName?: string): Promise<void> {
     if (selectedLanguage) {
       console.log(`   ${chalk.hex('#ffa502')('Language:')} ${chalk.hex('#9c88ff')(selectedLanguage)}`);
     }
-    console.log(`   ${chalk.hex('#ffa502')('Template:')} ${chalk.hex('#a29bfe')(templateName)}`);
     console.log(`   ${chalk.hex('#ffa502')('Location:')} ${chalk.hex('#95afc0')(projectPath)}\n`);
     
     // Next steps
@@ -521,8 +537,14 @@ async function createProjectFromCachedTemplate(
   }
   
   // Install dependencies
-  const { installDependenciesForCreate } = await import('../utils/templateCreator.js');
-  await installDependenciesForCreate(projectPath);
+  try {
+    const templateCreator = await import('../utils/templateCreator.js');
+    if (templateCreator.installDependenciesForCreate) {
+      await templateCreator.installDependenciesForCreate(projectPath);
+    }
+  } catch (error) {
+    console.log(chalk.yellow('⚠️  Could not install dependencies automatically'));
+  }
   
   return projectPath;
 }

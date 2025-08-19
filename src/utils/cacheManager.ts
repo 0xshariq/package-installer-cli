@@ -2,23 +2,26 @@
  * Cache Manager - Centralized caching operations for Package Installer CLI
  */
 
-import { cacheManager, ProjectCache, AnalysisCache, TemplateCacheFiles } from './cache.js';
+import { cacheManager as cacheManagerInstance, ProjectCache, AnalysisCache, TemplateCacheFiles } from './cache.js';
 import fs from 'fs-extra';
 import path from 'path';
 import chalk from 'chalk';
+
+// Export the cache manager instance
+export const cacheManager = cacheManagerInstance;
 
 /**
  * Initialize cache system on CLI startup
  */
 export async function initializeCache(): Promise<void> {
-  await cacheManager.init();
+  await cacheManagerInstance.init();
 }
 
 /**
  * Check if project has been cached recently
  */
 export async function getCachedProject(projectPath: string): Promise<ProjectCache | null> {
-  return await cacheManager.getProject(projectPath);
+  return await cacheManagerInstance.getProject(projectPath);
 }
 
 /**
@@ -32,7 +35,7 @@ export async function cacheProjectData(
   dependencies: string[],
   size: number
 ): Promise<void> {
-  await cacheManager.setProject({
+  await cacheManagerInstance.setProject({
     path: projectPath,
     name,
     language,
@@ -46,21 +49,21 @@ export async function cacheProjectData(
  * Get cached analysis results
  */
 export async function getCachedAnalysis(projectPath: string): Promise<AnalysisCache | null> {
-  return await cacheManager.getAnalysis(projectPath);
+  return await cacheManagerInstance.getAnalysis(projectPath);
 }
 
 /**
  * Cache analysis results
  */
 export async function cacheAnalysisResults(projectPath: string, analysisStats: any): Promise<void> {
-  await cacheManager.setAnalysis(projectPath, analysisStats);
+  await cacheManagerInstance.setAnalysis(projectPath, analysisStats);
 }
 
 /**
  * Check if package version is cached
  */
 export async function getCachedPackageVersion(packageName: string): Promise<string | null> {
-  const pkg = await cacheManager.getPackage(packageName);
+  const pkg = await cacheManagerInstance.getPackage(packageName);
   return pkg ? pkg.latestVersion : null;
 }
 
@@ -73,7 +76,7 @@ export async function cachePackageVersion(
   latestVersion: string,
   updateAvailable: boolean
 ): Promise<void> {
-  await cacheManager.setPackage({
+  await cacheManagerInstance.setPackage({
     name: packageName,
     version: currentVersion,
     latestVersion,
@@ -85,7 +88,7 @@ export async function cachePackageVersion(
  * Get cached template files
  */
 export async function getCachedTemplateFiles(templateName: string): Promise<TemplateCacheFiles | null> {
-  return await cacheManager.getTemplateFiles(templateName);
+  return await cacheManagerInstance.getTemplateFiles(templateName);
 }
 
 /**
@@ -97,7 +100,7 @@ export async function cacheTemplateFiles(
   files: Record<string, string>,
   size: number
 ): Promise<void> {
-  await cacheManager.setTemplateFiles({
+  await cacheManagerInstance.setTemplateFiles({
     templateName,
     templatePath,
     files,
@@ -109,7 +112,7 @@ export async function cacheTemplateFiles(
  * Get cached system information
  */
 export async function getCachedSystemInfo() {
-  return await cacheManager.getSystem();
+  return await cacheManagerInstance.getSystem();
 }
 
 /**
@@ -121,7 +124,7 @@ export async function cacheSystemInfo(
   packageManagers: Record<string, string>,
   installedTools: Record<string, string>
 ): Promise<void> {
-  await cacheManager.setSystem({
+  await cacheManagerInstance.setSystem({
     os,
     nodeVersion,
     packageManagers,
@@ -138,14 +141,14 @@ export async function updateTemplateUsage(
   language: string,
   features: string[]
 ): Promise<void> {
-  await cacheManager.updateTemplateUsage(templateName, framework, language, features);
+  await cacheManagerInstance.updateTemplateUsage(templateName, framework, language, features);
 }
 
 /**
  * Get template usage statistics for recommendations
  */
 export function getTemplateStats() {
-  return cacheManager.getTemplateStats();
+  return cacheManagerInstance.getTemplateStats();
 }
 
 /**
@@ -182,7 +185,7 @@ export async function getDirectorySize(dirPath: string): Promise<number> {
 }
 
 /**
- * Fast dependency list with caching
+ * Fast dependency list with caching for multiple languages
  */
 export async function getProjectDependencies(projectPath: string, useCache = true): Promise<string[]> {
   if (useCache) {
@@ -194,7 +197,7 @@ export async function getProjectDependencies(projectPath: string, useCache = tru
 
   const dependencies: string[] = [];
   
-  // Check package.json
+  // Check package.json (Node.js)
   const packageJsonPath = path.join(projectPath, 'package.json');
   if (await fs.pathExists(packageJsonPath)) {
     try {
@@ -209,7 +212,7 @@ export async function getProjectDependencies(projectPath: string, useCache = tru
     }
   }
 
-  // Check Cargo.toml
+  // Check Cargo.toml (Rust)
   const cargoTomlPath = path.join(projectPath, 'Cargo.toml');
   if (await fs.pathExists(cargoTomlPath)) {
     try {
@@ -229,7 +232,7 @@ export async function getProjectDependencies(projectPath: string, useCache = tru
     }
   }
 
-  // Check requirements.txt
+  // Check requirements.txt (Python)
   const requirementsPath = path.join(projectPath, 'requirements.txt');
   if (await fs.pathExists(requirementsPath)) {
     try {
@@ -243,7 +246,27 @@ export async function getProjectDependencies(projectPath: string, useCache = tru
     }
   }
 
-  // Check go.mod
+  // Check pipfile (Python - Pipenv)
+  const pipfilePath = path.join(projectPath, 'Pipfile');
+  if (await fs.pathExists(pipfilePath)) {
+    try {
+      const content = await fs.readFile(pipfilePath, 'utf-8');
+      const packageMatches = content.match(/\[packages\]([\s\S]*?)(?=\[|$)/);
+      if (packageMatches) {
+        const depLines = packageMatches[1].split('\n').filter(line => line.trim() && !line.startsWith('#'));
+        depLines.forEach(line => {
+          const match = line.match(/^([a-zA-Z0-9_-]+)\s*=/);
+          if (match) {
+            dependencies.push(match[1]);
+          }
+        });
+      }
+    } catch (error) {
+      // Ignore parsing errors
+    }
+  }
+
+  // Check go.mod (Go)
   const goModPath = path.join(projectPath, 'go.mod');
   if (await fs.pathExists(goModPath)) {
     try {
@@ -258,6 +281,39 @@ export async function getProjectDependencies(projectPath: string, useCache = tru
           })
           .filter(dep => dep);
         dependencies.push(...deps);
+      }
+    } catch (error) {
+      // Ignore parsing errors
+    }
+  }
+
+  // Check composer.json (PHP)
+  const composerJsonPath = path.join(projectPath, 'composer.json');
+  if (await fs.pathExists(composerJsonPath)) {
+    try {
+      const composerJson = await fs.readJson(composerJsonPath);
+      const deps = [
+        ...Object.keys(composerJson.require || {}),
+        ...Object.keys(composerJson['require-dev'] || {})
+      ];
+      dependencies.push(...deps);
+    } catch (error) {
+      // Ignore parsing errors
+    }
+  }
+
+  // Check Gemfile (Ruby)
+  const gemfilePath = path.join(projectPath, 'Gemfile');
+  if (await fs.pathExists(gemfilePath)) {
+    try {
+      const content = await fs.readFile(gemfilePath, 'utf-8');
+      const gemMatches = content.match(/gem\s+['"]([^'"]+)['"]/g);
+      if (gemMatches) {
+        const gems = gemMatches.map(match => {
+          const gemMatch = match.match(/gem\s+['"]([^'"]+)['"]/);
+          return gemMatch ? gemMatch[1] : '';
+        }).filter(gem => gem);
+        dependencies.push(...gems);
       }
     } catch (error) {
       // Ignore parsing errors
@@ -296,7 +352,7 @@ export async function scanProjectWithCache(projectPath: string): Promise<{
   const dependencies = await getProjectDependencies(projectPath, false);
   const size = await getDirectorySize(projectPath);
   
-  // Detect language and framework (simplified detection)
+  // Detect language and framework (enhanced detection for multiple languages)
   let language = 'Unknown';
   let framework: string | undefined;
 
@@ -315,20 +371,64 @@ export async function scanProjectWithCache(projectPath: string): Promise<{
       framework = 'Express.js';
     } else if (dependencies.includes('@angular/core')) {
       framework = 'Angular';
+    } else if (dependencies.includes('@nestjs/core')) {
+      framework = 'NestJS';
     }
   } else if (await fs.pathExists(path.join(projectPath, 'Cargo.toml'))) {
     language = 'Rust';
+    
+    // Check for common Rust frameworks
+    if (dependencies.includes('actix-web')) {
+      framework = 'Actix Web';
+    } else if (dependencies.includes('warp')) {
+      framework = 'Warp';
+    } else if (dependencies.includes('rocket')) {
+      framework = 'Rocket';
+    } else if (dependencies.includes('axum')) {
+      framework = 'Axum';
+    }
   } else if (await fs.pathExists(path.join(projectPath, 'requirements.txt')) ||
-             await fs.pathExists(path.join(projectPath, 'setup.py'))) {
+             await fs.pathExists(path.join(projectPath, 'setup.py')) ||
+             await fs.pathExists(path.join(projectPath, 'Pipfile'))) {
     language = 'Python';
     
     if (dependencies.includes('django')) {
       framework = 'Django';
     } else if (dependencies.includes('flask')) {
       framework = 'Flask';
+    } else if (dependencies.includes('fastapi')) {
+      framework = 'FastAPI';
+    } else if (dependencies.includes('tornado')) {
+      framework = 'Tornado';
     }
   } else if (await fs.pathExists(path.join(projectPath, 'go.mod'))) {
     language = 'Go';
+    
+    if (dependencies.some(dep => dep.includes('gin-gonic/gin'))) {
+      framework = 'Gin';
+    } else if (dependencies.some(dep => dep.includes('gorilla/mux'))) {
+      framework = 'Gorilla Mux';
+    } else if (dependencies.some(dep => dep.includes('echo'))) {
+      framework = 'Echo';
+    }
+  } else if (await fs.pathExists(path.join(projectPath, 'composer.json'))) {
+    language = 'PHP';
+    
+    if (dependencies.includes('laravel/framework')) {
+      framework = 'Laravel';
+    } else if (dependencies.includes('symfony/symfony')) {
+      framework = 'Symfony';
+    } else if (dependencies.includes('slim/slim')) {
+      framework = 'Slim';
+    }
+  } else if (await fs.pathExists(path.join(projectPath, 'Gemfile'))) {
+    language = 'Ruby';
+    
+    if (dependencies.includes('rails')) {
+      framework = 'Ruby on Rails';
+    } else if (dependencies.includes('sinatra')) {
+      framework = 'Sinatra';
+    }
   }
 
   // Cache the results
@@ -348,8 +448,8 @@ export async function scanProjectWithCache(projectPath: string): Promise<{
  * Display cache statistics
  */
 export async function displayCacheStats(): Promise<void> {
-  const stats = cacheManager.getStats();
-  const recentProjects = cacheManager.getRecentProjects();
+  const stats = cacheManagerInstance.getStats();
+  const recentProjects = cacheManagerInstance.getRecentProjects();
   
   console.log(chalk.cyan('\n🗄️  Cache Statistics:'));
   console.log(chalk.gray(`   Cache Hits: ${stats.hits}`));
@@ -378,7 +478,7 @@ export async function clearCache(type?: string): Promise<void> {
     return;
   }
 
-  await cacheManager.clearCache(type as any);
+  await cacheManagerInstance.clearCache(type as any);
   
   const typeStr = type === 'all' || !type ? 'all caches' : `${type} cache`;
   console.log(chalk.green(`✅ Cleared ${typeStr} successfully`));

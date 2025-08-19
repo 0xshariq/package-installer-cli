@@ -129,7 +129,7 @@ export async function analyzeCommand(): Promise<void> {
       
       displaySuccessMessage(
         'Analytics dashboard generated successfully!',
-        'Cached data loaded in milliseconds'
+        ['Cached data loaded in milliseconds']
       );
       
       return;

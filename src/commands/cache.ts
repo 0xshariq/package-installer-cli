@@ -5,7 +5,7 @@
 import { Command } from 'commander';
 import chalk from 'chalk';
 import figlet from 'figlet';
-import gradient from 'gradient-string';
+import gradientString from 'gradient-string';
 import { displayCacheStats, clearCache, cacheManager } from '../utils/cacheManager.js';
 
 /**
@@ -17,12 +17,8 @@ export function createCacheCommand(): Command {
   cacheCommand
     .description('Manage Package Installer CLI cache system')
     .action(async () => {
-      // Display banner
-      const banner = figlet.textSync('Cache Manager', { 
-        font: 'ANSI Shadow',
-        horizontalLayout: 'fitted'
-      });
-      console.log(gradient.cyan.blue(banner));
+      // Display simple banner
+      console.log(gradientString(['#00d2d3', '#0084ff'])('🗄️  Cache Manager\n'));
       
       await displayCacheStats();
     });
@@ -32,7 +28,7 @@ export function createCacheCommand(): Command {
     .command('stats')
     .description('Display detailed cache statistics')
     .action(async () => {
-      console.log(gradient.cyan.blue('\n🗄️  Cache Statistics\n'));
+      console.log(gradientString(['#00d2d3', '#0084ff'])('\n🗄️  Cache Statistics\n'));
       await displayCacheStats();
       
       // Additional detailed stats
@@ -42,17 +38,17 @@ export function createCacheCommand(): Command {
       
       console.log(chalk.cyan('\n📊 Detailed Statistics:'));
       console.log(chalk.gray(`   Total cache entries: ${allProjects.length + stats.packages}`));
-      console.log(chalk.gray(`   Most used templates: ${templateStats.slice(0, 3).map(t => t.name).join(', ') || 'None'}`));
+      console.log(chalk.gray(`   Most used templates: ${templateStats.slice(0, 3).map((t: any) => t.name).join(', ') || 'None'}`));
       
       if (allProjects.length > 0) {
-        const languages = allProjects.reduce((acc, p) => {
+        const languages = allProjects.reduce((acc: Record<string, number>, p: any) => {
           acc[p.language] = (acc[p.language] || 0) + 1;
           return acc;
         }, {} as Record<string, number>);
         
         console.log(chalk.cyan('\n🔤 Languages Breakdown:'));
         Object.entries(languages)
-          .sort(([,a], [,b]) => b - a)
+          .sort(([,a], [,b]) => (b as number) - (a as number))
           .slice(0, 5)
           .forEach(([lang, count]) => {
             console.log(chalk.gray(`   ${lang}: ${count} projects`));
@@ -65,7 +61,7 @@ export function createCacheCommand(): Command {
     .command('clear [type]')
     .description('Clear cache data (types: projects, analysis, packages, templates, nodeModules, system, all)')
     .action(async (type) => {
-      console.log(gradient.cyan.blue('\n🗑️  Cache Cleaner\n'));
+      console.log(gradientString(['#00d2d3', '#0084ff'])('\n🗑️  Cache Cleaner\n'));
       await clearCache(type);
     });
 
@@ -74,7 +70,7 @@ export function createCacheCommand(): Command {
     .command('info')
     .description('Display cache configuration and paths')
     .action(async () => {
-      console.log(gradient.cyan.blue('\n🔧 Cache Configuration\n'));
+      console.log(gradientString(['#00d2d3', '#0084ff'])('\n🔧 Cache Configuration\n'));
       
       const os = require('os');
       const path = require('path');
@@ -100,7 +96,7 @@ export function createCacheCommand(): Command {
           
           console.log(chalk.gray(`   File Size: ${size} KB`));
           console.log(chalk.gray(`   Last Modified: ${modified}`));
-        } catch (error) {
+        } catch (error: any) {
           console.log(chalk.red(`   Error reading cache file: ${error.message}`));
         }
       }
@@ -119,7 +115,7 @@ export function createCacheCommand(): Command {
     .command('optimize')
     .description('Optimize cache by removing expired and unused entries')
     .action(async () => {
-      console.log(gradient.cyan.blue('\n⚡ Cache Optimizer\n'));
+      console.log(gradientString(['#00d2d3', '#0084ff'])('\n⚡ Cache Optimizer\n'));
       
       console.log(chalk.yellow('🔄 Optimizing cache...'));
       
@@ -133,7 +129,7 @@ export function createCacheCommand(): Command {
       
       // For now, just display what would be optimized
       const allProjects = cacheManager.getAllProjects();
-      const oldProjects = allProjects.filter(p => {
+      const oldProjects = allProjects.filter((p: any) => {
         const age = Date.now() - new Date(p.lastAnalyzed).getTime();
         return age > (7 * 24 * 60 * 60 * 1000); // Older than 7 days
       });
