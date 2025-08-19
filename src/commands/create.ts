@@ -22,19 +22,23 @@ import {
   promptFrameworkSpecificOptions
 } from '../utils/prompts.js';
 import { resolveTemplatePath, generateTemplateName } from '../utils/templateResolver.js';
-import { createProjectFromTemplate } from '../utils/templateCreator.js';
+import { createProjectFromTemplate, installDependenciesForCreate } from '../utils/templateCreator.js';
 import { ProjectOptions, TemplateConfig } from '../utils/types.js';
 import { 
   loadUserCache, 
   saveUserCache, 
   getCacheDefault, 
-  UserCacheData 
+  UserCacheData,
+  clearUserCache,
+  showUserCache,
+  generateProjectNameSuggestions
 } from '../utils/userCache.js';
 import { 
   updateTemplateUsage, 
   getCachedTemplateFiles, 
   cacheTemplateFiles, 
-  getDirectorySize 
+  getDirectorySize,
+  cacheProjectData
 } from '../utils/cacheManager.js';
 
 /**

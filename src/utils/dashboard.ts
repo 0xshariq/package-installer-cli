@@ -261,13 +261,13 @@ export function displayCommandsGrid(): void {
     },
     {
       name: 'clean',
-      description: 'Clean development artifacts (Coming Soon)',
+      description: 'Clean development artifacts',
       icon: '🧹',
       color: '#00d2d3'
     },
     {
       name: 'clone',
-      description: 'Clone and setup repositories (Coming Soon)',
+      description: 'Clone and setup repositories',
       icon: '�',
       color: '#10ac84'
     },
@@ -279,13 +279,13 @@ export function displayCommandsGrid(): void {
     },
     {
       name: 'doctor',
-      description: 'Diagnose and fix project issues (Coming Soon)',
+      description: 'Diagnose and fix project issues',
       icon: '🩺',
       color: '#00d2d3'
     },
     {
       name: 'env',
-      description: 'Manage environment variables (Coming Soon)',
+      description: 'Manage environment variables',
       icon: '🌍',
       color: '#10ac84'
     },

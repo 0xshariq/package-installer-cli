@@ -48,7 +48,7 @@ export async function createProjectFromTemplate(
  * Uses the multi-language dependency installer
  * @param projectPath - Path to the project directory
  */
-async function installDependenciesForCreate(projectPath: string): Promise<void> {
+export async function installDependenciesForCreate(projectPath: string): Promise<void> {
     try {
         const { installProjectDependencies } = await import('./dependencyInstaller.js');
         await installProjectDependencies(projectPath, path.basename(projectPath), true); // Install MCP server for created projects
