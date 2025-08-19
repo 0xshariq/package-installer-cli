@@ -1,4 +1,3 @@
-import { Command } from 'commander';
 import chalk from 'chalk';
 import ora, { type Ora } from 'ora';
 import { detectProjectLanguage, installAdditionalPackages } from '../utils/dependencyInstaller.js';
@@ -71,29 +70,19 @@ export async function updateCommand(options: any): Promise<void> {
         ]
       );
       
-    } catch (error: any) {
-      spinner.fail(chalk.red('❌ Failed to update packages'));
-      displayErrorMessage(
-        error.message,
-        [
-          'Try running the command with --dry-run to see what would be updated',
-          'Use --force flag to override conflict warnings',
-          'Check your internet connection and package registry access'
-        ]
-      );
-    }
   } catch (error: any) {
     spinner.fail(chalk.red('❌ Failed to update packages'));
     displayErrorMessage(
       error.message,
       [
         'Try running the command with --dry-run to see what would be updated',
-        'Use --force flag to override conflict warnings', 
+        'Use --force flag to override conflict warnings',
         'Check your internet connection and package registry access'
       ]
     );
   }
 }
+
 
 /**
  * Update packages for a specific language/ecosystem
