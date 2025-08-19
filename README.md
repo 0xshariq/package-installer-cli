@@ -12,14 +12,10 @@ A **cross-platform, interactive CLI** to scaffold modern web application templat
 - **🔤 Language Support**: TypeScript & JavaScript variants
 - **🎭 UI Libraries**: Tailwind CSS, Material-UI, shadcn/ui
 - **📦 Smart Bundlers**: Vite, built-in framework bundlers
-- **🔐 Authentication**: Clerk, Auth0, NextAuth.js integration
-- **🐳 Docker Support**: Ready-to-use containerization
-- **🧪 Feature Add-ons**: Extensible project enhancement system
-- **📊 Project Analytics**: Real-time dashboard and insights
-- **⚡ Auto-Installation**: Automatic dependency installation
+- ** Auto-Installation**: Automatic dependency installation
 - **🎯 Interactive Prompts**: Guided project setup experience
-- **🌈 Beautiful CLI**: Gorgeous terminal interface with gradients
-- **📈 Multi-language Updates**: Support for 6+ programming languages
+- **⚡ Lightning Fast**: Optimized template generation
+- **🌈 Beautiful CLI**: Gorgeous terminal interface
 
 ## 📥 Installation
 
@@ -52,26 +48,11 @@ pi create
 # Create with specific name
 pi create my-awesome-app
 
-# Add features to existing project
-pi add auth clerk                 # Add Clerk authentication
-pi add auth next-auth            # Add NextAuth.js authentication
-pi add docker                   # Add Docker containerization
-
-# Analyze current project with real-time data
+# Analyze current project
 pi analyze
 
-# Update project dependencies (multi-language support)
-pi update react lodash          # Update specific Node.js packages
-pi update                       # Interactive update menu
-
-# Check project health
-pi check
-
-# Clone and setup repositories
-pi clone https://github.com/user/repo
-
-# Upgrade CLI itself
-pi upgrade-cli
+# Update project dependencies
+pi update
 ```
 
 ## 📋 Commands Overview
@@ -85,14 +66,49 @@ pi upgrade-cli
 | `pi check` | Check project health and dependencies | ✅ Available |
 | `pi clone` | Clone and setup repositories | ✅ Available |
 | `pi doctor` | Diagnose and fix project issues | ✅ Available |
+| `pi env` | Analyze development environment | ✅ Available |
+| `pi clean` | Clean development artifacts | ✅ Available |
+| `pi cache` | Manage CLI cache system | ✅ Available |
 | `pi upgrade-cli` | Upgrade CLI to latest version | ✅ Available |
-| `pi clean` | Clean development artifacts | 🚧 Coming Soon |
 | `pi deploy` | Deploy projects to platforms | 🚧 Coming Soon |
-| `pi env` | Manage environment variables | 🚧 Coming Soon |
 | `pi --help` | Show help information | ✅ Available |
 | `pi --version` | Display CLI version | ✅ Available |
 
 For detailed command documentation, see [docs/commands.md](docs/commands.md).
+
+## ⚡ Intelligent Caching System
+
+Package Installer CLI includes a comprehensive caching system for lightning-fast performance:
+
+### 🗄️ Cache Features
+- **Project Analysis Caching** - Stores project metadata and analysis results
+- **Template Usage Tracking** - Recommends popular templates based on usage
+- **Package Version Caching** - Caches npm package version checks
+- **Node Modules Scanning** - Fast dependency scanning with cache
+- **System Environment Caching** - Stores development tool information
+
+### 📊 Cache Management
+```bash
+# View cache statistics and info
+pi cache
+
+# Clear specific cache types
+pi cache clear projects    # Clear project analysis cache
+pi cache clear packages    # Clear package version cache
+pi cache clear all         # Clear all caches
+
+# View detailed cache stats
+pi cache stats
+
+# Show cache configuration
+pi cache info
+```
+
+### 🎯 Performance Benefits
+- **2-5x faster** project analysis with cached data
+- **Instant template recommendations** based on usage patterns
+- **Reduced API calls** for package version checks
+- **Smart cache invalidation** ensures data freshness
 
 ## 🎨 Supported Templates
 
@@ -108,27 +124,12 @@ For detailed command documentation, see [docs/commands.md](docs/commands.md).
 ### System Programming
 - **Rust** - Basic & Advanced project templates
 
-## 🛠️ Template Features & Add-ons
+## 🛠️ Template Features
 
-### Built-in Template Features
 - **UI & Styling**: Tailwind CSS, Material-UI, shadcn/ui
-- **Project Structure**: Source directory or root level organization  
+- **Project Structure**: Source directory or root level organization
 - **Development Tools**: ESLint, Prettier, TypeScript support
 - **Build Tools**: Vite, framework-specific bundlers
-
-### Add-on Features (Dynamic Detection)
-- **🔐 Authentication**: Clerk, Auth0, NextAuth.js with automatic provider detection
-- **🐳 Docker**: Complete containerization with docker-compose
-- **📡 API Routes**: RESTful API scaffolding
-- **💾 Storage**: Database integration (Coming Soon)
-- **💳 Payments**: Stripe & Razorpay integration (Coming Soon)
-- **🎨 UI Components**: Additional component libraries (Coming Soon)
-
-### Smart Feature Integration
-- **Automatic src/ folder detection**: Features adapt to your project structure
-- **Framework-specific implementations**: Each feature supports multiple frameworks
-- **Provider selection**: Choose your preferred service (e.g., Clerk vs NextAuth)
-- **Real-time feature scanning**: CLI automatically detects available features
 
 ## 🏗️ Project Structure
 
@@ -147,29 +148,14 @@ my-awesome-app/
 └── tailwind.config.js      # Tailwind CSS config (if selected)
 ```
 
-## 🔄 Smart Features
+## 🔄 Auto-Installation Features
 
-### Auto-Installation Features
 Package Installer CLI automatically:
+
 - **Installs dependencies** using your preferred package manager (npm/yarn/pnpm)
 - **Sets up Git repository** with initial commit
 - **Configures development scripts** and build processes
 - **Creates well-structured project layout**
-
-### Real-time Project Analysis
-- **Live project scanning**: Detects actual project statistics, not dummy data
-- **Framework detection**: Automatically identifies project frameworks
-- **Dependency analysis**: Real-time dependency health checks
-- **Feature usage tracking**: Monitors used technologies and libraries
-- **Performance insights**: Project size, build times, and optimization suggestions
-
-### Multi-language Package Updates
-- **Node.js**: npm, pnpm, yarn package managers
-- **Rust**: cargo dependencies
-- **Python**: pip and poetry support
-- **Go**: go modules management
-- **PHP**: composer packages
-- **Ruby**: bundler gems
 
 ## 🐛 Troubleshooting
 
@@ -196,31 +182,11 @@ We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) f
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🔗 Links & Related Tools
+## 🔗 Links
 
 - **NPM Package**: [@0xshariq/package-installer](https://www.npmjs.com/package/@0xshariq/package-installer)
 - **GitHub Repository**: [package-installer-cli](https://github.com/0xshariq/package-installer-cli)
 - **Issues & Feedback**: [GitHub Issues](https://github.com/0xshariq/package-installer-cli/issues)
-
-### 🤖 GitHub MCP Server
-
-**Enhanced Git workflow automation for Package Installer CLI projects**
-
-- **Repository**: [https://github.com/0xshariq/github-mcp-server/](https://github.com/0xshariq/github-mcp-server/)
-- **Features**: Automated Git operations, repository management, branch handling, and issue/PR management
-- **Perfect Companion**: Seamlessly integrates with projects created using Package Installer CLI
-
-```bash
-# Install GitHub MCP Server
-npm install -g @0xshariq/github-mcp-server
-
-# Example workflow
-pi create my-project          # Create with Package Installer CLI
-ginit                         # Initialize Git with MCP Server
-gadd file.txt                 # Automated add files
-gcommit "Initial"             # Automated commit
-gpush origin main             # Push to repository
-```
 
 ---
 

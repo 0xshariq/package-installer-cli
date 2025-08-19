@@ -20,6 +20,12 @@ import {
   scanForRecentProjects,
   displaySuccessMessage
 } from '../utils/dashboard.js';
+import { 
+  getCachedAnalysis, 
+  cacheAnalysisResults, 
+  scanProjectWithCache, 
+  displayCacheStats 
+} from '../utils/cacheManager.js';
 
 /**
  * Display help for analyze command
@@ -96,11 +102,51 @@ export async function analyzeCommand(): Promise<void> {
   const spinner = ora(chalk.hex('#9c88ff')('🔍 Gathering analytics data...')).start();
   
   try {
-    // Gather all data
+    // Check cache first for faster analysis
+    const currentDir = process.cwd();
+    const cachedAnalysis = await getCachedAnalysis(currentDir);
+    
+    if (cachedAnalysis) {
+      spinner.text = chalk.hex('#9c88ff')('📊 Loading cached analytics data...');
+      
+      // Use cached data
+      const stats = cachedAnalysis.stats.projectStats || await gatherProjectStats();
+      const recentProjects = cachedAnalysis.stats.recentProjects || await scanForRecentProjects();
+      
+      spinner.stop();
+      
+      // Display cached indicator
+      console.log(chalk.green('⚡ Using cached analytics data (updated: ' + 
+        new Date(cachedAnalysis.timestamp).toLocaleString() + ')'));
+      console.log();
+      
+      // Display comprehensive dashboard
+      displayProjectStats(stats);
+      displayRecentProjects(recentProjects);
+      displayCommandsGrid();
+      displaySystemInfo();
+      displayCacheStats();
+      
+      displaySuccessMessage(
+        'Analytics dashboard generated successfully!',
+        'Cached data loaded in milliseconds'
+      );
+      
+      return;
+    }
+    
+    // Gather fresh data with cache-first approach
     const [stats, recentProjects] = await Promise.all([
       gatherProjectStats(),
       scanForRecentProjects()
     ]);
+    
+    // Cache the results for next time
+    await cacheAnalysisResults(currentDir, {
+      projectStats: stats,
+      recentProjects: recentProjects,
+      timestamp: new Date().toISOString()
+    });
     
     spinner.stop();
     
@@ -109,6 +155,7 @@ export async function analyzeCommand(): Promise<void> {
     displayRecentProjects(recentProjects);
     displayCommandsGrid();
     displaySystemInfo();
+    displayCacheStats();
     
     displaySuccessMessage(
       'Analytics dashboard generated successfully!',

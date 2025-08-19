@@ -20,9 +20,11 @@ import { updateCommand } from './commands/update.js';
 import { cleanCommand } from './commands/clean.js';
 import { environmentCommand } from './commands/env.js';
 import { doctorCommand } from './commands/doctor.js';
+import { createCacheCommand } from './commands/cache.js';
 
 // Import utilities
 import { printBanner, logError, showBanner } from './utils/ui.js';
+import { initializeCache } from './utils/cacheManager.js';
 
 // Get current file directory for ESM
 const __filename = fileURLToPath(import.meta.url);
@@ -288,7 +290,7 @@ program.addCommand(updateCommand);
 program
   .command('clean')
   .alias('cleanup')
-  .description(chalk.hex('#ffa502')('🧹 Clean development artifacts and caches (Coming Soon)'))
+  .description(chalk.hex('#ffa502')('🧹 Clean development artifacts and caches'))
   .option('--node-modules', 'Clean node_modules directories')
   .option('--build', 'Clean build/dist directories')
   .option('--cache', 'Clean package manager caches')
@@ -342,6 +344,9 @@ program
       handleCommandError('doctor', error as Error);
     }
   });
+
+// CACHE COMMAND - Manage CLI cache system
+program.addCommand(createCacheCommand());
 
 // DEPLOY COMMAND - Future deployment features
 program
@@ -398,6 +403,8 @@ program.on('--help', () => {
     chalk.hex('#95afc0')('  ') + piGradient('pi') + ' ' + commandGradient('doctor') + chalk.hex('#95afc0')(' --fix             # Auto-fix common issues') + '\n' +
     chalk.hex('#95afc0')('  ') + piGradient('pi') + ' ' + commandGradient('env') + chalk.hex('#95afc0')('                     # Check development environment') + '\n' +
     chalk.hex('#95afc0')('  ') + piGradient('pi') + ' ' + commandGradient('env') + chalk.hex('#95afc0')(' --setup           # Setup optimal dev environment') + '\n' +
+    chalk.hex('#95afc0')('  ') + piGradient('pi') + ' ' + commandGradient('clean') + chalk.hex('#95afc0')('                   # Clean artifacts and caches') + '\n' +
+    chalk.hex('#95afc0')('  ') + piGradient('pi') + ' ' + commandGradient('cache') + chalk.hex('#95afc0')('                   # Manage CLI cache system') + '\n' +
     chalk.hex('#95afc0')('  ') + piGradient('pi') + ' ' + commandGradient('upgrade-cli') + chalk.hex('#95afc0')('            # Upgrade CLI to latest version') + '\n\n' +
 
     chalk.hex('#00d2d3')('💡 Pro Tips & Best Practices:') + '\n' +
@@ -438,6 +445,15 @@ if (process.argv.length === 2) {
     }
   ));
 }
+
+// Initialize cache system on startup
+(async () => {
+  try {
+    await initializeCache();
+  } catch (error) {
+    // Silent fail - cache will work in memory
+  }
+})();
 
 // Parse command line arguments
 program.parse();

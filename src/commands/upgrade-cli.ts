@@ -149,35 +149,27 @@ export async function upgradeCliCommand(): Promise<void> {
     let upgradeCommand: string;
     switch (packageManager) {
       case 'pnpm':
-        upgradeCommand = 'pnpm remove -g @0xshariq/package-installer && pnpm add -g @0xshariq/package-installer@latest';
+        upgradeCommand = 'pnpm add -g @0xshariq/package-installer@latest';
         break;
       case 'yarn':
-        upgradeCommand = 'yarn global remove @0xshariq/package-installer && yarn global add @0xshariq/package-installer@latest';
+        upgradeCommand = 'yarn global add @0xshariq/package-installer@latest';
         break;
       default:
-        upgradeCommand = 'npm uninstall -g @0xshariq/package-installer && npm install -g @0xshariq/package-installer@latest';
+        upgradeCommand = 'npm install -g @0xshariq/package-installer@latest';
     }
     
     await execAsync(upgradeCommand, { timeout: 120000 }); // 2 minute timeout
     
     upgradeSpinner.succeed(chalk.green('✅ CLI upgraded successfully!'));
     
-    // Verify upgrade with a delay to allow for system update
+    // Verify upgrade
     const verifySpinner = ora(chalk.hex('#00d2d3')('🔍 Verifying upgrade...')).start();
-    await new Promise(resolve => setTimeout(resolve, 2000)); // Wait 2 seconds
+    const newVersion = await getCurrentVersion();
     
-    try {
-      const { stdout } = await execAsync('pi --version');
-      const newVersion = stdout.trim();
-      
-      if (newVersion.includes(latestVersion)) {
-        verifySpinner.succeed(chalk.green(`✅ Upgrade verified! Now running v${latestVersion}`));
-      } else {
-        verifySpinner.warn(chalk.yellow('⚠️  Upgrade completed but version verification failed'));
-        console.log(chalk.hex('#95afc0')('   Try running: pi --version'));
-      }
-    } catch (verifyError) {
-      verifySpinner.warn(chalk.yellow('⚠️  Upgrade completed but verification failed'));
+    if (newVersion === latestVersion) {
+      verifySpinner.succeed(chalk.green(`✅ Upgrade verified! Now running v${newVersion}`));
+    } else {
+      verifySpinner.warn(chalk.yellow('⚠️  Upgrade completed but version verification failed'));
       console.log(chalk.hex('#95afc0')('   Try running: pi --version'));
     }
     
@@ -201,13 +193,6 @@ export async function upgradeCliCommand(): Promise<void> {
     spinner.fail(chalk.red('❌ Upgrade failed'));
     console.log(chalk.red(`\n❌ Error: ${error.message}`));
     console.log(chalk.hex('#95afc0')('\n💡 Try running the upgrade manually:'));
-    console.log(chalk.hex('#ffa502')('\n# Uninstall current version first:'));
-    console.log(chalk.hex('#95afc0')('   npm uninstall -g @0xshariq/package-installer'));
-    console.log(chalk.hex('#95afc0')('   # or'));
-    console.log(chalk.hex('#95afc0')('   yarn global remove @0xshariq/package-installer'));
-    console.log(chalk.hex('#95afc0')('   # or'));
-    console.log(chalk.hex('#95afc0')('   pnpm remove -g @0xshariq/package-installer'));
-    console.log(chalk.hex('#ffa502')('\n# Then install latest version:'));
     console.log(chalk.hex('#95afc0')('   npm install -g @0xshariq/package-installer@latest'));
     console.log(chalk.hex('#95afc0')('   # or'));
     console.log(chalk.hex('#95afc0')('   yarn global add @0xshariq/package-installer@latest'));

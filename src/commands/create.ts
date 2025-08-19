@@ -28,12 +28,14 @@ import {
   loadUserCache, 
   saveUserCache, 
   getCacheDefault, 
+  UserPreferences 
+} from '../utils/userCache.js';
+import { updateTemplateUsage } from '../utils/cacheManager.js';
   clearUserCache, 
   showUserCache,
   generateProjectNameSuggestions,
   UserCacheData 
 } from '../utils/userCache.js';
-import { scanAvailableFeatures, addFeature } from '../utils/featureInstaller.js';
 
 /**
  * Display help for create command
@@ -283,110 +285,36 @@ export async function createProject(providedName?: string): Promise<void> {
       return;
     }
 
-    // Step 16: Ask for additional features before creating the project
-    console.log(chalk.hex('#00d2d3')('🔧 Would you like to add any features to your project?'));
-    
-    const { addFeatures } = await inquirer.prompt([
-      {
-        type: 'confirm',
-        name: 'addFeatures',
-        message: chalk.hex('#9c88ff')('Add features like authentication, Docker, etc.?'),
-        default: false
-      }
-    ]);
-
-    let selectedFeatures: string[] = [];
-    let featureConfigs: any = {};
-
-    if (addFeatures) {
-      const supportedFeatures = await scanAvailableFeatures();
-      
-      // Filter features that support the selected framework
-      const availableFeatures = Object.keys(supportedFeatures).filter(key => {
-        const config = supportedFeatures[key];
-        const hasImplementation = Object.keys(config.files).length > 0;
-        const frameworkSupported = config.supportedFrameworks.includes(selectedFramework) ||
-          config.supportedFrameworks.some(fw => selectedFramework.startsWith(fw));
-        return hasImplementation && frameworkSupported;
-      });
-
-      if (availableFeatures.length > 0) {
-        const featureChoices = availableFeatures.map(key => {
-          const config = supportedFeatures[key];
-          return {
-            name: `${config.name} - ${config.description}`,
-            value: key
-          };
-        });
-
-        const { features } = await inquirer.prompt([
-          {
-            type: 'checkbox',
-            name: 'features',
-            message: chalk.hex('#9c88ff')('Select features to add:'),
-            choices: featureChoices
-          }
-        ]);
-
-        selectedFeatures = features;
-
-        // Collect configuration for each selected feature
-        for (const feature of selectedFeatures) {
-          if (feature === 'auth') {
-            const { provider } = await inquirer.prompt([
-              {
-                type: 'list',
-                name: 'provider',
-                message: chalk.hex('#9c88ff')('Choose authentication provider:'),
-                choices: [
-                  { name: 'Clerk', value: 'clerk' },
-                  { name: 'NextAuth.js', value: 'next-auth' },
-                  { name: 'Auth0', value: 'auth0' }
-                ]
-              }
-            ]);
-            featureConfigs[feature] = { authProvider: provider };
-          }
-        }
-      } else {
-        console.log(chalk.yellow(`⚠️  No features available for ${selectedFramework} projects yet.`));
-      }
-    }
-
-    // Step 17: Verify template exists
+    // Step 16: Verify template exists
     if (!fs.existsSync(templatePath)) {
       throw new Error(`Template not found at: ${templatePath}`);
     }
 
-    // Step 18: Save user preferences cache
+    // Step 17: Save user preferences cache
     await saveUserCache(userCache);
 
-    // Step 19: Create project
+    // Step 18: Create project
     console.log('\n' + chalk.hex('#10ac84')('🔨 Creating your project...'));
     console.log(chalk.hex('#95afc0')('This might take a moment...\n'));
     
     const projectPath = await createProjectFromTemplate(projectName!, templatePath);
     
-    // Step 20: Add selected features to the project
-    if (selectedFeatures.length > 0) {
-      console.log('\n' + chalk.hex('#00d2d3')('🔧 Adding selected features...'));
-      
-      // Get the feature names again for display
-      const supportedFeatures = await scanAvailableFeatures();
-      
-      for (const feature of selectedFeatures) {
-        console.log(`\n${chalk.hex('#00d2d3')(`🔧 Adding ${supportedFeatures[feature]?.name || feature}...`)}`);
-        
-        try {
-          await addFeature(feature, projectPath, featureConfigs[feature] || {});
-          console.log(chalk.green(`✅ ${feature} added successfully!`));
-        } catch (error: any) {
-          console.error(chalk.red(`❌ Failed to add ${feature}: ${error.message}`));
-        }
-      }
-    }
-
-    // Step 21: Success message
+    // Track template usage in cache
+    const templateFeatures = [];
+    if (options.uiLibrary) templateFeatures.push(options.uiLibrary);
+    if (options.hasTailwind) templateFeatures.push('Tailwind CSS');
+    if (options.database) templateFeatures.push(options.database);
+    if (options.orm) templateFeatures.push(options.orm);
+    if (options.bundler) templateFeatures.push(options.bundler);
+    
+    await updateTemplateUsage(
+      templateName,
+      selectedFramework,
+      selectedLanguage || 'JavaScript',
+      templateFeatures
+    );
+    
+    // Step 19: Success message
     console.log('\n' + chalk.hex('#10ac84')('✨ Project created successfully!'));
     console.log(chalk.hex('#95afc0')('Welcome to your new project!\n'));
     
