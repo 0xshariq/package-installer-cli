@@ -1,6 +1,6 @@
 /**
  * Multi-language dependency installer utility
- * Supports Node.js (npm/pnpm/yarn), Rust (cargo), Python (pip/poetry), Go, Ruby (gem/bundler), PHP (composer)
+ * Supports Node.js, Rust, Python, Go, Ruby, PHP, Java, C#, Swift, Dart/Flutter
  */
 
 import { exec } from 'child_process';
@@ -9,6 +9,18 @@ import fs from 'fs-extra';
 import path from 'path';
 import chalk from 'chalk';
 import ora, { Ora } from 'ora';
+import { 
+  LANGUAGE_CONFIGS, 
+  SupportedLanguage, 
+  LanguageConfig, 
+  PackageManager,
+  getSupportedLanguages,
+  getLanguageConfig,
+  getAllConfigFiles,
+  detectLanguageFromFiles,
+  getPreferredPackageManager,
+  matchesLanguagePattern
+} from './languageConfig.js';
 
 const execAsync = promisify(exec);
 
@@ -20,93 +32,26 @@ export interface DependencyInstaller {
   priority: number;
 }
 
-export type SupportedLanguage = 'nodejs' | 'rust' | 'python' | 'go' | 'ruby' | 'php';
+export { SupportedLanguage };
 
-// Package managers for different languages
-export const DEPENDENCY_INSTALLERS: Record<SupportedLanguage, DependencyInstaller[]> = {
-  nodejs: [
-    {
-      name: 'pnpm',
-      command: 'pnpm install',
-      configFiles: ['pnpm-lock.yaml', 'pnpm-workspace.yaml'],
-      detectCommand: 'pnpm --version',
-      priority: 1
-    },
-    {
-      name: 'yarn',
-      command: 'yarn install',
-      configFiles: ['yarn.lock', '.yarnrc.yml'],
-      detectCommand: 'yarn --version',
-      priority: 2
-    },
-    {
-      name: 'npm',
-      command: 'npm install',
-      configFiles: ['package-lock.json'],
-      detectCommand: 'npm --version',
-      priority: 3
-    }
-  ],
-  rust: [
-    {
-      name: 'cargo',
-      command: 'cargo build',
-      configFiles: ['Cargo.toml', 'Cargo.lock'],
-      detectCommand: 'cargo --version',
-      priority: 1
-    }
-  ],
-  python: [
-    {
-      name: 'poetry',
-      command: 'poetry install',
-      configFiles: ['pyproject.toml', 'poetry.lock'],
-      detectCommand: 'poetry --version',
-      priority: 1
-    },
-    {
-      name: 'pip',
-      command: 'pip install -r requirements.txt',
-      configFiles: ['requirements.txt', 'setup.py', 'pyproject.toml'],
-      detectCommand: 'pip --version',
-      priority: 2
-    }
-  ],
-  go: [
-    {
-      name: 'go mod',
-      command: 'go mod download',
-      configFiles: ['go.mod', 'go.sum'],
-      detectCommand: 'go version',
-      priority: 1
-    }
-  ],
-  ruby: [
-    {
-      name: 'bundler',
-      command: 'bundle install',
-      configFiles: ['Gemfile', 'Gemfile.lock'],
-      detectCommand: 'bundle --version',
-      priority: 1
-    },
-    {
-      name: 'gem',
-      command: 'gem install',
-      configFiles: ['Gemfile'],
-      detectCommand: 'gem --version',
-      priority: 2
-    }
-  ],
-  php: [
-    {
-      name: 'composer',
-      command: 'composer install',
-      configFiles: ['composer.json', 'composer.lock'],
-      detectCommand: 'composer --version',
-      priority: 1
-    }
-  ]
-};
+// Convert shared language config to legacy format for backward compatibility
+export const DEPENDENCY_INSTALLERS: Record<SupportedLanguage, DependencyInstaller[]> = 
+  Object.fromEntries(
+    Object.entries(LANGUAGE_CONFIGS).map(([lang, config]) => [
+      lang,
+      config.packageManagers.map(pm => ({
+        name: pm.name,
+        command: pm.installCommand,
+        configFiles: [
+          ...config.configFiles.map(cf => cf.filename),
+          ...pm.lockFiles,
+          ...pm.configFiles
+        ],
+        detectCommand: pm.detectCommand,
+        priority: pm.priority
+      }))
+    ])
+  ) as Record<SupportedLanguage, DependencyInstaller[]>;
 
 /**
  * Recursively find package.json files and other config files
@@ -133,11 +78,36 @@ async function findProjectFiles(projectPath: string, maxDepth: number = 2): Prom
           }
         } else {
           // Check if this is a config file we're interested in
-          const configFiles = ['package.json', 'package-lock.json', 'yarn.lock', 'pnpm-lock.yaml', 
-                              'Cargo.toml', 'requirements.txt', 'pyproject.toml', 'Gemfile', 
-                              'composer.json', 'go.mod'];
+          const configFiles = [
+            // Node.js
+            'package.json', 'package-lock.json', 'yarn.lock', 'pnpm-lock.yaml', 'pnpm-workspace.yaml', '.yarnrc.yml',
+            // Rust  
+            'Cargo.toml', 'Cargo.lock',
+            // Python
+            'requirements.txt', 'pyproject.toml', 'setup.py', 'poetry.lock', 'Pipfile', 'Pipfile.lock', 'setup.cfg',
+            // Go
+            'go.mod', 'go.sum',
+            // Ruby
+            'Gemfile', 'Gemfile.lock', '.ruby-version',
+            // PHP  
+            'composer.json', 'composer.lock',
+            // Java
+            'pom.xml', 'build.gradle', 'build.gradle.kts', 'gradle.properties',
+            // C#/.NET
+            '*.csproj', '*.sln', 'global.json', 'nuget.config',
+            // Swift
+            'Package.swift', 'Package.resolved',
+            // Kotlin
+            'build.gradle.kts',
+            // Scala  
+            'build.sbt',
+            // Dart/Flutter
+            'pubspec.yaml', 'pubspec.lock'
+          ];
           
-          if (configFiles.includes(file)) {
+          if (configFiles.includes(file) || configFiles.some(pattern => 
+            pattern.includes('*') ? file.match(new RegExp(pattern.replace('*', '.*'))) : false
+          )) {
             foundFiles.push(filePath);
           }
         }

@@ -14,6 +14,7 @@ export interface CacheData {
   templates: TemplateCache[];
   templateFiles: TemplateCacheFiles[];
   system: SystemCache | null;
+  featureUsage: FeatureUsageCache;
   metadata: CacheMetadata;
 }
 
@@ -23,6 +24,7 @@ export interface ProjectCache {
   language: string;
   framework?: string;
   dependencies: string[];
+  features?: string[];
   lastAnalyzed: string;
   size: number;
   hash: string;
@@ -50,6 +52,14 @@ export interface TemplateCache {
   features: string[];
   lastUsed: string;
   usageCount: number;
+}
+
+export interface FeatureUsageCache {
+  [featureName: string]: {
+    count: number;
+    frameworks: Record<string, number>;
+    lastUsed: string;
+  };
 }
 
 export interface TemplateCacheFiles {
@@ -124,6 +134,7 @@ export class CacheManager {
       templates: [],
       templateFiles: [],
       system: null,
+      featureUsage: {},
       metadata: {
         version: '1.0.0',
         created: new Date().toISOString(),
@@ -472,6 +483,21 @@ export class CacheManager {
    */
   getRecentProjects(): ProjectCache[] {
     return this.cache.projects.slice(0, 10);
+  }
+
+  /**
+   * Get cache data
+   */
+  getCache(): CacheData {
+    return this.cache;
+  }
+
+  /**
+   * Save cache data
+   */
+  async saveCache(cacheData: CacheData): Promise<void> {
+    this.cache = cacheData;
+    await this.save();
   }
 }
 

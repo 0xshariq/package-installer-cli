@@ -40,6 +40,32 @@ import {
   getDirectorySize,
   cacheProjectData
 } from '../utils/cacheManager.js';
+import { HistoryManager } from '../utils/historyManager.js';
+
+/**
+ * Display important disclaimer about potential issues
+ */
+function showFeatureDisclaimer(): void {
+  const disclaimerBox = boxen(
+    chalk.yellow.bold('⚠️  IMPORTANT DISCLAIMER') + '\n\n' +
+    chalk.white('When adding features to your project:') + '\n' +
+    chalk.gray('• Syntax errors may occur during integration') + '\n' +
+    chalk.gray('• Code formatting issues might arise') + '\n' +
+    chalk.gray('• Manual adjustments may be required') + '\n' +
+    chalk.gray('• Always backup your project before adding features') + '\n\n' +
+    chalk.cyan('💡 It\'s recommended to test your project after feature integration'),
+    {
+      padding: 1,
+      margin: 1,
+      borderStyle: 'round',
+      borderColor: 'yellow',
+      title: 'Feature Integration Warning',
+      titleAlignment: 'center'
+    }
+  );
+  
+  console.log(disclaimerBox);
+}
 
 /**
  * Display help for create command
@@ -103,6 +129,9 @@ export async function createProject(providedName?: string): Promise<void> {
     await showUserCache();
     return;
   }
+  
+  // Show disclaimer about potential issues
+  showFeatureDisclaimer();
 
   try {
     // Load user cache for personalized defaults
@@ -360,7 +389,88 @@ export async function createProject(providedName?: string): Promise<void> {
       await getDirectorySize(projectPath)
     );
     
-    // Step 19: Success message
+    // Step 19: Ask about additional features
+    console.log('\n' + chalk.hex('#00d2d3')('🎯 Would you like to add any features to your project?'));
+    
+    const { wantFeatures } = await inquirer.prompt([
+      {
+        type: 'confirm',
+        name: 'wantFeatures',
+        message: 'Add features (auth, docker, testing, etc.)?',
+        default: false
+      }
+    ]);
+    
+    let addedFeatures: string[] = [];
+    
+    if (wantFeatures) {
+      try {
+        const { addFeature, listAvailableFeatures, detectProjectStack } = await import('../utils/featureInstaller.js');
+        
+        // Detect project stack
+        const projectStack = await detectProjectStack(projectPath);
+        const availableFeatures = await listAvailableFeatures(projectStack.framework, projectStack.language);
+        
+        if (availableFeatures.length > 0) {
+          const { selectedFeatures } = await inquirer.prompt([
+            {
+              type: 'checkbox',
+              name: 'selectedFeatures',
+              message: 'Select features to add:',
+              choices: availableFeatures.map(feature => ({
+                name: `${feature.name} - ${feature.description}`,
+                value: feature.key,
+                checked: false
+              }))
+            }
+          ]);
+          
+          if (selectedFeatures.length > 0) {
+            console.log('\n' + chalk.hex('#9c88ff')('🔨 Adding selected features...'));
+            
+            for (const featureKey of selectedFeatures) {
+              try {
+                console.log(chalk.hex('#00d2d3')(`\n➕ Adding ${featureKey}...`));
+                await addFeature(featureKey, projectPath);
+                addedFeatures.push(featureKey);
+                console.log(chalk.green(`✅ ${featureKey} added successfully`));
+              } catch (error: any) {
+                console.log(chalk.yellow(`⚠️  Failed to add ${featureKey}: ${error.message}`));
+              }
+            }
+            
+            // Cache the added features
+            const { cacheFeatureUsage } = await import('../utils/cacheManager.js');
+            await cacheFeatureUsage(projectPath, addedFeatures, selectedFramework);
+            
+            console.log('\n' + chalk.green('🎉 All features added successfully!'));
+          }
+        } else {
+          console.log(chalk.yellow('No features available for this project type.'));
+        }
+      } catch (error: any) {
+        console.log(chalk.yellow(`⚠️  Feature addition failed: ${error.message}`));
+      }
+    }
+
+    // Step 20: Record project creation in history
+    try {
+      const historyManager = HistoryManager.getInstance();
+      await historyManager.recordProject({
+        name: projectName!,
+        framework: selectedFramework,
+        language: selectedLanguage || 'JavaScript',
+        templateName: templateName,
+        path: projectPath,
+        features: addedFeatures
+      });
+      console.log(chalk.gray('📊 Project recorded in usage history'));
+    } catch (error) {
+      // History recording failure shouldn't stop project creation
+      console.log(chalk.gray('⚠️  History recording skipped'));
+    }
+
+    // Step 21: Success message
     console.log('\n' + chalk.hex('#10ac84')('✨ Project created successfully!'));
     console.log(chalk.hex('#95afc0')('Welcome to your new project!\n'));
     
@@ -370,6 +480,9 @@ export async function createProject(providedName?: string): Promise<void> {
     console.log(`   ${chalk.hex('#ffa502')('Framework:')} ${chalk.hex('#ff6b6b')(selectedFramework)}`);
     if (selectedLanguage) {
       console.log(`   ${chalk.hex('#ffa502')('Language:')} ${chalk.hex('#9c88ff')(selectedLanguage)}`);
+    }
+    if (addedFeatures.length > 0) {
+      console.log(`   ${chalk.hex('#ffa502')('Features:')} ${chalk.hex('#00d2d3')(addedFeatures.join(', '))}`);
     }
     console.log(`   ${chalk.hex('#ffa502')('Location:')} ${chalk.hex('#95afc0')(projectPath)}\n`);
     

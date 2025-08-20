@@ -16,6 +16,7 @@ import {
   displayRecentProjects, 
   displayCommandsGrid,
   displaySystemInfo,
+  displayFeatureUsage,
   gatherProjectStats,
   scanForRecentProjects,
   displaySuccessMessage
@@ -26,6 +27,7 @@ import {
   scanProjectWithCache, 
   displayCacheStats 
 } from '../utils/cacheManager.js';
+import { historyManager } from '../utils/historyManager.js';
 
 /**
  * Display help for analyze command
@@ -104,32 +106,38 @@ export async function analyzeCommand(): Promise<void> {
   try {
     const currentDir = process.cwd();
     
-    // Always fetch real-time data for analyze command
-    spinner.text = chalk.hex('#9c88ff')('📊 Collecting fresh analytics data...');
+    // Initialize history manager
+    await historyManager.init();
     
-    // Gather fresh data
-    const stats = await gatherProjectStats();
-    const recentProjects = await scanForRecentProjects();
+    // Check if cache should restart (5 hours)
+    const shouldRestart = historyManager.shouldRestartCache();
+    const history = historyManager.getHistory();
     
-    spinner.stop();
+    if (shouldRestart) {
+      spinner.text = chalk.hex('#ffa502')('🔄 Cache expired, gathering fresh data...');
+      
+      spinner.stop();
+      
+      console.log(chalk.green('🔄 Real-time analytics data (cache restarted after 5 hours)'));
+      console.log(chalk.yellow(`📊 Data from: ${new Date(history.lastUpdated).toLocaleString()}`));
+    } else {
+      spinner.text = chalk.hex('#9c88ff')('⚡ Loading cached analytics data...');
+      
+      spinner.stop();
+      
+      console.log(chalk.green('⚡ Cached analytics data (updated: ' + 
+        new Date(history.lastUpdated).toLocaleString() + ')'));
+    }
     
-    // Display real-time indicator
-    console.log(chalk.green('🔄 Real-time analytics data (updated: ' + 
-      new Date().toLocaleString() + ')'));
     console.log();
     
-    // Display comprehensive dashboard
-    displayProjectStats(stats);
-    displayRecentProjects(recentProjects);
+    // Display comprehensive dashboard with real data from history
+    displayProjectStatsFromHistory(history);
+    displayRecentProjectsFromHistory(historyManager.getRecentProjects());
+    displayFeatureUsageFromHistory(historyManager.getFeatureStats());
     displayCommandsGrid();
     displaySystemInfo();
     displayCacheStats();
-    
-    // Cache the fresh results for other commands
-    await cacheAnalysisResults(currentDir, {
-      projectStats: stats,
-      recentProjects: recentProjects
-    });
     
     displaySuccessMessage(
       'Analytics dashboard generated successfully!',

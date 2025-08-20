@@ -7,6 +7,8 @@ import { dbConnect } from "@/lib/dbConnect" // Import your database file here
 const MAX_LOGIN_ATTEMPTS = 5
 const LOCK_TIME = 2 * 60 * 60 * 1000 // 2 hours
 export const runtime = "nodejs";
+
+// Always pass authOptions in getServerSession to avoid errors
 export const authOptions: NextAuthOptions = {
   providers: [
     CredentialsProvider({

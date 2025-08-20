@@ -7,12 +7,31 @@ import {
   cachePackageVersion,
   scanProjectWithCache 
 } from '../utils/cacheManager.js';
+import { 
+  getSupportedLanguages,
+  getLanguageConfig,
+  SupportedLanguage
+} from '../utils/languageConfig.js';
 import { exec } from 'child_process';
 import { promisify } from 'util';
 import fs from 'fs-extra';
 import path from 'path';
 
 const execAsync = promisify(exec);
+
+/**
+ * Get update command for a specific language and package manager
+ */
+function getUpdateCommand(language: SupportedLanguage, packageManagerName?: string): string {
+  const config = getLanguageConfig(language);
+  if (!config) return '';
+  
+  const pm = packageManagerName 
+    ? config.packageManagers.find(p => p.name === packageManagerName)
+    : config.packageManagers[0];
+    
+  return pm?.updateCommand || pm?.installCommand || '';
+}
 
 /**
  * Main update command function
@@ -47,7 +66,7 @@ export async function updateCommand(options: any): Promise<void> {
         'Could not detect any supported project types',
         [
           'Make sure you are in a project directory',
-          'Supported: Node.js, Rust, Python, Go, PHP, Ruby projects',
+          `Supported: ${getSupportedLanguages().map(lang => getLanguageConfig(lang)!.displayName).join(', ')} projects`,
           'Look for files like package.json, Cargo.toml, requirements.txt, etc.'
           ]
         );

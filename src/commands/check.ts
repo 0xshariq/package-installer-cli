@@ -12,6 +12,14 @@ import {
   cachePackageVersion,
   scanProjectWithCache 
 } from '../utils/cacheManager.js';
+import { 
+  LANGUAGE_CONFIGS, 
+  SupportedLanguage, 
+  getSupportedLanguages,
+  getLanguageConfig,
+  getAllConfigFiles,
+  detectLanguageFromFiles 
+} from '../utils/languageConfig.js';
 
 const execAsync = promisify(exec);
 
@@ -181,12 +189,149 @@ const PROJECT_TYPES: ProjectType[] = [
     getDependencies: (composerJson) => ({
       ...composerJson.require,
       ...composerJson['require-dev']
-    }),
-    getInstallCommand: (packages) => `composer require ${packages.join(' ')}`,
-    getUpdateCommand: () => 'composer update',
-    registryUrl: 'https://packagist.org/packages'
+// Generate PROJECT_TYPES from shared language configuration
+const PROJECT_TYPES: ProjectType[] = getSupportedLanguages().map(lang => {
+  const config = getLanguageConfig(lang)!;
+  const primaryPackageManager = config.packageManagers[0];
+  
+  return {
+    name: config.displayName,
+    files: config.configFiles.filter(cf => cf.required || cf.type === 'dependency').map(cf => cf.filename),
+    packageManager: config.packageManagers.map(pm => pm.name).join('/'),
+    getDependencies: (content: any, filename: string) => {
+      const deps: Record<string, string> = {};
+      
+      // Language-specific dependency parsing
+      switch (lang) {
+        case 'nodejs':
+          if (filename === 'package.json') {
+            return {
+              ...content.dependencies,
+              ...content.devDependencies
+            };
+          }
+          break;
+          
+        case 'rust':
+          if (filename === 'Cargo.toml') {
+            if (content.dependencies) {
+              Object.entries(content.dependencies).forEach(([key, value]: [string, any]) => {
+                if (typeof value === 'string') {
+                  deps[key] = value;
+                } else if (value && value.version) {
+                  deps[key] = value.version;
+                }
+              });
+            }
+            if (content['dev-dependencies']) {
+              Object.entries(content['dev-dependencies']).forEach(([key, value]: [string, any]) => {
+                if (typeof value === 'string') {
+                  deps[key] = value;
+                } else if (value && value.version) {
+                  deps[key] = value.version;
+                }
+              });
+            }
+          }
+          break;
+          
+        case 'python':
+          if (filename === 'requirements.txt') {
+            const lines = content.toString().split('\n');
+            lines.forEach((line: string) => {
+              const trimmed = line.trim();
+              if (trimmed && !trimmed.startsWith('#')) {
+                const match = trimmed.match(/^([a-zA-Z0-9_-]+)([>=<!~]+)?(.*)?$/);
+                if (match) {
+                  deps[match[1]] = match[3] || 'latest';
+                }
+              }
+            });
+          } else if (filename === 'pyproject.toml') {
+            if (content.dependencies) {
+              content.dependencies.forEach((dep: string) => {
+                const match = dep.match(/^([a-zA-Z0-9_-]+)([>=<!~]+)?(.*)?$/);
+                if (match) {
+                  deps[match[1]] = match[3] || 'latest';
+                }
+              });
+            }
+          }
+          break;
+          
+        case 'php':
+          if (filename === 'composer.json') {
+            return {
+              ...content.require,
+              ...content['require-dev']
+            };
+          }
+          break;
+          
+        case 'ruby':
+          if (filename === 'Gemfile') {
+            const lines = content.toString().split('\n');
+            lines.forEach((line: string) => {
+              const trimmed = line.trim();
+              const match = trimmed.match(/gem\s+['"]([^'"]+)['"](?:\s*,\s*['"]([^'"]+)['"])?/);
+              if (match) {
+                deps[match[1]] = match[2] || 'latest';
+              }
+            });
+          }
+          break;
+          
+        case 'go':
+          if (filename === 'go.mod') {
+            const lines = content.toString().split('\n');
+            let inRequire = false;
+            lines.forEach((line: string) => {
+              const trimmed = line.trim();
+              if (trimmed === 'require (') {
+                inRequire = true;
+                return;
+              }
+              if (trimmed === ')') {
+                inRequire = false;
+                return;
+              }
+              if (inRequire || trimmed.startsWith('require ')) {
+                const match = trimmed.match(/^(?:require\s+)?([^\s]+)\s+([^\s]+)/);
+                if (match) {
+                  deps[match[1]] = match[2];
+                }
+              }
+            });
+          }
+          break;
+      }
+      
+      return deps;
+    },
+    getInstallCommand: (packages) => {
+      const addCmd = primaryPackageManager.addCommand || primaryPackageManager.installCommand;
+      return `${addCmd} ${packages.join(' ')}`;
+    },
+    getUpdateCommand: () => primaryPackageManager.updateCommand || primaryPackageManager.installCommand,
+    registryUrl: getRegistryUrl(lang)
+  };
+});
+
+function getRegistryUrl(lang: SupportedLanguage): string {
+  switch (lang) {
+    case 'nodejs': return 'https://registry.npmjs.org';
+    case 'rust': return 'https://crates.io/api/v1/crates';
+    case 'python': return 'https://pypi.org/pypi';
+    case 'go': return 'https://proxy.golang.org';
+    case 'ruby': return 'https://rubygems.org/api/v1/gems';
+    case 'php': return 'https://packagist.org/packages';
+    case 'java': return 'https://repo1.maven.org/maven2';
+    case 'csharp': return 'https://api.nuget.org/v3-flatcontainer';
+    case 'swift': return 'https://packagecatalog.com';
+    case 'dart': return 'https://pub.dev/api/packages';
+    default: return '';
   }
-];
+}
 
 /**
  * Display help for check command

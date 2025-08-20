@@ -2,7 +2,34 @@ import chalk from 'chalk';
 import inquirer from 'inquirer';
 import gradient from 'gradient-string';
 import boxen from 'boxen';
+import path from 'path';
 import { addFeature, listAvailableFeatures, SUPPORTED_FEATURES, detectProjectStack } from '../utils/featureInstaller.js';
+import { HistoryManager } from '../utils/historyManager.js';
+
+/**
+ * Display important disclaimer about potential issues
+ */
+function showFeatureDisclaimer(): void {
+  const disclaimerBox = boxen(
+    chalk.yellow.bold('⚠️  IMPORTANT DISCLAIMER') + '\n\n' +
+    chalk.white('When adding features to your project:') + '\n' +
+    chalk.gray('• Syntax errors may occur during integration') + '\n' +
+    chalk.gray('• Code formatting issues might arise') + '\n' +
+    chalk.gray('• Manual adjustments may be required') + '\n' +
+    chalk.gray('• Always backup your project before adding features') + '\n\n' +
+    chalk.cyan('💡 It\'s recommended to test your project after feature integration'),
+    {
+      padding: 1,
+      margin: 1,
+      borderStyle: 'round',
+      borderColor: 'yellow',
+      title: 'Feature Integration Warning',
+      titleAlignment: 'center'
+    }
+  );
+  
+  console.log(disclaimerBox);
+}
 
 /**
  * Display help for add command
@@ -45,6 +72,10 @@ export async function addCommand(feature?: string) {
     showAddHelp();
     return;
   }
+  
+  // Show disclaimer about potential issues
+  showFeatureDisclaimer();
+  
   try {
     // Handle --list flag
     if (feature === '--list' || feature === '-l') {
@@ -145,6 +176,27 @@ export async function addCommand(feature?: string) {
 
     // Add the selected feature
     await addFeature(feature, process.cwd(), { authProvider });
+
+    // Record feature addition in history
+    try {
+      const historyManager = HistoryManager.getInstance();
+      const currentPath = process.cwd();
+      const projectName = path.basename(currentPath);
+      
+      await historyManager.recordFeature({
+        name: feature,
+        projectName: projectName,
+        projectPath: currentPath,
+        framework: projectInfo.framework!,
+        language: projectInfo.language!,
+        provider: authProvider
+      });
+      
+      console.log(chalk.gray('📊 Feature addition recorded in usage history'));
+    } catch (error) {
+      // History recording failure shouldn't stop feature addition
+      console.log(chalk.gray('⚠️  History recording skipped'));
+    }
 
   } catch (error: any) {
     console.error(chalk.red(`❌ Failed to add feature: ${error.message}`));

@@ -167,7 +167,7 @@ export const SUPPORTED_FEATURES: { [key: string]: FeatureConfig } = {
   },
   ui: {
     name: 'UI Components',
-    description: 'Add UI component library ( Ant Design, Mantine-UI) - Coming Soon',
+    description: 'Add UI component library ( Daisy UI, ScrollX UI, Mantine-UI) - Coming Soon',
     supportedFrameworks: ['nextjs', 'reactjs', 'vuejs'],
     supportedLanguages: ['nodejs'],
     files: {}
@@ -502,7 +502,7 @@ async function readTemplateFile(templatePath: string, fileName: string): Promise
 }
 
 /**
- * Handle file operations for feature installation
+ * Handle file operations for feature installation with enhanced folder creation
  */
 async function processFeatureFile(
   projectPath: string,
@@ -517,6 +517,13 @@ async function processFeatureFile(
   }
   
   const targetPath = path.join(projectPath, filePath);
+  const targetDir = path.dirname(targetPath);
+  
+  // Ensure directory exists - create if missing
+  if (!await fs.pathExists(targetDir)) {
+    console.log(chalk.blue(`📁 Creating directory: ${path.relative(projectPath, targetDir)}`));
+    await fs.ensureDir(targetDir);
+  }
   
   switch (fileConfig.action) {
     case 'create':
@@ -531,6 +538,7 @@ async function processFeatureFile(
         const content = await readTemplateFile(templatePath, filePath);
         await fs.outputFile(targetPath, content);
       }
+      console.log(chalk.green(`✅ Created: ${filePath}`));
       break;
       
     case 'overwrite':
@@ -547,6 +555,7 @@ async function processFeatureFile(
           await fs.outputFile(targetPath, content);
         }
       }
+      console.log(chalk.green(`✅ Updated: ${filePath}`));
       break;
       
     case 'append':
@@ -578,10 +587,12 @@ async function processFeatureFile(
           const separator = existingContent ? '\n\n# Authentication Configuration\n' : '';
           const finalContent = existingContent + separator + uniqueNewLines.join('\n') + '\n';
           await fs.outputFile(targetPath, finalContent);
+          console.log(chalk.green(`✅ Updated: ${filePath}`));
         }
       } else {
         const separator = existingContent ? '\n\n' : '';
         await fs.outputFile(targetPath, existingContent + separator + newContent);
+        console.log(chalk.green(`✅ Updated: ${filePath}`));
       }
       break;
   }
@@ -758,13 +769,6 @@ export async function addFeature(
     
     fileSpinner.succeed(chalk.green('✅ Feature files added successfully'));
     
-    // Initialize git if it's a new project and Node.js
-    if (language === 'nodejs') {
-      await initializeGitWithMCP(projectPath);
-    } else {
-      await initializeGitStandard(projectPath);
-    }
-    
     // Show success message
     console.log('\n' + chalk.hex('#10ac84')('✨ Feature added successfully!'));
     console.log(chalk.hex('#00d2d3')(`📁 ${feature.name} has been added to your project`));
@@ -787,100 +791,6 @@ export async function addFeature(
   } catch (error: any) {
     spinner.fail(chalk.red(`❌ Failed to add feature: ${error.message}`));
     throw error;
-  }
-}
-
-/**
- * Initialize git repository using MCP server (for Node.js projects)
- */
-async function initializeGitWithMCP(projectPath: string): Promise<void> {
-  const { exec } = await import('child_process');
-  const { promisify } = await import('util');
-  const execAsync = promisify(exec);
-  
-  const gitSpinner = ora(chalk.hex('#00d2d3')('🔧 Initializing git repository with MCP server...')).start();
-  
-  try {
-    // Check if already a git repository
-    const gitDir = path.join(projectPath, '.git');
-    if (await fs.pathExists(gitDir)) {
-      gitSpinner.info(chalk.yellow('ℹ️  Git repository already exists'));
-      return;
-    }
-    
-    // Try to initialize git repository using MCP server commands
-    try {
-      gitSpinner.text = chalk.hex('#00d2d3')('Initializing git with ginit...');
-      await execAsync('ginit', { cwd: projectPath });
-    } catch {
-      gitSpinner.text = chalk.hex('#00d2d3')('Initializing git with git init...');
-      await execAsync('git init', { cwd: projectPath });
-    }
-    
-    // Add files to git
-    try {
-      gitSpinner.text = chalk.hex('#00d2d3')('Adding files with gadd...');
-      await execAsync('gadd', { cwd: projectPath });
-    } catch {
-      gitSpinner.text = chalk.hex('#00d2d3')('Adding files with git add...');
-      await execAsync('git add .', { cwd: projectPath });
-    }
-    
-    // Make initial commit
-    try {
-      gitSpinner.text = chalk.hex('#00d2d3')('Creating initial commit with gcommit...');
-      await execAsync('gcommit "Add features via Package Installer CLI"', { cwd: projectPath });
-    } catch {
-      gitSpinner.text = chalk.hex('#00d2d3')('Creating initial commit with git commit...');
-      await execAsync('git commit -m "Add features via Package Installer CLI"', { cwd: projectPath });
-    }
-    
-    gitSpinner.succeed(chalk.hex('#10ac84')('✅ Git repository initialized with MCP server'));
-    
-  } catch (error: any) {
-    gitSpinner.warn(chalk.hex('#ffa502')('⚠️  Could not initialize git repository'));
-    console.log(chalk.hex('#95afc0')('💡 You can initialize git manually:'));
-    console.log(chalk.hex('#95afc0')('   git init'));
-    console.log(chalk.hex('#95afc0')('   git add .'));
-    console.log(chalk.hex('#95afc0')('   git commit -m "Add features"'));
-  }
-}
-
-/**
- * Initialize git repository using standard git commands (for non-Node.js projects)
- */
-async function initializeGitStandard(projectPath: string): Promise<void> {
-  const { exec } = await import('child_process');
-  const { promisify } = await import('util');
-  const execAsync = promisify(exec);
-  
-  const gitSpinner = ora(chalk.hex('#00d2d3')('🔧 Initializing git repository...')).start();
-  
-  try {
-    // Check if already a git repository
-    const gitDir = path.join(projectPath, '.git');
-    if (await fs.pathExists(gitDir)) {
-      gitSpinner.info(chalk.yellow('ℹ️  Git repository already exists'));
-      return;
-    }
-    
-    // Initialize git repository
-    await execAsync('git init', { cwd: projectPath });
-    
-    // Add files to git
-    await execAsync('git add .', { cwd: projectPath });
-    
-    // Make initial commit
-    await execAsync('git commit -m "Add features via Package Installer CLI"', { cwd: projectPath });
-    
-    gitSpinner.succeed(chalk.hex('#10ac84')('✅ Git repository initialized'));
-    
-  } catch (error: any) {
-    gitSpinner.warn(chalk.hex('#ffa502')('⚠️  Could not initialize git repository'));
-    console.log(chalk.hex('#95afc0')('💡 You can initialize git manually:'));
-    console.log(chalk.hex('#95afc0')('   git init'));
-    console.log(chalk.hex('#95afc0')('   git add .'));
-    console.log(chalk.hex('#95afc0')('   git commit -m "Add features"'));
   }
 }
 

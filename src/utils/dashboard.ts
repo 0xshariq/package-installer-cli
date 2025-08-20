@@ -223,6 +223,223 @@ export function displayRecentProjects(projects: ProjectInfo[]): void {
 }
 
 /**
+ * Display feature usage statistics from history
+ */
+export function displayFeatureUsageFromHistory(featureStats: Array<{ feature: string; count: number; frameworks: string[] }>): void {
+  console.log('\n' + gradientString('orange', 'red')('🎯 FEATURE USAGE\n'));
+  
+  if (featureStats.length === 0) {
+    console.log(chalk.gray('   No features used yet. Use \'pi add\' to add features to projects.\n'));
+    return;
+  }
+  
+  const featureTable = new Table({
+    head: [
+      chalk.cyan('Feature'),
+      chalk.cyan('Usage Count'),
+      chalk.cyan('Frameworks'),
+      chalk.cyan('Popularity')
+    ],
+    colWidths: [18, 15, 25, 15],
+    style: {
+      head: ['cyan'],
+      border: ['dim']
+    },
+    chars: {
+      'top': '─',
+      'top-mid': '┬',
+      'top-left': '┌',
+      'top-right': '┐',
+      'bottom': '─',
+      'bottom-mid': '┴',
+      'bottom-left': '└',
+      'bottom-right': '┘',
+      'left': '│',
+      'left-mid': '├',
+      'mid': '─',
+      'mid-mid': '┼',
+      'right': '│',
+      'right-mid': '┤',
+      'middle': '│'
+    }
+  });
+  
+  featureStats.slice(0, 5).forEach((feature) => {
+    const icon = getFeatureIcon(feature.feature);
+    const popularity = '█'.repeat(Math.ceil((feature.count / Math.max(...featureStats.map(f => f.count))) * 10));
+    
+    featureTable.push([
+      `${icon} ${feature.feature}`,
+      chalk.green(feature.count.toString()),
+      feature.frameworks.join(', '),
+      chalk.blue(popularity)
+    ]);
+  });
+  
+  console.log(featureTable.toString());
+}
+
+/**
+ * Display project statistics from history
+ */
+export function displayProjectStatsFromHistory(history: any): void {
+  console.log('\n' + gradientString('cyan', 'blue')('📊 PROJECT STATISTICS\n'));
+  
+  const stats = history.statistics;
+  const frameworks = new Map<string, number>();
+  const languages = new Map<string, number>();
+  
+  // Calculate framework and language usage
+  history.projects.forEach((project: any) => {
+    frameworks.set(project.framework, (frameworks.get(project.framework) || 0) + 1);
+    languages.set(project.language, (languages.get(project.language) || 0) + 1);
+  });
+  
+  const projectTable = new Table({
+    head: [
+      chalk.cyan('Metric'),
+      chalk.cyan('Value'),
+      chalk.cyan('Details')
+    ],
+    colWidths: [25, 15, 40],
+    style: {
+      head: ['cyan'],
+      border: ['dim']
+    },
+    chars: {
+      'top': '─',
+      'top-mid': '┬',
+      'top-left': '┌',
+      'top-right': '┐',
+      'bottom': '─',
+      'bottom-mid': '┴',
+      'bottom-left': '└',
+      'bottom-right': '┘',
+      'left': '│',
+      'left-mid': '├',
+      'mid': '─',
+      'mid-mid': '┼',
+      'right': '│',
+      'right-mid': '┤',
+      'middle': '│'
+    }
+  });
+
+  projectTable.push([
+    '🏗️  Total Projects',
+    chalk.green(stats.totalProjectsCreated.toString()),
+    'Projects created with CLI'
+  ]);
+
+  projectTable.push([
+    '⚡ Features Added',
+    chalk.blue(stats.totalFeaturesAdded.toString()),
+    'Total features installed'
+  ]);
+
+  if (stats.mostUsedFramework) {
+    projectTable.push([
+      '🎯 Top Framework',
+      chalk.yellow(stats.mostUsedFramework),
+      `Most popular framework`
+    ]);
+  }
+
+  if (stats.mostUsedLanguage) {
+    projectTable.push([
+      '🔤 Top Language',
+      chalk.magenta(stats.mostUsedLanguage),
+      `Most used language`
+    ]);
+  }
+
+  if (stats.mostUsedFeature) {
+    projectTable.push([
+      '🚀 Top Feature',
+      chalk.cyan(stats.mostUsedFeature),
+      `Most added feature`
+    ]);
+  }
+
+  console.log(projectTable.toString());
+}
+
+/**
+ * Display recent projects from history
+ */
+export function displayRecentProjectsFromHistory(recentProjects: any[]): void {
+  console.log('\n' + gradientString('green', 'teal')('📁 RECENT PROJECTS\n'));
+  
+  if (recentProjects.length === 0) {
+    console.log(chalk.gray('   No projects found. Create your first project with \'pi create\'.\n'));
+    return;
+  }
+  
+  const projectTable = new Table({
+    head: [
+      chalk.cyan('Project'),
+      chalk.cyan('Framework'),
+      chalk.cyan('Language'),
+      chalk.cyan('Features'),
+      chalk.cyan('Created')
+    ],
+    colWidths: [20, 15, 12, 25, 12],
+    style: {
+      head: ['cyan'],
+      border: ['dim']
+    },
+    chars: {
+      'top': '─',
+      'top-mid': '┬',
+      'top-left': '┌',
+      'top-right': '┐',
+      'bottom': '─',
+      'bottom-mid': '┴',
+      'bottom-left': '└',
+      'bottom-right': '┘',
+      'left': '│',
+      'left-mid': '├',
+      'mid': '─',
+      'mid-mid': '┼',
+      'right': '│',
+      'right-mid': '┤',
+      'middle': '│'
+    }
+  });
+
+  recentProjects.slice(0, 5).forEach((project) => {
+    const createdDate = new Date(project.createdAt).toLocaleDateString();
+    const features = project.features?.length > 0 ? project.features.join(', ') : 'None';
+    
+    projectTable.push([
+      chalk.white(project.name),
+      chalk.yellow(project.framework),
+      chalk.blue(project.language),
+      chalk.gray(features.length > 20 ? features.substring(0, 20) + '...' : features),
+      chalk.gray(createdDate)
+    ]);
+  });
+  
+  console.log(projectTable.toString());
+}
+
+/**
+ * Get icon for feature
+ */
+function getFeatureIcon(featureName: string): string {
+  const icons: Record<string, string> = {
+    'auth': '🔐',
+    'docker': '🐳',
+    'testing': '🧪',
+    'ui': '🎨',
+    'api': '🚀',
+    'pwa': '📱',
+    'monitoring': '📊'
+  };
+  return icons[featureName] || '⚡';
+}
+
+/**
  * Display available commands in a beautiful grid
  */
 export function displayCommandsGrid(): void {

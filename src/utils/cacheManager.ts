@@ -145,6 +145,66 @@ export async function updateTemplateUsage(
 }
 
 /**
+ * Cache feature usage statistics
+ */
+export async function cacheFeatureUsage(
+  projectPath: string,
+  features: string[],
+  framework: string
+): Promise<void> {
+  const cache = await cacheManagerInstance.getCache();
+  
+  // Update feature usage stats
+  if (!cache.featureUsage) {
+    cache.featureUsage = {};
+  }
+  
+  for (const feature of features) {
+    if (!cache.featureUsage[feature]) {
+      cache.featureUsage[feature] = {
+        count: 0,
+        frameworks: {},
+        lastUsed: new Date().toISOString()
+      };
+    }
+    
+    cache.featureUsage[feature].count++;
+    cache.featureUsage[feature].lastUsed = new Date().toISOString();
+    
+    if (!cache.featureUsage[feature].frameworks[framework]) {
+      cache.featureUsage[feature].frameworks[framework] = 0;
+    }
+    cache.featureUsage[feature].frameworks[framework]++;
+  }
+  
+  // Update project to include features
+  const project = await cacheManagerInstance.getProject(projectPath);
+  if (project) {
+    project.features = features;
+    await cacheManagerInstance.setProject(project);
+  }
+  
+  await cacheManagerInstance.saveCache(cache);
+}
+
+/**
+ * Get feature usage statistics
+ */
+export function getFeatureStats() {
+  const cache = cacheManagerInstance.getCache();
+  const featureUsage = cache.featureUsage || {};
+  
+  return Object.entries(featureUsage)
+    .map(([feature, data]) => ({
+      name: feature,
+      count: data.count,
+      frameworks: data.frameworks,
+      lastUsed: data.lastUsed
+    }))
+    .sort((a, b) => b.count - a.count);
+}
+
+/**
  * Get template usage statistics for recommendations
  */
 export function getTemplateStats() {
