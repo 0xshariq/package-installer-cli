@@ -356,8 +356,21 @@ function getFrameworkFiles(featureName: string, framework: string): { [filePath:
     // Framework-specific files
     switch (framework) {
       case 'nextjs':
-        baseFiles['middleware.ts'] = { action: 'overwrite' };
-        baseFiles['app/layout.tsx'] = { action: 'overwrite' };
+        // Check if project has src folder structure
+        const projectPath = process.cwd();
+        const hasSrc = fs.existsSync(path.join(projectPath, 'src'));
+        
+        if (hasSrc) {
+          // Files that go in src folder
+          baseFiles['src/middleware.ts'] = { action: 'overwrite' };
+          baseFiles['src/app/page.tsx'] = { action: 'overwrite' };
+          baseFiles['src/lib/auth0.ts'] = { action: 'create' };
+        } else {
+          // Files that go in root
+          baseFiles['middleware.ts'] = { action: 'overwrite' };
+          baseFiles['app/page.tsx'] = { action: 'overwrite' };
+          baseFiles['lib/auth0.ts'] = { action: 'create' };
+        }
         break;
       case 'expressjs':
         baseFiles['index.ts'] = { action: 'overwrite' };
@@ -368,16 +381,20 @@ function getFrameworkFiles(featureName: string, framework: string): { [filePath:
         baseFiles['src/App.tsx'] = { action: 'overwrite' };
         break;
       case 'vuejs':
+        // Always overwrite main file and create components folder
         baseFiles['src/main.ts'] = { action: 'overwrite' };
         baseFiles['src/App.vue'] = { action: 'overwrite' };
+        baseFiles['src/components/LoginButton.vue'] = { action: 'create' };
+        baseFiles['src/components/LogoutButton.vue'] = { action: 'create' };
+        baseFiles['src/components/UserProfile.vue'] = { action: 'create' };
         break;
       case 'remixjs':
         baseFiles['app/root.tsx'] = { action: 'overwrite' };
         break;
       case 'reactjs+expressjs+shadcn':
         // Use backend auth for combo templates
-        baseFiles['backend/index.ts'] = { action: 'overwrite' };
-        baseFiles['backend/types/index.ts'] = { action: 'create' };
+        baseFiles['backend/index.ts'] = { action: 'append' };
+        baseFiles['backend/types/global.d.ts'] = { action: 'create' };
         break;
     }
   } else if (featureName === 'docker') {

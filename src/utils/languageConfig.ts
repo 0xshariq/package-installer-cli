@@ -107,7 +107,7 @@ export const LANGUAGE_CONFIGS: Record<SupportedLanguage, LanguageConfig> = {
       { framework: 'vuejs', patterns: ['vue.config.*'], dependencies: ['vue'] },
       { framework: 'angular', patterns: ['angular.json'], dependencies: ['@angular/core'] },
       { framework: 'nestjs', patterns: ['nest-cli.json'], dependencies: ['@nestjs/core'] },
-      { framework: 'expressjs', patterns: ['app.js', 'server.js'], dependencies: ['express'] }
+      { framework: 'expressjs', patterns: ['app.js', 'index.js'], dependencies: ['express'] }
     ]
   },
   rust: {
