@@ -187,8 +187,6 @@ const PROJECT_TYPES: ProjectType[] = [
     files: ['composer.json'],
     packageManager: 'composer',
     getDependencies: (composerJson) => ({
-      ...composerJson.require,
-      ...composerJson['require-dev']
 // Generate PROJECT_TYPES from shared language configuration
 const PROJECT_TYPES: ProjectType[] = getSupportedLanguages().map(lang => {
   const config = getLanguageConfig(lang)!;

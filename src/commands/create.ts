@@ -43,31 +43,6 @@ import {
 import { HistoryManager } from '../utils/historyManager.js';
 
 /**
- * Display important disclaimer about potential issues
- */
-function showFeatureDisclaimer(): void {
-  const disclaimerBox = boxen(
-    chalk.yellow.bold('⚠️  IMPORTANT DISCLAIMER') + '\n\n' +
-    chalk.white('When adding features to your project:') + '\n' +
-    chalk.gray('• Syntax errors may occur during integration') + '\n' +
-    chalk.gray('• Code formatting issues might arise') + '\n' +
-    chalk.gray('• Manual adjustments may be required') + '\n' +
-    chalk.gray('• Always backup your project before adding features') + '\n\n' +
-    chalk.cyan('💡 It\'s recommended to test your project after feature integration'),
-    {
-      padding: 1,
-      margin: 1,
-      borderStyle: 'round',
-      borderColor: 'yellow',
-      title: 'Feature Integration Warning',
-      titleAlignment: 'center'
-    }
-  );
-  
-  console.log(disclaimerBox);
-}
-
-/**
  * Display help for create command
  */
 export function showCreateHelp(): void {
@@ -129,9 +104,6 @@ export async function createProject(providedName?: string): Promise<void> {
     await showUserCache();
     return;
   }
-  
-  // Show disclaimer about potential issues
-  showFeatureDisclaimer();
 
   try {
     // Load user cache for personalized defaults
