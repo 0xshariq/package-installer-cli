@@ -128,8 +128,8 @@ export interface FeatureConfig {
 export const SUPPORTED_FEATURES: { [key: string]: FeatureConfig } = {
   auth: {
     name: 'Authentication',
-    description: 'Add authentication to your project (Clerk or Auth0)',
-    supportedFrameworks: ['nextjs', 'expressjs', 'reactjs', 'vuejs', 'remixjs'],
+    description: 'Add authentication to your project (Clerk, Next-Auth or Auth0)',
+    supportedFrameworks: ['nextjs', 'expressjs', 'reactjs', 'vuejs', 'remixjs','angularjs'],
     supportedLanguages: ['nodejs'],
     files: {
       '.env': {
