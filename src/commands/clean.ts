@@ -49,7 +49,13 @@ export function showCleanHelp(): void {
  * Main clean command function
  */
 export async function cleanCommand(options: any = {}): Promise<void> {
-  createBanner('Project Cleaner');
+  // Blue gradient banner with "CLEANER" on next line
+  console.clear();
+  const banner = `
+${chalk.bgHex('#00c6ff').hex('#fff').bold(' PROJECT ')}${chalk.bgHex('#0072ff').hex('#fff').bold(' CLEAN ')}
+${chalk.bgHex('#00c6ff').hex('#fff').bold(' ER ')}
+`;
+  console.log(banner);
   
   const projectPath = process.cwd();
   const cleanTargets = determineCleanTargets(options);

@@ -42,7 +42,13 @@ export async function updateCommand(options: any): Promise<void> {
     return;
   }
 
-  createBanner('Package Updater');
+  // Blue gradient banner with "UPDATER" on next line
+  console.clear();
+  const banner = `
+${chalk.bgHex('#00c6ff').hex('#fff').bold(' PACKAGE ')}${chalk.bgHex('#0072ff').hex('#fff').bold(' UP ')}
+${chalk.bgHex('#00c6ff').hex('#fff').bold(' DATER ')}
+`;
+  console.log(banner);
   
   const projectPath = process.cwd();
   const spinner = ora(chalk.hex('#9c88ff')('🔍 Analyzing project structure...')).start();
