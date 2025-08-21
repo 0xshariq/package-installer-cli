@@ -48,141 +48,6 @@ interface ProjectType {
   registryUrl?: string;
 }
 
-const PROJECT_TYPES: ProjectType[] = [
-  {
-    name: 'Node.js',
-    files: ['package.json'],
-    packageManager: 'npm/pnpm/yarn',
-    getDependencies: (packageJson, filename) => ({
-      ...packageJson.dependencies,
-      ...packageJson.devDependencies
-    }),
-    getInstallCommand: (packages) => `npm install ${packages.join(' ')}`,
-    getUpdateCommand: () => 'npm update',
-    registryUrl: 'https://registry.npmjs.org'
-  },
-  {
-    name: 'Rust',
-    files: ['Cargo.toml'],
-    packageManager: 'cargo',
-    getDependencies: (cargoToml, filename) => {
-      const deps: Record<string, string> = {};
-      if (cargoToml.dependencies) {
-        Object.entries(cargoToml.dependencies).forEach(([key, value]: [string, any]) => {
-          if (typeof value === 'string') {
-            deps[key] = value;
-          } else if (value && value.version) {
-            deps[key] = value.version;
-          }
-        });
-      }
-      if (cargoToml['dev-dependencies']) {
-        Object.entries(cargoToml['dev-dependencies']).forEach(([key, value]: [string, any]) => {
-          if (typeof value === 'string') {
-            deps[key] = value;
-          } else if (value && value.version) {
-            deps[key] = value.version;
-          }
-        });
-      }
-      return deps;
-    },
-    getInstallCommand: (packages) => `cargo add ${packages.join(' ')}`,
-    getUpdateCommand: () => 'cargo update',
-    registryUrl: 'https://crates.io/api/v1/crates'
-  },
-  {
-    name: 'Python',
-    files: ['requirements.txt', 'pyproject.toml', 'Pipfile', 'setup.py'],
-    packageManager: 'pip/poetry/pipenv',
-    getDependencies: (content, filename) => {
-      const deps: Record<string, string> = {};
-      
-      if (filename === 'requirements.txt') {
-        const lines = content.toString().split('\n');
-        lines.forEach((line: string) => {
-          const trimmed = line.trim();
-          if (trimmed && !trimmed.startsWith('#')) {
-            const match = trimmed.match(/^([a-zA-Z0-9_-]+)([>=<!~]+)?(.*)?$/);
-            if (match) {
-              deps[match[1]] = match[3] || 'latest';
-            }
-          }
-        });
-      } else if (filename === 'pyproject.toml') {
-        if (content.tool?.poetry?.dependencies) {
-          Object.entries(content.tool.poetry.dependencies).forEach(([key, value]: [string, any]) => {
-            if (key !== 'python') {
-              deps[key] = typeof value === 'string' ? value : value.version || 'latest';
-            }
-          });
-        }
-      } else if (filename === 'Pipfile') {
-        if (content.packages) {
-          Object.entries(content.packages).forEach(([key, value]: [string, any]) => {
-            deps[key] = typeof value === 'string' ? value : value.version || 'latest';
-          });
-        }
-      }
-      
-      return deps;
-    },
-    getInstallCommand: (packages) => `pip install ${packages.join(' ')}`,
-    getUpdateCommand: () => 'pip list --outdated',
-    registryUrl: 'https://pypi.org/pypi'
-  },
-  {
-    name: 'Go',
-    files: ['go.mod'],
-    packageManager: 'go',
-    getDependencies: (content) => {
-      const deps: Record<string, string> = {};
-      const lines = content.toString().split('\n');
-      let inRequire = false;
-      
-      lines.forEach((line: string) => {
-        const trimmed = line.trim();
-        if (trimmed === 'require (') {
-          inRequire = true;
-        } else if (trimmed === ')' && inRequire) {
-          inRequire = false;
-        } else if (inRequire || trimmed.startsWith('require ')) {
-          const match = trimmed.match(/^(?:require\s+)?([^\s]+)\s+([^\s]+)/);
-          if (match) {
-            deps[match[1]] = match[2];
-          }
-        }
-      });
-      
-      return deps;
-    },
-    getInstallCommand: (packages) => `go get ${packages.join(' ')}`,
-    getUpdateCommand: () => 'go get -u ./...',
-    registryUrl: 'https://proxy.golang.org'
-  },
-  {
-    name: 'Ruby',
-    files: ['Gemfile', 'gemspec'],
-    packageManager: 'gem/bundler',
-    getDependencies: (content) => {
-      const deps: Record<string, string> = {};
-      const lines = content.toString().split('\n');
-      
-      lines.forEach((line: string) => {
-        const trimmed = line.trim();
-        const match = trimmed.match(/gem\s+['"]([^'"]+)['"](?:\s*,\s*['"]([^'"]+)['"])?/);
-        if (match) {
-          deps[match[1]] = match[2] || 'latest';
-        }
-      });
-      
-      return deps;
-    },
-    getInstallCommand: (packages) => `bundle add ${packages.join(' ')}`,
-    getUpdateCommand: () => 'bundle update',
-    registryUrl: 'https://rubygems.org/api/v1/gems'
-  },
-];
 
 // Generate PROJECT_TYPES from shared language configuration
 const PROJECT_TYPES: ProjectType[] = getSupportedLanguages().map(lang => {
@@ -199,7 +64,7 @@ const PROJECT_TYPES: ProjectType[] = getSupportedLanguages().map(lang => {
       // Language-specific dependency parsing
       switch (lang) {
         case 'nodejs':
-          if (filename === 'package.json') {
+          if (filename === 'package.json' || filename === 'package-lock.json' || filename === 'pnpm-lock.yml') {
             return {
               ...content.dependencies,
               ...content.devDependencies
@@ -340,11 +205,13 @@ export function showCheckHelp(): void {
     chalk.white('Check package versions in your project and get suggestions for updates.') + '\n' +
     chalk.white('Helps you keep your dependencies up-to-date and secure.') + '\n\n' +
     chalk.cyan('Usage:') + '\n' +
-    chalk.white(`  ${piGradient('pi')} ${chalk.hex('#f39c12')('check')} [package-name]`) + '\n\n' +
+    chalk.white(`  ${piGradient('pi')} ${chalk.hex('#f39c12')('check')} [package-name] [options]`) + '\n\n' +
     chalk.cyan('Options:') + '\n' +
-    chalk.gray('  -h, --help    Display help for this command') + '\n\n' +
+    chalk.gray('  -h, --help      Display help for this command') + '\n' +
+    chalk.gray('  -v, --verbose   Show detailed information for all packages') + '\n\n' +
     chalk.cyan('Examples:') + '\n' +
     chalk.gray(`  ${piGradient('pi')} ${chalk.hex('#f39c12')('check')}                    # Check all packages in current project`) + '\n' +
+    chalk.gray(`  ${piGradient('pi')} ${chalk.hex('#f39c12')('check')} ${chalk.hex('#feca57')('--verbose')}          # Check all packages with detailed info`) + '\n' +
     chalk.gray(`  ${piGradient('pi')} ${chalk.hex('#f39c12')('check')} react              # Check specific package version`) + '\n' +
     chalk.gray(`  ${piGradient('pi')} ${chalk.hex('#f39c12')('check')} @types/node        # Check scoped packages`) + '\n' +
     chalk.gray(`  ${piGradient('pi')} ${chalk.hex('#f39c12')('check')} ${chalk.hex('#ff6b6b')('--help')}             # Show this help message`) + '\n\n' +
@@ -363,19 +230,28 @@ export function showCheckHelp(): void {
   ));
 }
 
-export async function checkCommand(packageName?: string) {
+export async function checkCommand(packageName?: string, options?: { verbose?: boolean }) {
   // Check for help flag
   if (packageName === '--help' || packageName === '-h') {
     showCheckHelp();
     return;
   }
+  
+  // Check for verbose flag
+  const isVerbose = packageName === '--verbose' || packageName === '-v' || options?.verbose;
+  
+  // If verbose is the first argument, check all packages with verbose output
+  if (packageName === '--verbose' || packageName === '-v') {
+    packageName = undefined;
+  }
+  
   try {
     console.log('\n' + chalk.hex('#f39c12')('🔍 Starting package check...'));
     
-    if (packageName) {
-      await checkSinglePackage(packageName);
+    if (packageName && packageName !== '--verbose' && packageName !== '-v') {
+      await checkSinglePackage(packageName, isVerbose);
     } else {
-      await checkProjectPackages();
+      await checkProjectPackages(isVerbose);
     }
   } catch (error: any) {
     console.error(chalk.hex('#ff4757')(`❌ Failed to check packages: ${error.message}`));
@@ -383,7 +259,7 @@ export async function checkCommand(packageName?: string) {
   }
 }
 
-async function checkSinglePackage(packageName: string) {
+async function checkSinglePackage(packageName: string, verbose: boolean = false) {
   const spinner = ora(chalk.hex('#f39c12')(`🔄 Checking ${packageName}...`)).start();
   
   try {
@@ -392,14 +268,14 @@ async function checkSinglePackage(packageName: string) {
     const packageInfo = await getPackageInfo(packageName, undefined, projectType);
     spinner.succeed(chalk.hex('#10ac84')(`✅ Package information retrieved for ${packageName}`));
     
-    displayPackageInfo([packageInfo]);
+    displayPackageInfo([packageInfo], projectType, verbose);
   } catch (error: any) {
     spinner.fail(chalk.hex('#ff4757')(`❌ Failed to check ${packageName}`));
     throw error;
   }
 }
 
-async function checkProjectPackages() {
+async function checkProjectPackages(verbose: boolean = false) {
   const spinner = ora('Analyzing project dependencies...').start();
   
   try {
@@ -436,7 +312,7 @@ async function checkProjectPackages() {
     }
 
     spinner.succeed(`Checked ${packageInfos.length} ${projectType.name} packages`);
-    displayPackageInfo(packageInfos, projectType);
+    displayPackageInfo(packageInfos, projectType, verbose);
     
   } catch (error: any) {
     spinner.fail('Failed to analyze project dependencies');
@@ -657,7 +533,7 @@ async function getPackageInfo(
   }
 }
 
-function displayPackageInfo(packages: PackageInfo[], projectType?: ProjectType) {
+function displayPackageInfo(packages: PackageInfo[], projectType?: ProjectType, verbose: boolean = false) {
   if (packages.length === 0) {
     console.log(chalk.yellow('📦 No packages to display'));
     return;
@@ -686,8 +562,14 @@ function displayPackageInfo(packages: PackageInfo[], projectType?: ProjectType) 
     console.log(`\n${chalk.hex('#00d2d3')('📋 Project Type:')} ${chalk.bold(projectType.name)} (${chalk.cyan(projectType.packageManager)})`);
   }
 
-  // Show first few packages in detail with enhanced info
-  const packagesToShow = packages.slice(0, 8); // Show more packages
+  // Determine how many packages to show based on verbose flag
+  const packagesToShow = verbose ? packages : packages.slice(0, 8);
+  
+  if (verbose && packages.length > 8) {
+    console.log(`\n${chalk.hex('#f39c12')('📋 Showing all')} ${chalk.bold(packages.length.toString())} ${chalk.hex('#f39c12')('packages (verbose mode)')}`);
+  } else if (!verbose && packages.length > 8) {
+    console.log(`\n${chalk.hex('#f39c12')('📋 Showing first')} ${chalk.bold('8')} ${chalk.hex('#f39c12')('packages (use --verbose to see all)')}`);
+  }
   
   packagesToShow.forEach((pkg, index) => {
     const statusIcon = pkg.isDeprecated ? '🚨' : pkg.needsUpdate ? '⚠️' : '✅';
@@ -717,8 +599,33 @@ function displayPackageInfo(packages: PackageInfo[], projectType?: ProjectType) 
     ));
   });
 
-  if (packages.length > 8) {
-    console.log(chalk.gray(`\n📦 ... and ${packages.length - 8} more packages (use --verbose to see all)`));
+  // Show remaining packages info when not in verbose mode
+  if (!verbose && packages.length > 8) {
+    const remaining = packages.length - 8;
+    const remainingOutdated = packages.slice(8).filter(pkg => pkg.needsUpdate).length;
+    const remainingDeprecated = packages.slice(8).filter(pkg => pkg.isDeprecated).length;
+    const remainingUpToDate = packages.slice(8).filter(pkg => !pkg.needsUpdate && !pkg.isDeprecated).length;
+
+    console.log('\n' + chalk.hex('#f39c12')(`📦 Remaining ${remaining} packages:`));
+    console.log(chalk.gray('─'.repeat(30)));
+    
+    if (remainingUpToDate > 0) {
+      console.log(`   ${chalk.hex('#10ac84')('✅')} ${remainingUpToDate} up to date`);
+    }
+    if (remainingOutdated > 0) {
+      console.log(`   ${chalk.hex('#f39c12')('⚠️')} ${remainingOutdated} need updates`);
+      // Show names of remaining outdated packages
+      const outdatedNames = packages.slice(8).filter(pkg => pkg.needsUpdate).slice(0, 5).map(pkg => pkg.name);
+      console.log(`      ${chalk.gray('Packages:')} ${outdatedNames.join(', ')}${outdatedNames.length < remainingOutdated ? '...' : ''}`);
+    }
+    if (remainingDeprecated > 0) {
+      console.log(`   ${chalk.hex('#ff4757')('🚨')} ${remainingDeprecated} deprecated`);
+      // Show names of remaining deprecated packages
+      const deprecatedNames = packages.slice(8).filter(pkg => pkg.isDeprecated).slice(0, 3).map(pkg => pkg.name);
+      console.log(`      ${chalk.gray('Packages:')} ${deprecatedNames.join(', ')}${deprecatedNames.length < remainingDeprecated ? '...' : ''}`);
+    }
+    
+    console.log(`\n   ${chalk.cyan('💡 Tip:')} Use ${chalk.bold('--verbose')} to see detailed info for all ${packages.length} packages`);
   }
 
   // Enhanced recommendations section

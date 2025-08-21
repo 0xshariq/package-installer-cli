@@ -32,6 +32,65 @@ function showFeatureDisclaimer(): void {
 }
 
 /**
+ * Show auth provider specific documentation and setup steps
+ */
+function showAuthProviderDocs(authProvider: string): void {
+  const authDocs = {
+    clerk: {
+      name: 'Clerk',
+      url: 'https://clerk.com/docs',
+      steps: [
+        '1. Create a Clerk account at https://clerk.com',
+        '2. Create a new application',
+        '3. Copy your API keys to .env file',
+        '4. Configure your sign-in/sign-up pages'
+      ]
+    },
+    auth0: {
+      name: 'Auth0',
+      url: 'https://auth0.com/docs',
+      steps: [
+        '1. Create an Auth0 account at https://auth0.com',
+        '2. Create a new application',
+        '3. Configure allowed callback URLs',
+        '4. Copy your domain and client ID to .env file'
+      ]
+    },
+    'next-auth': {
+      name: 'NextAuth.js',
+      url: 'https://next-auth.js.org',
+      steps: [
+        '1. Configure your providers in lib/auth.ts',
+        '2. Set NEXTAUTH_SECRET in .env file', 
+        '3. Configure OAuth providers (Google, GitHub, etc.)',
+        '4. Set up your database connection'
+      ]
+    }
+  };
+
+  const docs = authDocs[authProvider as keyof typeof authDocs];
+  if (!docs) return;
+
+  const docsBox = boxen(
+    chalk.hex('#00d2d3').bold(`📖 ${docs.name} Setup Guide`) + '\n\n' +
+    chalk.white('Quick Setup Steps:') + '\n' +
+    docs.steps.map(step => chalk.gray(step)).join('\n') + '\n\n' +
+    chalk.cyan('📚 Full Documentation: ') + chalk.blue(docs.url) + '\n' +
+    chalk.gray('💡 Make sure to test your authentication flow after setup'),
+    {
+      padding: 1,
+      margin: 1,
+      borderStyle: 'round',
+      borderColor: 'cyan',
+      title: 'Authentication Setup',
+      titleAlignment: 'center'
+    }
+  );
+  
+  console.log(docsBox);
+}
+
+/**
  * Display help for add command
  */
 export function showAddHelp(): void {
@@ -176,6 +235,11 @@ export async function addCommand(feature?: string) {
 
     // Add the selected feature
     await addFeature(feature, process.cwd(), { authProvider });
+
+    // Show auth provider specific documentation
+    if (feature === 'auth' && authProvider) {
+      showAuthProviderDocs(authProvider);
+    }
 
     // Record feature addition in history
     try {

@@ -132,8 +132,154 @@ export const SUPPORTED_FEATURES: { [key: string]: FeatureConfig } = {
     supportedFrameworks: ['nextjs', 'expressjs', 'reactjs', 'vuejs', 'remixjs','angularjs'],
     supportedLanguages: ['nodejs'],
     files: {
-      '.env': {
-        action: 'append'
+      // Auth0 files
+      auth0: {
+        nextjs: {
+          typescript: {
+            '.env': { action: '' },
+            'middleware.ts': { action: '' },
+            'package.json': { action: '' },
+            'app/page.tsx': { action: '' },
+            'lib/auth0.ts': { action: '' }
+          },
+          javascript: {
+            '.env': { action: '' },
+            'middleware.js': { action: '' },
+            'package.json': { action: '' },
+            'app/page.jsx': { action: '' },
+            'lib/auth0.js': { action: '' }
+          }
+        },
+        expressjs: {
+          typescript: {
+            'index.ts': { action: '' },
+            'package.json': { action: '' }
+          },
+          javascript: {
+            'index.js': { action: '' },
+            'package.json': { action: '' }
+          }
+        },
+        vuejs: {
+          typescript: {
+            'main.ts': { action: '' },
+            'package.json': { action: '' },
+            'src/components/LoginButton.vue': { action: '' },
+            'src/components/LogoutButton.vue': { action: '' },
+            'src/components/UserProfile.vue': { action: '' },
+            'src/components/login.vue': { action: '' },
+            'src/components/logout.vue': { action: '' },
+            'src/components/profile.vue': { action: '' }
+          },
+          javascript: {
+            'main.js': { action: '' },
+            'package.json': { action: '' },
+            'src/components/LoginButton.vue': { action: '' },
+            'src/components/LogoutButton.vue': { action: '' },
+            'src/components/UserProfile.vue': { action: '' },
+            'src/components/login.vue': { action: '' },
+            'src/components/logout.vue': { action: '' },
+            'src/components/profile.vue': { action: '' }
+          }
+        },
+        angularjs: {
+          typescript: {
+            'main.ts': { action: '' },
+            'package.json': { action: '' },
+            'src/app/user-profile.ts': { action: '' },
+            'src/app/login-button.ts': { action: '' },
+            'src/app/logout-button.ts': { action: '' }
+          }
+        }
+      },
+      // Clerk files
+      clerk: {
+        nextjs: {
+          typescript: {
+            '.env': { action: '' },
+            'middleware.ts': { action: '' },
+            'package.json': { action: '' },
+            'app/layout.tsx': { action: '' }
+          },
+          javascript: {
+            '.env': { action: '' },
+            'middleware.js': { action: '' },
+            'package.json': { action: '' },
+            'app/layout.js': { action: '' }
+          }
+        },
+        expressjs: {
+          typescript: {
+            '.env': { action: '' },
+            'index.ts': { action: '' },
+            'package.json': { action: '' },
+            'types/global.d.ts': { action: '' }
+          },
+          javascript: {
+            '.env': { action: '' },
+            'index.js': { action: '' },
+            'package.json': { action: '' }
+          }
+        },
+        reactjs: {
+          typescript: {
+            '.env': { action: '' },
+            'package.json': { action: '' },
+            'src/App.tsx': { action: '' },
+            'src/main.tsx': { action: '' }
+          },
+          javascript: {
+            '.env': { action: '' },
+            'package.json': { action: '' },
+            'src/App.jsx': { action: '' },
+            'src/main.jsx': { action: '' }
+          }
+        },
+        vuejs: {
+          typescript: {
+            '.env': { action: '' },
+            'package.json': { action: '' },
+            'src/main.ts': { action: '' },
+            'src/App.vue': { action: '' }
+          },
+          javascript: {
+            '.env': { action: '' },
+            'package.json': { action: '' },
+            'src/main.js': { action: '' },
+            'src/App.vue': { action: '' }
+          }
+        },
+        remixjs: {
+          typescript: {
+            '.env': { action: '' },
+            'package.json': { action: '' },
+            'app/root.tsx': { action: '' },
+            'routes/_index.tsx': { action: '' }
+          }
+        }
+      },
+      // Next-auth files
+      'next-auth': {
+        nextjs: {
+          typescript: {
+            '.env': { action: '' },
+            'package.json': { action: '' },
+            'middleware.ts': { action: '' },
+            'lib/auth.ts': { action: '' },
+            'lib/auth-provider.tsx': { action: '' },
+            'app/layout.tsx': { action: '' },
+            'app/api/auth/[...nextauth]/route.ts': { action: '' }
+          },
+          javascript: {
+            '.env': { action: '' },
+            'package.json': { action: '' },
+            'middleware.js': { action: '' },
+            'lib/auth.js': { action: '' },
+            'lib/auth-provider.jsx': { action: '' },
+            'app/layout.jsx': { action: '' },
+            'app/api/auth/[...nextauth]/route.js': { action: '' }
+          }
+        }
       }
     }
   },
@@ -170,7 +316,54 @@ export const SUPPORTED_FEATURES: { [key: string]: FeatureConfig } = {
     description: 'Add UI component library ( Daisy UI, ScrollX UI, Mantine-UI) - Coming Soon',
     supportedFrameworks: ['nextjs', 'reactjs', 'vuejs'],
     supportedLanguages: ['nodejs'],
-    files: {}
+    files: {
+      // Daisy UI files
+      daisy: {
+        nextjs: {
+          typescript: {
+            'package.json': { action: '' },
+            'postcss.config.mjs': { action: '' },
+            'app/globals.css': { action: '' }
+          },
+          javascript: {
+            'package.json': { action: '' },
+            'postcss.config.mjs': { action: '' },
+            'app/globals.css': { action: '' }
+          }
+        },
+        reactjs: {
+          typescript: {
+            'package.json': { action: '' },
+            'vite.config.ts': { action: '' },
+            'src/index.css': { action: '' }
+          },
+          javascript: {
+            'package.json': { action: '' },
+            'vite.config.js': { action: '' },
+            'src/index.css': { action: '' }
+          }
+        },
+        vuejs: {
+          typescript: {
+            'package.json': { action: '' },
+            'vite.config.ts': { action: '' },
+            'src/assets/main.css': { action: '' }
+          },
+          javascript: {
+            'package.json': { action: '' },
+            'vite.config.ts': { action: '' },
+            'src/assets/main.css': { action: '' }
+          }
+        },
+        angularjs: {
+          typescript: {
+            'package.json': { action: '' },
+            '.postcssrc.json': { action: '' },
+            'src/styles.css': { action: '' }
+          }
+        }
+      }
+    }
   },
   api: {
     name: 'API Routes',
@@ -223,11 +416,15 @@ export async function detectProjectStack(projectPath: string): Promise<{
       const packageJson = await fs.readJson(packageJsonPath);
       const dependencies = { ...packageJson.dependencies, ...packageJson.devDependencies };
       
-      // Detect TypeScript
-      if (dependencies['typescript'] || 
-          await fs.pathExists(path.join(projectPath, 'tsconfig.json')) ||
+      // Detect TypeScript - Always check tsconfig.json first
+      if (await fs.pathExists(path.join(projectPath, 'tsconfig.json'))) {
+        projectLanguage = 'typescript';
+      } else if (dependencies['typescript'] || 
           await fs.pathExists(path.join(projectPath, 'next.config.ts'))) {
         projectLanguage = 'typescript';
+      } else {
+        // Default to JavaScript if no TypeScript indicators found
+        projectLanguage = 'javascript';
       }
       
       // Check for src folder structure
@@ -344,57 +541,148 @@ function getFrameworkPackages(
 }
 
 /**
- * Get framework-specific files for a feature
+ * Get framework-specific files for a feature based on SUPPORTED_FEATURES structure
  */
-function getFrameworkFiles(featureName: string, framework: string): { [filePath: string]: FeatureConfig['files'][string] } {
+function getFrameworkFiles(
+  featureName: string, 
+  framework: string, 
+  language: string = 'typescript',
+  authProvider: string = 'clerk'
+): { [filePath: string]: FeatureConfig['files'][string] } {
+  const feature = SUPPORTED_FEATURES[featureName];
+  if (!feature || !feature.files) {
+    return {};
+  }
+
+  const baseFiles: { [filePath: string]: FeatureConfig['files'][string] } = {};
+
+  if (featureName === 'auth') {
+    // Get auth provider specific files
+    const authFiles = feature.files[authProvider];
+    if (!authFiles) {
+      console.log(chalk.yellow(`⚠️  Auth provider '${authProvider}' not found, falling back to 'clerk'`));
+      const clerkFiles = feature.files['clerk'];
+      if (clerkFiles) {
+        return getAuthProviderFiles(clerkFiles, framework, language);
+      }
+      return {};
+    }
+    
+    return getAuthProviderFiles(authFiles, framework, language);
+  } else if (featureName === 'ui') {
+    // Get UI library specific files (daisy, etc.)
+    const uiProvider = 'daisy'; // Default to daisy for now
+    const uiFiles = feature.files[uiProvider];
+    if (!uiFiles) {
+      return {};
+    }
+    
+    return getUIProviderFiles(uiFiles, framework, language);
+  } else {
+    // For other features, use direct structure
+    const files = feature.files as any;
+    Object.keys(files).forEach(filePath => {
+      baseFiles[filePath] = files[filePath];
+    });
+  }
+
+  return baseFiles;
+}
+
+/**
+ * Get auth provider specific files for a framework and language
+ */
+function getAuthProviderFiles(
+  authProviderFiles: any, 
+  framework: string, 
+  language: string
+): { [filePath: string]: FeatureConfig['files'][string] } {
   const baseFiles: { [filePath: string]: FeatureConfig['files'][string] } = {};
   
-  if (featureName === 'auth') {
-    // Always include .env file
-    baseFiles['.env'] = { action: 'append' };
-    
-    // Framework-specific files
-    switch (framework) {
-      case 'nextjs':
-        // Check if project has src folder structure
-        const projectPath = process.cwd();
-        const hasSrc = fs.existsSync(path.join(projectPath, 'src'));
-        
-        if (hasSrc) {
-          // Files that go in src folder
-          baseFiles['src/middleware.ts'] = { action: 'overwrite' };
-          baseFiles['src/app/page.tsx'] = { action: 'overwrite' };
-          baseFiles['src/lib/auth0.ts'] = { action: 'create' };
-        } else {
-          // Files that go in root
-          baseFiles['middleware.ts'] = { action: 'overwrite' };
-          baseFiles['app/page.tsx'] = { action: 'overwrite' };
-          baseFiles['lib/auth0.ts'] = { action: 'create' };
+  // Get framework specific files
+  const frameworkFiles = authProviderFiles[framework];
+  if (!frameworkFiles) {
+    return {};
+  }
+  
+  // Get language specific files
+  const languageFiles = frameworkFiles[language];
+  if (!languageFiles) {
+    // Fallback to typescript if javascript not available
+    const fallbackFiles = frameworkFiles['typescript'];
+    if (fallbackFiles) {
+      console.log(chalk.yellow(`⚠️  ${language} templates not available, using TypeScript templates`));
+      Object.keys(fallbackFiles).forEach(filePath => {
+        // Convert .ts/.tsx extensions to .js/.jsx for JavaScript projects
+        let jsFilePath = filePath;
+        if (language === 'javascript') {
+          jsFilePath = filePath.replace(/\.tsx?$/, filePath.endsWith('.tsx') ? '.jsx' : '.js');
         }
-        break;
-      case 'expressjs':
-        baseFiles['index.ts'] = { action: 'overwrite' };
-        baseFiles['types/index.ts'] = { action: 'create' };
-        break;
-      case 'reactjs':
-        baseFiles['src/main.tsx'] = { action: 'overwrite' };
-        baseFiles['src/App.tsx'] = { action: 'overwrite' };
-        break;
-      case 'vuejs':
-        // Always overwrite main file and create components folder
-        baseFiles['src/main.ts'] = { action: 'overwrite' };
-        baseFiles['src/App.vue'] = { action: 'overwrite' };
-        baseFiles['src/components/LoginButton.vue'] = { action: 'create' };
-        baseFiles['src/components/LogoutButton.vue'] = { action: 'create' };
-        baseFiles['src/components/UserProfile.vue'] = { action: 'create' };
-        break;
-      case 'remixjs':
-        baseFiles['app/root.tsx'] = { action: 'overwrite' };
-        break;
-      case 'reactjs+expressjs+shadcn':
-        // Use backend auth for combo templates
-        baseFiles['backend/index.ts'] = { action: 'append' };
-        baseFiles['backend/types/global.d.ts'] = { action: 'create' };
+        baseFiles[jsFilePath] = fallbackFiles[filePath];
+      });
+    }
+    return baseFiles;
+  }
+  
+  // Handle Next.js src folder structure
+  if (framework === 'nextjs') {
+    const projectPath = process.cwd();
+    const hasSrc = fs.existsSync(path.join(projectPath, 'src'));
+    
+    Object.keys(languageFiles).forEach(filePath => {
+      let finalPath = filePath;
+      
+      // Adjust paths for src folder structure
+      if (hasSrc && !filePath.startsWith('src/') && 
+          (filePath.includes('app/') || filePath.includes('lib/') || filePath === 'middleware.ts' || filePath === 'middleware.js')) {
+        finalPath = `src/${filePath}`;
+      }
+      
+      baseFiles[finalPath] = languageFiles[filePath];
+    });
+  } else {
+    // For other frameworks, use files as-is
+    Object.keys(languageFiles).forEach(filePath => {
+      baseFiles[filePath] = languageFiles[filePath];
+    });
+  }
+  
+  return baseFiles;
+}
+
+/**
+ * Get UI provider specific files for a framework and language
+ */
+function getUIProviderFiles(
+  uiProviderFiles: any,
+  framework: string, 
+  language: string
+): { [filePath: string]: FeatureConfig['files'][string] } {
+  const baseFiles: { [filePath: string]: FeatureConfig['files'][string] } = {};
+  
+  const frameworkFiles = uiProviderFiles[framework];
+  if (!frameworkFiles) {
+    return {};
+  }
+  
+  const languageFiles = frameworkFiles[language];
+  if (!languageFiles) {
+    // For UI, always overwrite files regardless of language
+    const fallbackFiles = frameworkFiles['typescript'] || frameworkFiles['javascript'];
+    if (fallbackFiles) {
+      Object.keys(fallbackFiles).forEach(filePath => {
+        baseFiles[filePath] = { action: 'overwrite' };  // UI files should always overwrite
+      });
+    }
+    return baseFiles;
+  }
+  
+  // UI files should always overwrite
+  Object.keys(languageFiles).forEach(filePath => {
+    baseFiles[filePath] = { action: 'overwrite' };
+  });
+  
+  return baseFiles;
         break;
     }
   } else if (featureName === 'docker') {
@@ -770,7 +1058,7 @@ export async function addFeature(
     }
     
     // Get framework-specific files
-    const frameworkFiles = getFrameworkFiles(featureName, framework);
+    const frameworkFiles = getFrameworkFiles(featureName, framework, projectLanguage || 'typescript', authProvider);
     
     // Process feature files
     const fileSpinner = ora(chalk.hex('#00d2d3')('📝 Adding feature files...')).start();
@@ -824,4 +1112,277 @@ export function listAvailableFeatures(): void {
     console.log(`  ${chalk.hex('#ffa502')('Frameworks:')} ${config.supportedFrameworks.join(', ')}`);
     console.log('');
   }
+}
+
+/**
+ * Install Auth0 authentication
+ */
+export async function installAuth0Auth(
+  framework: string, 
+  language: string,
+  options: { src?: boolean } = {}
+): Promise<void> {
+  const spinner = ora(chalk.hex('#f39c12')('Installing Auth0 authentication...')).start();
+  
+  try {
+    // Auth0 only supports TypeScript for AngularJS 
+    if (framework === 'angularjs' && language === 'javascript') {
+      spinner.fail(chalk.red('❌ Auth0 only supports TypeScript for Angular projects'));
+      throw new Error('Auth0 does not support JavaScript for Angular projects');
+    }
+    
+    const featurePath = path.join(getCliRootPath(), 'features', 'auth', 'auth0', framework, language);
+    
+    if (!await fs.pathExists(featurePath)) {
+      spinner.fail(chalk.red(`❌ Auth0 templates not found for ${framework}/${language}`));
+      throw new Error(`Auth0 templates not available for ${framework}/${language}`);
+    }
+    
+    await copyFeatureFiles(featurePath, process.cwd(), { src: options.src });
+    
+    // Install Auth0 dependencies
+    const dependencies = getAuth0Dependencies(framework);
+    if (dependencies.length > 0) {
+      await installAdditionalPackages(dependencies, language as SupportedLanguage);
+    }
+    
+    spinner.succeed(chalk.green('✅ Auth0 authentication installed successfully'));
+    
+    // Show Auth0 setup instructions
+    console.log('\n' + chalk.hex('#f39c12')('📋 Auth0 Setup Instructions:'));
+    console.log(chalk.hex('#95afc0')('1. Create an Auth0 account at https://auth0.com'));
+    console.log(chalk.hex('#95afc0')('2. Set up your Auth0 application and get your domain and client ID'));
+    console.log(chalk.hex('#95afc0')('3. Update the .env file with your Auth0 credentials'));
+    console.log(chalk.hex('#95afc0')('4. Documentation: https://auth0.com/docs/quickstart/webapp'));
+    
+  } catch (error: any) {
+    spinner.fail(chalk.red(`❌ Failed to install Auth0: ${error.message}`));
+    throw error;
+  }
+}
+
+/**
+ * Install Clerk authentication
+ */
+export async function installClerkAuth(
+  framework: string, 
+  language: string,
+  options: { src?: boolean } = {}
+): Promise<void> {
+  const spinner = ora(chalk.hex('#f39c12')('Installing Clerk authentication...')).start();
+  
+  try {
+    // Clerk only supports TypeScript for RemixJS
+    if (framework === 'remixjs' && language === 'javascript') {
+      spinner.fail(chalk.red('❌ Clerk only supports TypeScript for Remix projects'));
+      throw new Error('Clerk does not support JavaScript for Remix projects');
+    }
+    
+    const featurePath = path.join(getCliRootPath(), 'features', 'auth', 'clerk', framework, language);
+    
+    if (!await fs.pathExists(featurePath)) {
+      spinner.fail(chalk.red(`❌ Clerk templates not found for ${framework}/${language}`));
+      throw new Error(`Clerk templates not available for ${framework}/${language}`);
+    }
+    
+    await copyFeatureFiles(featurePath, process.cwd(), { src: options.src });
+    
+    // Install Clerk dependencies
+    const dependencies = getClerkDependencies(framework);
+    if (dependencies.length > 0) {
+      await installAdditionalPackages(dependencies, language as SupportedLanguage);
+    }
+    
+    spinner.succeed(chalk.green('✅ Clerk authentication installed successfully'));
+    
+    // Show Clerk setup instructions
+    console.log('\n' + chalk.hex('#f39c12')('📋 Clerk Setup Instructions:'));
+    console.log(chalk.hex('#95afc0')('1. Create a Clerk account at https://clerk.com'));
+    console.log(chalk.hex('#95afc0')('2. Create a new application and get your publishable key and secret key'));
+    console.log(chalk.hex('#95afc0')('3. Update the .env file with your Clerk credentials'));
+    console.log(chalk.hex('#95afc0')('4. Documentation: https://clerk.com/docs'));
+    
+  } catch (error: any) {
+    spinner.fail(chalk.red(`❌ Failed to install Clerk: ${error.message}`));
+    throw error;
+  }
+}
+
+/**
+ * Install Next-Auth authentication
+ */
+export async function installNextAuth(
+  framework: string, 
+  language: string,
+  options: { src?: boolean } = {}
+): Promise<void> {
+  const spinner = ora(chalk.hex('#f39c12')('Installing Next-Auth authentication...')).start();
+  
+  try {
+    // Next-Auth is primarily for Next.js
+    if (framework !== 'nextjs') {
+      spinner.fail(chalk.red('❌ Next-Auth is only available for Next.js projects'));
+      throw new Error('Next-Auth is only supported for Next.js projects');
+    }
+    
+    const featurePath = path.join(getCliRootPath(), 'features', 'auth', 'next-auth', framework, language);
+    
+    if (!await fs.pathExists(featurePath)) {
+      spinner.fail(chalk.red(`❌ Next-Auth templates not found for ${framework}/${language}`));
+      throw new Error(`Next-Auth templates not available for ${framework}/${language}`);
+    }
+    
+    await copyFeatureFiles(featurePath, process.cwd(), { src: options.src });
+    
+    // Install Next-Auth dependencies
+    const dependencies = getNextAuthDependencies();
+    if (dependencies.length > 0) {
+      await installAdditionalPackages(dependencies, language as SupportedLanguage);
+    }
+    
+    spinner.succeed(chalk.green('✅ Next-Auth authentication installed successfully'));
+    
+    // Show Next-Auth setup instructions
+    console.log('\n' + chalk.hex('#f39c12')('📋 Next-Auth Setup Instructions:'));
+    console.log(chalk.hex('#95afc0')('1. Configure your authentication providers in lib/auth.ts'));
+    console.log(chalk.hex('#95afc0')('2. Set up your environment variables in .env.local'));
+    console.log(chalk.hex('#95afc0')('3. Add your database connection if using database sessions'));
+    console.log(chalk.hex('#95afc0')('4. Documentation: https://next-auth.js.org/getting-started/introduction'));
+    
+  } catch (error: any) {
+    spinner.fail(chalk.red(`❌ Failed to install Next-Auth: ${error.message}`));
+    throw error;
+  }
+}
+
+/**
+ * Get Auth0 dependencies for a specific framework
+ */
+function getAuth0Dependencies(framework: string): string[] {
+  switch (framework) {
+    case 'nextjs':
+      return ['@auth0/nextjs-auth0'];
+    case 'expressjs':
+      return ['express-openid-connect'];
+    case 'vuejs':
+      return ['@auth0/auth0-vue'];
+    case 'reactjs':
+      return ['@auth0/auth0-react'];
+    case 'angularjs':
+      return ['@auth0/auth0-angular'];
+    default:
+      return [];
+  }
+}
+
+/**
+ * Get Clerk dependencies for a specific framework
+ */
+function getClerkDependencies(framework: string): string[] {
+  switch (framework) {
+    case 'nextjs':
+      return ['@clerk/nextjs'];
+    case 'expressjs':
+      return ['@clerk/express'];
+    case 'reactjs':
+      return ['@clerk/clerk-react'];
+    case 'vuejs':
+      return ['@clerk/vue'];
+    case 'remixjs':
+      return ['@clerk/remix'];
+    default:
+      return [];
+  }
+}
+
+/**
+ * Get Next-Auth dependencies
+ */
+function getNextAuthDependencies(): string[] {
+  return ['next-auth', 'bcryptjs', '@types/bcryptjs'];
+}
+
+/**
+ * Separate auth provider installation functions to avoid conflicts
+ */
+
+/**
+ * Install Clerk authentication
+ */
+export async function installClerkAuth(
+  framework: string,
+  language: string,
+  projectPath: string = process.cwd()
+): Promise<void> {
+  console.log(chalk.hex('#7c3aed')('🔐 Installing Clerk Authentication...'));
+  
+  // Add disclaimer about Auth0 Angular support
+  if (framework === 'angularjs') {
+    console.log(chalk.yellow('⚠️  Clerk may have limited support for AngularJS. Consider using TypeScript templates.'));
+  }
+  
+  if (framework === 'remixjs' && language === 'javascript') {
+    throw new Error('Clerk only supports TypeScript for Remix.js projects');
+  }
+  
+  await addFeature('auth', projectPath, { authProvider: 'clerk' });
+  
+  // Add quick setup docs
+  console.log(chalk.hex('#00d2d3')('\n📖 Quick Setup Guide:'));
+  console.log(chalk.gray('1. Create a Clerk account at https://clerk.com'));
+  console.log(chalk.gray('2. Create a new application'));
+  console.log(chalk.gray('3. Copy your API keys to .env file'));
+  console.log(chalk.gray('4. Configure your sign-in/sign-up pages'));
+  console.log(chalk.hex('#00d2d3')('📚 Full docs: https://clerk.com/docs'));
+}
+
+/**
+ * Install Auth0 authentication
+ */
+export async function installAuth0Auth(
+  framework: string,
+  language: string,
+  projectPath: string = process.cwd()
+): Promise<void> {
+  console.log(chalk.hex('#eb5424')('🔐 Installing Auth0 Authentication...'));
+  
+  // Check language support
+  if (framework === 'angularjs' && language === 'javascript') {
+    throw new Error('Auth0 only supports TypeScript for AngularJS projects');
+  }
+  
+  await addFeature('auth', projectPath, { authProvider: 'auth0' });
+  
+  // Add quick setup docs
+  console.log(chalk.hex('#00d2d3')('\n📖 Quick Setup Guide:'));
+  console.log(chalk.gray('1. Create an Auth0 account at https://auth0.com'));
+  console.log(chalk.gray('2. Create a new application'));
+  console.log(chalk.gray('3. Configure allowed callback URLs'));
+  console.log(chalk.gray('4. Copy your domain and client ID to .env file'));
+  console.log(chalk.hex('#00d2d3')('📚 Full docs: https://auth0.com/docs'));
+}
+
+/**
+ * Install Next-Auth authentication
+ */
+export async function installNextAuth(
+  framework: string,
+  language: string,
+  projectPath: string = process.cwd()
+): Promise<void> {
+  console.log(chalk.hex('#0070f3')('🔐 Installing NextAuth.js...'));
+  
+  if (framework !== 'nextjs') {
+    throw new Error('NextAuth.js is only supported for Next.js projects');
+  }
+  
+  await addFeature('auth', projectPath, { authProvider: 'next-auth' });
+  
+  // Add quick setup docs
+  console.log(chalk.hex('#00d2d3')('\n📖 Quick Setup Guide:'));
+  console.log(chalk.gray('1. Configure your providers in lib/auth.ts'));
+  console.log(chalk.gray('2. Set NEXTAUTH_SECRET in .env file'));
+  console.log(chalk.gray('3. Configure OAuth providers (Google, GitHub, etc.)'));
+  console.log(chalk.gray('4. Set up your database connection'));
+  console.log(chalk.hex('#00d2d3')('📚 Full docs: https://next-auth.js.org'));
 }
