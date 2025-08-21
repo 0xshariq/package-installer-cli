@@ -182,11 +182,8 @@ const PROJECT_TYPES: ProjectType[] = [
     getUpdateCommand: () => 'bundle update',
     registryUrl: 'https://rubygems.org/api/v1/gems'
   },
-  {
-    name: 'PHP',
-    files: ['composer.json'],
-    packageManager: 'composer',
-    getDependencies: (composerJson) => ({
+];
+
 // Generate PROJECT_TYPES from shared language configuration
 const PROJECT_TYPES: ProjectType[] = getSupportedLanguages().map(lang => {
   const config = getLanguageConfig(lang)!;
