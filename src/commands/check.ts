@@ -230,7 +230,12 @@ export function showCheckHelp(): void {
   ));
 }
 
-export async function checkCommand(packageName?: string, options?: { verbose?: boolean }) {
+export async function checkCommand(packageName?: string, options?: { verbose?: boolean; help?: boolean; '--help'?: boolean; '-h'?: boolean }) {
+  // Check for help flag
+  if (options?.help || options?.['--help'] || options?.['-h']) {
+    showCheckHelp();
+    return;
+  }
   // Check for help flag
   if (packageName === '--help' || packageName === '-h') {
     showCheckHelp();

@@ -88,9 +88,9 @@ export function showCreateHelp(): void {
 /**
  * Main create project function with comprehensive prompt system
  */
-export async function createProject(providedName?: string): Promise<void> {
+export async function createProject(providedName?: string, options?: any): Promise<void> {
   // Check for special flags
-  if (providedName === '--help' || providedName === '-h') {
+  if (providedName === '--help' || providedName === '-h' || options?.help || options?.['--help'] || options?.['-h']) {
     showCreateHelp();
     return;
   }
@@ -534,7 +534,7 @@ async function promptLanguageSelectionWithCache(fwConfig: any, theme: any, cache
  * Cache-aware database selection prompt
  */
 async function promptDatabaseSelectionWithCache(fwConfig: any, theme: any, cache: UserCacheData) {
-  if (cache.database && fwConfig.databases && fwConfig.databases.includes(cache.database)) {
+  if (cache.database && fwConfig.databases && Array.isArray(fwConfig.databases) && fwConfig.databases.includes(cache.database)) {
     console.log(chalk.hex('#95afc0')(`💾 Using cached database preference: ${chalk.bold(cache.database)}`));
     
     const { useCache } = await inquirer.prompt([

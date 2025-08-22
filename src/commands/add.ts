@@ -125,9 +125,9 @@ export function showAddHelp(): void {
   ));
 }
 
-export async function addCommand(feature?: string) {
+export async function addCommand(feature?: string, options?: any) {
   // Check for help flag
-  if (feature === '--help' || feature === '-h') {
+  if (feature === '--help' || feature === '-h' || options?.help || options?.['--help'] || options?.['-h']) {
     showAddHelp();
     return;
   }

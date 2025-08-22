@@ -66,7 +66,13 @@ export function showAnalyzeHelp(): void {
 /**
  * Main analyze command function
  */
-export async function analyzeCommand(): Promise<void> {
+export async function analyzeCommand(options: any = {}): Promise<void> {
+  // Show help if help flag is present
+  if (options.help || options['--help'] || options['-h']) {
+    showAnalyzeHelp();
+    return;
+  }
+
   // Create beautiful banner with full name
   console.clear();
   
@@ -93,7 +99,7 @@ export async function analyzeCommand(): Promise<void> {
   
   // Add tagline
   const tagline = chalk.hex('#00d2d3')('🔍 Advanced Project Analytics Dashboard');
-  const version = chalk.hex('#95afc0')('v2.3.0');
+  const version = chalk.hex('#95afc0')('v2.5.0');
   const author = chalk.hex('#ffa502')('by @0xshariq');
   
   const centered = `${tagline} ${version} ${author}`;
@@ -132,9 +138,9 @@ export async function analyzeCommand(): Promise<void> {
     console.log();
     
     // Display comprehensive dashboard with real data from history
-    displayProjectStatsFromHistory(history);
-    displayRecentProjectsFromHistory(historyManager.getRecentProjects());
-    displayFeatureUsageFromHistory(historyManager.getFeatureStats());
+    displayProjectStats(history);
+    displayRecentProjects(historyManager.getRecentProjects());
+    displayFeatureUsage(historyManager.getFeatureStats());
     displayCommandsGrid();
     displaySystemInfo();
     displayCacheStats();

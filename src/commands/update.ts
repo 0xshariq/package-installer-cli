@@ -37,7 +37,7 @@ function getUpdateCommand(language: SupportedLanguage, packageManagerName?: stri
  * Main update command function
  */
 export async function updateCommand(options: any): Promise<void> {
-  if (options.help) {
+  if (options.help || options['--help'] || options['-h']) {
     showUpdateHelp();
     return;
   }

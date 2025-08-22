@@ -136,59 +136,59 @@ export const SUPPORTED_FEATURES: { [key: string]: FeatureConfig } = {
       auth0: {
         nextjs: {
           typescript: {
-            '.env': { action: '' },
-            'middleware.ts': { action: '' },
+            '.env': { action: 'append' },
+            'middleware.ts': { action: 'create' }, // if the file already exists then overwrite the file
             'package.json': { action: '' },
-            'app/page.tsx': { action: '' },
-            'lib/auth0.ts': { action: '' }
+            'app/page.tsx': { action: 'overwrite' },
+            'lib/auth0.ts': { action: 'create' }
           },
           javascript: {
-            '.env': { action: '' },
-            'middleware.js': { action: '' },
+            '.env': { action: 'append' },
+            'middleware.js': { action: 'create' }, // if the file already exists then overwrite the file
             'package.json': { action: '' },
-            'app/page.jsx': { action: '' },
-            'lib/auth0.js': { action: '' }
+            'app/page.jsx': { action: 'overwrite' },
+            'lib/auth0.js': { action: 'create' }
           }
         },
         expressjs: {
           typescript: {
-            'index.ts': { action: '' },
+            'index.ts': { action: 'prepend' },
             'package.json': { action: '' }
           },
           javascript: {
-            'index.js': { action: '' },
+            'index.js': { action: 'prepend' },
             'package.json': { action: '' }
           }
         },
         vuejs: {
           typescript: {
-            'main.ts': { action: '' },
+            'src/main.ts': { action: 'overwrite' },
             'package.json': { action: '' },
-            'src/components/LoginButton.vue': { action: '' },
-            'src/components/LogoutButton.vue': { action: '' },
-            'src/components/UserProfile.vue': { action: '' },
-            'src/components/login.vue': { action: '' },
-            'src/components/logout.vue': { action: '' },
-            'src/components/profile.vue': { action: '' }
+            'src/components/LoginButton.vue': { action: 'create' },
+            'src/components/LogoutButton.vue': { action: 'create' },
+            'src/components/UserProfile.vue': { action: 'create' },
+            'src/components/login.vue': { action: 'create' },
+            'src/components/logout.vue': { action: 'create' },
+            'src/components/profile.vue': { action: 'create' }
           },
           javascript: {
-            'main.js': { action: '' },
+            'src/main.js': { action: 'overwrite' },
             'package.json': { action: '' },
-            'src/components/LoginButton.vue': { action: '' },
-            'src/components/LogoutButton.vue': { action: '' },
-            'src/components/UserProfile.vue': { action: '' },
-            'src/components/login.vue': { action: '' },
-            'src/components/logout.vue': { action: '' },
-            'src/components/profile.vue': { action: '' }
+            'src/components/LoginButton.vue': { action: 'create' },
+            'src/components/LogoutButton.vue': { action: 'create' },
+            'src/components/UserProfile.vue': { action: 'create' },
+            'src/components/login.vue': { action: 'create' },
+            'src/components/logout.vue': { action: 'create' },
+            'src/components/profile.vue': { action: 'create' }
           }
         },
         angularjs: {
           typescript: {
-            'main.ts': { action: '' },
+            'src/main.ts': { action: 'overwrite' },
             'package.json': { action: '' },
-            'src/app/user-profile.ts': { action: '' },
-            'src/app/login-button.ts': { action: '' },
-            'src/app/logout-button.ts': { action: '' }
+            'src/app/user-profile.ts': { action: 'create' },
+            'src/app/login-button.ts': { action: 'create' },
+            'src/app/logout-button.ts': { action: 'create' }
           }
         }
       },
@@ -217,7 +217,7 @@ export const SUPPORTED_FEATURES: { [key: string]: FeatureConfig } = {
           },
           javascript: {
             '.env': { action: '' },
-            'index.js': { action: '' },
+            'index.js': { action: '' },3
             'package.json': { action: '' }
           }
         },
@@ -262,22 +262,22 @@ export const SUPPORTED_FEATURES: { [key: string]: FeatureConfig } = {
       'next-auth': {
         nextjs: {
           typescript: {
-            '.env': { action: '' },
+            '.env': { action: 'append' },
             'package.json': { action: '' },
-            'middleware.ts': { action: '' },
-            'lib/auth.ts': { action: '' },
-            'lib/auth-provider.tsx': { action: '' },
-            'app/layout.tsx': { action: '' },
-            'app/api/auth/[...nextauth]/route.ts': { action: '' }
+            'middleware.ts': { action: 'create' },
+            'lib/auth.ts': { action: 'create' },
+            'lib/auth-provider.tsx': { action: 'create' },
+            'app/layout.tsx': { action: 'overwrite' },
+            'app/api/auth/[...nextauth]/route.ts': { action: 'create' }
           },
           javascript: {
-            '.env': { action: '' },
+            '.env': { action: 'append' },
             'package.json': { action: '' },
-            'middleware.js': { action: '' },
-            'lib/auth.js': { action: '' },
-            'lib/auth-provider.jsx': { action: '' },
-            'app/layout.jsx': { action: '' },
-            'app/api/auth/[...nextauth]/route.js': { action: '' }
+            'middleware.js': { action: 'create' },
+            'lib/auth.js': { action: 'create' },
+            'lib/auth-provider.jsx': { action: 'create' },
+            'app/layout.jsx': { action: 'overwrite' },
+            'app/api/auth/[...nextauth]/route.js': { action: 'create' }
           }
         }
       }
@@ -322,44 +322,44 @@ export const SUPPORTED_FEATURES: { [key: string]: FeatureConfig } = {
         nextjs: {
           typescript: {
             'package.json': { action: '' },
-            'postcss.config.mjs': { action: '' },
-            'app/globals.css': { action: '' }
+            'postcss.config.mjs': { action: 'create' }, // if the file is already exist then overwrite it
+            'app/globals.css': { action: 'prepend' }
           },
           javascript: {
             'package.json': { action: '' },
-            'postcss.config.mjs': { action: '' },
-            'app/globals.css': { action: '' }
+            'postcss.config.mjs': { action: 'create' }, // if the file is already exist then overwrite it
+            'app/globals.css': { action: 'prepend' }
           }
         },
         reactjs: {
           typescript: {
             'package.json': { action: '' },
-            'vite.config.ts': { action: '' },
-            'src/index.css': { action: '' }
+            'vite.config.ts': { action: 'overwrite' },
+            'src/index.css': { action: 'prepend' }
           },
           javascript: {
             'package.json': { action: '' },
-            'vite.config.js': { action: '' },
-            'src/index.css': { action: '' }
+            'vite.config.js': { action: 'overwrite' },
+            'src/index.css': { action: 'prepend' }
           }
         },
         vuejs: {
           typescript: {
             'package.json': { action: '' },
-            'vite.config.ts': { action: '' },
-            'src/assets/main.css': { action: '' }
+            'vite.config.ts': { action: 'overwrite' },
+            'src/assets/main.css': { action: 'prepend' }
           },
           javascript: {
             'package.json': { action: '' },
-            'vite.config.ts': { action: '' },
-            'src/assets/main.css': { action: '' }
+            'vite.config.ts': { action: 'overwrite' },
+            'src/assets/main.css': { action: 'prepend' }
           }
         },
         angularjs: {
           typescript: {
             'package.json': { action: '' },
-            '.postcssrc.json': { action: '' },
-            'src/styles.css': { action: '' }
+            '.postcssrc.json': { action: 'create' },
+            'src/styles.css': { action: 'prepend' }
           }
         }
       }
