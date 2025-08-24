@@ -1,3 +1,3 @@
 import paymentRoutes from "./routes/payment";
 
-app.use(paymentRoutes);
+app.use("/api/razorpay", paymentRoutes);
