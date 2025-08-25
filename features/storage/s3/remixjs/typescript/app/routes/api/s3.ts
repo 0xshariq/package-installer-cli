@@ -1,6 +1,6 @@
 import type { ActionFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
-import { uploadFile, listFiles } from "../../../utils/s3";
+import { uploadFile, listFiles } from "../../utils/s3";
 
 export const action: ActionFunction = async ({ request }) => {
   const body = await request.json();
