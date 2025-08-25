@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { upload, list, deletefile } from "../controllers/imagekitController.js";
+import { upload, list, deletefile } from "../controllers/imagekitControllers.js";
 
 const router = Router();
 

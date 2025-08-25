@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { createPaymentIntent, refundPayment } from "../controllers/stripeController";
+import { createPaymentIntent, refundPayment } from "../controllers/stripeControllers";
 
 const router = Router();
 

@@ -1,6 +1,6 @@
 import { Router } from "express";
 import Razorpay from "razorpay";
-import { createOrder, refundPayment } from "../../controllers/payment";
+import { createOrder, refundPayment } from "../controllers/payment";
 
 const router = Router();
 const razorpay = new Razorpay({

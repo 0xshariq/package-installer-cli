@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { upload, list } from "../controllers/s3Controller";
+import { upload, list } from "../controllers/s3Controllers";
 
 const router = Router();
 
