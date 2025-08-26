@@ -1,0 +1,5 @@
+{
+    "dependencies": {
+        "@aws-sdk/client-codebuild": "^3.873.0"
+    }
+}
