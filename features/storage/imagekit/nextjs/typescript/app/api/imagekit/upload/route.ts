@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { uploadFile } from "@/utils/imagekit";
+import { uploadFile } from "@/lib/imagekit";
 
 export async function POST(request: Request) {
   try {

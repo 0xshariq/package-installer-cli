@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { listFiles } from "@/utils/cloudinary";
+import { listFiles } from "@/lib/cloudinary";
 
 export async function GET(request: Request) {
   try {

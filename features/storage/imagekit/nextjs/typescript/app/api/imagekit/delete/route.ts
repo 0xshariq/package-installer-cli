@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import {deletefile} from '@/utils/imagekit';
+import {deletefile} from '@/lib/imagekit';
 
 export async function DELETE(request) {
     try {

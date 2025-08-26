@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { deleteFile } from "@/utils/cloudinary";
+import { deleteFile } from "@/lib/cloudinary";
 
 export async function POST(request: Request) {
   try {
