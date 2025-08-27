@@ -1,4 +1,4 @@
 
 import awsEcsRoutes from './routes/awsEcsRoutes.js';
 
-app.use("/api/iam",awsEcsRoutes)
+app.use("/api/ecs",awsEcsRoutes)
