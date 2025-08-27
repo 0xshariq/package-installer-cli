@@ -1,6 +1,6 @@
 import type { ActionFunction, LoaderFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
-import { runTask, listTasks, stopTask } from "../../services/awsEcsService";
+import { runTask, listTasks, stopTask } from "../../utils/awsEcs";
 
 export const loader: LoaderFunction = async ({ request }) => {
   const url = new URL(request.url);
