@@ -74,7 +74,7 @@ function displayRoadmap(): void {
     chalk.hex('#ffa502')('🔄 Phase 2: Advanced Templates') + chalk.hex('#95afc0')(' (In Progress)') + '\n' +
     chalk.hex('#ff6b6b')('📋 Phase 3: Deployment Integration') + chalk.hex('#95afc0')(' (Planned)') + '\n' +
     chalk.hex('#e056fd')('🚀 Phase 4: CI/CD Automation') + chalk.hex('#95afc0')(' (Future)') + '\n\n' +
-    chalk.hex('#00d2d3')('Estimated Timeline: Q2 2024'),
+    chalk.hex('#00d2d3')('Estimated Timeline: Q2 2025'),
     {
       padding: 1,
       borderStyle: 'round',
@@ -92,7 +92,7 @@ function displayPlatformSupport(): void {
     { name: 'Vercel', status: 'planned', icon: '▲' },
     { name: 'Netlify', status: 'planned', icon: '🟢' },
     { name: 'Railway', status: 'planned', icon: '🚂' },
-    { name: 'Heroku', status: 'planned', icon: '💜' },
+    { name: 'Render', status: 'planned', icon: '💜' },
     { name: 'AWS', status: 'future', icon: '☁️' },
     { name: 'Google Cloud', status: 'future', icon: '🌥️' },
     { name: 'Docker Hub', status: 'planned', icon: '🐳' },
