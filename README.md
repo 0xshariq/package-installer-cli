@@ -12,7 +12,7 @@ A **cross-platform, interactive CLI** to scaffold modern web application templat
 - **🔤 Language Support**: TypeScript & JavaScript variants
 - **🎭 UI Libraries**: Tailwind CSS, Material-UI, shadcn/ui
 - **📦 Smart Bundlers**: Vite, built-in framework bundlers
-- ** Auto-Installation**: Automatic dependency installation
+- **Auto-Installation**: Automatic dependency installation
 - **🎯 Interactive Prompts**: Guided project setup experience
 - **⚡ Lightning Fast**: Optimized template generation
 - **🌈 Beautiful CLI**: Gorgeous terminal interface
