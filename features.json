@@ -1,0 +1,13 @@
+{
+    "features": {
+        "ai": {},
+        "auth": {},
+        "aws": {},
+        "database": {},
+        "docker": {},
+        "gitignore": {},
+        "payment": {},
+        "storage": {},
+        "ui": {}
+    }
+}
