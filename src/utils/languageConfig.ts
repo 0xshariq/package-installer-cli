@@ -3,7 +3,7 @@
  * Used by dependencyInstaller, check command, update command, and others
  */
 
-export type SupportedLanguage = 'nodejs' | 'rust' | 'python' | 'go' | 'ruby' | 'php' | 'java' | 'csharp' | 'swift' | 'dart';
+export type SupportedLanguage = 'js' | 'rust' | 'python' | 'go' | 'ruby' | 'php' | 'java' | 'csharp' | 'swift' | 'dart';
 
 export interface LanguageConfig {
   name: string;
