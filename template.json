@@ -97,6 +97,9 @@
       "languages": ["typescript"],
       "ui": ["shadcn"],
       "templates": ["react-nest-shadcn-template"]
-    }
+    },
+    "ruby": {},
+    "django": {},
+    "go": {}
   }
 }
