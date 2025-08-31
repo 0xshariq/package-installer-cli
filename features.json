@@ -1,13 +1,105 @@
 {
-    "features": {
-        "ai": {},
-        "auth": {},
-        "aws": {},
-        "database": {},
-        "docker": {},
-        "gitignore": {},
-        "payment": {},
-        "storage": {},
-        "ui": {}
+  "features": {
+    "ai": {
+      "supportedFrameworks": ["nextjs", "expressjs", "nestjs", "remixjs"],
+      "supportedLanguages": ["javascript"],
+      "supportedAIs": ["gemini", "grok", "open-ai", "open-router", "claude"]
+    },
+    "auth": {
+      "supportedFrameworks": [
+        "nextjs",
+        "expressjs",
+        "nestjs",
+        "remixjs",
+        "angularjs",
+        "vuejs",
+        "reactjs"
+      ],
+      "supportedLanguages": ["javascript"],
+      "supportedAuths": ["auth0", "clerk", "next-auth"]
+    },
+    "aws": {
+      "supportedFrameworks": ["nextjs", "expressjs", "nestjs", "remixjs"],
+      "supportedLanguages": ["javascript"],
+      "supportedAwsServices": [
+        "cloudfront",
+        "cloudwatch",
+        "codecommit",
+        "codepipeline",
+        "config",
+        "ec2",
+        "efs",
+        "iam",
+        "lambda",
+        "s3",
+        "x-ray",
+        "cloudtrail",
+        "codebuild",
+        "codedeploy",
+        "cognito",
+        "ebs",
+        "ecs",
+        "elb",
+        "kms",
+        "organizations",
+        "trustedAdvisor"
+      ]
+    },
+    "database": {
+      "supportedFrameworks": ["nextjs", "expressjs", "nestjs", "remixjs"],
+      "supportedLanguages": ["javascript"],
+      "supportedDatabases": ["mongodb", "supabase", "neondb"],
+      "supportedORMs": {
+        "mongodb": {
+          "javascript": ["mongoose"],
+          "typescript": ["mongoose", "typegoose"]
+        },
+        "supabase": {
+          "javascript": ["typeorm"],
+          "typescript": ["typeorm", "prisma", "drizzle"]
+        },
+        "neondb": {
+          "javascript": ["typeorm"],
+          "typescript": ["typeorm", "prisma", "drizzle"]
+        }
+      }
+    },
+    "docker": {
+      "supportedFrameworks": [
+        "nextjs",
+        "expressjs",
+        "nestjs",
+        "remixjs",
+        "angularjs",
+        "vuejs",
+        "reactjs"
+      ],
+      "supportedLanguages": ["javascript"]
+    },
+    "gitignore": {
+      "supportedFrameworks": ["nextjs", "angularjs", "nestjs"],
+      "supportedLanguages": ["javascript", "go", "python", "rust"]
+    },
+    "payment": {
+      "supportedFrameworks": [
+        "nextjs",
+        "expressjs",
+        "nestjs",
+        "remixjs",
+        "vuejs"
+      ],
+      "supportedLanguages": ["javascript"],
+      "supportedPayments": ["stripe", "razorpay", "paypal"]
+    },
+    "storage": {
+      "supportedFrameworks": ["nextjs", "expressjs", "nestjs", "remixjs"],
+      "supportedLanguages": ["javascript"],
+      "supportedStorages": ["imagekit.io", "cloudinary", "google-cloud"]
+    },
+    "ui": {
+      "supportedFrameworks": ["nextjs", "angularjs", "reactjs", "vuejs"],
+      "supportedLanguages": ["javascript"],
+      "supportedUiLibraries": ["daisy"]
     }
+  }
 }
