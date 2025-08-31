@@ -4,32 +4,6 @@
       "type": "fullstack",
       "description": "Full-stack React framework with server-side rendering",
       "languages": ["javascript", "typescript"],
-      "databases": {
-        "mongodb": {
-          "javascript": {
-            "orms": ["mongoose"]
-          },
-          "typescript": {
-            "orms": ["mongoose", "typegoose"]
-          }
-        },
-        "supabase": {
-          "javascript": {
-            "orms": ["typeorm"]
-          },
-          "typescript": {
-            "orms": ["drizzle", "prisma", "typeorm"]
-          }
-        },
-        "neondb": {
-          "javascript": {
-            "orms": ["typeorm"]
-          },
-          "typescript": {
-            "orms": ["prisma", "drizzle", "typeorm"]
-          }
-        }
-      },
       "ui": ["shadcn"],
       "options": ["src", "tailwind"],
       "templates": [
@@ -93,45 +67,12 @@
       "type": "backend",
       "description": "Fast, unopinionated web framework for Node.js",
       "languages": ["javascript", "typescript"],
-      "databases": {
-        "mongodb": {
-          "javascript": {
-            "orms": ["mongoose"]
-          },
-          "typescript": {
-            "orms": ["mongoose", "typegoose"]
-          }
-        },
-        "supabase": {
-          "javascript": {
-            "orms": ["typeorm"]
-          },
-          "typescript": {
-            "orms": ["drizzle", "prisma", "typeorm"]
-          }
-        },
-        "neondb": {
-          "javascript": {
-            "orms": ["typeorm"]
-          },
-          "typescript": {
-            "orms": ["prisma", "drizzle", "typeorm"]
-          }
-        }
-      },
       "options": ["basic", "advance"]
     },
     "nestjs": {
       "type": "backend",
       "description": "Progressive Node.js framework for building efficient server-side applications",
       "languages": ["typescript"],
-      "databases": {
-        "mongodb": {
-          "typescript": {
-            "orms": ["mongoose"]
-          }
-        }
-      },
       "templates": ["template"]
     },
     "rust": {
@@ -144,32 +85,6 @@
       "type": "fullstack",
       "description": "Complete full-stack solution with React frontend, Express backend, and Shadcn UI",
       "languages": ["javascript", "typescript"],
-      "databases": {
-        "mongodb": {
-          "javascript": {
-            "orms": ["mongoose"]
-          },
-          "typescript": {
-            "orms": ["mongoose", "typegoose"]
-          }
-        },
-        "supabase": {
-          "javascript": {
-            "orms": ["typeorm"]
-          },
-          "typescript": {
-            "orms": ["drizzle", "prisma", "typeorm"]
-          }
-        },
-        "neondb": {
-          "javascript": {
-            "orms": ["typeorm"]
-          },
-          "typescript": {
-            "orms": ["prisma", "drizzle", "typeorm"]
-          }
-        }
-      },
       "ui": ["shadcn"],
       "templates": [
         "react-basic-express-shadcn-template",
@@ -180,13 +95,6 @@
       "type": "fullstack",
       "description": "Enterprise-grade full-stack solution with React frontend, NestJS backend, and Shadcn UI",
       "languages": ["typescript"],
-      "databases": {
-        "mongodb": {
-          "typescript": {
-            "orms": ["mongoose"]
-          }
-        }
-      },
       "ui": ["shadcn"],
       "templates": ["react-nest-shadcn-template"]
     }
