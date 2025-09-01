@@ -3,7 +3,89 @@
     "ai": {
       "supportedFrameworks": ["nextjs", "expressjs", "nestjs", "remixjs"],
       "supportedLanguages": ["javascript"],
-      "supportedAIs": ["gemini", "grok", "open-ai", "open-router", "claude"]
+      "supportedAIs": ["gemini", "grok", "open-ai", "open-router", "claude"],
+      "files": {
+        "claude": {
+          "expressjs": {
+            "javascript": {},
+            "typescript": {}
+          },
+          "nestjs": {
+            "typescript": {}
+          },
+          "nextjs": {
+            "javascript": {},
+            "typescript": {}
+          },
+          "remixjs": {
+            "typescript": {}
+          }
+        },
+        "gemini": {
+          "expressjs": {
+            "javascript": {},
+            "typescript": {}
+          },
+          "nestjs": {
+            "typescript": {}
+          },
+          "nextjs": {
+            "javascript": {},
+            "typescript": {}
+          },
+          "remixjs": {
+            "typescript": {}
+          }
+        },
+        "grok": {
+          "expressjs": {
+            "javascript": {},
+            "typescript": {}
+          },
+          "nestjs": {
+            "typescript": {}
+          },
+          "nextjs": {
+            "javascript": {},
+            "typescript": {}
+          },
+          "remixjs": {
+            "typescript": {}
+          }
+        },
+        "open-router": {
+          "expressjs": {
+            "javascript": {},
+            "typescript": {}
+          },
+          "nestjs": {
+            "typescript": {}
+          },
+          "nextjs": {
+            "javascript": {},
+            "typescript": {}
+          },
+          "remixjs": {
+            "typescript": {}
+          }
+        },
+        "openai": {
+          "expressjs": {
+            "javascript": {},
+            "typescript": {}
+          },
+          "nestjs": {
+            "typescript": {}
+          },
+          "nextjs": {
+            "javascript": {},
+            "typescript": {}
+          },
+          "remixjs": {
+            "typescript": {}
+          }
+        }
+      }
     },
     "auth": {
       "supportedFrameworks": [
@@ -16,7 +98,53 @@
         "reactjs"
       ],
       "supportedLanguages": ["javascript"],
-      "supportedAuths": ["auth0", "clerk", "next-auth"]
+      "supportedAuths": ["auth0", "clerk", "next-auth"],
+      "files": {
+        "auth0": {
+          "angularjs": {
+            "typescript": {}
+          },
+          "expressjs": {
+            "javascript": {},
+            "typescript": {}
+          },
+          "nextjs": {
+            "javascript": {},
+            "typescript": {}
+          },
+          "vuejs": {
+            "javascript": {},
+            "typescript": {}
+          }
+        },
+        "clerk": {
+          "reactjs": {
+            "javascript": {},
+            "typescript": {}
+          },
+          "expressjs": {
+            "javascript": {},
+            "typescript": {}
+          },
+          "nextjs": {
+            "javascript": {},
+            "typescript": {}
+          },
+          "remixjs": {
+            "typescript": {}
+          },
+          "vuejs": {
+            "javascript": {},
+            "typescript": {}
+          }
+        },
+        "next-auth": {
+          "nextjs": {
+            "javascript": {},
+            "typescript": {}
+          }
+        }
+      }
     },
     "aws": {
       "supportedFrameworks": ["nextjs", "expressjs", "nestjs", "remixjs"],
@@ -43,7 +171,345 @@
         "kms",
         "organizations",
         "trustedAdvisor"
-      ]
+      ],
+      "files": {
+        "cloudfront": {
+          "expressjs": {
+            "javascript": {},
+            "typescript": {}
+          },
+          "nestjs": {
+            "typescript": {}
+          },
+          "nextjs": {
+            "javascript": {},
+            "typescript": {}
+          },
+          "remixjs": {
+            "typescript": {}
+          }
+        },
+        "cloudwatch": {
+          "expressjs": {
+            "javascript": {},
+            "typescript": {}
+          },
+          "nestjs": {
+            "typescript": {}
+          },
+          "nextjs": {
+            "javascript": {},
+            "typescript": {}
+          },
+          "remixjs": {
+            "typescript": {}
+          }
+        },
+        "codecommit": {
+          "expressjs": {
+            "javascript": {},
+            "typescript": {}
+          },
+          "nestjs": {
+            "typescript": {}
+          },
+          "nextjs": {
+            "javascript": {},
+            "typescript": {}
+          },
+          "remixjs": {
+            "typescript": {}
+          }
+        },
+        "codepipeline": {
+          "expressjs": {
+            "javascript": {},
+            "typescript": {}
+          },
+          "nestjs": {
+            "typescript": {}
+          },
+          "nextjs": {
+            "javascript": {},
+            "typescript": {}
+          },
+          "remixjs": {
+            "typescript": {}
+          }
+        },
+        "config": {
+          "expressjs": {
+            "javascript": {},
+            "typescript": {}
+          },
+          "nestjs": {
+            "typescript": {}
+          },
+          "nextjs": {
+            "javascript": {},
+            "typescript": {}
+          },
+          "remixjs": {
+            "typescript": {}
+          }
+        },
+        "ec2": {
+          "expressjs": {
+            "javascript": {},
+            "typescript": {}
+          },
+          "nestjs": {
+            "typescript": {}
+          },
+          "nextjs": {
+            "javascript": {},
+            "typescript": {}
+          },
+          "remixjs": {
+            "typescript": {}
+          }
+        },
+        "efs": {
+          "expressjs": {
+            "javascript": {},
+            "typescript": {}
+          },
+          "nestjs": {
+            "typescript": {}
+          },
+          "nextjs": {
+            "javascript": {},
+            "typescript": {}
+          },
+          "remixjs": {
+            "typescript": {}
+          }
+        },
+        "iam": {
+          "expressjs": {
+            "javascript": {},
+            "typescript": {}
+          },
+          "nestjs": {
+            "typescript": {}
+          },
+          "nextjs": {
+            "javascript": {},
+            "typescript": {}
+          },
+          "remixjs": {
+            "typescript": {}
+          }
+        },
+        "lambda": {
+          "expressjs": {
+            "javascript": {},
+            "typescript": {}
+          },
+          "nestjs": {
+            "typescript": {}
+          },
+          "nextjs": {
+            "javascript": {},
+            "typescript": {}
+          },
+          "remixjs": {
+            "typescript": {}
+          }
+        },
+        "s3": {
+          "expressjs": {
+            "javascript": {},
+            "typescript": {}
+          },
+          "nestjs": {
+            "typescript": {}
+          },
+          "nextjs": {
+            "javascript": {},
+            "typescript": {}
+          },
+          "remixjs": {
+            "typescript": {}
+          }
+        },
+        "x-ray": {
+          "expressjs": {
+            "javascript": {},
+            "typescript": {}
+          },
+          "nestjs": {
+            "typescript": {}
+          },
+          "nextjs": {
+            "javascript": {},
+            "typescript": {}
+          },
+          "remixjs": {
+            "typescript": {}
+          }
+        },
+        "cloudtrail": {
+          "expressjs": {
+            "javascript": {},
+            "typescript": {}
+          },
+          "nestjs": {
+            "typescript": {}
+          },
+          "nextjs": {
+            "javascript": {},
+            "typescript": {}
+          },
+          "remixjs": {
+            "typescript": {}
+          }
+        },
+        "codebuild": {
+          "expressjs": {
+            "javascript": {},
+            "typescript": {}
+          },
+          "nestjs": {
+            "typescript": {}
+          },
+          "nextjs": {
+            "javascript": {},
+            "typescript": {}
+          },
+          "remixjs": {
+            "typescript": {}
+          }
+        },
+        "codedeploy": {
+          "expressjs": {
+            "javascript": {},
+            "typescript": {}
+          },
+          "nestjs": {
+            "typescript": {}
+          },
+          "nextjs": {
+            "javascript": {},
+            "typescript": {}
+          },
+          "remixjs": {
+            "typescript": {}
+          }
+        },
+        "cognito": {
+          "expressjs": {
+            "javascript": {},
+            "typescript": {}
+          },
+          "nestjs": {
+            "typescript": {}
+          },
+          "nextjs": {
+            "javascript": {},
+            "typescript": {}
+          },
+          "remixjs": {
+            "typescript": {}
+          }
+        },
+        "ebs": {
+          "expressjs": {
+            "javascript": {},
+            "typescript": {}
+          },
+          "nestjs": {
+            "typescript": {}
+          },
+          "nextjs": {
+            "javascript": {},
+            "typescript": {}
+          },
+          "remixjs": {
+            "typescript": {}
+          }
+        },
+        "ecs": {
+          "expressjs": {
+            "javascript": {},
+            "typescript": {}
+          },
+          "nestjs": {
+            "typescript": {}
+          },
+          "nextjs": {
+            "javascript": {},
+            "typescript": {}
+          },
+          "remixjs": {
+            "typescript": {}
+          }
+        },
+        "elb": {
+          "expressjs": {
+            "javascript": {},
+            "typescript": {}
+          },
+          "nestjs": {
+            "typescript": {}
+          },
+          "nextjs": {
+            "javascript": {},
+            "typescript": {}
+          },
+          "remixjs": {
+            "typescript": {}
+          }
+        },
+        "kms": {
+          "expressjs": {
+            "javascript": {},
+            "typescript": {}
+          },
+          "nestjs": {
+            "typescript": {}
+          },
+          "nextjs": {
+            "javascript": {},
+            "typescript": {}
+          },
+          "remixjs": {
+            "typescript": {}
+          }
+        },
+        "organizations": {
+          "expressjs": {
+            "javascript": {},
+            "typescript": {}
+          },
+          "nestjs": {
+            "typescript": {}
+          },
+          "nextjs": {
+            "javascript": {},
+            "typescript": {}
+          },
+          "remixjs": {
+            "typescript": {}
+          }
+        },
+        "trustedAdvisor": {
+          "expressjs": {
+            "javascript": {},
+            "typescript": {}
+          },
+          "nestjs": {
+            "typescript": {}
+          },
+          "nextjs": {
+            "javascript": {},
+            "typescript": {}
+          },
+          "remixjs": {
+            "typescript": {}
+          }
+        }
+      }
     },
     "database": {
       "supportedFrameworks": ["nextjs", "expressjs", "nestjs", "remixjs"],
@@ -61,6 +527,93 @@
         "neondb": {
           "javascript": ["typeorm"],
           "typescript": ["typeorm", "prisma", "drizzle"]
+        },
+        "mysql": {}
+      },
+      "files": {
+        "mongodb": {
+          "javascript": {
+            "mongoose": {
+              "expressjs": {},
+              "nestjs": {},
+              "nextjs": {},
+              "remixjs": {}
+            }
+          },
+          "typescript": {
+            "mongoose": {
+              "expressjs": {},
+              "nestjs": {},
+              "nextjs": {},
+              "remixjs": {}
+            },
+            "typegoose": {
+              "expressjs": {},
+              "nestjs": {},
+              "nextjs": {},
+              "remixjs": {}
+            }
+          }
+        },
+        "supabase": {
+          "javascript": {
+            "typeorm": {
+              "expressjs": {},
+              "nestjs": {},
+              "nextjs": {},
+              "remixjs": {}
+            }
+          },
+          "typescript": {
+            "drizzle": {
+              "expressjs": {},
+              "nestjs": {},
+              "nextjs": {},
+              "remixjs": {}
+            },
+            "prisma": {
+              "expressjs": {},
+              "nestjs": {},
+              "nextjs": {},
+              "remixjs": {}
+            },
+            "typeorm": {
+              "expressjs": {},
+              "nestjs": {},
+              "nextjs": {},
+              "remixjs": {}
+            }
+          }
+        },
+        "neondb": {
+          "javascript": {
+            "typeorm": {
+              "expressjs": {},
+              "nestjs": {},
+              "nextjs": {},
+              "remixjs": {}
+            }
+          },
+          "typescript": {
+            "drizzle": {
+              "expressjs": {},
+              "nestjs": {},
+              "nextjs": {},
+              "remixjs": {}
+            },
+            "prisma": {
+              "expressjs": {},
+              "nestjs": {},
+              "nextjs": {},
+              "remixjs": {}
+            },
+            "typeorm": {
+              "expressjs": {},
+              "nestjs": {},
+              "nextjs": {},
+              "remixjs": {}
+            }
+          }
         }
       }
     },
@@ -74,11 +627,144 @@
         "vuejs",
         "reactjs"
       ],
-      "supportedLanguages": ["javascript"]
+      "supportedLanguages": ["javascript"],
+      "files": {
+        "angularjs": {
+          ".dockerignore": {
+            "action": "create"
+          },
+          "docker-compose.yml": {
+            "action": "create"
+          },
+          "Dockerfile": {
+            "action": "create"
+          }
+        },
+        "nestjs": {
+          ".dockerignore": {
+            "action": "create"
+          },
+          "docker-compose.yml": {
+            "action": "create"
+          },
+          "Dockerfile": {
+            "action": "create"
+          }
+        },
+        "nextjs": {
+          ".dockerignore": {
+            "action": "create"
+          },
+          "docker-compose.yml": {
+            "action": "create"
+          },
+          "Dockerfile": {
+            "action": "create"
+          }
+        },
+        "expressjs": {
+          ".dockerignore": {
+            "action": "create"
+          },
+          "docker-compose.yml": {
+            "action": "create"
+          },
+          "Dockerfile": {
+            "action": "create"
+          }
+        },
+        "reactjs": {
+          ".dockerignore": {
+            "action": "create"
+          },
+          "docker-compose.yml": {
+            "action": "create"
+          },
+          "Dockerfile": {
+            "action": "create"
+          }
+        },
+        "reactjs+expressjs+shadcn": {
+          ".dockerignore": {
+            "action": "create"
+          },
+          "docker-compose.yml": {
+            "action": "create"
+          },
+          "Dockerfile": {
+            "action": "create"
+          }
+        },
+        "reactjs+nestjs+shadcn": {
+          ".dockerignore": {
+            "action": "create"
+          },
+          "docker-compose.yml": {
+            "action": "create"
+          },
+          "Dockerfile": {
+            "action": "create"
+          }
+        },
+        "remixjs": {
+          ".dockerignore": {
+            "action": "create"
+          },
+          "docker-compose.yml": {
+            "action": "create"
+          },
+          "Dockerfile": {
+            "action": "create"
+          }
+        },
+        "vuejs": {
+          ".dockerignore": {
+            "action": "create"
+          },
+          "docker-compose.yml": {
+            "action": "create"
+          },
+          "Dockerfile": {
+            "action": "create"
+          }
+        }
+      }
     },
     "gitignore": {
       "supportedFrameworks": ["nextjs", "angularjs", "nestjs"],
-      "supportedLanguages": ["javascript", "go", "python", "rust"]
+      "supportedLanguages": ["javascript", "go", "python", "rust"],
+      "files": {
+        "angularjs": {
+          "angular-gitignore": {
+            "action": "create"
+          }
+        },
+        "go": {
+          "go-gitignore": {
+            "action": "create"
+          }
+        },
+        "nestjs": {
+          "nestjs-gitignore": {
+            "action": "create"
+          }
+        },
+        "nextjs": {
+          "nextjs-gitignore": {
+            "action": "create"
+          }
+        },
+        "python": {
+          "python-gitignore": {
+            "action": "create"
+          }
+        },
+        "rust": {
+          "rust-gitignore": {
+            "action": "create"
+          }
+        }
+      }
     },
     "payment": {
       "supportedFrameworks": [
@@ -89,17 +775,140 @@
         "vuejs"
       ],
       "supportedLanguages": ["javascript"],
-      "supportedPayments": ["stripe", "razorpay", "paypal"]
+      "supportedPayments": ["stripe", "razorpay", "paypal"],
+      "files": {
+        "paypal": {
+          "expressjs": {
+            "javascript": {},
+            "typescript": {}
+          },
+          "nestjs": {
+            "typescript": {}
+          },
+          "nextjs": {
+            "javascript": {},
+            "typescript": {}
+          },
+          "remixjs": {
+            "typescript": {}
+          }
+        },
+        "razorpay": {
+          "expressjs": {
+            "javascript": {},
+            "typescript": {}
+          },
+          "nestjs": {
+            "typescript": {}
+          },
+          "nextjs": {
+            "javascript": {},
+            "typescript": {}
+          },
+          "remixjs": {
+            "typescript": {}
+          }
+        },
+        "stripe": {
+          "expressjs": {
+            "javascript": {},
+            "typescript": {}
+          },
+          "nestjs": {
+            "typescript": {}
+          },
+          "nextjs": {
+            "javascript": {},
+            "typescript": {}
+          },
+          "remixjs": {
+            "typescript": {}
+          },
+          "vuejs": {
+            "javascript": {},
+            "typescript": {}
+          }
+        }
+      }
     },
     "storage": {
       "supportedFrameworks": ["nextjs", "expressjs", "nestjs", "remixjs"],
       "supportedLanguages": ["javascript"],
-      "supportedStorages": ["imagekit.io", "cloudinary", "google-cloud"]
+      "supportedStorages": ["imagekit.io", "cloudinary", "google-cloud"],
+      "files": {
+        "imagekit.io": {
+          "expressjs": {
+            "javascript": {},
+            "typescript": {}
+          },
+          "nestjs": {
+            "typescript": {}
+          },
+          "nextjs": {
+            "javascript": {},
+            "typescript": {}
+          },
+          "remixjs": {
+            "typescript": {}
+          }
+        },
+        "cloudinary": {
+          "expressjs": {
+            "javascript": {},
+            "typescript": {}
+          },
+          "nestjs": {
+            "typescript": {}
+          },
+          "nextjs": {
+            "javascript": {},
+            "typescript": {}
+          },
+          "remixjs": {
+            "typescript": {}
+          }
+        },
+        "google-cloud": {
+          "expressjs": {
+            "javascript": {},
+            "typescript": {}
+          },
+          "nestjs": {
+            "typescript": {}
+          },
+          "nextjs": {
+            "javascript": {},
+            "typescript": {}
+          },
+          "remixjs": {
+            "typescript": {}
+          }
+        }
+      }
     },
     "ui": {
       "supportedFrameworks": ["nextjs", "angularjs", "reactjs", "vuejs"],
       "supportedLanguages": ["javascript"],
-      "supportedUiLibraries": ["daisy"]
+      "supportedUiLibraries": ["daisy"],
+      "files": {
+        "daisy": {
+          "angularjs": {
+            "typescript": {}
+          },
+          "nextjs": {
+            "javascript": {},
+            "typescript": {}
+          },
+          "reactjs": {
+            "javascript": {},
+            "typescript": {}
+          },
+          "vuejs": {
+            "javascript": {},
+            "typescript": {}
+          }
+        }
+      }
     }
   }
 }
