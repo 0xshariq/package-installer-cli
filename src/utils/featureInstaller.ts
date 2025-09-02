@@ -9,138 +9,67 @@ import { dirname } from 'path';
 import chalk from 'chalk';
 import ora from 'ora';
 import { SupportedLanguage, detectProjectLanguage, installAdditionalPackages } from './dependencyInstaller.js';
+import { cacheManager } from './cacheManager.js';
 
 // Get the directory of this file for proper path resolution
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-// Load supported features from JSON file
-let SUPPORTED_FEATURES: any = {};
-try {
-  const featuresPath = path.join(__dirname, '../../features/features.json');
-  if (fs.existsSync(featuresPath)) {
-    const featuresData = JSON.parse(fs.readFileSync(featuresPath, 'utf-8'));
-    SUPPORTED_FEATURES = featuresData.features;
-  }
-} catch (error) {
-  console.warn(chalk.yellow('⚠️  Could not load features.json, using fallback configuration'));
-}
+// Action types for feature files
+export type FeatureAction = 'install' | 'prepend' | 'append' | 'overwrite' | 'create';
 
-// Export for use in other modules
-export { SUPPORTED_FEATURES };
-
-
-/**
- * Get the CLI installation root directory
- */
-function getCliRootPath(): string {
-  let cliRoot: string;
-  
-  if (__dirname.includes('/dist/')) {
-    // Running from compiled version (dist/utils/featureInstaller.js)
-    cliRoot = path.join(__dirname, '../..');
-  } else {
-    // Running from source (src/utils/featureInstaller.ts)
-    cliRoot = path.join(__dirname, '../..');
-  }
-  
-  // Check if we're in a global npm installation
-  // Global installations typically have the structure: /usr/local/lib/node_modules/@scope/package/
-  if (__dirname.includes('node_modules')) {
-    const nodeModulesIndex = __dirname.lastIndexOf('node_modules');
-    if (nodeModulesIndex !== -1) {
-      // Navigate to the package root from node_modules
-      const afterNodeModules = __dirname.substring(nodeModulesIndex + 'node_modules'.length);
-      const packageParts = afterNodeModules.split(path.sep).filter(Boolean);
-      
-      if (packageParts.length >= 2) {
-        // For scoped packages: @scope/package
-        if (packageParts[0].startsWith('@')) {
-          cliRoot = path.join(__dirname.substring(0, nodeModulesIndex + 'node_modules'.length), packageParts[0], packageParts[1]);
-        } else {
-          // For regular packages: package
-          cliRoot = path.join(__dirname.substring(0, nodeModulesIndex + 'node_modules'.length), packageParts[0]);
-        }
-      }
-    }
-  }
-  
-  return cliRoot;
-}
-
-/**
- * Get the path to a feature template
- */
-function getFeaturePath(
-  featureName: string, 
-  framework: string, 
-  projectLanguage: 'javascript' | 'typescript' = 'typescript',
-  authProvider: string = 'clerk'
-): string {
-  // Get the features directory from the CLI installation root
-  const cliRoot = getCliRootPath();
-  const featuresRoot = path.join(cliRoot, 'features');
-  
-  // Verify the features directory exists
-  if (!fs.existsSync(featuresRoot)) {
-    console.warn(chalk.yellow(`⚠️  Features directory not found at: ${featuresRoot}`));
-    console.warn(chalk.yellow(`   CLI root detected as: ${cliRoot}`));
-    console.warn(chalk.yellow(`   __dirname is: ${__dirname}`));
-    throw new Error(`Features directory not found. Please ensure the CLI is properly installed.`);
-  }
-  
-  if (featureName === 'auth') {
-    // Handle combo templates - use the backend framework for auth
-    if (framework.includes('+')) {
-      const parts = framework.split('+');
-      const backendFramework = parts.find(part => 
-        ['expressjs', 'nestjs'].includes(part)
-      ) || parts[1]; // fallback to second part
-      
-      return path.join(featuresRoot, featureName, authProvider, backendFramework, projectLanguage);
-    }
-    
-    // For regular frameworks
-    return path.join(featuresRoot, featureName, authProvider, framework, projectLanguage);
-  }
-  
-  // For docker - language is not important, just framework
-  if (featureName === 'docker') {
-    // Handle combo templates
-    if (framework.includes('+')) {
-      return path.join(featuresRoot, featureName, framework);
-    }
-    
-    // For regular frameworks - no language subdirectory for docker
-    return path.join(featuresRoot, featureName, framework);
-  }
-  
-  // For other features - use a consistent structure
-  if (framework.includes('+')) {
-    // For combo templates, try the first framework
-    const baseFramework = framework.split('+')[0];
-    return path.join(featuresRoot, featureName, baseFramework);
-  }
-  
-  // For regular frameworks
-  return path.join(featuresRoot, featureName, framework);
+export interface FeatureFile {
+  action: FeatureAction;
 }
 
 export interface FeatureConfig {
-  name: string;
-  description: string;
   supportedFrameworks: string[];
-  supportedLanguages: SupportedLanguage[];
+  supportedLanguages: string[];
   files: {
-    [filePath: string]: {
-      action: 'create' | 'append' | 'overwrite';
-      content?: string;
-      templatePath?: string;
+    [provider: string]: {
+      [framework: string]: {
+        [language: string]: {
+          [filePath: string]: FeatureFile;
+        };
+      };
     };
   };
 }
 
+// Load supported features from cached or direct file access
+let SUPPORTED_FEATURES: { [featureName: string]: FeatureConfig } = {};
 
+/**
+ * Load features from cache or file system
+ */
+async function loadFeatures(): Promise<void> {
+  try {
+    // Try to load from cache first
+    const cachedFeatures = await cacheManager.getCachedFeatures();
+    if (cachedFeatures) {
+      SUPPORTED_FEATURES = cachedFeatures.features;
+      return;
+    }
+    
+    // Fallback to direct file access
+    const featuresPath = path.join(__dirname, '../../features/features.json');
+    if (await fs.pathExists(featuresPath)) {
+      const featuresData = await fs.readJson(featuresPath);
+      SUPPORTED_FEATURES = featuresData.features;
+      
+      // Cache the features for offline use
+      await cacheManager.cacheFeatures(featuresData);
+    }
+  } catch (error) {
+    console.warn(chalk.yellow('⚠️  Could not load features.json, using fallback configuration'));
+  }
+}
+
+// Initialize features on module load
+await loadFeatures();
+
+// Export for use in other modules
+export { SUPPORTED_FEATURES };
 
 /**
  * Detect the current project's framework and language with improved logic
@@ -148,20 +77,34 @@ export interface FeatureConfig {
 export async function detectProjectStack(projectPath: string): Promise<{
   framework?: string;
   language?: SupportedLanguage;
-  projectLanguage?: 'javascript' | 'typescript'; // JS/TS distinction
+  projectLanguage?: 'javascript' | 'typescript';
   isComboTemplate?: boolean;
   packageManager?: string;
   hasSrcFolder?: boolean;
 }> {
   try {
+    // Check cache first
+    const cachedProject = await cacheManager.getProject(projectPath);
+    if (cachedProject) {
+      const packageManager = await detectPackageManager(projectPath);
+      const hasSrcFolder = await fs.pathExists(path.join(projectPath, 'src'));
+      
+      return {
+        framework: cachedProject.framework,
+        language: cachedProject.language as SupportedLanguage,
+        projectLanguage: cachedProject.language as 'javascript' | 'typescript',
+        packageManager,
+        hasSrcFolder
+      };
+    }
+    
     // Detect language first
     const detectedLanguages = await detectProjectLanguage(projectPath);
     const primaryLanguage = detectedLanguages[0];
     
-    // Detect framework by looking at key files and package.json
     let framework: string | undefined;
     let isComboTemplate = false;
-    let packageManager = 'npm'; // default
+    let packageManager = 'npm';
     let projectLanguage: 'javascript' | 'typescript' = 'javascript';
     let hasSrcFolder = false;
     
@@ -170,57 +113,45 @@ export async function detectProjectStack(projectPath: string): Promise<{
       const packageJson = await fs.readJson(packageJsonPath);
       const dependencies = { ...packageJson.dependencies, ...packageJson.devDependencies };
       
-      // Detect TypeScript - Always check tsconfig.json first
+      // Detect TypeScript
       if (await fs.pathExists(path.join(projectPath, 'tsconfig.json'))) {
         projectLanguage = 'typescript';
-      } else if (dependencies['typescript'] || 
-          await fs.pathExists(path.join(projectPath, 'next.config.ts'))) {
+      } else if (dependencies['typescript']) {
         projectLanguage = 'typescript';
-      } else {
-        // Default to JavaScript if no TypeScript indicators found
-        projectLanguage = 'javascript';
       }
       
       // Check for src folder structure
       hasSrcFolder = await fs.pathExists(path.join(projectPath, 'src'));
       
       // Detect package manager
-      if (await fs.pathExists(path.join(projectPath, 'pnpm-lock.yaml'))) {
-        packageManager = 'pnpm';
-      } else if (await fs.pathExists(path.join(projectPath, 'yarn.lock'))) {
-        packageManager = 'yarn';
-      }
+      packageManager = await detectPackageManager(projectPath);
       
-      // Detect framework combinations first (more specific)
-      if (dependencies['react'] && dependencies['express']) {
-        framework = 'reactjs+expressjs+shadcn';
-        isComboTemplate = true;
-      } else if (dependencies['react'] && dependencies['@nestjs/core']) {
-        framework = 'reactjs+nestjs+shadcn';
-        isComboTemplate = true;
-      }
-      // Then detect individual frameworks
-      else if (dependencies['next'] || dependencies['@next/core']) {
+      // Detect framework
+      if (dependencies['next']) {
         framework = 'nextjs';
-      } else if (dependencies['@nestjs/core'] || dependencies['@nestjs/common']) {
-        framework = 'nestjs';
+      } else if (dependencies['react']) {
+        framework = 'reactjs';
       } else if (dependencies['express']) {
         framework = 'expressjs';
-      } else if (dependencies['react'] && !dependencies['next']) {
-        framework = 'reactjs';
-      } else if (dependencies['vue'] || dependencies['@vue/core']) {
+      } else if (dependencies['@nestjs/core']) {
+        framework = 'nestjs';
+      } else if (dependencies['vue']) {
         framework = 'vuejs';
       } else if (dependencies['@angular/core']) {
         framework = 'angularjs';
-      } else if (dependencies['@remix-run/node'] || dependencies['@remix-run/dev']) {
+      } else if (dependencies['@remix-run/react']) {
         framework = 'remixjs';
       }
-    }
-    
-    // Check for Rust projects
-    const cargoTomlPath = path.join(projectPath, 'Cargo.toml');
-    if (await fs.pathExists(cargoTomlPath)) {
-      framework = 'rust';
+      
+      // Cache the detected information
+      await cacheManager.setProject({
+        path: projectPath,
+        name: packageJson.name || path.basename(projectPath),
+        language: projectLanguage,
+        framework,
+        dependencies: Object.keys(dependencies),
+        size: 0 // We can calculate this later if needed
+      });
     }
     
     return {
@@ -232,909 +163,422 @@ export async function detectProjectStack(projectPath: string): Promise<{
       hasSrcFolder
     };
   } catch (error) {
-    console.warn(chalk.yellow(`⚠️  Could not detect project stack: ${error}`));
+    console.error('Error detecting project stack:', error);
     return {};
   }
 }
 
 /**
- * Get framework-specific required packages for a feature
+ * Detect package manager for the project
  */
-function getFrameworkPackages(
-  featureName: string, 
-  framework: string, 
-  language: SupportedLanguage, 
-  authProvider: string = 'clerk'
-): {
-  dependencies?: string[];
-  devDependencies?: string[];
-} {
-  if (featureName === 'auth' && language === 'nodejs') {
-    if (authProvider === 'clerk') {
-      switch (framework) {
-        case 'nextjs':
-          return { dependencies: ['@clerk/nextjs'] };
-        case 'expressjs':
-          return { dependencies: ['@clerk/express'] };
-        case 'reactjs':
-          return { dependencies: ['@clerk/clerk-react'] };
-        case 'vuejs':
-          return { dependencies: ['@clerk/vue'] };
-        case 'remixjs':
-          return { dependencies: ['@clerk/remix'] };
-        case 'reactjs+expressjs+shadcn':
-          return { dependencies: ['@clerk/clerk-react', '@clerk/express'] };
-        case 'reactjs+nestjs+shadcn':
-          return { dependencies: ['@clerk/clerk-react'] };
-        default:
-          return {};
-      }
-    } else if (authProvider === 'auth0') {
-      switch (framework) {
-        case 'nextjs':
-          return { dependencies: ['@auth0/nextjs-auth0'] };
-        case 'expressjs':
-          return { dependencies: ['express-oauth-server', '@auth0/express-oauth2'] };
-        case 'reactjs':
-          return { dependencies: ['@auth0/auth0-react'] };
-        case 'vuejs':
-          return { dependencies: ['@auth0/auth0-vue'] };
-        case 'remixjs':
-          return { dependencies: ['@auth0/auth0-react'] }; // Use React SDK for Remix
-        case 'reactjs+expressjs+shadcn':
-          return { dependencies: ['@auth0/auth0-react', '@auth0/express-oauth2'] };
-        case 'reactjs+nestjs+shadcn':
-          return { dependencies: ['@auth0/auth0-react'] };
-        default:
-          return {};
-      }
-    }
+async function detectPackageManager(projectPath: string): Promise<string> {
+  if (await fs.pathExists(path.join(projectPath, 'pnpm-lock.yaml'))) {
+    return 'pnpm';
+  } else if (await fs.pathExists(path.join(projectPath, 'yarn.lock'))) {
+    return 'yarn';
+  } else if (await fs.pathExists(path.join(projectPath, 'bun.lockb'))) {
+    return 'bun';
   }
+  return 'npm';
+}
+
+/**
+ * Add a feature to the current project
+ */
+export async function addFeature(
+  featureName: string,
+  provider?: string,
+  projectPath: string = process.cwd()
+): Promise<void> {
+  const spinner = ora(chalk.hex('#9c88ff')(`Adding ${featureName} feature...`)).start();
   
-  return {};
-}
-
-/**
- * Get framework-specific files for a feature based on SUPPORTED_FEATURES structure
- */
-function getFrameworkFiles(
-  featureName: string, 
-  framework: string, 
-  language: string = 'typescript',
-  authProvider: string = 'clerk'
-): { [filePath: string]: FeatureConfig['files'][string] } {
-  const feature = SUPPORTED_FEATURES[featureName];
-  if (!feature || !feature.files) {
-    return {};
-  }
-
-  const baseFiles: { [filePath: string]: FeatureConfig['files'][string] } = {};
-
-  if (featureName === 'auth') {
-    // Get auth provider specific files
-    const authFiles = feature.files[authProvider];
-    if (!authFiles) {
-      console.log(chalk.yellow(`⚠️  Auth provider '${authProvider}' not found, falling back to 'clerk'`));
-      const clerkFiles = feature.files['clerk'];
-      if (clerkFiles) {
-        return getAuthProviderFiles(clerkFiles, framework, language);
+  try {
+    // Ensure features are loaded
+    await loadFeatures();
+    
+    // Get project information
+    const projectInfo = await detectProjectStack(projectPath);
+    
+    if (!projectInfo.framework) {
+      throw new Error('Could not detect project framework');
+    }
+    
+    // Get feature configuration
+    const featureConfig = SUPPORTED_FEATURES[featureName];
+    if (!featureConfig) {
+      throw new Error(`Feature '${featureName}' not found in features.json`);
+    }
+    
+    // Check if feature supports this framework
+    if (!featureConfig.supportedFrameworks.includes(projectInfo.framework)) {
+      throw new Error(`Feature '${featureName}' is not supported for ${projectInfo.framework} projects`);
+    }
+    
+    // For features with providers (like auth), prompt for provider selection
+    let selectedProvider = provider;
+    if (!selectedProvider && featureConfig.files) {
+      const availableProviders = Object.keys(featureConfig.files);
+      if (availableProviders.length > 1) {
+        const inquirer = await import('inquirer');
+        const { provider: chosenProvider } = await inquirer.default.prompt([
+          {
+            type: 'list',
+            name: 'provider',
+            message: `Choose a ${featureName} provider:`,
+            choices: availableProviders
+          }
+        ]);
+        selectedProvider = chosenProvider;
+      } else {
+        selectedProvider = availableProviders[0];
       }
-      return {};
     }
     
-    return getAuthProviderFiles(authFiles, framework, language);
-  } else if (featureName === 'ui') {
-    // Get UI library specific files (daisy, etc.)
-    const uiProvider = 'daisy'; // Default to daisy for now
-    const uiFiles = feature.files[uiProvider];
-    if (!uiFiles) {
-      return {};
+    // Get files for the specific provider, framework, and language
+    const files = getFeatureFiles(featureConfig, selectedProvider!, projectInfo.framework, projectInfo.projectLanguage!);
+    
+    if (Object.keys(files).length === 0) {
+      throw new Error(`No files configured for ${featureName} with ${selectedProvider} provider for ${projectInfo.framework} (${projectInfo.projectLanguage})`);
     }
     
-    return getUIProviderFiles(uiFiles, framework, language);
-  } else {
-    // For other features, use direct structure
-    const files = feature.files as any;
-    Object.keys(files).forEach(filePath => {
-      baseFiles[filePath] = files[filePath];
-    });
+    spinner.text = `Processing ${Object.keys(files).length} files...`;
+    
+    // Process each file based on its action
+    for (const [filePath, fileConfig] of Object.entries(files)) {
+      await processFeatureFile(filePath, fileConfig, featureName, selectedProvider!, projectInfo, projectPath);
+    }
+    
+    spinner.succeed(chalk.green(`✅ ${featureName} feature added successfully!`));
+    
+    // Update cache with feature usage
+    await cacheManager.recordFeatureUsage(featureName, projectInfo.framework);
+    
+    // Show setup instructions
+    showSetupInstructions(featureName, selectedProvider!);
+    
+  } catch (error: any) {
+    spinner.fail(chalk.red(`❌ Failed to add ${featureName} feature: ${error.message}`));
+    throw error;
   }
-
-  return baseFiles;
 }
 
 /**
- * Get auth provider specific files for a framework and language
+ * Get feature files for a specific provider, framework, and language
  */
-function getAuthProviderFiles(
-  authProviderFiles: any, 
-  framework: string, 
+function getFeatureFiles(
+  featureConfig: FeatureConfig,
+  provider: string,
+  framework: string,
   language: string
-): { [filePath: string]: FeatureConfig['files'][string] } {
-  const baseFiles: { [filePath: string]: FeatureConfig['files'][string] } = {};
+): { [filePath: string]: FeatureFile } {
+  const providerConfig = featureConfig.files[provider];
+  if (!providerConfig) return {};
   
-  // Get framework specific files
-  const frameworkFiles = authProviderFiles[framework];
-  if (!frameworkFiles) {
-    return {};
-  }
+  const frameworkConfig = providerConfig[framework];
+  if (!frameworkConfig) return {};
   
-  // Get language specific files
-  const languageFiles = frameworkFiles[language];
-  if (!languageFiles) {
+  const languageConfig = frameworkConfig[language];
+  if (!languageConfig) {
     // Fallback to typescript if javascript not available
-    const fallbackFiles = frameworkFiles['typescript'];
-    if (fallbackFiles) {
-      console.log(chalk.yellow(`⚠️  ${language} templates not available, using TypeScript templates`));
-      Object.keys(fallbackFiles).forEach(filePath => {
-        // Convert .ts/.tsx extensions to .js/.jsx for JavaScript projects
-        let jsFilePath = filePath;
-        if (language === 'javascript') {
-          jsFilePath = filePath.replace(/\.tsx?$/, filePath.endsWith('.tsx') ? '.jsx' : '.js');
-        }
-        baseFiles[jsFilePath] = fallbackFiles[filePath];
-      });
+    const tsConfig = frameworkConfig['typescript'];
+    if (tsConfig && language === 'javascript') {
+      console.log(chalk.yellow(`⚠️  JavaScript templates not available, using TypeScript templates`));
+      return tsConfig;
     }
-    return baseFiles;
-  }
-  
-  // Handle Next.js src folder structure
-  if (framework === 'nextjs') {
-    const projectPath = process.cwd();
-    const hasSrc = fs.existsSync(path.join(projectPath, 'src'));
-    
-    Object.keys(languageFiles).forEach(filePath => {
-      let finalPath = filePath;
-      
-      // Adjust paths for src folder structure
-      if (hasSrc && !filePath.startsWith('src/') && 
-          (filePath.includes('app/') || filePath.includes('lib/') || filePath === 'middleware.ts' || filePath === 'middleware.js')) {
-        finalPath = `src/${filePath}`;
-      }
-      
-      baseFiles[finalPath] = languageFiles[filePath];
-    });
-  } else {
-    // For other frameworks, use files as-is
-    Object.keys(languageFiles).forEach(filePath => {
-      baseFiles[filePath] = languageFiles[filePath];
-    });
-  }
-  
-  return baseFiles;
-}
-
-/**
- * Get UI provider specific files for a framework and language
- */
-function getUIProviderFiles(
-  uiProviderFiles: any,
-  framework: string, 
-  language: string
-): { [filePath: string]: FeatureConfig['files'][string] } {
-  const baseFiles: { [filePath: string]: FeatureConfig['files'][string] } = {};
-  
-  const frameworkFiles = uiProviderFiles[framework];
-  if (!frameworkFiles) {
     return {};
   }
   
-  const languageFiles = frameworkFiles[language];
-  if (!languageFiles) {
-    // For UI, always overwrite files regardless of language
-    const fallbackFiles = frameworkFiles['typescript'] || frameworkFiles['javascript'];
-    if (fallbackFiles) {
-      Object.keys(fallbackFiles).forEach(filePath => {
-        baseFiles[filePath] = { action: 'overwrite' };  // UI files should always overwrite
-      });
-    }
-    return baseFiles;
-  }
-  
-  // UI files should always overwrite
-  Object.keys(languageFiles).forEach(filePath => {
-    baseFiles[filePath] = { action: 'overwrite' };
-  });
-  
-  return baseFiles;
-  } else if (featureName === 'docker') {
-    baseFiles['Dockerfile'] = { action: 'create' };
-    baseFiles['docker-compose.yml'] = { action: 'create' };
-    baseFiles['.dockerignore'] = { action: 'create' };
-  }
-  
-  return baseFiles;
+  return languageConfig;
 }
 
 /**
- * Check if a file should be skipped based on framework and project structure
- */
-function shouldSkipFile(filePath: string, framework: string, projectPath: string): boolean {
-  // Skip files that don't exist in the current project structure
-  if (filePath.includes('/') && !filePath.startsWith('.')) {
-    const directory = path.dirname(filePath);
-    const dirPath = path.join(projectPath, directory);
-    
-    // Check if the directory exists
-    if (!fs.existsSync(dirPath)) {
-      console.log(chalk.yellow(`⚠️  Directory ${directory} not found, skipping ${filePath}`));
-      return true;
-    }
-  }
-  
-  // Skip Next.js specific files for non-Next.js frameworks
-  if ((filePath === 'app/layout.tsx' || filePath === 'middleware.ts') && 
-      !framework.includes('nextjs')) {
-    return true;
-  }
-  
-  // Skip Express specific files for non-Express frameworks
-  if (filePath === 'index.ts' && !framework.includes('expressjs')) {
-    return true;
-  }
-  
-  return false;
-}
-
-/**
- * Check if a feature is supported for the current project stack
- */
-export function isFeatureSupported(
-  featureName: string, 
-  framework: string, 
-  language: SupportedLanguage
-): boolean {
-  const feature = SUPPORTED_FEATURES[featureName];
-  if (!feature) return false;
-  
-  const frameworkSupported = feature.supportedFrameworks.includes(framework) ||
-    feature.supportedFrameworks.some(fw => framework.startsWith(fw));
-    
-  const languageSupported = feature.supportedLanguages.includes(language);
-  
-  return frameworkSupported && languageSupported;
-}
-
-/**
- * Get template path for a specific framework, feature, and language
- */
-function getFeatureTemplatePath(
-  featureName: string, 
-  framework: string, 
-  projectLanguage: 'javascript' | 'typescript' = 'typescript',
-  authProvider: string = 'clerk'
-): string {
-  // Get the features directory relative to the CLI installation
-  // From src/utils/featureInstaller.ts -> ../../features
-  let featuresRoot = path.join(__dirname, '../../features');
-  
-  // Check if we're running from dist folder (compiled)
-  if (__dirname.includes('/dist/')) {
-    // From dist/utils/featureInstaller.js -> ../../features
-    featuresRoot = path.join(__dirname, '../../features');
-  }
-  
-  if (featureName === 'auth') {
-    // Handle combo templates - use the backend framework for auth
-    if (framework.includes('+')) {
-      const parts = framework.split('+');
-      const backendFramework = parts.find(part => 
-        ['expressjs', 'nestjs'].includes(part)
-      ) || parts[1]; // fallback to second part
-      
-      return path.join(featuresRoot, featureName, authProvider, backendFramework, projectLanguage);
-    }
-    
-    // For regular frameworks
-    return path.join(featuresRoot, featureName, authProvider, framework, projectLanguage);
-  }
-  
-  // For docker - language is not important, just framework
-  if (featureName === 'docker') {
-    // Handle combo templates
-    if (framework.includes('+')) {
-      return path.join(featuresRoot, featureName, framework);
-    }
-    
-    // For regular frameworks - no language subdirectory for docker
-    return path.join(featuresRoot, featureName, framework);
-  }
-  
-  // For other features
-  const baseFramework = framework.split('+')[0];
-  return path.join(featuresRoot, featureName, baseFramework);
-}
-
-/**
- * Read template file content
- */
-async function readTemplateFile(templatePath: string, fileName: string): Promise<string> {
-  const filePath = path.join(templatePath, fileName);
-  
-  if (!(await fs.pathExists(filePath))) {
-    throw new Error(`Template file not found: ${filePath}`);
-  }
-  
-  return fs.readFile(filePath, 'utf-8');
-}
-
-/**
- * Handle file operations for feature installation with enhanced folder creation
+ * Process a single feature file based on its action
  */
 async function processFeatureFile(
-  projectPath: string,
   filePath: string,
-  fileConfig: FeatureConfig['files'][string],
-  templatePath: string,
-  framework: string
+  fileConfig: FeatureFile,
+  featureName: string,
+  provider: string,
+  projectInfo: any,
+  projectPath: string
 ): Promise<void> {
-  // Check if file should be skipped
-  if (shouldSkipFile(filePath, framework, projectPath)) {
-    return;
+  const { action } = fileConfig;
+  
+  // Try to get template content from cache first
+  let sourceContent: string | null = null;
+  const templateCacheKey = `${featureName}/${provider}/${projectInfo.framework}/${projectInfo.projectLanguage}/${filePath}`;
+  
+  try {
+    sourceContent = await cacheManager.getCachedTemplateFile(templateCacheKey);
+  } catch (error) {
+    // Cache miss, will load from file system
   }
   
-  const targetPath = path.join(projectPath, filePath);
-  const targetDir = path.dirname(targetPath);
+  // Get the CLI root path for accessing feature templates
+  const cliRoot = getCliRootPath();
+  const featureTemplatePath = path.join(cliRoot, 'features', featureName, provider, projectInfo.framework, projectInfo.projectLanguage);
+  const sourceFilePath = path.join(featureTemplatePath, filePath);
   
-  // Ensure directory exists - create if missing
-  if (!await fs.pathExists(targetDir)) {
-    console.log(chalk.blue(`📁 Creating directory: ${path.relative(projectPath, targetDir)}`));
-    await fs.ensureDir(targetDir);
+  // If not in cache, load from file system and cache it
+  if (!sourceContent && await fs.pathExists(sourceFilePath)) {
+    sourceContent = await fs.readFile(sourceFilePath, 'utf-8');
+    // Cache the template file content for offline use
+    await cacheManager.cacheTemplateFile(templateCacheKey, sourceContent);
   }
   
-  switch (fileConfig.action) {
-    case 'create':
-      if (await fs.pathExists(targetPath)) {
-        console.log(chalk.yellow(`⚠️  File ${filePath} already exists, skipping...`));
-        return;
-      }
+  // Handle Next.js src folder structure and automatic folder creation
+  let targetFilePath = path.join(projectPath, filePath);
+  
+  // For Next.js projects, handle src folder structure
+  if (projectInfo.framework === 'nextjs') {
+    // If the project doesn't have a src folder but the template expects one
+    if (!projectInfo.hasSrcFolder && (filePath.startsWith('app/') || filePath.startsWith('components/') || filePath.startsWith('lib/'))) {
+      // Check if we need to create an app directory or use src structure
+      const appDirExists = await fs.pathExists(path.join(projectPath, 'app'));
+      const pagesDirExists = await fs.pathExists(path.join(projectPath, 'pages'));
       
-      if (fileConfig.content) {
-        await fs.outputFile(targetPath, fileConfig.content);
-      } else {
-        const content = await readTemplateFile(templatePath, filePath);
-        await fs.outputFile(targetPath, content);
+      if (!appDirExists && !pagesDirExists) {
+        // Create app directory for App Router structure
+        targetFilePath = path.join(projectPath, filePath);
       }
-      console.log(chalk.green(`✅ Created: ${filePath}`));
+    } else if (projectInfo.hasSrcFolder && (filePath.startsWith('app/') || filePath.startsWith('components/') || filePath.startsWith('lib/'))) {
+      targetFilePath = path.join(projectPath, 'src', filePath);
+    }
+  }
+  
+  // Ensure all parent directories exist before processing
+  await fs.ensureDir(path.dirname(targetFilePath));
+  
+  switch (action) {
+    case 'install':
+      await handlePackageInstallation(sourceFilePath, projectPath, projectInfo.packageManager || 'npm');
+      break;
+      
+    case 'create':
+      await handleFileCreation(sourceFilePath, targetFilePath, sourceContent);
       break;
       
     case 'overwrite':
-      if (fileConfig.content) {
-        await fs.outputFile(targetPath, fileConfig.content);
-      } else {
-        const content = await readTemplateFile(templatePath, filePath);
-        
-        // Handle special cases for layout.tsx metadata
-        if (filePath.includes('layout.tsx') && framework === 'nextjs') {
-          const processedContent = await processNextjsLayout(content, projectPath);
-          await fs.outputFile(targetPath, processedContent);
-        } else {
-          await fs.outputFile(targetPath, content);
-        }
-      }
-      console.log(chalk.green(`✅ Updated: ${filePath}`));
+      await handleFileOverwrite(sourceFilePath, targetFilePath, sourceContent);
       break;
       
     case 'append':
-      let existingContent = '';
-      if (await fs.pathExists(targetPath)) {
-        existingContent = await fs.readFile(targetPath, 'utf-8');
-      }
-      
-      let newContent = '';
-      if (fileConfig.content) {
-        newContent = fileConfig.content;
-      } else {
-        newContent = await readTemplateFile(templatePath, filePath);
-      }
-      
-      // Handle .env file appending - avoid duplicates
-      if (filePath === '.env') {
-        const existingLines = new Set(existingContent.split('\n').filter(line => line.trim()));
-        const newLines = newContent.split('\n').filter(line => line.trim());
-        
-        const uniqueNewLines = newLines.filter(line => {
-          const [key] = line.split('=');
-          return !Array.from(existingLines).some(existingLine => 
-            existingLine.startsWith(key + '=')
-          );
-        });
-        
-        if (uniqueNewLines.length > 0) {
-          const separator = existingContent ? '\n\n# Authentication Configuration\n' : '';
-          const finalContent = existingContent + separator + uniqueNewLines.join('\n') + '\n';
-          await fs.outputFile(targetPath, finalContent);
-          console.log(chalk.green(`✅ Updated: ${filePath}`));
-        }
-      } else {
-        const separator = existingContent ? '\n\n' : '';
-        await fs.outputFile(targetPath, existingContent + separator + newContent);
-        console.log(chalk.green(`✅ Updated: ${filePath}`));
-      }
+      await handleFileAppend(sourceFilePath, targetFilePath, sourceContent);
       break;
+      
+    case 'prepend':
+      await handleFilePrepend(sourceFilePath, targetFilePath, sourceContent);
+      break;
+      
+    default:
+      console.warn(chalk.yellow(`⚠️  Unknown action '${action}' for file: ${filePath}`));
   }
 }
 
 /**
- * Process Next.js layout.tsx to preserve template-specific metadata
+ * Handle package.json installation
  */
-async function processNextjsLayout(content: string, projectPath: string): Promise<string> {
+async function handlePackageInstallation(
+  sourceFilePath: string,
+  projectPath: string,
+  packageManager: string
+): Promise<void> {
   try {
-    const layoutPath = path.join(projectPath, 'app/layout.tsx');
-    
-    if (await fs.pathExists(layoutPath)) {
-      const existingContent = await fs.readFile(layoutPath, 'utf-8');
+    if (await fs.pathExists(sourceFilePath)) {
+      const packageData = await fs.readJson(sourceFilePath);
+      const dependencies = packageData.dependencies || {};
+      const devDependencies = packageData.devDependencies || {};
       
-      // Extract metadata from existing layout
-      const metadataMatch = existingContent.match(/export const metadata[^}]+}/s);
+      const allDeps = { ...dependencies, ...devDependencies };
+      const depNames = Object.keys(allDeps);
       
-      if (metadataMatch) {
-        // Replace the metadata in the auth template with the existing one
-        const updatedContent = content.replace(
-          /export const metadata[^}]+}/s,
-          metadataMatch[0]
-        );
-        return updatedContent;
+      if (depNames.length > 0) {
+        console.log(chalk.blue(`📦 Installing packages: ${depNames.join(', ')}`));
+        await installAdditionalPackages(depNames, 'javascript', packageManager);
       }
     }
-    
-    return content;
-  } catch (error) {
-    console.warn(chalk.yellow('⚠️  Could not process layout.tsx metadata, using default'));
-    return content;
+  } catch (error: any) {
+    console.warn(chalk.yellow(`⚠️  Could not install packages: ${error.message}`));
   }
 }
 
 /**
- * Separate function for feature installation packages
+ * Handle file creation (only if it doesn't exist)
  */
-export async function installFeaturePackagesOnly(
-  featureName: string,
-  language: SupportedLanguage,
-  framework: string,
-  projectPath: string,
-  authProvider: string = 'clerk'
-): Promise<void> {
-  // Get dynamic package requirements based on framework
-  const packages = getFrameworkPackages(featureName, framework, language, authProvider);
-  
-  if (!packages || (!packages.dependencies?.length && !packages.devDependencies?.length)) {
+async function handleFileCreation(sourceFilePath: string, targetFilePath: string, cachedContent?: string | null): Promise<void> {
+  if (await fs.pathExists(targetFilePath)) {
+    console.log(chalk.yellow(`⚠️  File already exists, skipping: ${path.relative(process.cwd(), targetFilePath)}`));
     return;
   }
   
-  // Install dependencies
-  if (packages.dependencies && packages.dependencies.length > 0) {
-    await installAdditionalPackages(language, packages.dependencies, projectPath, false);
+  if (cachedContent) {
+    await fs.outputFile(targetFilePath, cachedContent);
+  } else {
+    await copyTemplateFile(sourceFilePath, targetFilePath);
+  }
+  console.log(chalk.green(`✅ Created: ${path.relative(process.cwd(), targetFilePath)}`));
+}
+
+/**
+ * Handle file overwrite (replace existing content)
+ */
+async function handleFileOverwrite(sourceFilePath: string, targetFilePath: string, cachedContent?: string | null): Promise<void> {
+  if (cachedContent) {
+    await fs.outputFile(targetFilePath, cachedContent);
+  } else {
+    await copyTemplateFile(sourceFilePath, targetFilePath);
+  }
+  console.log(chalk.green(`✅ Updated: ${path.relative(process.cwd(), targetFilePath)}`));
+}
+
+/**
+ * Handle file append (add content to end of file)
+ */
+async function handleFileAppend(sourceFilePath: string, targetFilePath: string, cachedContent?: string | null): Promise<void> {
+  let existingContent = '';
+  if (await fs.pathExists(targetFilePath)) {
+    existingContent = await fs.readFile(targetFilePath, 'utf-8');
   }
   
-  // Install dev dependencies
-  if (packages.devDependencies && packages.devDependencies.length > 0) {
-    await installAdditionalPackages(language, packages.devDependencies, projectPath, true);
+  let templateContent: string;
+  if (cachedContent) {
+    templateContent = cachedContent;
+  } else {
+    templateContent = await fs.readFile(sourceFilePath, 'utf-8');
   }
   
-  // Install GitHub MCP server for Node.js projects
-  if (language === 'nodejs') {
-    try {
-      await installAdditionalPackages(language, ['@0xshariq/github-mcp-server'], projectPath, false);
-      console.log(chalk.green('✅ GitHub MCP server installed for git operations'));
-    } catch (error) {
-      console.warn(chalk.yellow('⚠️  Could not install GitHub MCP server'));
+  const separator = existingContent && !existingContent.endsWith('\n') ? '\n\n' : '\n';
+  const newContent = existingContent + separator + templateContent;
+  
+  // Ensure target directory exists
+  await fs.ensureDir(path.dirname(targetFilePath));
+  await fs.outputFile(targetFilePath, newContent);
+  console.log(chalk.green(`✅ Appended to: ${path.relative(process.cwd(), targetFilePath)}`));
+}
+
+/**
+ * Handle file prepend (add content to beginning of file)
+ */
+async function handleFilePrepend(sourceFilePath: string, targetFilePath: string, cachedContent?: string | null): Promise<void> {
+  let existingContent = '';
+  if (await fs.pathExists(targetFilePath)) {
+    existingContent = await fs.readFile(targetFilePath, 'utf-8');
+  }
+  
+  let templateContent: string;
+  if (cachedContent) {
+    templateContent = cachedContent;
+  } else {
+    templateContent = await fs.readFile(sourceFilePath, 'utf-8');
+  }
+  
+  const separator = templateContent.endsWith('\n') ? '' : '\n';
+  const newContent = templateContent + separator + existingContent;
+  
+  // Ensure target directory exists
+  await fs.ensureDir(path.dirname(targetFilePath));
+  await fs.outputFile(targetFilePath, newContent);
+  console.log(chalk.green(`✅ Prepended to: ${path.relative(process.cwd(), targetFilePath)}`));
+}
+
+/**
+ * Copy template file to target location with Next.js content processing
+ */
+async function copyTemplateFile(sourceFilePath: string, targetFilePath: string): Promise<void> {
+  if (!await fs.pathExists(sourceFilePath)) {
+    throw new Error(`Template file not found: ${sourceFilePath}`);
+  }
+  
+  // Ensure target directory exists
+  await fs.ensureDir(path.dirname(targetFilePath));
+  
+  // For Next.js projects, we might need to adjust import paths in template files
+  if (path.extname(sourceFilePath).match(/\.(js|jsx|ts|tsx)$/)) {
+    const templateContent = await fs.readFile(sourceFilePath, 'utf-8');
+    
+    // Process content for Next.js src folder structure
+    let processedContent = templateContent;
+    
+    // Adjust import paths if needed (this is basic - you might want to make it more sophisticated)
+    if (targetFilePath.includes('/src/')) {
+      processedContent = processedContent.replace(/from ['"]@\//g, 'from "@/');
+      processedContent = processedContent.replace(/from ['"]\.\.\//g, 'from "../');
     }
+    
+    await fs.writeFile(targetFilePath, processedContent);
+  } else {
+    // For non-code files, just copy directly
+    await fs.copy(sourceFilePath, targetFilePath);
   }
 }
 
 /**
- * Install required packages for a feature (backward compatibility)
+ * Get the CLI installation root directory
  */
-async function installFeaturePackages(
-  featureName: string,
-  language: SupportedLanguage,
-  framework: string,
-  projectPath: string,
-  authProvider: string = 'clerk'
-): Promise<void> {
-  return installFeaturePackagesOnly(featureName, language, framework, projectPath, authProvider);
-}
-
-export async function addFeature(
-  featureName: string, 
-  projectPath: string = process.cwd(), 
-  options: { authProvider?: string } = {}
-): Promise<void> {
-  const spinner = ora(chalk.hex('#9c88ff')('🔍 Analyzing project structure...')).start();
+function getCliRootPath(): string {
+  let cliRoot: string;
   
-  try {
-    // Detect project stack
-    const { framework, language, projectLanguage, isComboTemplate, packageManager } = await detectProjectStack(projectPath);
-    
-    if (!framework || !language) {
-      spinner.fail(chalk.red('❌ Could not detect project framework or language'));
-      console.log(chalk.hex('#95afc0')('💡 Make sure you are in a valid project directory'));
-      console.log(chalk.hex('#95afc0')('   Supported: Next.js, React, Express, NestJS, Vue.js, Angular, Remix, Rust'));
-      return;
-    }
-    
-    spinner.text = chalk.hex('#9c88ff')(`Detected ${framework} project with ${language} (${projectLanguage || 'typescript'})...`);
-    
-    // Check if feature is supported
-    if (!isFeatureSupported(featureName, framework, language)) {
-      spinner.fail(chalk.red(`❌ Feature '${featureName}' is not supported for ${framework} projects`));
-      console.log(chalk.hex('#95afc0')(`💡 Supported frameworks for ${featureName}:`));
-      const feature = SUPPORTED_FEATURES[featureName];
-      if (feature) {
-        feature.supportedFrameworks.forEach(fw => {
-          console.log(chalk.hex('#95afc0')(`   • ${fw}`));
-        });
-      }
-      return;
-    }
-    
-    const feature = SUPPORTED_FEATURES[featureName];
-    spinner.succeed(chalk.green(`✅ ${feature.name} is supported for ${framework}`));
-    
-    // Get template path with language consideration and auth provider
-    const authProvider = options.authProvider || 'clerk';
-    const templatePath = getFeatureTemplatePath(featureName, framework, projectLanguage || 'typescript', authProvider);
-    
-    if (!(await fs.pathExists(templatePath))) {
-      // Fallback to TypeScript template if JavaScript variant doesn't exist
-      const fallbackPath = getFeatureTemplatePath(featureName, framework, 'typescript', authProvider);
-      if (!(await fs.pathExists(fallbackPath))) {
-        // If auth provider template doesn't exist, try the default (clerk)
-        if (featureName === 'auth' && authProvider !== 'clerk') {
-          const clerkPath = getFeatureTemplatePath(featureName, framework, projectLanguage || 'typescript', 'clerk');
-          if (await fs.pathExists(clerkPath)) {
-            console.log(chalk.yellow(`⚠️  ${authProvider} templates not available yet, using Clerk template`));
-          } else {
-            throw new Error(`Feature template not found: ${templatePath} (fallback: ${fallbackPath})`);
-          }
+  if (__dirname.includes('/dist/')) {
+    cliRoot = path.join(__dirname, '../..');
+  } else {
+    cliRoot = path.join(__dirname, '../..');
+  }
+  
+  if (__dirname.includes('node_modules')) {
+    const nodeModulesIndex = __dirname.lastIndexOf('node_modules');
+    if (nodeModulesIndex !== -1) {
+      const afterNodeModules = __dirname.substring(nodeModulesIndex + 'node_modules'.length);
+      const packageParts = afterNodeModules.split(path.sep).filter(Boolean);
+      
+      if (packageParts.length >= 2) {
+        if (packageParts[0].startsWith('@')) {
+          cliRoot = path.join(__dirname.substring(0, nodeModulesIndex + 'node_modules'.length), packageParts[0], packageParts[1]);
         } else {
-          throw new Error(`Feature template not found: ${templatePath} (fallback: ${fallbackPath})`);
+          cliRoot = path.join(__dirname.substring(0, nodeModulesIndex + 'node_modules'.length), packageParts[0]);
         }
-      } else {
-        console.log(chalk.yellow(`⚠️  Using TypeScript template as fallback for ${projectLanguage} project`));
       }
     }
-    
-    console.log(chalk.hex('#00d2d3')(`📦 Adding ${feature.name} to your ${framework} project...`));
-    
-    // Install required packages
-    if (featureName === 'auth' || featureName === 'docker') {
-      const packageSpinner = ora(chalk.hex('#f39c12')('📦 Installing required packages...')).start();
-      try {
-        await installFeaturePackages(featureName, language, framework, projectPath, authProvider);
-        packageSpinner.succeed(chalk.green('✅ Required packages installed'));
-      } catch (error: any) {
-        packageSpinner.warn(chalk.yellow(`⚠️  Some packages failed to install: ${error.message}`));
+  }
+  
+  return cliRoot;
+}
+
+/**
+ * Show setup instructions for a feature
+ */
+function showSetupInstructions(featureName: string, provider: string): void {
+  console.log(`\n${chalk.hex('#00d2d3')('📋 Setup Instructions:')}`);
+  
+  switch (featureName) {
+    case 'auth':
+      if (provider === 'clerk') {
+        console.log(chalk.hex('#95afc0')('1. Sign up at https://clerk.com'));
+        console.log(chalk.hex('#95afc0')('2. Get your API keys from the dashboard'));
+        console.log(chalk.hex('#95afc0')('3. Add them to your .env file'));
+      } else if (provider === 'auth0') {
+        console.log(chalk.hex('#95afc0')('1. Sign up at https://auth0.com'));
+        console.log(chalk.hex('#95afc0')('2. Create an application and get your domain/client ID'));
+        console.log(chalk.hex('#95afc0')('3. Configure your .env file'));
+      } else if (provider === 'next-auth') {
+        console.log(chalk.hex('#95afc0')('1. Configure providers in your auth config'));
+        console.log(chalk.hex('#95afc0')('2. Set NEXTAUTH_SECRET in .env'));
+        console.log(chalk.hex('#95afc0')('3. Add provider client IDs/secrets'));
       }
-    }
-    
-    // Get framework-specific files
-    const frameworkFiles = getFrameworkFiles(featureName, framework, projectLanguage || 'typescript', authProvider);
-    
-    // Process feature files
-    const fileSpinner = ora(chalk.hex('#00d2d3')('📝 Adding feature files...')).start();
-    
-    for (const [filePath, fileConfig] of Object.entries(frameworkFiles)) {
-      try {
-        fileSpinner.text = chalk.hex('#00d2d3')(`Processing ${filePath}...`);
-        await processFeatureFile(projectPath, filePath, fileConfig, templatePath, framework);
-      } catch (error: any) {
-        console.warn(chalk.yellow(`⚠️  Could not process ${filePath}: ${error.message}`));
-      }
-    }
-    
-    fileSpinner.succeed(chalk.green('✅ Feature files added successfully'));
-    
-    // Show success message
-    console.log('\n' + chalk.hex('#10ac84')('✨ Feature added successfully!'));
-    console.log(chalk.hex('#00d2d3')(`📁 ${feature.name} has been added to your project`));
-    
-    // Show next steps based on feature
-    if (featureName === 'auth') {
-      console.log('\n' + chalk.hex('#00d2d3')('🔐 Next Steps for Authentication:'));
-      console.log(chalk.hex('#95afc0')('1. Sign up for Clerk at https://clerk.com'));
-      console.log(chalk.hex('#95afc0')('2. Create a new application'));
-      console.log(chalk.hex('#95afc0')('3. Copy your API keys to the .env file'));
-      console.log(chalk.hex('#95afc0')('4. Configure your sign-in/sign-up pages'));
-      console.log(chalk.hex('#95afc0')('5. Start your development server'));
-    } else if (featureName === 'docker') {
-      console.log('\n' + chalk.hex('#00d2d3')('🐳 Next Steps for Docker:'));
-      console.log(chalk.hex('#95afc0')('1. Review and customize Dockerfile and docker-compose.yml'));
-      console.log(chalk.hex('#95afc0')('2. Build your Docker image: docker build -t your-app .'));
-      console.log(chalk.hex('#95afc0')('3. Run with Docker Compose: docker-compose up'));
-    }
-    
-  } catch (error: any) {
-    spinner.fail(chalk.red(`❌ Failed to add feature: ${error.message}`));
-    throw error;
-  }
-}
-
-/**
- * List all available features
- */
-export function listAvailableFeatures(): void {
-  console.log('\n' + chalk.hex('#9c88ff')('✨ Available Features:'));
-  console.log(chalk.hex('#95afc0')('─'.repeat(50)));
-  
-  for (const [name, config] of Object.entries(SUPPORTED_FEATURES)) {
-    console.log(`${chalk.hex('#10ac84')('• ' + config.name)} ${chalk.hex('#95afc0')('(' + name + ')')}`);
-    console.log(`  ${chalk.hex('#95afc0')(config.description)}`);
-    console.log(`  ${chalk.hex('#ffa502')('Frameworks:')} ${config.supportedFrameworks.join(', ')}`);
-    console.log('');
-  }
-}
-
-/**
- * Install Auth0 authentication
- */
-export async function installAuth0Auth(
-  framework: string, 
-  language: string,
-  options: { src?: boolean } = {}
-): Promise<void> {
-  const spinner = ora(chalk.hex('#f39c12')('Installing Auth0 authentication...')).start();
-  
-  try {
-    // Auth0 only supports TypeScript for AngularJS 
-    if (framework === 'angularjs' && language === 'javascript') {
-      spinner.fail(chalk.red('❌ Auth0 only supports TypeScript for Angular projects'));
-      throw new Error('Auth0 does not support JavaScript for Angular projects');
-    }
-    
-    const featurePath = path.join(getCliRootPath(), 'features', 'auth', 'auth0', framework, language);
-    
-    if (!await fs.pathExists(featurePath)) {
-      spinner.fail(chalk.red(`❌ Auth0 templates not found for ${framework}/${language}`));
-      throw new Error(`Auth0 templates not available for ${framework}/${language}`);
-    }
-    
-    await copyFeatureFiles(featurePath, process.cwd(), { src: options.src });
-    
-    // Install Auth0 dependencies
-    const dependencies = getAuth0Dependencies(framework);
-    if (dependencies.length > 0) {
-      await installAdditionalPackages(dependencies, language as SupportedLanguage);
-    }
-    
-    spinner.succeed(chalk.green('✅ Auth0 authentication installed successfully'));
-    
-    // Show Auth0 setup instructions
-    console.log('\n' + chalk.hex('#f39c12')('📋 Auth0 Setup Instructions:'));
-    console.log(chalk.hex('#95afc0')('1. Create an Auth0 account at https://auth0.com'));
-    console.log(chalk.hex('#95afc0')('2. Set up your Auth0 application and get your domain and client ID'));
-    console.log(chalk.hex('#95afc0')('3. Update the .env file with your Auth0 credentials'));
-    console.log(chalk.hex('#95afc0')('4. Documentation: https://auth0.com/docs/quickstart/webapp'));
-    
-  } catch (error: any) {
-    spinner.fail(chalk.red(`❌ Failed to install Auth0: ${error.message}`));
-    throw error;
-  }
-}
-
-/**
- * Install Clerk authentication
- */
-export async function installClerkAuth(
-  framework: string, 
-  language: string,
-  options: { src?: boolean } = {}
-): Promise<void> {
-  const spinner = ora(chalk.hex('#f39c12')('Installing Clerk authentication...')).start();
-  
-  try {
-    // Clerk only supports TypeScript for RemixJS
-    if (framework === 'remixjs' && language === 'javascript') {
-      spinner.fail(chalk.red('❌ Clerk only supports TypeScript for Remix projects'));
-      throw new Error('Clerk does not support JavaScript for Remix projects');
-    }
-    
-    const featurePath = path.join(getCliRootPath(), 'features', 'auth', 'clerk', framework, language);
-    
-    if (!await fs.pathExists(featurePath)) {
-      spinner.fail(chalk.red(`❌ Clerk templates not found for ${framework}/${language}`));
-      throw new Error(`Clerk templates not available for ${framework}/${language}`);
-    }
-    
-    await copyFeatureFiles(featurePath, process.cwd(), { src: options.src });
-    
-    // Install Clerk dependencies
-    const dependencies = getClerkDependencies(framework);
-    if (dependencies.length > 0) {
-      await installAdditionalPackages(dependencies, language as SupportedLanguage);
-    }
-    
-    spinner.succeed(chalk.green('✅ Clerk authentication installed successfully'));
-    
-    // Show Clerk setup instructions
-    console.log('\n' + chalk.hex('#f39c12')('📋 Clerk Setup Instructions:'));
-    console.log(chalk.hex('#95afc0')('1. Create a Clerk account at https://clerk.com'));
-    console.log(chalk.hex('#95afc0')('2. Create a new application and get your publishable key and secret key'));
-    console.log(chalk.hex('#95afc0')('3. Update the .env file with your Clerk credentials'));
-    console.log(chalk.hex('#95afc0')('4. Documentation: https://clerk.com/docs'));
-    
-  } catch (error: any) {
-    spinner.fail(chalk.red(`❌ Failed to install Clerk: ${error.message}`));
-    throw error;
-  }
-}
-
-/**
- * Install Next-Auth authentication
- */
-export async function installNextAuth(
-  framework: string, 
-  language: string,
-  options: { src?: boolean } = {}
-): Promise<void> {
-  const spinner = ora(chalk.hex('#f39c12')('Installing Next-Auth authentication...')).start();
-  
-  try {
-    // Next-Auth is primarily for Next.js
-    if (framework !== 'nextjs') {
-      spinner.fail(chalk.red('❌ Next-Auth is only available for Next.js projects'));
-      throw new Error('Next-Auth is only supported for Next.js projects');
-    }
-    
-    const featurePath = path.join(getCliRootPath(), 'features', 'auth', 'next-auth', framework, language);
-    
-    if (!await fs.pathExists(featurePath)) {
-      spinner.fail(chalk.red(`❌ Next-Auth templates not found for ${framework}/${language}`));
-      throw new Error(`Next-Auth templates not available for ${framework}/${language}`);
-    }
-    
-    await copyFeatureFiles(featurePath, process.cwd(), { src: options.src });
-    
-    // Install Next-Auth dependencies
-    const dependencies = getNextAuthDependencies();
-    if (dependencies.length > 0) {
-      await installAdditionalPackages(dependencies, language as SupportedLanguage);
-    }
-    
-    spinner.succeed(chalk.green('✅ Next-Auth authentication installed successfully'));
-    
-    // Show Next-Auth setup instructions
-    console.log('\n' + chalk.hex('#f39c12')('📋 Next-Auth Setup Instructions:'));
-    console.log(chalk.hex('#95afc0')('1. Configure your authentication providers in lib/auth.ts'));
-    console.log(chalk.hex('#95afc0')('2. Set up your environment variables in .env.local'));
-    console.log(chalk.hex('#95afc0')('3. Add your database connection if using database sessions'));
-    console.log(chalk.hex('#95afc0')('4. Documentation: https://next-auth.js.org/getting-started/introduction'));
-    
-  } catch (error: any) {
-    spinner.fail(chalk.red(`❌ Failed to install Next-Auth: ${error.message}`));
-    throw error;
-  }
-}
-
-/**
- * Get Auth0 dependencies for a specific framework
- */
-function getAuth0Dependencies(framework: string): string[] {
-  switch (framework) {
-    case 'nextjs':
-      return ['@auth0/nextjs-auth0'];
-    case 'expressjs':
-      return ['express-openid-connect'];
-    case 'vuejs':
-      return ['@auth0/auth0-vue'];
-    case 'reactjs':
-      return ['@auth0/auth0-react'];
-    case 'angularjs':
-      return ['@auth0/auth0-angular'];
+      break;
+      
+    case 'database':
+      console.log(chalk.hex('#95afc0')('1. Set up your database connection'));
+      console.log(chalk.hex('#95afc0')('2. Update connection string in .env'));
+      console.log(chalk.hex('#95afc0')('3. Run migrations if needed'));
+      break;
+      
+    case 'docker':
+      console.log(chalk.hex('#95afc0')('1. Install Docker on your system'));
+      console.log(chalk.hex('#95afc0')('2. Run: docker-compose up -d'));
+      console.log(chalk.hex('#95afc0')('3. Your app will be available at the configured port'));
+      break;
+      
     default:
-      return [];
+      console.log(chalk.hex('#95afc0')(`Check the documentation for ${featureName} configuration`));
   }
-}
-
-/**
- * Get Clerk dependencies for a specific framework
- */
-function getClerkDependencies(framework: string): string[] {
-  switch (framework) {
-    case 'nextjs':
-      return ['@clerk/nextjs'];
-    case 'expressjs':
-      return ['@clerk/express'];
-    case 'reactjs':
-      return ['@clerk/clerk-react'];
-    case 'vuejs':
-      return ['@clerk/vue'];
-    case 'remixjs':
-      return ['@clerk/remix'];
-    default:
-      return [];
-  }
-}
-
-/**
- * Get Next-Auth dependencies
- */
-function getNextAuthDependencies(): string[] {
-  return ['next-auth', 'bcryptjs', '@types/bcryptjs'];
-}
-
-/**
- * Separate auth provider installation functions to avoid conflicts
- */
-
-/**
- * Install Clerk authentication
- */
-export async function installClerkAuth(
-  framework: string,
-  language: string,
-  projectPath: string = process.cwd()
-): Promise<void> {
-  console.log(chalk.hex('#7c3aed')('🔐 Installing Clerk Authentication...'));
-  
-  // Add disclaimer about Auth0 Angular support
-  if (framework === 'angularjs') {
-    console.log(chalk.yellow('⚠️  Clerk may have limited support for AngularJS. Consider using TypeScript templates.'));
-  }
-  
-  if (framework === 'remixjs' && language === 'javascript') {
-    throw new Error('Clerk only supports TypeScript for Remix.js projects');
-  }
-  
-  await addFeature('auth', projectPath, { authProvider: 'clerk' });
-  
-  // Add quick setup docs
-  console.log(chalk.hex('#00d2d3')('\n📖 Quick Setup Guide:'));
-  console.log(chalk.gray('1. Create a Clerk account at https://clerk.com'));
-  console.log(chalk.gray('2. Create a new application'));
-  console.log(chalk.gray('3. Copy your API keys to .env file'));
-  console.log(chalk.gray('4. Configure your sign-in/sign-up pages'));
-  console.log(chalk.hex('#00d2d3')('📚 Full docs: https://clerk.com/docs'));
-}
-
-/**
- * Install Auth0 authentication
- */
-export async function installAuth0Auth(
-  framework: string,
-  language: string,
-  projectPath: string = process.cwd()
-): Promise<void> {
-  console.log(chalk.hex('#eb5424')('🔐 Installing Auth0 Authentication...'));
-  
-  // Check language support
-  if (framework === 'angularjs' && language === 'javascript') {
-    throw new Error('Auth0 only supports TypeScript for AngularJS projects');
-  }
-  
-  await addFeature('auth', projectPath, { authProvider: 'auth0' });
-  
-  // Add quick setup docs
-  console.log(chalk.hex('#00d2d3')('\n📖 Quick Setup Guide:'));
-  console.log(chalk.gray('1. Create an Auth0 account at https://auth0.com'));
-  console.log(chalk.gray('2. Create a new application'));
-  console.log(chalk.gray('3. Configure allowed callback URLs'));
-  console.log(chalk.gray('4. Copy your domain and client ID to .env file'));
-  console.log(chalk.hex('#00d2d3')('📚 Full docs: https://auth0.com/docs'));
-}
-
-/**
- * Install Next-Auth authentication
- */
-export async function installNextAuth(
-  framework: string,
-  language: string,
-  projectPath: string = process.cwd()
-): Promise<void> {
-  console.log(chalk.hex('#0070f3')('🔐 Installing NextAuth.js...'));
-  
-  if (framework !== 'nextjs') {
-    throw new Error('NextAuth.js is only supported for Next.js projects');
-  }
-  
-  await addFeature('auth', projectPath, { authProvider: 'next-auth' });
-  
-  // Add quick setup docs
-  console.log(chalk.hex('#00d2d3')('\n📖 Quick Setup Guide:'));
-  console.log(chalk.gray('1. Configure your providers in lib/auth.ts'));
-  console.log(chalk.gray('2. Set NEXTAUTH_SECRET in .env file'));
-  console.log(chalk.gray('3. Configure OAuth providers (Google, GitHub, etc.)'));
-  console.log(chalk.gray('4. Set up your database connection'));
-  console.log(chalk.hex('#00d2d3')('📚 Full docs: https://next-auth.js.org'));
 }

@@ -148,6 +148,61 @@ export async function updateTemplateUsage(
  * Cache feature usage statistics
  */
 export async function cacheFeatureUsage(
+  featureName: string,
+  framework: string
+): Promise<void> {
+  await cacheManagerInstance.recordFeatureUsage(featureName, framework);
+}
+
+/**
+ * Cache features configuration for offline use
+ */
+export async function cacheFeatures(featuresData: any): Promise<void> {
+  await cacheManagerInstance.cacheFeatures(featuresData);
+}
+
+/**
+ * Get cached features configuration
+ */
+export async function getCachedFeatures(): Promise<any | null> {
+  return await cacheManagerInstance.getCachedFeatures();
+}
+
+/**
+ * Cache template file content for offline use
+ */
+export async function cacheTemplateFile(templateKey: string, content: string): Promise<void> {
+  await cacheManagerInstance.cacheTemplateFile(templateKey, content);
+}
+
+/**
+ * Get cached template file content
+ */
+export async function getCachedTemplateFile(templateKey: string): Promise<string | null> {
+  return await cacheManagerInstance.getCachedTemplateFile(templateKey);
+}
+
+/**
+ * Cache complete template for offline use
+ */
+export async function cacheCompleteTemplate(templateName: string, templatePath: string): Promise<void> {
+  await cacheManagerInstance.cacheCompleteTemplate(templateName, templatePath);
+}
+
+/**
+ * Get cached template path
+ */
+export function getCachedTemplatePath(templateName: string): string {
+  return cacheManagerInstance.getCachedTemplatePath(templateName);
+}
+
+/**
+ * Check if template is completely cached
+ */
+export async function isTemplateCached(templateName: string): Promise<boolean> {
+  return await cacheManagerInstance.isTemplateCached(templateName);
+}
+export async function cacheFeatureUsage(
   projectPath: string,
   features: string[],
   framework: string

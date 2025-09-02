@@ -3,8 +3,30 @@ import inquirer from 'inquirer';
 import gradient from 'gradient-string';
 import boxen from 'boxen';
 import path from 'path';
-import { addFeature, listAvailableFeatures, SUPPORTED_FEATURES, detectProjectStack } from '../utils/featureInstaller.js';
+import { addFeature, detectProjectStack, SUPPORTED_FEATURES } from '../utils/featureInstaller.js';
 import { HistoryManager } from '../utils/historyManager.js';
+
+/**
+ * List available features from features.json
+ */
+function listAvailableFeatures(): void {
+  console.log('\n' + boxen(
+    gradient(['#4facfe', '#00f2fe'])('🔮 Available Features') + '\n\n' +
+    Object.entries(SUPPORTED_FEATURES).map(([key, config]) => {
+      const frameworks = Array.isArray(config.supportedFrameworks) 
+        ? config.supportedFrameworks.join(', ') 
+        : 'Unknown';
+      const status = Object.keys(config.files || {}).length > 0 ? '✅' : '🚧';
+      return `${status} ${chalk.bold(key)} - ${frameworks}`;
+    }).join('\n'),
+    {
+      padding: 1,
+      margin: 1,
+      borderStyle: 'round',
+      borderColor: 'cyan'
+    }
+  ));
+}
 
 /**
  * Display important disclaimer about potential issues

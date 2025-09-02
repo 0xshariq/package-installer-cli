@@ -486,6 +486,128 @@ export class CacheManager {
   }
 
   /**
+   * Record feature usage for analytics
+   */
+  async recordFeatureUsage(featureName: string, framework: string): Promise<void> {
+    if (!this.cache.featureUsage[featureName]) {
+      this.cache.featureUsage[featureName] = {
+        count: 0,
+        frameworks: {},
+        lastUsed: new Date().toISOString()
+      };
+    }
+
+    this.cache.featureUsage[featureName].count++;
+    this.cache.featureUsage[featureName].lastUsed = new Date().toISOString();
+    
+    if (!this.cache.featureUsage[featureName].frameworks[framework]) {
+      this.cache.featureUsage[featureName].frameworks[framework] = 0;
+    }
+    this.cache.featureUsage[featureName].frameworks[framework]++;
+
+    await this.save();
+  }
+
+  /**
+   * Cache features configuration for offline use
+   */
+  async cacheFeatures(featuresData: any): Promise<void> {
+    const cacheDir = path.join(this.cacheDir, 'features');
+    await fs.ensureDir(cacheDir);
+    await fs.writeJson(path.join(cacheDir, 'features.json'), featuresData);
+  }
+
+  /**
+   * Get cached features configuration
+   */
+  async getCachedFeatures(): Promise<any | null> {
+    try {
+      const featuresPath = path.join(this.cacheDir, 'features', 'features.json');
+      if (await fs.pathExists(featuresPath)) {
+        return await fs.readJson(featuresPath);
+      }
+    } catch (error) {
+      console.warn('Could not load cached features:', error);
+    }
+    return null;
+  }
+
+  /**
+   * Cache template file content for offline use
+   */
+  async cacheTemplateFile(templateKey: string, content: string): Promise<void> {
+    const templateCacheDir = path.join(this.cacheDir, 'templates');
+    await fs.ensureDir(templateCacheDir);
+    
+    // Create a safe filename from the template key
+    const safeKey = templateKey.replace(/[/\\:*?"<>|]/g, '_');
+    const templateFilePath = path.join(templateCacheDir, `${safeKey}.cached`);
+    
+    await fs.writeFile(templateFilePath, content, 'utf-8');
+  }
+
+  /**
+   * Get cached template file content
+   */
+  async getCachedTemplateFile(templateKey: string): Promise<string | null> {
+    try {
+      const templateCacheDir = path.join(this.cacheDir, 'templates');
+      const safeKey = templateKey.replace(/[/\\:*?"<>|]/g, '_');
+      const templateFilePath = path.join(templateCacheDir, `${safeKey}.cached`);
+      
+      if (await fs.pathExists(templateFilePath)) {
+        return await fs.readFile(templateFilePath, 'utf-8');
+      }
+    } catch (error) {
+      console.warn('Could not load cached template file:', error);
+    }
+    return null;
+  }
+
+  /**
+   * Cache complete template directory for offline use
+   */
+  async cacheCompleteTemplate(templateName: string, templatePath: string): Promise<void> {
+    try {
+      const templateCacheDir = path.join(this.cacheDir, 'complete-templates', templateName);
+      await fs.ensureDir(templateCacheDir);
+      
+      // Copy entire template directory to cache
+      if (await fs.pathExists(templatePath)) {
+        await fs.copy(templatePath, templateCacheDir, {
+          overwrite: true,
+          filter: (src: string) => {
+            // Skip node_modules and other unnecessary directories
+            return !src.includes('node_modules') && 
+                   !src.includes('.git') && 
+                   !src.includes('dist') && 
+                   !src.includes('.next');
+          }
+        });
+        
+        console.log(chalk.blue(`📦 Cached template: ${templateName}`));
+      }
+    } catch (error) {
+      console.warn(chalk.yellow(`⚠️  Failed to cache template ${templateName}:`, error));
+    }
+  }
+
+  /**
+   * Get cached complete template path
+   */
+  getCachedTemplatePath(templateName: string): string {
+    return path.join(this.cacheDir, 'complete-templates', templateName);
+  }
+
+  /**
+   * Check if template is cached completely
+   */
+  async isTemplateCached(templateName: string): Promise<boolean> {
+    const cachedPath = this.getCachedTemplatePath(templateName);
+    return await fs.pathExists(cachedPath);
+  }
+
+  /**
    * Get cache data
    */
   getCache(): CacheData {

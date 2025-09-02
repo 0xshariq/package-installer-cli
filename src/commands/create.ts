@@ -13,8 +13,6 @@ import {
   promptFrameworkSelection,
   promptLanguageSelection, 
   promptTemplateSelection,
-  promptDatabaseSelection,
-  promptOrmSelection,
   promptUiSelection,
   promptBundlerSelection,
   promptSrcDirectory,
@@ -168,30 +166,21 @@ export async function createProject(providedName?: string, options?: any): Promi
     const selectedLanguage = await promptLanguageSelectionWithCache(fwConfig, theme, userCache);
     userCache.language = selectedLanguage;
     
-    // Step 5: Database selection with cache
-    const selectedDatabase = await promptDatabaseSelectionWithCache(fwConfig, theme, userCache);
-    userCache.database = selectedDatabase;
-    
-    // Step 6: ORM selection (if database is selected)
-    let selectedOrm: string | undefined;
-    if (selectedDatabase && selectedDatabase !== 'none') {
-      selectedOrm = await promptOrmSelection(fwConfig, selectedDatabase, selectedLanguage!, theme);
-      userCache.orm = selectedOrm;
-    }
-
-    // Step 7: Template selection (for combination templates)
+    // Step 5: Template selection (for combination templates)
     let selectedTemplate: string | undefined;
     if (isCombinationTemplate(selectedFramework) && fwConfig.templates) {
       selectedTemplate = await promptTemplateSelection(fwConfig, theme);
     }
 
-    // Step 8: UI library selection
+    // Step 6: UI library selection
     const selectedUi = await promptUiSelection(fwConfig, theme);
-        userCache.ui = selectedUi || undefined;    // Step 9: Bundler selection
+    userCache.ui = selectedUi || undefined;
+    
+    // Step 7: Bundler selection
     const selectedBundler = await promptBundlerSelection(fwConfig, theme);
     userCache.bundler = selectedBundler;
     
-    // Step 10: Src directory option
+    // Step 8: Src directory option
     let useSrc: boolean | undefined;
     if (fwConfig.options?.includes('src') && 
         selectedFramework !== 'angularjs' && 
@@ -363,78 +352,51 @@ export async function createProject(providedName?: string, options?: any): Promi
     
     // Step 19: Ask about additional features
     console.log('\n' + chalk.hex('#00d2d3')('🎯 Would you like to add any features to your project?'));
+    console.log(chalk.hex('#95afc0')('   Features: Authentication, Database, Docker, Payment, Storage, etc.'));
     
     const { wantFeatures } = await inquirer.prompt([
       {
         type: 'confirm',
         name: 'wantFeatures',
-        message: 'Add features (auth, docker, testing, etc.)?',
+        message: 'Add features to your project?',
         default: false
       }
     ]);
     
-    let addedFeatures: string[] = [];
-    
     if (wantFeatures) {
       try {
-        const { addFeature, listAvailableFeatures, detectProjectStack } = await import('../utils/featureInstaller.js');
+        // Import the add command functionality
+        const { addCommand } = await import('./add.js');
         
-        // Detect project stack
-        const projectStack = await detectProjectStack(projectPath);
-        const availableFeatures = await listAvailableFeatures(projectStack.framework, projectStack.language);
+        // Show available features and let user add them
+        console.log('\n' + chalk.hex('#9c88ff')('🔨 Let\'s add some features to your project...'));
         
-        if (availableFeatures.length > 0) {
-          const { selectedFeatures } = await inquirer.prompt([
-            {
-              type: 'checkbox',
-              name: 'selectedFeatures',
-              message: 'Select features to add:',
-              choices: availableFeatures.map(feature => ({
-                name: `${feature.name} - ${feature.description}`,
-                value: feature.key,
-                checked: false
-              }))
-            }
-          ]);
-          
-          if (selectedFeatures.length > 0) {
-            console.log('\n' + chalk.hex('#9c88ff')('🔨 Adding selected features...'));
-            
-            for (const featureKey of selectedFeatures) {
-              try {
-                console.log(chalk.hex('#00d2d3')(`\n➕ Adding ${featureKey}...`));
-                await addFeature(featureKey, projectPath);
-                addedFeatures.push(featureKey);
-                console.log(chalk.green(`✅ ${featureKey} added successfully`));
-              } catch (error: any) {
-                console.log(chalk.yellow(`⚠️  Failed to add ${featureKey}: ${error.message}`));
-              }
-            }
-            
-            // Cache the added features
-            const { cacheFeatureUsage } = await import('../utils/cacheManager.js');
-            await cacheFeatureUsage(projectPath, addedFeatures, selectedFramework);
-            
-            console.log('\n' + chalk.green('🎉 All features added successfully!'));
-          }
-        } else {
-          console.log(chalk.yellow('No features available for this project type.'));
-        }
+        // Change to the project directory
+        const originalCwd = process.cwd();
+        process.chdir(projectPath);
+        
+        // Run add command interactively
+        await addCommand();
+        
+        // Change back to original directory
+        process.chdir(originalCwd);
+        
       } catch (error: any) {
-        console.log(chalk.yellow(`⚠️  Feature addition failed: ${error.message}`));
+        console.warn(chalk.yellow(`⚠️  Could not add features: ${error.message}`));
+        console.log(chalk.hex('#95afc0')('   You can add features later using: pi add'));
       }
     }
 
     // Step 20: Record project creation in history
     try {
-      const historyManager = HistoryManager.getInstance();
+      const historyManager = new HistoryManager();
       await historyManager.recordProject({
         name: projectName!,
         framework: selectedFramework,
         language: selectedLanguage || 'JavaScript',
         templateName: templateName,
         path: projectPath,
-        features: addedFeatures
+        features: []
       });
       console.log(chalk.gray('📊 Project recorded in usage history'));
     } catch (error) {
@@ -452,9 +414,6 @@ export async function createProject(providedName?: string, options?: any): Promi
     console.log(`   ${chalk.hex('#ffa502')('Framework:')} ${chalk.hex('#ff6b6b')(selectedFramework)}`);
     if (selectedLanguage) {
       console.log(`   ${chalk.hex('#ffa502')('Language:')} ${chalk.hex('#9c88ff')(selectedLanguage)}`);
-    }
-    if (addedFeatures.length > 0) {
-      console.log(`   ${chalk.hex('#ffa502')('Features:')} ${chalk.hex('#00d2d3')(addedFeatures.join(', '))}`);
     }
     console.log(`   ${chalk.hex('#ffa502')('Location:')} ${chalk.hex('#95afc0')(projectPath)}\n`);
     
@@ -528,30 +487,6 @@ async function promptLanguageSelectionWithCache(fwConfig: any, theme: any, cache
   }
   
   return promptLanguageSelection(fwConfig, theme);
-}
-
-/**
- * Cache-aware database selection prompt
- */
-async function promptDatabaseSelectionWithCache(fwConfig: any, theme: any, cache: UserCacheData) {
-  if (cache.database && fwConfig.databases && Array.isArray(fwConfig.databases) && fwConfig.databases.includes(cache.database)) {
-    console.log(chalk.hex('#95afc0')(`💾 Using cached database preference: ${chalk.bold(cache.database)}`));
-    
-    const { useCache } = await inquirer.prompt([
-      {
-        type: 'confirm',
-        name: 'useCache',
-        message: chalk.hex('#00d2d3')(`Use ${cache.database} database again?`),
-        default: true
-      }
-    ]);
-    
-    if (useCache) {
-      return cache.database;
-    }
-  }
-  
-  return promptDatabaseSelection(fwConfig, theme);
 }
 
 /**

@@ -12,13 +12,10 @@ export interface UserCacheData {
   projectName?: string;
   framework?: string;
   language?: string;
-  database?: string;
-  orm?: string;
   ui?: string;
   bundler?: string;
   srcDirectory?: boolean;
   tailwindCss?: boolean;
-  authProvider?: string;
   lastUsed?: Date;
   projectCount?: number;
 }
