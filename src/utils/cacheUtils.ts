@@ -95,7 +95,7 @@ export class CacheManager {
   private cache: CacheData;
 
   constructor() {
-    this.cacheDir = path.join(os.homedir(), '.pi-cache');
+    this.cacheDir = path.join(os.homedir(), '.package-installer-cli');
     this.cacheFile = path.join(this.cacheDir, 'cache.json');
     this.cache = this.getDefaultCache();
   }

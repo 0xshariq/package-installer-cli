@@ -1,0 +1,4579 @@
+{
+  "features": {
+    "ai": {
+      "supportedFrameworks": [
+        "nextjs",
+        "expressjs",
+        "nestjs",
+        "remixjs"
+      ],
+      "supportedLanguages": [
+        "javascript"
+      ],
+      "supportedAIs": [
+        "gemini",
+        "grok",
+        "open-ai",
+        "open-router",
+        "claude"
+      ],
+      "files": {
+        "claude": {
+          "expressjs": {
+            "javascript": {
+              ".env": {
+                "action": ""
+              },
+              "controllers/claudeController.js": {
+                "action": ""
+              },
+              "index.js": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              },
+              "routes/claudeRoutes.js": {
+                "action": ""
+              },
+              "utils/claude.js": {
+                "action": ""
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "controllers/claudeController.ts": {
+                "action": ""
+              },
+              "index.ts": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              },
+              "routes/claudeRoutes.ts": {
+                "action": ""
+              },
+              "utils/claude.ts": {
+                "action": ""
+              }
+            }
+          },
+          "nestjs": {
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              },
+              "src/claude/claude.controller.ts": {
+                "action": ""
+              },
+              "src/claude/claude.module.ts": {
+                "action": ""
+              },
+              "src/claude/claude.service.ts": {
+                "action": ""
+              }
+            }
+          },
+          "nextjs": {
+            "javascript": {
+              ".env": {
+                "action": ""
+              },
+              "app/api/claude/route.js": {
+                "action": ""
+              },
+              "lib/claude.js": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "app/api/claude/route.ts": {
+                "action": ""
+              },
+              "lib/claude.ts": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              }
+            }
+          },
+          "remixjs": {
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "app/routes/api/claude.ts": {
+                "action": ""
+              },
+              "app/utils/claude.ts": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              }
+            }
+          }
+        },
+        "gemini": {
+          "expressjs": {
+            "javascript": {
+              ".env": {
+                "action": ""
+              },
+              "controllers/geminiController.js": {
+                "action": ""
+              },
+              "index.js": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              },
+              "routes/geminiRoutes.js": {
+                "action": ""
+              },
+              "utils/gemini.js": {
+                "action": ""
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "controllers/geminiController.ts": {
+                "action": ""
+              },
+              "index.ts": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              },
+              "routes/geminiRoutes.ts": {
+                "action": ""
+              },
+              "utils/gemini.ts": {
+                "action": ""
+              }
+            }
+          },
+          "nestjs": {
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              },
+              "src/gemini/gemini.controller.ts": {
+                "action": ""
+              },
+              "src/gemini/gemini.module.ts": {
+                "action": ""
+              },
+              "src/gemini/gemini.service.ts": {
+                "action": ""
+              }
+            }
+          },
+          "nextjs": {
+            "javascript": {
+              ".env": {
+                "action": ""
+              },
+              "app/api/generate/route.js": {
+                "action": ""
+              },
+              "lib/gemini.js": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "app/api/generate/route.ts": {
+                "action": ""
+              },
+              "lib/gemini.ts": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              }
+            }
+          },
+          "remixjs": {
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "app/routes/api/gemini.ts": {
+                "action": ""
+              },
+              "app/utils/gemini.ts": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              }
+            }
+          }
+        },
+        "grok": {
+          "expressjs": {
+            "javascript": {
+              ".env": {
+                "action": ""
+              },
+              "controllers/grokController.js": {
+                "action": ""
+              },
+              "index.js": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              },
+              "routes/grokRoutes.js": {
+                "action": ""
+              },
+              "utils/grok.js": {
+                "action": ""
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "controllers/grokController.ts": {
+                "action": ""
+              },
+              "index.ts": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              },
+              "routes/grokRoutes.ts": {
+                "action": ""
+              },
+              "utils/grok.ts": {
+                "action": ""
+              }
+            }
+          },
+          "nestjs": {
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              },
+              "src/grok/grok.controller.ts": {
+                "action": ""
+              },
+              "src/grok/grok.module.ts": {
+                "action": ""
+              },
+              "src/grok/grok.service.ts": {
+                "action": ""
+              }
+            }
+          },
+          "nextjs": {
+            "javascript": {
+              ".env": {
+                "action": ""
+              },
+              "app/api/grok/route.js": {
+                "action": ""
+              },
+              "lib/grok.js": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "app/api/grok/route.ts": {
+                "action": ""
+              },
+              "lib/grok.ts": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              }
+            }
+          },
+          "remixjs": {
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "app/routes/api/grok.ts": {
+                "action": ""
+              },
+              "app/utils/grok.ts": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              }
+            }
+          }
+        },
+        "open-router": {
+          "expressjs": {
+            "javascript": {
+              ".env": {
+                "action": ""
+              },
+              "controllers/openrouterController.js": {
+                "action": ""
+              },
+              "index.js": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              },
+              "routes/openRouterRoutes.js": {
+                "action": ""
+              },
+              "utils/openrouter.js": {
+                "action": ""
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "controllers/openrouterController.ts": {
+                "action": ""
+              },
+              "index.ts": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              },
+              "routes/openRouterRoutes.ts": {
+                "action": ""
+              },
+              "utils/openrouter.ts": {
+                "action": ""
+              }
+            }
+          },
+          "nestjs": {
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              },
+              "src/openrouter/openrouter.controller.ts": {
+                "action": ""
+              },
+              "src/openrouter/openrouter.module.ts": {
+                "action": ""
+              },
+              "src/openrouter/openrouter.service.ts": {
+                "action": ""
+              }
+            }
+          },
+          "nextjs": {
+            "javascript": {
+              ".env": {
+                "action": ""
+              },
+              "app/api/openrouter/route.js": {
+                "action": ""
+              },
+              "lib/openrouter.js": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "app/api/openrouter/route.ts": {
+                "action": ""
+              },
+              "lib/openrouter.ts": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              }
+            }
+          },
+          "remixjs": {
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "app/routes/api/openrouter.ts": {
+                "action": ""
+              },
+              "app/utils/openrouter.ts": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              }
+            }
+          }
+        },
+        "openai": {
+          "expressjs": {
+            "javascript": {
+              ".env": {
+                "action": ""
+              },
+              "controllers/openaiController.js": {
+                "action": ""
+              },
+              "index.js": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              },
+              "routes/openAiRoutes.js": {
+                "action": ""
+              },
+              "utils/openai.js": {
+                "action": ""
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "controllers/openaiController.ts": {
+                "action": ""
+              },
+              "index.ts": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              },
+              "routes/openAiRoutes.ts": {
+                "action": ""
+              },
+              "utils/openai.ts": {
+                "action": ""
+              }
+            }
+          },
+          "nestjs": {
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              },
+              "src/openai/openai.controller.ts": {
+                "action": ""
+              },
+              "src/openai/openai.module.ts": {
+                "action": ""
+              },
+              "src/openai/openai.service.ts": {
+                "action": ""
+              }
+            }
+          },
+          "nextjs": {
+            "javascript": {
+              ".env": {
+                "action": ""
+              },
+              "app/api/openai/route.js": {
+                "action": ""
+              },
+              "lib/openai.js": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "app/api/openai/route.ts": {
+                "action": ""
+              },
+              "lib/openai.ts": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              }
+            }
+          },
+          "remixjs": {
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "app/routes/api/openai.ts": {
+                "action": ""
+              },
+              "app/utils/openai.ts": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              }
+            }
+          }
+        }
+      }
+    },
+    "auth": {
+      "supportedFrameworks": [
+        "nextjs",
+        "expressjs",
+        "nestjs",
+        "remixjs",
+        "angularjs",
+        "vuejs",
+        "reactjs"
+      ],
+      "supportedLanguages": [
+        "javascript"
+      ],
+      "supportedAuths": [
+        "auth0",
+        "clerk",
+        "next-auth"
+      ],
+      "files": {
+        "auth0": {
+          "angularjs": {
+            "typescript": {
+              "package.json": {
+                "action": ""
+              },
+              "src/app/login-button.ts": {
+                "action": ""
+              },
+              "src/app/logout-button.ts": {
+                "action": ""
+              },
+              "src/app/user-profile.ts": {
+                "action": ""
+              },
+              "src/main.ts": {
+                "action": ""
+              }
+            }
+          },
+          "expressjs": {
+            "javascript": {
+              "index.js": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              }
+            },
+            "typescript": {
+              "index.ts": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              }
+            }
+          },
+          "nextjs": {
+            "javascript": {
+              ".env": {
+                "action": ""
+              },
+              "app/page.jsx": {
+                "action": ""
+              },
+              "lib/auth0.js": {
+                "action": ""
+              },
+              "middleware.js": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "app/page.tsx": {
+                "action": ""
+              },
+              "lib/auth0.ts": {
+                "action": ""
+              },
+              "middleware.ts": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              }
+            }
+          },
+          "vuejs": {
+            "javascript": {
+              "package.json": {
+                "action": ""
+              },
+              "src/components/LoginButton.vue": {
+                "action": ""
+              },
+              "src/components/LogoutButton.vue": {
+                "action": ""
+              },
+              "src/components/UserProfile.vue": {
+                "action": ""
+              },
+              "src/components/login.vue": {
+                "action": ""
+              },
+              "src/components/logout.vue": {
+                "action": ""
+              },
+              "src/components/profile.vue": {
+                "action": ""
+              },
+              "src/main.js": {
+                "action": ""
+              }
+            },
+            "typescript": {
+              "main.ts": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              },
+              "src/components/LoginButton.vue": {
+                "action": ""
+              },
+              "src/components/LogoutButton.vue": {
+                "action": ""
+              },
+              "src/components/UserProfile.vue": {
+                "action": ""
+              },
+              "src/components/login.vue": {
+                "action": ""
+              },
+              "src/components/logout.vue": {
+                "action": ""
+              },
+              "src/components/profile.vue": {
+                "action": ""
+              },
+              "src/main.ts": {
+                "action": ""
+              }
+            }
+          }
+        },
+        "clerk": {
+          "reactjs": {
+            "javascript": {
+              ".env": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              },
+              "src/App.jsx": {
+                "action": ""
+              },
+              "src/main.jsx": {
+                "action": ""
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              },
+              "src/App.tsx": {
+                "action": ""
+              },
+              "src/main.tsx": {
+                "action": ""
+              }
+            }
+          },
+          "expressjs": {
+            "javascript": {
+              ".env": {
+                "action": ""
+              },
+              "index.js": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "index.ts": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              },
+              "types/global.d.ts": {
+                "action": ""
+              }
+            }
+          },
+          "nextjs": {
+            "javascript": {
+              ".env": {
+                "action": ""
+              },
+              "app/layout.js": {
+                "action": ""
+              },
+              "middleware.js": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "app/layout.tsx": {
+                "action": ""
+              },
+              "middleware.ts": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              }
+            }
+          },
+          "remixjs": {
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "app/root.tsx": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              },
+              "routes/_index.tsx": {
+                "action": ""
+              }
+            }
+          },
+          "vuejs": {
+            "javascript": {
+              ".env": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              },
+              "src/App.vue": {
+                "action": ""
+              },
+              "src/main.js": {
+                "action": ""
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              },
+              "src/App.vue": {
+                "action": ""
+              },
+              "src/main.ts": {
+                "action": ""
+              }
+            }
+          }
+        },
+        "next-auth": {
+          "nextjs": {
+            "javascript": {
+              ".env": {
+                "action": ""
+              },
+              "app/api/auth/[...nextauth]/route.js": {
+                "action": ""
+              },
+              "app/layout.jsx": {
+                "action": ""
+              },
+              "lib/auth-provider.jsx": {
+                "action": ""
+              },
+              "lib/auth.js": {
+                "action": ""
+              },
+              "middleware.js": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "app/api/auth/[...nextauth]/route.ts": {
+                "action": ""
+              },
+              "app/layout.tsx": {
+                "action": ""
+              },
+              "lib/auth-provider.tsx": {
+                "action": ""
+              },
+              "lib/auth.ts": {
+                "action": ""
+              },
+              "middleware.ts": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              }
+            }
+          }
+        }
+      }
+    },
+    "aws": {
+      "supportedFrameworks": [
+        "nextjs",
+        "expressjs",
+        "nestjs",
+        "remixjs"
+      ],
+      "supportedLanguages": [
+        "javascript"
+      ],
+      "supportedAwsServices": [
+        "cloudfront",
+        "cloudwatch",
+        "codecommit",
+        "codepipeline",
+        "config",
+        "ec2",
+        "efs",
+        "iam",
+        "lambda",
+        "s3",
+        "x-ray",
+        "cloudtrail",
+        "codebuild",
+        "codedeploy",
+        "cognito",
+        "ebs",
+        "ecs",
+        "elb",
+        "kms",
+        "organizations",
+        "trustedAdvisor"
+      ],
+      "files": {
+        "cloudfront": {
+          "expressjs": {
+            "javascript": {
+              ".env": {
+                "action": ""
+              },
+              "controllers/awsCloudFrontController.js": {
+                "action": ""
+              },
+              "index.js": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              },
+              "routes/awsCloudFrontRoutes.js": {
+                "action": ""
+              },
+              "utils/awsCloudFront.js": {
+                "action": ""
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "controllers/awsCloudFrontController.ts": {
+                "action": ""
+              },
+              "index.ts": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              },
+              "routes/awsCloudFrontRoutes.ts": {
+                "action": ""
+              },
+              "utils/awsCloudFront.ts": {
+                "action": ""
+              }
+            }
+          },
+          "nestjs": {
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              },
+              "src/aws-cloudfront/aws-cloudfront.controller.ts": {
+                "action": ""
+              },
+              "src/aws-cloudfront/aws-cloudfront.service.ts": {
+                "action": ""
+              }
+            }
+          },
+          "nextjs": {
+            "javascript": {
+              ".env": {
+                "action": ""
+              },
+              "app/api/aws/cloudfront/route.js": {
+                "action": ""
+              },
+              "lib/awsCloudFront.js": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "app/api/aws/cloudfront/route.ts": {
+                "action": ""
+              },
+              "lib/awsCloudFront.ts": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              }
+            }
+          },
+          "remixjs": {
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "app/routes/api/aws-cloudfront.ts": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              }
+            }
+          }
+        },
+        "cloudwatch": {
+          "expressjs": {
+            "javascript": {
+              ".env": {
+                "action": ""
+              },
+              "controllers/awsCloudWatchController.js": {
+                "action": ""
+              },
+              "index.js": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              },
+              "routes/awsCloudWatchRoutes.js": {
+                "action": ""
+              },
+              "utils/aws-cloudwatch.js": {
+                "action": ""
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "controllers/awsCloudWatchController.ts": {
+                "action": ""
+              },
+              "index.ts": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              },
+              "routes/awsCloudWatchRoutes.ts": {
+                "action": ""
+              },
+              "utils/aws-cloudwatch.ts": {
+                "action": ""
+              }
+            }
+          },
+          "nestjs": {
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              },
+              "src/cloudwatch/aws-cloudwatch.controller.ts": {
+                "action": ""
+              },
+              "src/cloudwatch/aws-cloudwatch.module.ts": {
+                "action": ""
+              },
+              "src/cloudwatch/aws-cloudwatch.service.ts": {
+                "action": ""
+              }
+            }
+          },
+          "nextjs": {
+            "javascript": {
+              ".env": {
+                "action": ""
+              },
+              "app/api/aws/cloudwatch/route.js": {
+                "action": ""
+              },
+              "lib/aws-cloudwatch.js": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "app/api/aws/cloudwatch/route.ts": {
+                "action": ""
+              },
+              "lib/aws-cloudwatch.ts": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              }
+            }
+          },
+          "remixjs": {
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "app/routes/api/aws-cloudwatch.ts": {
+                "action": ""
+              },
+              "app/utils/aws-cloudwatch.ts": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              }
+            }
+          }
+        },
+        "codecommit": {
+          "expressjs": {
+            "javascript": {
+              ".env": {
+                "action": ""
+              },
+              "controllers/codeCommitController.js": {
+                "action": ""
+              },
+              "index.js": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              },
+              "routes/codeCommitRoutes.js": {
+                "action": ""
+              },
+              "utils/codeCommit.js": {
+                "action": ""
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "controllers/codeCommitController.ts": {
+                "action": ""
+              },
+              "index.ts": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              },
+              "routes/codeCommitRoutes.ts": {
+                "action": ""
+              },
+              "utils/codeCommit.ts": {
+                "action": ""
+              }
+            }
+          },
+          "nestjs": {
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              },
+              "src/codecommit/codecommit.controller.ts": {
+                "action": ""
+              },
+              "src/codecommit/codecommit.service.ts": {
+                "action": ""
+              }
+            }
+          },
+          "nextjs": {
+            "javascript": {
+              ".env": {
+                "action": ""
+              },
+              "app/api/aws/codecommit/route.js": {
+                "action": ""
+              },
+              "lib/codeCommit.js": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "app/api/aws/codecommit/route.ts": {
+                "action": ""
+              },
+              "lib/codeCommit.ts": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              }
+            }
+          },
+          "remixjs": {
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "app/routes/api/aws-codecommit.ts": {
+                "action": ""
+              },
+              "app/utils/awsCodeCommit.ts": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              }
+            }
+          }
+        },
+        "codepipeline": {
+          "expressjs": {
+            "javascript": {
+              ".env": {
+                "action": ""
+              },
+              "controllers/codePipelineController.js": {
+                "action": ""
+              },
+              "index.js": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              },
+              "routes/codePipelineRoutes.js": {
+                "action": ""
+              },
+              "utils/codePipeline.js": {
+                "action": ""
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "controllers/codePipelineController.ts": {
+                "action": ""
+              },
+              "index.ts": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              },
+              "routes/codePipelineRoutes.ts": {
+                "action": ""
+              },
+              "utils/codePipeline.ts": {
+                "action": ""
+              }
+            }
+          },
+          "nestjs": {
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              },
+              "src/codepipeline/codepipeline.controller.ts": {
+                "action": ""
+              },
+              "src/codepipeline/codepipeline.module.ts": {
+                "action": ""
+              },
+              "src/codepipeline/codepipeline.service.ts": {
+                "action": ""
+              }
+            }
+          },
+          "nextjs": {
+            "javascript": {
+              ".env": {
+                "action": ""
+              },
+              "app/api/aws/codepipeline/route.js": {
+                "action": ""
+              },
+              "lib/codePipeline.js": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "app/api/aws/codepipeline/route.ts": {
+                "action": ""
+              },
+              "lib/codePipeline.ts": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              }
+            }
+          },
+          "remixjs": {
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "app/routes/api/codepipeline.ts": {
+                "action": ""
+              },
+              "app/utils/codePipeline.ts": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              }
+            }
+          }
+        },
+        "config": {
+          "expressjs": {
+            "javascript": {
+              ".env": {
+                "action": ""
+              },
+              "controllers/configController.js": {
+                "action": ""
+              },
+              "index.js": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              },
+              "routes/configRoutes.js": {
+                "action": ""
+              },
+              "utils/aws-config.js": {
+                "action": ""
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "controllers/configController.ts": {
+                "action": ""
+              },
+              "index.ts": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              },
+              "routes/configRoutes.ts": {
+                "action": ""
+              },
+              "utils/aws-config.ts": {
+                "action": ""
+              }
+            }
+          },
+          "nestjs": {
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              },
+              "src/config/config.controller.ts": {
+                "action": ""
+              },
+              "src/config/config.module.ts": {
+                "action": ""
+              },
+              "src/config/config.service.ts": {
+                "action": ""
+              }
+            }
+          },
+          "nextjs": {
+            "javascript": {
+              ".env": {
+                "action": ""
+              },
+              "app/api/aws/config/route.js": {
+                "action": ""
+              },
+              "lib/aws-config.js": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "app/api/aws/config/route.ts": {
+                "action": ""
+              },
+              "lib/aws-config.ts": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              }
+            }
+          },
+          "remixjs": {
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "app/routes/api/config.ts": {
+                "action": ""
+              },
+              "app/utils/aws-config.ts": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              }
+            }
+          }
+        },
+        "ec2": {
+          "expressjs": {
+            "javascript": {
+              ".env": {
+                "action": ""
+              },
+              "controllers/awsEc2Controller.js": {
+                "action": ""
+              },
+              "index.js": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              },
+              "routes/awsEc2Routes.js": {
+                "action": ""
+              },
+              "utils/awsEc2.js": {
+                "action": ""
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "controllers/awsEc2Controller.ts": {
+                "action": ""
+              },
+              "index.ts": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              },
+              "routes/awsEc2Routes.ts": {
+                "action": ""
+              },
+              "utils/awsEc2.ts": {
+                "action": ""
+              }
+            }
+          },
+          "nestjs": {
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              },
+              "src/aws-ec2/aws-ec2.controller.ts": {
+                "action": ""
+              },
+              "src/aws-ec2/aws-ec2.service.ts": {
+                "action": ""
+              }
+            }
+          },
+          "nextjs": {
+            "javascript": {
+              ".env": {
+                "action": ""
+              },
+              "app/api/aws/ec2/route.js": {
+                "action": ""
+              },
+              "lib/awsEc2.js": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "app/api/aws/ec2/route.ts": {
+                "action": ""
+              },
+              "lib/awsEc2.ts": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              }
+            }
+          },
+          "remixjs": {
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "app/routes/api/aws-ec2.ts": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              }
+            }
+          }
+        },
+        "efs": {
+          "expressjs": {
+            "javascript": {
+              ".env": {
+                "action": ""
+              },
+              "controllers/awsEfsController.js": {
+                "action": ""
+              },
+              "index.js": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              },
+              "routes/awsEfsRoutes.js": {
+                "action": ""
+              },
+              "utils/awsEfs.js": {
+                "action": ""
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "controllers/awsEfsController.ts": {
+                "action": ""
+              },
+              "index.ts": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              },
+              "routes/awsEfsRoutes.ts": {
+                "action": ""
+              },
+              "utils/awsEfs.ts": {
+                "action": ""
+              }
+            }
+          },
+          "nestjs": {
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              },
+              "src/aws-efs/aws-efs.controller.ts": {
+                "action": ""
+              },
+              "src/aws-efs/aws-efs.service.ts": {
+                "action": ""
+              }
+            }
+          },
+          "nextjs": {
+            "javascript": {
+              ".env": {
+                "action": ""
+              },
+              "app/api/aws/efs/route.js": {
+                "action": ""
+              },
+              "lib/awsEfs.js": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "app/api/aws/efs/route.ts": {
+                "action": ""
+              },
+              "lib/awsEfs.ts": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              }
+            }
+          },
+          "remixjs": {
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "app/routes/api/aws-efs.ts": {
+                "action": ""
+              },
+              "app/utils/awsEfs.ts": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              }
+            }
+          }
+        },
+        "iam": {
+          "expressjs": {
+            "javascript": {
+              ".env": {
+                "action": ""
+              },
+              "controllers/iamControllers.js": {
+                "action": ""
+              },
+              "index.js": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              },
+              "routes/iamRoutes.js": {
+                "action": ""
+              },
+              "utils/awsIam.js": {
+                "action": ""
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "controllers/iamControllers.ts": {
+                "action": ""
+              },
+              "index.ts": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              },
+              "routes/iamRoutes.ts": {
+                "action": ""
+              },
+              "utils/awsIam.ts": {
+                "action": ""
+              }
+            }
+          },
+          "nestjs": {
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              },
+              "src/aws-iam/aws-iam.controller.ts": {
+                "action": ""
+              },
+              "src/aws-iam/aws-iam.module.ts": {
+                "action": ""
+              },
+              "src/aws-iam/aws-iam.service.ts": {
+                "action": ""
+              }
+            }
+          },
+          "nextjs": {
+            "javascript": {
+              ".env": {
+                "action": ""
+              },
+              "app/api/aws/iam/route.js": {
+                "action": ""
+              },
+              "lib/awsIam.js": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "app/api/aws/iam/route.ts": {
+                "action": ""
+              },
+              "lib/awsIam.ts": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              }
+            }
+          },
+          "remixjs": {
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "app/routes/api/aws-iam.ts": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              }
+            }
+          }
+        },
+        "lambda": {
+          "expressjs": {
+            "javascript": {
+              ".env": {
+                "action": ""
+              },
+              "controllers/awsLambdaController.js": {
+                "action": ""
+              },
+              "index.js": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              },
+              "routes/awsLambdaRoutes.js": {
+                "action": ""
+              },
+              "utils/awsLambda.js": {
+                "action": ""
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "controllers/awsLambdaController.ts": {
+                "action": ""
+              },
+              "index.ts": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              },
+              "routes/awsLambdaRoutes.ts": {
+                "action": ""
+              },
+              "utils/awsLambda.ts": {
+                "action": ""
+              }
+            }
+          },
+          "nestjs": {
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              },
+              "src/aws-lambda/aws-lambda.controller.ts": {
+                "action": ""
+              },
+              "src/aws-lambda/aws-lambda.service.ts": {
+                "action": ""
+              }
+            }
+          },
+          "nextjs": {
+            "javascript": {
+              ".env": {
+                "action": ""
+              },
+              "app/api/aws/lambda/route.js": {
+                "action": ""
+              },
+              "lib/awsLambda.js": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "app/api/aws/lambda/route.ts": {
+                "action": ""
+              },
+              "lib/awsLambda.ts": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              }
+            }
+          },
+          "remixjs": {
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "app/routes/api/aws-lambda.ts": {
+                "action": ""
+              },
+              "app/utils/awsLambda.ts": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              }
+            }
+          }
+        },
+        "s3": {
+          "expressjs": {
+            "javascript": {
+              ".env": {
+                "action": ""
+              },
+              "controllers/s3Controllers.js": {
+                "action": ""
+              },
+              "index.js": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              },
+              "routes/s3Routes.js": {
+                "action": ""
+              },
+              "utils/s3.js": {
+                "action": ""
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "controllers/s3Controllers.ts": {
+                "action": ""
+              },
+              "index.ts": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              },
+              "routes/s3Routes.ts": {
+                "action": ""
+              },
+              "utils/s3.ts": {
+                "action": ""
+              }
+            }
+          },
+          "nestjs": {
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              },
+              "src/s3/s3.controller.ts": {
+                "action": ""
+              },
+              "src/s3/s3.module.ts": {
+                "action": ""
+              },
+              "src/s3/s3.service.ts": {
+                "action": ""
+              }
+            }
+          },
+          "nextjs": {
+            "javascript": {
+              ".env": {
+                "action": ""
+              },
+              "app/api/aws/s3/list/route.js": {
+                "action": ""
+              },
+              "app/api/aws/s3/upload/route.js": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              },
+              "utils/s3.js": {
+                "action": ""
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "app/api/aws/s3/list/route.ts": {
+                "action": ""
+              },
+              "app/api/aws/s3/upload/route.ts": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              },
+              "utils/s3.ts": {
+                "action": ""
+              }
+            }
+          },
+          "remixjs": {
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "app/routes/api/s3.ts": {
+                "action": ""
+              },
+              "app/utils/s3.ts": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              }
+            }
+          }
+        },
+        "x-ray": {
+          "expressjs": {
+            "javascript": {
+              ".env": {
+                "action": ""
+              },
+              "controllers/xrayController.js": {
+                "action": ""
+              },
+              "index.js": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              },
+              "routes/xrayRoutes.js": {
+                "action": ""
+              },
+              "utils/xray.js": {
+                "action": ""
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "controllers/xrayController.ts": {
+                "action": ""
+              },
+              "index.ts": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              },
+              "routes/xrayRoutes.ts": {
+                "action": ""
+              },
+              "utils/xray.ts": {
+                "action": ""
+              }
+            }
+          },
+          "nestjs": {
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              },
+              "src/xray/xray.controller.ts": {
+                "action": ""
+              },
+              "src/xray/xray.module.ts": {
+                "action": ""
+              },
+              "src/xray/xray.service.ts": {
+                "action": ""
+              }
+            }
+          },
+          "nextjs": {
+            "javascript": {
+              ".env": {
+                "action": ""
+              },
+              "app/api/aws/xray/route.js": {
+                "action": ""
+              },
+              "lib/xray.js": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "app/api/aws/xray/route.ts": {
+                "action": ""
+              },
+              "lib/xray.ts": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              }
+            }
+          },
+          "remixjs": {
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "app/routes/api/xray.ts": {
+                "action": ""
+              },
+              "app/utils/xray.ts": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              }
+            }
+          }
+        },
+        "cloudtrail": {
+          "expressjs": {
+            "javascript": {
+              ".env": {
+                "action": ""
+              },
+              "controllers/cloudtrailController.js": {
+                "action": ""
+              },
+              "index.js": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              },
+              "routes/awsCloudTrailRoutes.js": {
+                "action": ""
+              },
+              "utils/aws-cloudtrail.js": {
+                "action": ""
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "controllers/awsCloudTrailController.ts": {
+                "action": ""
+              },
+              "index.ts": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              },
+              "routes/awsCloudTrailRoutes.ts": {
+                "action": ""
+              },
+              "utils/aws-cloudtrail.ts": {
+                "action": ""
+              }
+            }
+          },
+          "nestjs": {
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              },
+              "src/cloudtrail/cloudtrail.controller.ts": {
+                "action": ""
+              },
+              "src/cloudtrail/cloudtrail.module.ts": {
+                "action": ""
+              },
+              "src/cloudtrail/cloudtrail.service.ts": {
+                "action": ""
+              }
+            }
+          },
+          "nextjs": {
+            "javascript": {
+              ".env": {
+                "action": ""
+              },
+              "app/api/aws/cloudtrail/route.js": {
+                "action": ""
+              },
+              "lib/aws-cloudtrail.js": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "app/api/aws/cloudtrail/route.ts": {
+                "action": ""
+              },
+              "lib/aws-cloudtrail.ts": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              }
+            }
+          },
+          "remixjs": {
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "app/routes/api/aws-cloudtrail.ts": {
+                "action": ""
+              },
+              "app/utils/aws-cloudtrail.ts": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              }
+            }
+          }
+        },
+        "codebuild": {
+          "expressjs": {
+            "javascript": {
+              ".env": {
+                "action": ""
+              },
+              "controllers/codeBuildController.js": {
+                "action": ""
+              },
+              "index.js": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              },
+              "routes/codeBuildRoutes.js": {
+                "action": ""
+              },
+              "utils/codeBuild.js": {
+                "action": ""
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "controllers/codeBuildController.ts": {
+                "action": ""
+              },
+              "index.ts": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              },
+              "routes/codeBuildRoutes.ts": {
+                "action": ""
+              },
+              "utils/codeBuild.ts": {
+                "action": ""
+              }
+            }
+          },
+          "nestjs": {
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              },
+              "src/codebuild/codebuild.controller.ts": {
+                "action": ""
+              },
+              "src/codebuild/codebuild.service.ts": {
+                "action": ""
+              }
+            }
+          },
+          "nextjs": {
+            "javascript": {
+              ".env": {
+                "action": ""
+              },
+              "app/api/aws/codebuild/route.ts": {
+                "action": ""
+              },
+              "lib/codeBuild.js": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "app/api/aws/codebuild/route.ts": {
+                "action": ""
+              },
+              "lib/codeBuild.ts": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              }
+            }
+          },
+          "remixjs": {
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "app/routes/api/codebuild.ts": {
+                "action": ""
+              },
+              "app/utils/codeBuild.ts": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              }
+            }
+          }
+        },
+        "codedeploy": {
+          "expressjs": {
+            "javascript": {
+              ".env": {
+                "action": ""
+              },
+              "controllers/codeDeployController.js": {
+                "action": ""
+              },
+              "index.js": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              },
+              "routes/codeDeployRoutes.js": {
+                "action": ""
+              },
+              "utils/codeDeploy.js": {
+                "action": ""
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "controllers/codeDeployController.ts": {
+                "action": ""
+              },
+              "index.ts": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              },
+              "routes/codeDeployRoutes.ts": {
+                "action": ""
+              },
+              "utils/codeDeploy.ts": {
+                "action": ""
+              }
+            }
+          },
+          "nestjs": {
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              },
+              "src/codedeploy/codedeploy.controller.ts": {
+                "action": ""
+              },
+              "src/codedeploy/codedeploy.module.ts": {
+                "action": ""
+              },
+              "src/codedeploy/codedeploy.service.ts": {
+                "action": ""
+              }
+            }
+          },
+          "nextjs": {
+            "javascript": {
+              ".env": {
+                "action": ""
+              },
+              "app/api/aws/codedeploy/route.js": {
+                "action": ""
+              },
+              "lib/codeDeploy.js": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "app/api/aws/codedeploy/route.ts": {
+                "action": ""
+              },
+              "lib/codeDeploy.ts": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              }
+            }
+          },
+          "remixjs": {
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "app/routes/api/codedeploy.ts": {
+                "action": ""
+              },
+              "app/utils/codeDeploy.ts": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              }
+            }
+          }
+        },
+        "cognito": {
+          "expressjs": {
+            "javascript": {
+              ".env": {
+                "action": ""
+              },
+              "controllers/awsCognitoController.js": {
+                "action": ""
+              },
+              "index.js": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              },
+              "routes/awsCognitoRoutes.js": {
+                "action": ""
+              },
+              "utils/awsCognito.js": {
+                "action": ""
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "controllers/awsCognitoController.ts": {
+                "action": ""
+              },
+              "index.ts": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              },
+              "routes/awsCognitoRoutes.ts": {
+                "action": ""
+              },
+              "utils/awsCognito.ts": {
+                "action": ""
+              }
+            }
+          },
+          "nestjs": {
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              },
+              "src/aws-cognito/aws-cognito.controller.ts": {
+                "action": ""
+              },
+              "src/aws-cognito/aws-cognito.service.ts": {
+                "action": ""
+              }
+            }
+          },
+          "nextjs": {
+            "javascript": {
+              ".env": {
+                "action": ""
+              },
+              "app/api/aws/cognito/route.ts": {
+                "action": ""
+              },
+              "lib/awsCognito.js": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "app/api/aws/cognito/route.ts": {
+                "action": ""
+              },
+              "lib/awsCognito.ts": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              }
+            }
+          },
+          "remixjs": {
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "app/routes/api/aws-cognito.ts": {
+                "action": ""
+              },
+              "app/utils/awsCognito.ts": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              }
+            }
+          }
+        },
+        "ebs": {
+          "expressjs": {
+            "javascript": {
+              ".env": {
+                "action": ""
+              },
+              "controllers/awsEbsController.js": {
+                "action": ""
+              },
+              "index.js": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              },
+              "routes/awsEbsRoutes.js": {
+                "action": ""
+              },
+              "utils/awsEbs.js": {
+                "action": ""
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "controllers/awsEbsController.ts": {
+                "action": ""
+              },
+              "index.ts": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              },
+              "routes/awsEbsRoutes.ts": {
+                "action": ""
+              },
+              "utils/awsEbs.ts": {
+                "action": ""
+              }
+            }
+          },
+          "nestjs": {
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              },
+              "src/aws-ebs/aws-ebs.controller.ts": {
+                "action": ""
+              },
+              "src/aws-ebs/aws-ebs.service.ts": {
+                "action": ""
+              }
+            }
+          },
+          "nextjs": {
+            "javascript": {
+              ".env": {
+                "action": ""
+              },
+              "app/api/aws/ebs/route.js": {
+                "action": ""
+              },
+              "lib/awsEbs.js": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "app/api/aws/ebs/route.ts": {
+                "action": ""
+              },
+              "lib/awsEbs.ts": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              }
+            }
+          },
+          "remixjs": {
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "app/routes/api/aws-ebs.ts": {
+                "action": ""
+              },
+              "app/utils/awsEbs.ts": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              }
+            }
+          }
+        },
+        "ecs": {
+          "expressjs": {
+            "javascript": {
+              ".env": {
+                "action": ""
+              },
+              "controllers/awsEcsController.js": {
+                "action": ""
+              },
+              "index.js": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              },
+              "routes/awsEcsRoutes.js": {
+                "action": ""
+              },
+              "utils/awsEcs.js": {
+                "action": ""
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "controllers/awsEcsController.ts": {
+                "action": ""
+              },
+              "index.ts": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              },
+              "routes/awsEcsRoutes.ts": {
+                "action": ""
+              },
+              "utils/awsEcs.ts": {
+                "action": ""
+              }
+            }
+          },
+          "nestjs": {
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              },
+              "src/aws-ecs/aws-ecs.controller.ts": {
+                "action": ""
+              },
+              "src/aws-ecs/aws-ecs.service.ts": {
+                "action": ""
+              }
+            }
+          },
+          "nextjs": {
+            "javascript": {
+              ".env": {
+                "action": ""
+              },
+              "app/api/aws/ecs/route.js": {
+                "action": ""
+              },
+              "lib/awsEcs.js": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "app/api/aws/ecs/route.ts": {
+                "action": ""
+              },
+              "lib/awsEcs.ts": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              }
+            }
+          },
+          "remixjs": {
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "app/routes/api/aws-ecs.ts": {
+                "action": ""
+              },
+              "app/utils/awsEcs.ts": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              }
+            }
+          }
+        },
+        "elb": {
+          "expressjs": {
+            "javascript": {
+              ".env": {
+                "action": ""
+              },
+              "controllers/awsElbController.js": {
+                "action": ""
+              },
+              "index.js": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              },
+              "routes/awsElbRoutes.js": {
+                "action": ""
+              },
+              "utils/awsElb.js": {
+                "action": ""
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "controllers/awsElbController.ts": {
+                "action": ""
+              },
+              "index.ts": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              },
+              "routes/awsElbRoutes.ts": {
+                "action": ""
+              },
+              "utils/awsElb.ts": {
+                "action": ""
+              }
+            }
+          },
+          "nestjs": {
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              },
+              "src/aws-elb/aws-elb.controller.ts": {
+                "action": ""
+              },
+              "src/aws-elb/aws-elb.service.ts": {
+                "action": ""
+              }
+            }
+          },
+          "nextjs": {
+            "javascript": {
+              ".env": {
+                "action": ""
+              },
+              "app/api/aws/elb/route.js": {
+                "action": ""
+              },
+              "lib/awsElb.js": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "app/api/aws/elb/route.ts": {
+                "action": ""
+              },
+              "lib/awsElb.ts": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              }
+            }
+          },
+          "remixjs": {
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "app/routes/api/aws-elb.ts": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              }
+            }
+          }
+        },
+        "kms": {
+          "expressjs": {
+            "javascript": {
+              ".env": {
+                "action": ""
+              },
+              "controllers/awsKmsController.js": {
+                "action": ""
+              },
+              "index.js": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              },
+              "routes/awsKmsRoutes.js": {
+                "action": ""
+              },
+              "utils/awsKms.js": {
+                "action": ""
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "controllers/awsKmsController.ts": {
+                "action": ""
+              },
+              "index.ts": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              },
+              "routes/awsKmsRoutes.ts": {
+                "action": ""
+              },
+              "utils/awsKms.ts": {
+                "action": ""
+              }
+            }
+          },
+          "nestjs": {
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              },
+              "src/aws-kms/aws-kms.controller.ts": {
+                "action": ""
+              },
+              "src/aws-kms/aws-kms.service.ts": {
+                "action": ""
+              }
+            }
+          },
+          "nextjs": {
+            "javascript": {
+              ".env": {
+                "action": ""
+              },
+              "app/api/aws/kms/route.js": {
+                "action": ""
+              },
+              "lib/awsKms.js": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "app/api/aws/kms/route.ts": {
+                "action": ""
+              },
+              "lib/awsKms.ts": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              }
+            }
+          },
+          "remixjs": {
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "app/routes/api/aws-kms.ts": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              }
+            }
+          }
+        },
+        "organizations": {
+          "expressjs": {
+            "javascript": {
+              ".env": {
+                "action": ""
+              },
+              "controllers/organizationsController.js": {
+                "action": ""
+              },
+              "index.js": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              },
+              "routes/organizationsRoutes.js": {
+                "action": ""
+              },
+              "utils/aws-organizations.js": {
+                "action": ""
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "controllers/organizationController.ts": {
+                "action": ""
+              },
+              "index.ts": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              },
+              "routes/organizationsRoutes.ts": {
+                "action": ""
+              },
+              "utils/aws-organizations.ts": {
+                "action": ""
+              }
+            }
+          },
+          "nestjs": {
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              },
+              "src/organizations/organizations.controller.ts": {
+                "action": ""
+              },
+              "src/organizations/organizations.module.ts": {
+                "action": ""
+              },
+              "src/organizations/organizations.service.ts": {
+                "action": ""
+              }
+            }
+          },
+          "nextjs": {
+            "javascript": {
+              ".env": {
+                "action": ""
+              },
+              "app/api/aws/organizations/route.ts": {
+                "action": ""
+              },
+              "lib/aws-organizations.js": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "app/api/aws/organizations/route.ts": {
+                "action": ""
+              },
+              "lib/aws-organizations.ts": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              }
+            }
+          },
+          "remixjs": {
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "app/routes/api/organizations.ts": {
+                "action": ""
+              },
+              "app/utils/aws-organizations.ts": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              }
+            }
+          }
+        },
+        "trustedAdvisor": {
+          "expressjs": {
+            "javascript": {
+              ".env": {
+                "action": ""
+              },
+              "controllers/awsTrustedAdvisorController.js": {
+                "action": ""
+              },
+              "index.js": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              },
+              "routes/awsTrustedAdvisorRoutes.js": {
+                "action": ""
+              },
+              "utils/aws-trustedadvisor.js": {
+                "action": ""
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "controllers/awsTrustedAdvisorController.ts": {
+                "action": ""
+              },
+              "index.ts": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              },
+              "routes/awsTrustedAdvisorRoutes.ts": {
+                "action": ""
+              },
+              "utils/aws-trustedadvisor.ts": {
+                "action": ""
+              }
+            }
+          },
+          "nestjs": {
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              },
+              "src/trustedadvisor/aws-trustedadvisor.controller.ts": {
+                "action": ""
+              },
+              "src/trustedadvisor/aws-trustedadvisor.module.ts": {
+                "action": ""
+              },
+              "src/trustedadvisor/aws-trustedadvisor.service.ts": {
+                "action": ""
+              }
+            }
+          },
+          "nextjs": {
+            "javascript": {
+              ".env": {
+                "action": ""
+              },
+              "app/api/aws/trustedadvisor/route.js": {
+                "action": ""
+              },
+              "lib/aws-trustedadvisor.js": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "app/api/aws/trustedadvisor/route.ts": {
+                "action": ""
+              },
+              "lib/aws-trustedadvisor.ts": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              }
+            }
+          },
+          "remixjs": {
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "app/routes/api/aws-trustedadvisor.ts": {
+                "action": ""
+              },
+              "app/utils/aws-trustedadvisor.ts": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              }
+            }
+          }
+        }
+      }
+    },
+    "database": {
+      "supportedFrameworks": [
+        "nextjs",
+        "expressjs",
+        "nestjs",
+        "remixjs"
+      ],
+      "supportedLanguages": [
+        "javascript"
+      ],
+      "supportedDatabases": [
+        "mongodb",
+        "supabase",
+        "neondb"
+      ],
+      "supportedORMs": {
+        "mongodb": {
+          "javascript": [
+            "mongoose"
+          ],
+          "typescript": [
+            "mongoose",
+            "typegoose"
+          ]
+        },
+        "supabase": {
+          "javascript": [
+            "typeorm"
+          ],
+          "typescript": [
+            "typeorm",
+            "prisma",
+            "drizzle"
+          ]
+        },
+        "neondb": {
+          "javascript": [
+            "typeorm"
+          ],
+          "typescript": [
+            "typeorm",
+            "prisma",
+            "drizzle"
+          ]
+        },
+        "mysql": {}
+      },
+      "files": {
+        "mongodb": {
+          "javascript": {
+            "mongoose": {
+              "expressjs/javascript/.env": {
+                "action": ""
+              },
+              "expressjs/javascript/package.json": {
+                "action": ""
+              },
+              "expressjs/typescript/.env": {
+                "action": ""
+              },
+              "expressjs/typescript/package.json": {
+                "action": ""
+              },
+              "nestjs/typescript/.env": {
+                "action": ""
+              },
+              "nestjs/typescript/package.json": {
+                "action": ""
+              },
+              "nextjs/javascript/.env": {
+                "action": ""
+              },
+              "nextjs/javascript/package.json": {
+                "action": ""
+              },
+              "nextjs/typescript/.env": {
+                "action": ""
+              },
+              "nextjs/typescript/package.json": {
+                "action": ""
+              },
+              "remixjs/typescript/.env": {
+                "action": ""
+              },
+              "remixjs/typescript/package.json": {
+                "action": ""
+              }
+            }
+          },
+          "typescript": {
+            "mongoose": {
+              "expressjs/javascript/.env": {
+                "action": ""
+              },
+              "expressjs/javascript/package.json": {
+                "action": ""
+              },
+              "expressjs/typescript/.env": {
+                "action": ""
+              },
+              "expressjs/typescript/package.json": {
+                "action": ""
+              },
+              "nestjs/typescript/.env": {
+                "action": ""
+              },
+              "nestjs/typescript/package.json": {
+                "action": ""
+              },
+              "nextjs/javascript/.env": {
+                "action": ""
+              },
+              "nextjs/javascript/package.json": {
+                "action": ""
+              },
+              "nextjs/typescript/.env": {
+                "action": ""
+              },
+              "nextjs/typescript/package.json": {
+                "action": ""
+              },
+              "remixjs/typescript/.env": {
+                "action": ""
+              },
+              "remixjs/typescript/package.json": {
+                "action": ""
+              }
+            },
+            "typegoose": {
+              "expressjs/javascript/.env": {
+                "action": ""
+              },
+              "expressjs/javascript/package.json": {
+                "action": ""
+              },
+              "expressjs/typescript/.env": {
+                "action": ""
+              },
+              "expressjs/typescript/package.json": {
+                "action": ""
+              },
+              "nestjs/typescript/.env": {
+                "action": ""
+              },
+              "nestjs/typescript/package.json": {
+                "action": ""
+              },
+              "nextjs/javascript/.env": {
+                "action": ""
+              },
+              "nextjs/javascript/package.json": {
+                "action": ""
+              },
+              "nextjs/typescript/.env": {
+                "action": ""
+              },
+              "nextjs/typescript/package.json": {
+                "action": ""
+              },
+              "remixjs/typescript/.env": {
+                "action": ""
+              },
+              "remixjs/typescript/package.json": {
+                "action": ""
+              }
+            }
+          }
+        },
+        "supabase": {
+          "javascript": {
+            "typeorm": {
+              "expressjs/javascript/.env": {
+                "action": ""
+              },
+              "expressjs/javascript/package.json": {
+                "action": ""
+              },
+              "expressjs/typescript/.env": {
+                "action": ""
+              },
+              "expressjs/typescript/package.json": {
+                "action": ""
+              },
+              "nestjs/typescript/.env": {
+                "action": ""
+              },
+              "nestjs/typescript/package.json": {
+                "action": ""
+              },
+              "nextjs/javascript/.env": {
+                "action": ""
+              },
+              "nextjs/javascript/package.json": {
+                "action": ""
+              },
+              "nextjs/typescript/.env": {
+                "action": ""
+              },
+              "nextjs/typescript/package.json": {
+                "action": ""
+              },
+              "remixjs/typescript/.env": {
+                "action": ""
+              },
+              "remixjs/typescript/package.json": {
+                "action": ""
+              }
+            }
+          },
+          "typescript": {
+            "drizzle": {
+              "expressjs/javascript/.env": {
+                "action": ""
+              },
+              "expressjs/javascript/package.json": {
+                "action": ""
+              },
+              "expressjs/typescript/.env": {
+                "action": ""
+              },
+              "expressjs/typescript/package.json": {
+                "action": ""
+              },
+              "nestjs/typescript/.env": {
+                "action": ""
+              },
+              "nestjs/typescript/package.json": {
+                "action": ""
+              },
+              "nextjs/javascript/.env": {
+                "action": ""
+              },
+              "nextjs/javascript/package.json": {
+                "action": ""
+              },
+              "nextjs/typescript/.env": {
+                "action": ""
+              },
+              "nextjs/typescript/package.json": {
+                "action": ""
+              },
+              "remixjs/typescript/.env": {
+                "action": ""
+              },
+              "remixjs/typescript/package.json": {
+                "action": ""
+              }
+            },
+            "prisma": {
+              "expressjs/javascript/.env": {
+                "action": ""
+              },
+              "expressjs/javascript/package.json": {
+                "action": ""
+              },
+              "expressjs/typescript/.env": {
+                "action": ""
+              },
+              "expressjs/typescript/package.json": {
+                "action": ""
+              },
+              "nestjs/typescript/.env": {
+                "action": ""
+              },
+              "nestjs/typescript/package.json": {
+                "action": ""
+              },
+              "nextjs/javascript/.env": {
+                "action": ""
+              },
+              "nextjs/javascript/package.json": {
+                "action": ""
+              },
+              "nextjs/typescript/.env": {
+                "action": ""
+              },
+              "nextjs/typescript/package.json": {
+                "action": ""
+              },
+              "remixjs/typescript/.env": {
+                "action": ""
+              },
+              "remixjs/typescript/package.json": {
+                "action": ""
+              }
+            },
+            "typeorm": {
+              "expressjs/javascript/.env": {
+                "action": ""
+              },
+              "expressjs/javascript/package.json": {
+                "action": ""
+              },
+              "expressjs/typescript/.env": {
+                "action": ""
+              },
+              "expressjs/typescript/package.json": {
+                "action": ""
+              },
+              "nestjs/typescript/.env": {
+                "action": ""
+              },
+              "nestjs/typescript/package.json": {
+                "action": ""
+              },
+              "nextjs/javascript/.env": {
+                "action": ""
+              },
+              "nextjs/javascript/package.json": {
+                "action": ""
+              },
+              "nextjs/typescript/.env": {
+                "action": ""
+              },
+              "nextjs/typescript/package.json": {
+                "action": ""
+              },
+              "remixjs/typescript/.env": {
+                "action": ""
+              },
+              "remixjs/typescript/package.json": {
+                "action": ""
+              }
+            }
+          }
+        },
+        "neondb": {
+          "javascript": {
+            "typeorm": {
+              "expressjs/javascript/.env": {
+                "action": ""
+              },
+              "expressjs/javascript/package.json": {
+                "action": ""
+              },
+              "expressjs/typescript/.env": {
+                "action": ""
+              },
+              "expressjs/typescript/package.json": {
+                "action": ""
+              },
+              "nestjs/typescript/.env": {
+                "action": ""
+              },
+              "nestjs/typescript/package.json": {
+                "action": ""
+              },
+              "nextjs/javascript/.env": {
+                "action": ""
+              },
+              "nextjs/javascript/package.json": {
+                "action": ""
+              },
+              "nextjs/typescript/.env": {
+                "action": ""
+              },
+              "nextjs/typescript/package.json": {
+                "action": ""
+              },
+              "remixjs/typescript/.env": {
+                "action": ""
+              },
+              "remixjs/typescript/package.json": {
+                "action": ""
+              }
+            }
+          },
+          "typescript": {
+            "drizzle": {
+              "expressjs/javascript/.env": {
+                "action": ""
+              },
+              "expressjs/javascript/package.json": {
+                "action": ""
+              },
+              "expressjs/typescript/.env": {
+                "action": ""
+              },
+              "expressjs/typescript/package.json": {
+                "action": ""
+              },
+              "nestjs/typescript/.env": {
+                "action": ""
+              },
+              "nestjs/typescript/package.json": {
+                "action": ""
+              },
+              "nextjs/javascript/.env": {
+                "action": ""
+              },
+              "nextjs/javascript/package.json": {
+                "action": ""
+              },
+              "nextjs/typescript/.env": {
+                "action": ""
+              },
+              "nextjs/typescript/package.json": {
+                "action": ""
+              },
+              "remixjs/typescript/.env": {
+                "action": ""
+              },
+              "remixjs/typescript/package.json": {
+                "action": ""
+              }
+            },
+            "prisma": {
+              "expressjs/javascript/.env": {
+                "action": ""
+              },
+              "expressjs/javascript/package.json": {
+                "action": ""
+              },
+              "expressjs/typescript/.env": {
+                "action": ""
+              },
+              "expressjs/typescript/package.json": {
+                "action": ""
+              },
+              "nestjs/typescript/.env": {
+                "action": ""
+              },
+              "nestjs/typescript/package.json": {
+                "action": ""
+              },
+              "nextjs/javascript/.env": {
+                "action": ""
+              },
+              "nextjs/javascript/package.json": {
+                "action": ""
+              },
+              "nextjs/typescript/.env": {
+                "action": ""
+              },
+              "nextjs/typescript/package.json": {
+                "action": ""
+              },
+              "remixjs/typescript/.env": {
+                "action": ""
+              },
+              "remixjs/typescript/package.json": {
+                "action": ""
+              }
+            },
+            "typeorm": {
+              "expressjs/javascript/.env": {
+                "action": ""
+              },
+              "expressjs/javascript/package.json": {
+                "action": ""
+              },
+              "expressjs/typescript/.env": {
+                "action": ""
+              },
+              "expressjs/typescript/package.json": {
+                "action": ""
+              },
+              "nestjs/typescript/.env": {
+                "action": ""
+              },
+              "nestjs/typescript/package.json": {
+                "action": ""
+              },
+              "nextjs/javascript/.env": {
+                "action": ""
+              },
+              "nextjs/javascript/package.json": {
+                "action": ""
+              },
+              "nextjs/typescript/.env": {
+                "action": ""
+              },
+              "nextjs/typescript/package.json": {
+                "action": ""
+              },
+              "remixjs/typescript/.env": {
+                "action": ""
+              },
+              "remixjs/typescript/package.json": {
+                "action": ""
+              }
+            }
+          }
+        }
+      }
+    },
+    "docker": {
+      "supportedFrameworks": [
+        "nextjs",
+        "expressjs",
+        "nestjs",
+        "remixjs",
+        "angularjs",
+        "vuejs",
+        "reactjs"
+      ],
+      "supportedLanguages": [
+        "javascript"
+      ],
+      "files": {
+        "angularjs": {
+          ".dockerignore": {
+            "action": "create"
+          },
+          "docker-compose.yml": {
+            "action": "create"
+          },
+          "Dockerfile": {
+            "action": "create"
+          }
+        },
+        "nestjs": {
+          ".dockerignore": {
+            "action": "create"
+          },
+          "docker-compose.yml": {
+            "action": "create"
+          },
+          "Dockerfile": {
+            "action": "create"
+          }
+        },
+        "nextjs": {
+          ".dockerignore": {
+            "action": "create"
+          },
+          "docker-compose.yml": {
+            "action": "create"
+          },
+          "Dockerfile": {
+            "action": "create"
+          }
+        },
+        "expressjs": {
+          ".dockerignore": {
+            "action": "create"
+          },
+          "docker-compose.yml": {
+            "action": "create"
+          },
+          "Dockerfile": {
+            "action": "create"
+          }
+        },
+        "reactjs": {
+          ".dockerignore": {
+            "action": "create"
+          },
+          "docker-compose.yml": {
+            "action": "create"
+          },
+          "Dockerfile": {
+            "action": "create"
+          }
+        },
+        "reactjs+expressjs+shadcn": {
+          ".dockerignore": {
+            "action": "create"
+          },
+          "docker-compose.yml": {
+            "action": "create"
+          },
+          "Dockerfile": {
+            "action": "create"
+          }
+        },
+        "reactjs+nestjs+shadcn": {
+          ".dockerignore": {
+            "action": "create"
+          },
+          "docker-compose.yml": {
+            "action": "create"
+          },
+          "Dockerfile": {
+            "action": "create"
+          }
+        },
+        "remixjs": {
+          ".dockerignore": {
+            "action": "create"
+          },
+          "docker-compose.yml": {
+            "action": "create"
+          },
+          "Dockerfile": {
+            "action": "create"
+          }
+        },
+        "vuejs": {
+          ".dockerignore": {
+            "action": "create"
+          },
+          "docker-compose.yml": {
+            "action": "create"
+          },
+          "Dockerfile": {
+            "action": "create"
+          }
+        }
+      }
+    },
+    "gitignore": {
+      "supportedFrameworks": [
+        "nextjs",
+        "angularjs",
+        "nestjs"
+      ],
+      "supportedLanguages": [
+        "javascript",
+        "go",
+        "python",
+        "rust"
+      ],
+      "files": {
+        "angularjs": {
+          "angular-gitignore": {
+            "action": "create"
+          }
+        },
+        "go": {
+          "go-gitignore": {
+            "action": "create"
+          }
+        },
+        "nestjs": {
+          "nestjs-gitignore": {
+            "action": "create"
+          }
+        },
+        "nextjs": {
+          "nextjs-gitignore": {
+            "action": "create"
+          }
+        },
+        "python": {
+          "python-gitignore": {
+            "action": "create"
+          }
+        },
+        "rust": {
+          "rust-gitignore": {
+            "action": "create"
+          }
+        }
+      }
+    },
+    "payment": {
+      "supportedFrameworks": [
+        "nextjs",
+        "expressjs",
+        "nestjs",
+        "remixjs",
+        "vuejs"
+      ],
+      "supportedLanguages": [
+        "javascript"
+      ],
+      "supportedPayments": [
+        "stripe",
+        "razorpay",
+        "paypal"
+      ],
+      "files": {
+        "paypal": {
+          "expressjs": {
+            "javascript": {
+              ".env": {
+                "action": ""
+              },
+              "controllers/paypalControllers.js": {
+                "action": ""
+              },
+              "index.js": {
+                "action": ""
+              },
+              "routes/paypalRoutes.js": {
+                "action": ""
+              },
+              "utils/paypal.js": {
+                "action": ""
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "controllers/paypalControllers.ts": {
+                "action": ""
+              },
+              "index.ts": {
+                "action": ""
+              },
+              "routes/paypalRoutes.ts": {
+                "action": ""
+              },
+              "utils/paypal.ts": {
+                "action": ""
+              }
+            }
+          },
+          "nestjs": {
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "src/paypal.controller.ts": {
+                "action": ""
+              },
+              "src/paypal.service.ts": {
+                "action": ""
+              }
+            }
+          },
+          "nextjs": {
+            "javascript": {
+              ".env": {
+                "action": ""
+              },
+              "app/api/paypal/capture-payment/route.js": {
+                "action": ""
+              },
+              "app/api/paypal/create-payment/route.js": {
+                "action": ""
+              },
+              "app/api/paypal/refund/route.ts": {
+                "action": ""
+              },
+              "app/payment-checkout/page.tsx": {
+                "action": ""
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "app/api/paypal/capture-payment/route.ts": {
+                "action": ""
+              },
+              "app/api/paypal/create-payment/route.ts": {
+                "action": ""
+              },
+              "app/api/paypal/refund/route.ts": {
+                "action": ""
+              },
+              "app/payment-checkout/page.tsx": {
+                "action": ""
+              }
+            }
+          },
+          "remixjs": {
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "app/routes/api/paypal.ts": {
+                "action": ""
+              },
+              "app/routes/checkout.tsx": {
+                "action": ""
+              }
+            }
+          }
+        },
+        "razorpay": {
+          "expressjs": {
+            "javascript": {
+              ".env": {
+                "action": ""
+              },
+              "controllers/payment.js": {
+                "action": ""
+              },
+              "index.js": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              },
+              "routes/payment.js": {
+                "action": ""
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "controllers/payment.ts": {
+                "action": ""
+              },
+              "index.ts": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              },
+              "routes/payment.ts": {
+                "action": ""
+              }
+            }
+          },
+          "nestjs": {
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              },
+              "src/payment.controller.ts": {
+                "action": ""
+              }
+            }
+          },
+          "nextjs": {
+            "javascript": {
+              ".env": {
+                "action": ""
+              },
+              "app/api/payment/route.js": {
+                "action": ""
+              },
+              "app/api/refund/route.js": {
+                "action": ""
+              },
+              "app/payment-checkout/page.jsx": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "app/api/payment/route.ts": {
+                "action": ""
+              },
+              "app/api/refund/route.ts": {
+                "action": ""
+              },
+              "app/payment-checkout/page.tsx": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              }
+            }
+          },
+          "remixjs": {
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "app/routes/api.orders.ts": {
+                "action": ""
+              },
+              "app/routes/api.refunds.ts": {
+                "action": ""
+              },
+              "app/routes/checkout.tsx": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              }
+            }
+          }
+        },
+        "stripe": {
+          "expressjs": {
+            "javascript": {
+              ".env": {
+                "action": ""
+              },
+              "controllers/stripeController.js": {
+                "action": ""
+              },
+              "index.js": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              },
+              "routes/stripeRoutes.js": {
+                "action": ""
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "controllers/stripeControllers.ts": {
+                "action": ""
+              },
+              "index.ts": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              },
+              "routes/stripeRoutes.ts": {
+                "action": ""
+              },
+              "utils/stripe.ts": {
+                "action": ""
+              }
+            }
+          },
+          "nestjs": {
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              },
+              "src/app.module.ts": {
+                "action": ""
+              },
+              "src/stripe/stripe.controller.ts": {
+                "action": ""
+              },
+              "src/stripe/stripe.module.ts": {
+                "action": ""
+              },
+              "src/stripe/stripe.service.ts": {
+                "action": ""
+              }
+            }
+          },
+          "nextjs": {
+            "javascript": {
+              ".env": {
+                "action": ""
+              },
+              "app/api/stripe/create-payment-intent/route.js": {
+                "action": ""
+              },
+              "app/api/stripe/refund/route.js": {
+                "action": ""
+              },
+              "app/payment-checkout/page.jsx": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "app/api/stripe/create-payment-intent/route.ts": {
+                "action": ""
+              },
+              "app/api/stripe/refund/route.ts": {
+                "action": ""
+              },
+              "app/payment-checkout/page.tsx": {
+                "action": ""
+              },
+              "lib/stripe.ts": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              }
+            }
+          },
+          "remixjs": {
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "app/routes/checkout.tsx": {
+                "action": ""
+              },
+              "app/routes/refund.tsx": {
+                "action": ""
+              },
+              "app/utils/stripe.server.ts": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              }
+            }
+          },
+          "vuejs": {
+            "javascript": {
+              "package.json": {
+                "action": ""
+              },
+              "src/components/VueStripe.vue": {
+                "action": ""
+              }
+            },
+            "typescript": {
+              "package.json": {
+                "action": ""
+              },
+              "src/components/VueStripe.vue": {
+                "action": ""
+              }
+            }
+          }
+        }
+      }
+    },
+    "storage": {
+      "supportedFrameworks": [
+        "nextjs",
+        "expressjs",
+        "nestjs",
+        "remixjs"
+      ],
+      "supportedLanguages": [
+        "javascript"
+      ],
+      "supportedStorages": [
+        "imagekit.io",
+        "cloudinary",
+        "google-cloud"
+      ],
+      "files": {
+        "imagekit.io": {
+          "expressjs": {
+            "javascript": {},
+            "typescript": {}
+          },
+          "nestjs": {
+            "typescript": {}
+          },
+          "nextjs": {
+            "javascript": {},
+            "typescript": {}
+          },
+          "remixjs": {
+            "typescript": {}
+          }
+        },
+        "cloudinary": {
+          "expressjs": {
+            "javascript": {
+              ".env": {
+                "action": ""
+              },
+              "controllers/cloudinaryControllers.js": {
+                "action": ""
+              },
+              "index.js": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              },
+              "routes/cloudinaryRoutes.js": {
+                "action": ""
+              },
+              "utils/cloudinary.js": {
+                "action": ""
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "controllers/cloudinaryControllers.ts": {
+                "action": ""
+              },
+              "index.ts": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              },
+              "routes/cloudinaryRoutes.ts": {
+                "action": ""
+              },
+              "utils/cloudinary.ts": {
+                "action": ""
+              }
+            }
+          },
+          "nestjs": {
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              },
+              "src/cloudinary/cloudinary.controller.ts": {
+                "action": ""
+              },
+              "src/cloudinary/cloudinary.module.ts": {
+                "action": ""
+              },
+              "src/cloudinary/cloudinary.service.ts": {
+                "action": ""
+              }
+            }
+          },
+          "nextjs": {
+            "javascript": {
+              ".env": {
+                "action": ""
+              },
+              "app/api/cloudinary/delete/route.js": {
+                "action": ""
+              },
+              "app/api/cloudinary/list/route.js": {
+                "action": ""
+              },
+              "app/api/cloudinary/upload/route.js": {
+                "action": ""
+              },
+              "lib/cloudinary.js": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "app/api/cloudinary/delete/route.ts": {
+                "action": ""
+              },
+              "app/api/cloudinary/list/route.ts": {
+                "action": ""
+              },
+              "app/api/cloudinary/upload/route.ts": {
+                "action": ""
+              },
+              "lib/cloudinary.ts": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              }
+            }
+          },
+          "remixjs": {
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "app/routes/api/cloudinary.ts": {
+                "action": ""
+              },
+              "app/utils/cloudinary.ts": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              }
+            }
+          }
+        },
+        "google-cloud": {
+          "expressjs": {
+            "javascript": {
+              ".env": {
+                "action": ""
+              },
+              "controllers/gcsControllers.js": {
+                "action": ""
+              },
+              "index.js": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              },
+              "routes/gcsRoutes.js": {
+                "action": ""
+              },
+              "utils/gcs.js": {
+                "action": ""
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "controllers/gcsControllers.ts": {
+                "action": ""
+              },
+              "index.ts": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              },
+              "routes/gcsRoutes.ts": {
+                "action": ""
+              },
+              "utils/gcs.ts": {
+                "action": ""
+              }
+            }
+          },
+          "nestjs": {
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              },
+              "src/gcs/gcs.controller.ts": {
+                "action": ""
+              },
+              "src/gcs/gcs.module.ts": {
+                "action": ""
+              },
+              "src/gcs/gcs.service.ts": {
+                "action": ""
+              }
+            }
+          },
+          "nextjs": {
+            "javascript": {
+              ".env": {
+                "action": ""
+              },
+              "app/api/gcs/delete/route.js": {
+                "action": ""
+              },
+              "app/api/gcs/list/route.js": {
+                "action": ""
+              },
+              "app/api/gcs/upload/route.js": {
+                "action": ""
+              },
+              "lib/gcs.js": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "app/api/gcs/delete/route.ts": {
+                "action": ""
+              },
+              "app/api/gcs/list/route.ts": {
+                "action": ""
+              },
+              "app/api/gcs/upload/route.ts": {
+                "action": ""
+              },
+              "lib/gcs.ts": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              }
+            }
+          },
+          "remixjs": {
+            "typescript": {
+              ".env": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              },
+              "routes/api/gcs.ts": {
+                "action": ""
+              },
+              "utils/gcs.ts": {
+                "action": ""
+              }
+            }
+          }
+        }
+      }
+    },
+    "ui": {
+      "supportedFrameworks": [
+        "nextjs",
+        "angularjs",
+        "reactjs",
+        "vuejs"
+      ],
+      "supportedLanguages": [
+        "javascript"
+      ],
+      "supportedUiLibraries": [
+        "daisy"
+      ],
+      "files": {
+        "daisy": {
+          "angularjs": {
+            "typescript": {
+              ".postcssrc.json": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              },
+              "src/styles.css": {
+                "action": ""
+              }
+            }
+          },
+          "nextjs": {
+            "javascript": {
+              "app/globals.css": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              },
+              "postcss.config.mjs": {
+                "action": ""
+              }
+            },
+            "typescript": {
+              "app/globals.css": {
+                "action": ""
+              },
+              "package.json": {
+                "action": ""
+              },
+              "postcss.config.mjs": {
+                "action": ""
+              }
+            }
+          },
+          "reactjs": {
+            "javascript": {
+              "package.json": {
+                "action": ""
+              },
+              "src/index.css": {
+                "action": ""
+              },
+              "vite.config.js": {
+                "action": ""
+              }
+            },
+            "typescript": {
+              "package.json": {
+                "action": ""
+              },
+              "src/index.css": {
+                "action": ""
+              },
+              "vite.config.ts": {
+                "action": ""
+              }
+            }
+          },
+          "vuejs": {
+            "javascript": {
+              "package.json": {
+                "action": ""
+              },
+              "src/assets/main.css": {
+                "action": ""
+              },
+              "vite.config.ts": {
+                "action": ""
+              }
+            },
+            "typescript": {
+              "package.json": {
+                "action": ""
+              },
+              "src/assets/main.css": {
+                "action": ""
+              },
+              "vite.config.ts": {
+                "action": ""
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

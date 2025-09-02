@@ -14,6 +14,22 @@ import { SupportedLanguage, detectProjectLanguage, installAdditionalPackages } f
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
+// Load supported features from JSON file
+let SUPPORTED_FEATURES: any = {};
+try {
+  const featuresPath = path.join(__dirname, '../../features/features.json');
+  if (fs.existsSync(featuresPath)) {
+    const featuresData = JSON.parse(fs.readFileSync(featuresPath, 'utf-8'));
+    SUPPORTED_FEATURES = featuresData.features;
+  }
+} catch (error) {
+  console.warn(chalk.yellow('⚠️  Could not load features.json, using fallback configuration'));
+}
+
+// Export for use in other modules
+export { SUPPORTED_FEATURES };
+
+
 /**
  * Get the CLI installation root directory
  */
@@ -124,269 +140,7 @@ export interface FeatureConfig {
   };
 }
 
-// Supported features configuration
-export const SUPPORTED_FEATURES: { [key: string]: FeatureConfig } = {
-  auth: {
-    name: 'Authentication',
-    description: 'Add authentication to your project (Clerk, Next-Auth or Auth0)',
-    supportedFrameworks: ['nextjs', 'expressjs', 'reactjs', 'vuejs', 'remixjs','angularjs'],
-    supportedLanguages: ['nodejs'],
-    files: {
-      // Auth0 files
-      auth0: {
-        nextjs: {
-          typescript: {
-            '.env': { action: 'append' },
-            'middleware.ts': { action: 'create' }, // if the file already exists then overwrite the file
-            'package.json': { action: '' },
-            'app/page.tsx': { action: 'overwrite' },
-            'lib/auth0.ts': { action: 'create' }
-          },
-          javascript: {
-            '.env': { action: 'append' },
-            'middleware.js': { action: 'create' }, // if the file already exists then overwrite the file
-            'package.json': { action: '' },
-            'app/page.jsx': { action: 'overwrite' },
-            'lib/auth0.js': { action: 'create' }
-          }
-        },
-        expressjs: {
-          typescript: {
-            'index.ts': { action: 'prepend' },
-            'package.json': { action: '' }
-          },
-          javascript: {
-            'index.js': { action: 'prepend' },
-            'package.json': { action: '' }
-          }
-        },
-        vuejs: {
-          typescript: {
-            'src/main.ts': { action: 'overwrite' },
-            'package.json': { action: '' },
-            'src/components/LoginButton.vue': { action: 'create' },
-            'src/components/LogoutButton.vue': { action: 'create' },
-            'src/components/UserProfile.vue': { action: 'create' },
-            'src/components/login.vue': { action: 'create' },
-            'src/components/logout.vue': { action: 'create' },
-            'src/components/profile.vue': { action: 'create' }
-          },
-          javascript: {
-            'src/main.js': { action: 'overwrite' },
-            'package.json': { action: '' },
-            'src/components/LoginButton.vue': { action: 'create' },
-            'src/components/LogoutButton.vue': { action: 'create' },
-            'src/components/UserProfile.vue': { action: 'create' },
-            'src/components/login.vue': { action: 'create' },
-            'src/components/logout.vue': { action: 'create' },
-            'src/components/profile.vue': { action: 'create' }
-          }
-        },
-        angularjs: {
-          typescript: {
-            'src/main.ts': { action: 'overwrite' },
-            'package.json': { action: '' },
-            'src/app/user-profile.ts': { action: 'create' },
-            'src/app/login-button.ts': { action: 'create' },
-            'src/app/logout-button.ts': { action: 'create' }
-          }
-        }
-      },
-      // Clerk files
-      clerk: {
-        nextjs: {
-          typescript: {
-            '.env': { action: '' },
-            'middleware.ts': { action: '' },
-            'package.json': { action: '' },
-            'app/layout.tsx': { action: '' }
-          },
-          javascript: {
-            '.env': { action: '' },
-            'middleware.js': { action: '' },
-            'package.json': { action: '' },
-            'app/layout.js': { action: '' }
-          }
-        },
-        expressjs: {
-          typescript: {
-            '.env': { action: '' },
-            'index.ts': { action: '' },
-            'package.json': { action: '' },
-            'types/global.d.ts': { action: '' }
-          },
-          javascript: {
-            '.env': { action: '' },
-            'index.js': { action: '' },3
-            'package.json': { action: '' }
-          }
-        },
-        reactjs: {
-          typescript: {
-            '.env': { action: '' },
-            'package.json': { action: '' },
-            'src/App.tsx': { action: '' },
-            'src/main.tsx': { action: '' }
-          },
-          javascript: {
-            '.env': { action: '' },
-            'package.json': { action: '' },
-            'src/App.jsx': { action: '' },
-            'src/main.jsx': { action: '' }
-          }
-        },
-        vuejs: {
-          typescript: {
-            '.env': { action: '' },
-            'package.json': { action: '' },
-            'src/main.ts': { action: '' },
-            'src/App.vue': { action: '' }
-          },
-          javascript: {
-            '.env': { action: '' },
-            'package.json': { action: '' },
-            'src/main.js': { action: '' },
-            'src/App.vue': { action: '' }
-          }
-        },
-        remixjs: {
-          typescript: {
-            '.env': { action: '' },
-            'package.json': { action: '' },
-            'app/root.tsx': { action: '' },
-            'routes/_index.tsx': { action: '' }
-          }
-        }
-      },
-      // Next-auth files
-      'next-auth': {
-        nextjs: {
-          typescript: {
-            '.env': { action: 'append' },
-            'package.json': { action: '' },
-            'middleware.ts': { action: 'create' },
-            'lib/auth.ts': { action: 'create' },
-            'lib/auth-provider.tsx': { action: 'create' },
-            'app/layout.tsx': { action: 'overwrite' },
-            'app/api/auth/[...nextauth]/route.ts': { action: 'create' }
-          },
-          javascript: {
-            '.env': { action: 'append' },
-            'package.json': { action: '' },
-            'middleware.js': { action: 'create' },
-            'lib/auth.js': { action: 'create' },
-            'lib/auth-provider.jsx': { action: 'create' },
-            'app/layout.jsx': { action: 'overwrite' },
-            'app/api/auth/[...nextauth]/route.js': { action: 'create' }
-          }
-        }
-      }
-    }
-  },
-  docker: {
-    name: 'Docker',
-    description: 'Add Docker configuration to your project',
-    supportedFrameworks: ['nextjs', 'expressjs', 'nestjs', 'reactjs', 'vuejs', 'angularjs', 'remixjs', 'rust'],
-    supportedLanguages: ['nodejs', 'rust'],
-    files: {
-      'Dockerfile': {
-        action: 'create'
-      },
-      'docker-compose.yml': {
-        action: 'create'
-      },
-      '.dockerignore': {
-        action: 'create'
-      }
-    }
-  },
-  testing: {
-    name: 'Testing Setup',
-    description: 'Add testing configuration (Jest, Vitest, or framework-specific)',
-    supportedFrameworks: ['nextjs', 'expressjs', 'reactjs', 'vuejs', 'angularjs'],
-    supportedLanguages: ['nodejs'],
-    files: {
-      'jest.config.js': {
-        action: 'create'
-      }
-    }
-  },
-  ui: {
-    name: 'UI Components',
-    description: 'Add UI component library ( Daisy UI, ScrollX UI, Mantine-UI) - Coming Soon',
-    supportedFrameworks: ['nextjs', 'reactjs', 'vuejs'],
-    supportedLanguages: ['nodejs'],
-    files: {
-      // Daisy UI files
-      daisy: {
-        nextjs: {
-          typescript: {
-            'package.json': { action: '' },
-            'postcss.config.mjs': { action: 'create' }, // if the file is already exist then overwrite it
-            'app/globals.css': { action: 'prepend' }
-          },
-          javascript: {
-            'package.json': { action: '' },
-            'postcss.config.mjs': { action: 'create' }, // if the file is already exist then overwrite it
-            'app/globals.css': { action: 'prepend' }
-          }
-        },
-        reactjs: {
-          typescript: {
-            'package.json': { action: '' },
-            'vite.config.ts': { action: 'overwrite' },
-            'src/index.css': { action: 'prepend' }
-          },
-          javascript: {
-            'package.json': { action: '' },
-            'vite.config.js': { action: 'overwrite' },
-            'src/index.css': { action: 'prepend' }
-          }
-        },
-        vuejs: {
-          typescript: {
-            'package.json': { action: '' },
-            'vite.config.ts': { action: 'overwrite' },
-            'src/assets/main.css': { action: 'prepend' }
-          },
-          javascript: {
-            'package.json': { action: '' },
-            'vite.config.ts': { action: 'overwrite' },
-            'src/assets/main.css': { action: 'prepend' }
-          }
-        },
-        angularjs: {
-          typescript: {
-            'package.json': { action: '' },
-            '.postcssrc.json': { action: 'create' },
-            'src/styles.css': { action: 'prepend' }
-          }
-        }
-      }
-    }
-  },
-  api: {
-    name: 'API Routes',
-    description: 'Add API route templates and utilities - Coming Soon',
-    supportedFrameworks: ['nextjs', 'expressjs', 'nestjs'],
-    supportedLanguages: ['nodejs'],
-    files: {}
-  },
-  pwa: {
-    name: 'Progressive Web App',
-    description: 'Add PWA configuration and service workers - Coming Soon',
-    supportedFrameworks: ['nextjs', 'reactjs', 'vuejs'],
-    supportedLanguages: ['nodejs'],
-    files: {}
-  },
-  monitoring: {
-    name: 'Monitoring & Analytics',
-    description: 'Add monitoring tools (Sentry, Google Analytics) - Coming Soon',
-    supportedFrameworks: ['nextjs', 'reactjs', 'vuejs', 'expressjs'],
-    supportedLanguages: ['nodejs'],
-    files: {}
-  }
-};
+
 
 /**
  * Detect the current project's framework and language with improved logic
@@ -683,8 +437,6 @@ function getUIProviderFiles(
   });
   
   return baseFiles;
-        break;
-    }
   } else if (featureName === 'docker') {
     baseFiles['Dockerfile'] = { action: 'create' };
     baseFiles['docker-compose.yml'] = { action: 'create' };
