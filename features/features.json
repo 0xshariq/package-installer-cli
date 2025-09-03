@@ -1,6 +1,7 @@
 {
   "features": {
     "ai": {
+      "description": "AI integration code for enhanced user experiences",
       "supportedFrameworks": [
         "nextjs",
         "expressjs",
@@ -566,6 +567,7 @@
       }
     },
     "auth": {
+      "description": "Authentication and authorization features",
       "supportedFrameworks": [
         "nextjs",
         "expressjs",
@@ -904,6 +906,7 @@
       }
     },
     "aws": {
+      "description": "AWS integration and deployment features",
       "supportedFrameworks": [
         "nextjs",
         "expressjs",
@@ -3187,6 +3190,7 @@
       }
     },
     "database": {
+      "description": "Database integration with orm selection and management features",
       "supportedFrameworks": [
         "nextjs",
         "expressjs",
@@ -3673,6 +3677,7 @@
       }
     },
     "docker": {
+      "description": "Docker Config Files",
       "supportedFrameworks": [
         "nextjs",
         "expressjs",
@@ -3788,6 +3793,7 @@
       }
     },
     "gitignore": {
+      "description": "GitIgnore files for various frameworks and languages",
       "supportedFrameworks": [
         "nextjs",
         "angularjs",
@@ -3833,6 +3839,7 @@
       }
     },
     "payment": {
+      "description": "Payment integration code for multiple payment gateways",
       "supportedFrameworks": [
         "nextjs",
         "expressjs",
@@ -4197,6 +4204,7 @@
       }
     },
     "storage": {
+      "description": "Storage Integration for files, images, and videos",
       "supportedFrameworks": [
         "nextjs",
         "expressjs",
@@ -4473,6 +4481,7 @@
       }
     },
     "ui": {
+      "description": "UI Libraries features for various frameworks",
       "supportedFrameworks": [
         "nextjs",
         "angularjs",
