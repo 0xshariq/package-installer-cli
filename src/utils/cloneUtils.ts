@@ -9,7 +9,7 @@ import { getFrameworkTheme } from './utils.js';
 
 const execAsync = promisify(exec);
 
-export async function cloneRepo(userRepo: string, projectName?: string): Promise<void> {
+export async function cloneRepo(userRepo: string, projectName?: string, options: any = {}): Promise<{ projectName: string; provider: string } | null> {
   try {
     // Validate and process repository format
     let repoUrl = userRepo;
@@ -113,16 +113,26 @@ export async function cloneRepo(userRepo: string, projectName?: string): Promise
       spinner.succeed(chalk.hex('#10ac84')(`✅ Repository cloned successfully from ${provider.toUpperCase()}`));
 
       // Install dependencies if package.json exists
-      await installDependenciesForClone(targetPath, targetDir || 'cloned-repo');
+      if (!options.noDeps) {
+        await installDependenciesForClone(targetPath, targetDir || 'cloned-repo');
+      }
       
       // Create .env file from templates
       await createEnvFile(targetPath);
 
       // Initialize git repository
-      await initializeGitRepository(targetPath, targetDir || 'cloned-repo');
+      if (!options.noGit) {
+        await initializeGitRepository(targetPath, targetDir || 'cloned-repo');
+      }
 
       // Show success message
       showCloneSuccessMessage(targetDir || 'cloned-repo', userRepo);
+
+      // Return result for history tracking
+      return {
+        projectName: targetDir || 'cloned-repo',
+        provider: provider
+      };
 
     } catch (error: any) {
       spinner.fail(chalk.red('Failed to clone repository'));
@@ -149,7 +159,7 @@ export async function cloneRepo(userRepo: string, projectName?: string): Promise
     console.log('  ' + chalk.hex('#95afc0')('Full URLs:'));
     console.log('    ' + chalk.hex('#00d2d3')('pi clone https://github.com/user/repo.git'));
     console.log('    ' + chalk.hex('#00d2d3')('pi clone https://gitlab.com/user/project.git'));
-    throw error;
+    return null;
   }
 }
 

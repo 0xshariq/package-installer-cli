@@ -272,7 +272,7 @@ export function displayFeatureUsageFromHistory(featureStats: Array<{ feature: st
       `${icon} ${feature.feature}`,
       chalk.green(feature.count.toString()),
       feature.frameworks.join(', '),
-      chalk.blue(popu4rlarity)
+      chalk.blue(popularity)
     ]);
   });
   

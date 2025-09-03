@@ -23,74 +23,74 @@
           "expressjs": {
             "javascript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "controllers/claudeController.js": {
-                "action": ""
+                "action": "create"
               },
               "index.js": {
-                "action": ""
+                "action": "prepend"
               },
               "package.json": {
                 "action": "install"
               },
               "routes/claudeRoutes.js": {
-                "action": ""
+                "action": "create"
               },
               "utils/claude.js": {
-                "action": ""
+                "action": "create"
               }
             },
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "controllers/claudeController.ts": {
-                "action": ""
+                "action": "create"
               },
               "index.ts": {
-                "action": ""
+                "action": "prepend"
               },
               "package.json": {
                 "action": "install"
               },
               "routes/claudeRoutes.ts": {
-                "action": ""
+                "action": "create"
               },
               "utils/claude.ts": {
-                "action": ""
+                "action": "create"
               }
             }
           },
           "nestjs": {
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "package.json": {
                 "action": "install"
               },
               "src/claude/claude.controller.ts": {
-                "action": ""
+                "action": "create"
               },
               "src/claude/claude.module.ts": {
-                "action": ""
+                "action": "create"
               },
               "src/claude/claude.service.ts": {
-                "action": ""
+                "action": "create"
               }
             }
           },
           "nextjs": {
             "javascript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "app/api/claude/route.js": {
-                "action": ""
+                "action": "create"
               },
               "lib/claude.js": {
-                "action": ""
+                "action": "create"
               },
               "package.json": {
                 "action": "install"
@@ -98,13 +98,13 @@
             },
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "app/api/claude/route.ts": {
-                "action": ""
+                "action": "create"
               },
               "lib/claude.ts": {
-                "action": ""
+                "action": "create"
               },
               "package.json": {
                 "action": "install"
@@ -114,13 +114,13 @@
           "remixjs": {
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "app/routes/api/claude.ts": {
-                "action": ""
+                "action": "create"
               },
               "app/utils/claude.ts": {
-                "action": ""
+                "action": "create"
               },
               "package.json": {
                 "action": "install"
@@ -132,74 +132,74 @@
           "expressjs": {
             "javascript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "controllers/geminiController.js": {
-                "action": ""
+                "action": "create"
               },
               "index.js": {
-                "action": ""
+                "action": "prepend"
               },
               "package.json": {
                 "action": "install"
               },
               "routes/geminiRoutes.js": {
-                "action": ""
+                "action": "create"
               },
               "utils/gemini.js": {
-                "action": ""
+                "action": "create"
               }
             },
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "controllers/geminiController.ts": {
-                "action": ""
+                "action": "create"
               },
               "index.ts": {
-                "action": ""
+                "action": "prepend"
               },
               "package.json": {
                 "action": "install"
               },
               "routes/geminiRoutes.ts": {
-                "action": ""
+                "action": "create"
               },
               "utils/gemini.ts": {
-                "action": ""
+                "action": "create"
               }
             }
           },
           "nestjs": {
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "package.json": {
                 "action": "install"
               },
               "src/gemini/gemini.controller.ts": {
-                "action": ""
+                "action": "create"
               },
               "src/gemini/gemini.module.ts": {
-                "action": ""
+                "action": "create"
               },
               "src/gemini/gemini.service.ts": {
-                "action": ""
+                "action": "create"
               }
             }
           },
           "nextjs": {
             "javascript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "app/api/generate/route.js": {
-                "action": ""
+                "action": "create"
               },
               "lib/gemini.js": {
-                "action": ""
+                "action": "create"
               },
               "package.json": {
                 "action": "install"
@@ -207,13 +207,13 @@
             },
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "app/api/generate/route.ts": {
-                "action": ""
+                "action": "create"
               },
               "lib/gemini.ts": {
-                "action": ""
+                "action": "create"
               },
               "package.json": {
                 "action": "install"
@@ -223,13 +223,13 @@
           "remixjs": {
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "app/routes/api/gemini.ts": {
-                "action": ""
+                "action": "create"
               },
               "app/utils/gemini.ts": {
-                "action": ""
+                "action": "create"
               },
               "package.json": {
                 "action": "install"
@@ -241,10 +241,10 @@
           "expressjs": {
             "javascript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "controllers/grokController.js": {
-                "action": ""
+                "action": "create"
               },
               "index.js": {
                 "action": ""
@@ -261,7 +261,7 @@
             },
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "controllers/grokController.ts": {
                 "action": ""
@@ -283,7 +283,7 @@
           "nestjs": {
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "package.json": {
                 "action": "install"
@@ -302,7 +302,7 @@
           "nextjs": {
             "javascript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "app/api/grok/route.js": {
                 "action": ""
@@ -316,7 +316,7 @@
             },
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "app/api/grok/route.ts": {
                 "action": ""
@@ -332,7 +332,7 @@
           "remixjs": {
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "app/routes/api/grok.ts": {
                 "action": ""
@@ -350,7 +350,7 @@
           "expressjs": {
             "javascript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "controllers/openrouterController.js": {
                 "action": ""
@@ -370,7 +370,7 @@
             },
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "controllers/openrouterController.ts": {
                 "action": ""
@@ -392,7 +392,7 @@
           "nestjs": {
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "package.json": {
                 "action": "install"
@@ -411,7 +411,7 @@
           "nextjs": {
             "javascript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "app/api/openrouter/route.js": {
                 "action": ""
@@ -425,7 +425,7 @@
             },
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "app/api/openrouter/route.ts": {
                 "action": ""
@@ -441,7 +441,7 @@
           "remixjs": {
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "app/routes/api/openrouter.ts": {
                 "action": ""
@@ -459,7 +459,7 @@
           "expressjs": {
             "javascript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "controllers/openaiController.js": {
                 "action": ""
@@ -479,7 +479,7 @@
             },
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "controllers/openaiController.ts": {
                 "action": ""
@@ -501,7 +501,7 @@
           "nestjs": {
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "package.json": {
                 "action": "install"
@@ -520,7 +520,7 @@
           "nextjs": {
             "javascript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "app/api/openai/route.js": {
                 "action": ""
@@ -534,7 +534,7 @@
             },
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "app/api/openai/route.ts": {
                 "action": ""
@@ -550,7 +550,7 @@
           "remixjs": {
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "app/routes/api/openai.ts": {
                 "action": ""
@@ -627,7 +627,7 @@
           "nextjs": {
             "javascript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "app/page.jsx": {
                 "action": ""
@@ -644,7 +644,7 @@
             },
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "app/page.tsx": {
                 "action": ""
@@ -722,7 +722,7 @@
           "reactjs": {
             "javascript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "package.json": {
                 "action": "install"
@@ -736,7 +736,7 @@
             },
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "package.json": {
                 "action": "install"
@@ -752,7 +752,7 @@
           "expressjs": {
             "javascript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "index.js": {
                 "action": ""
@@ -763,7 +763,7 @@
             },
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "index.ts": {
                 "action": ""
@@ -779,7 +779,7 @@
           "nextjs": {
             "javascript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "app/layout.js": {
                 "action": ""
@@ -793,7 +793,7 @@
             },
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "app/layout.tsx": {
                 "action": ""
@@ -809,7 +809,7 @@
           "remixjs": {
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "app/root.tsx": {
                 "action": ""
@@ -825,7 +825,7 @@
           "vuejs": {
             "javascript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "package.json": {
                 "action": "install"
@@ -839,7 +839,7 @@
             },
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "package.json": {
                 "action": "install"
@@ -857,7 +857,7 @@
           "nextjs": {
             "javascript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "app/api/auth/[...nextauth]/route.js": {
                 "action": ""
@@ -880,7 +880,7 @@
             },
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "app/api/auth/[...nextauth]/route.ts": {
                 "action": ""
@@ -944,7 +944,7 @@
           "expressjs": {
             "javascript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "controllers/awsCloudFrontController.js": {
                 "action": ""
@@ -964,7 +964,7 @@
             },
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "controllers/awsCloudFrontController.ts": {
                 "action": ""
@@ -986,7 +986,7 @@
           "nestjs": {
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "package.json": {
                 "action": "install"
@@ -1002,7 +1002,7 @@
           "nextjs": {
             "javascript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "app/api/aws/cloudfront/route.js": {
                 "action": ""
@@ -1016,7 +1016,7 @@
             },
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "app/api/aws/cloudfront/route.ts": {
                 "action": ""
@@ -1032,7 +1032,7 @@
           "remixjs": {
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "app/routes/api/aws-cloudfront.ts": {
                 "action": ""
@@ -1047,7 +1047,7 @@
           "expressjs": {
             "javascript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "controllers/awsCloudWatchController.js": {
                 "action": ""
@@ -1067,7 +1067,7 @@
             },
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "controllers/awsCloudWatchController.ts": {
                 "action": ""
@@ -1089,7 +1089,7 @@
           "nestjs": {
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "package.json": {
                 "action": "install"
@@ -1108,7 +1108,7 @@
           "nextjs": {
             "javascript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "app/api/aws/cloudwatch/route.js": {
                 "action": ""
@@ -1122,7 +1122,7 @@
             },
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "app/api/aws/cloudwatch/route.ts": {
                 "action": ""
@@ -1138,7 +1138,7 @@
           "remixjs": {
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "app/routes/api/aws-cloudwatch.ts": {
                 "action": ""
@@ -1156,7 +1156,7 @@
           "expressjs": {
             "javascript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "controllers/codeCommitController.js": {
                 "action": ""
@@ -1176,7 +1176,7 @@
             },
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "controllers/codeCommitController.ts": {
                 "action": ""
@@ -1198,7 +1198,7 @@
           "nestjs": {
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "package.json": {
                 "action": "install"
@@ -1214,7 +1214,7 @@
           "nextjs": {
             "javascript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "app/api/aws/codecommit/route.js": {
                 "action": ""
@@ -1228,7 +1228,7 @@
             },
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "app/api/aws/codecommit/route.ts": {
                 "action": ""
@@ -1244,7 +1244,7 @@
           "remixjs": {
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "app/routes/api/aws-codecommit.ts": {
                 "action": ""
@@ -1262,7 +1262,7 @@
           "expressjs": {
             "javascript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "controllers/codePipelineController.js": {
                 "action": ""
@@ -1282,7 +1282,7 @@
             },
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "controllers/codePipelineController.ts": {
                 "action": ""
@@ -1304,7 +1304,7 @@
           "nestjs": {
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "package.json": {
                 "action": "install"
@@ -1323,7 +1323,7 @@
           "nextjs": {
             "javascript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "app/api/aws/codepipeline/route.js": {
                 "action": ""
@@ -1337,7 +1337,7 @@
             },
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "app/api/aws/codepipeline/route.ts": {
                 "action": ""
@@ -1353,7 +1353,7 @@
           "remixjs": {
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "app/routes/api/codepipeline.ts": {
                 "action": ""
@@ -1371,7 +1371,7 @@
           "expressjs": {
             "javascript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "controllers/configController.js": {
                 "action": ""
@@ -1391,7 +1391,7 @@
             },
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "controllers/configController.ts": {
                 "action": ""
@@ -1413,7 +1413,7 @@
           "nestjs": {
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "package.json": {
                 "action": "install"
@@ -1432,7 +1432,7 @@
           "nextjs": {
             "javascript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "app/api/aws/config/route.js": {
                 "action": ""
@@ -1446,7 +1446,7 @@
             },
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "app/api/aws/config/route.ts": {
                 "action": ""
@@ -1462,7 +1462,7 @@
           "remixjs": {
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "app/routes/api/config.ts": {
                 "action": ""
@@ -1480,7 +1480,7 @@
           "expressjs": {
             "javascript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "controllers/awsEc2Controller.js": {
                 "action": ""
@@ -1500,7 +1500,7 @@
             },
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "controllers/awsEc2Controller.ts": {
                 "action": ""
@@ -1522,7 +1522,7 @@
           "nestjs": {
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "package.json": {
                 "action": "install"
@@ -1538,7 +1538,7 @@
           "nextjs": {
             "javascript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "app/api/aws/ec2/route.js": {
                 "action": ""
@@ -1552,7 +1552,7 @@
             },
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "app/api/aws/ec2/route.ts": {
                 "action": ""
@@ -1568,7 +1568,7 @@
           "remixjs": {
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "app/routes/api/aws-ec2.ts": {
                 "action": ""
@@ -1583,7 +1583,7 @@
           "expressjs": {
             "javascript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "controllers/awsEfsController.js": {
                 "action": ""
@@ -1603,7 +1603,7 @@
             },
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "controllers/awsEfsController.ts": {
                 "action": ""
@@ -1625,7 +1625,7 @@
           "nestjs": {
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "package.json": {
                 "action": "install"
@@ -1641,7 +1641,7 @@
           "nextjs": {
             "javascript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "app/api/aws/efs/route.js": {
                 "action": ""
@@ -1655,7 +1655,7 @@
             },
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "app/api/aws/efs/route.ts": {
                 "action": ""
@@ -1671,7 +1671,7 @@
           "remixjs": {
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "app/routes/api/aws-efs.ts": {
                 "action": ""
@@ -1689,7 +1689,7 @@
           "expressjs": {
             "javascript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "controllers/iamControllers.js": {
                 "action": ""
@@ -1709,7 +1709,7 @@
             },
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "controllers/iamControllers.ts": {
                 "action": ""
@@ -1731,7 +1731,7 @@
           "nestjs": {
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "package.json": {
                 "action": "install"
@@ -1750,7 +1750,7 @@
           "nextjs": {
             "javascript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "app/api/aws/iam/route.js": {
                 "action": ""
@@ -1764,7 +1764,7 @@
             },
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "app/api/aws/iam/route.ts": {
                 "action": ""
@@ -1780,7 +1780,7 @@
           "remixjs": {
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "app/routes/api/aws-iam.ts": {
                 "action": ""
@@ -1795,7 +1795,7 @@
           "expressjs": {
             "javascript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "controllers/awsLambdaController.js": {
                 "action": ""
@@ -1815,7 +1815,7 @@
             },
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "controllers/awsLambdaController.ts": {
                 "action": ""
@@ -1837,7 +1837,7 @@
           "nestjs": {
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "package.json": {
                 "action": "install"
@@ -1853,7 +1853,7 @@
           "nextjs": {
             "javascript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "app/api/aws/lambda/route.js": {
                 "action": ""
@@ -1867,7 +1867,7 @@
             },
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "app/api/aws/lambda/route.ts": {
                 "action": ""
@@ -1883,7 +1883,7 @@
           "remixjs": {
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "app/routes/api/aws-lambda.ts": {
                 "action": ""
@@ -1901,7 +1901,7 @@
           "expressjs": {
             "javascript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "controllers/s3Controllers.js": {
                 "action": ""
@@ -1921,7 +1921,7 @@
             },
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "controllers/s3Controllers.ts": {
                 "action": ""
@@ -1943,7 +1943,7 @@
           "nestjs": {
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "package.json": {
                 "action": "install"
@@ -1962,7 +1962,7 @@
           "nextjs": {
             "javascript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "app/api/aws/s3/list/route.js": {
                 "action": ""
@@ -1979,7 +1979,7 @@
             },
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "app/api/aws/s3/list/route.ts": {
                 "action": ""
@@ -1998,7 +1998,7 @@
           "remixjs": {
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "app/routes/api/s3.ts": {
                 "action": ""
@@ -2016,7 +2016,7 @@
           "expressjs": {
             "javascript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "controllers/xrayController.js": {
                 "action": ""
@@ -2036,7 +2036,7 @@
             },
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "controllers/xrayController.ts": {
                 "action": ""
@@ -2058,7 +2058,7 @@
           "nestjs": {
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "package.json": {
                 "action": "install"
@@ -2077,7 +2077,7 @@
           "nextjs": {
             "javascript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "app/api/aws/xray/route.js": {
                 "action": ""
@@ -2091,7 +2091,7 @@
             },
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "app/api/aws/xray/route.ts": {
                 "action": ""
@@ -2107,7 +2107,7 @@
           "remixjs": {
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "app/routes/api/xray.ts": {
                 "action": ""
@@ -2125,7 +2125,7 @@
           "expressjs": {
             "javascript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "controllers/cloudtrailController.js": {
                 "action": ""
@@ -2145,7 +2145,7 @@
             },
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "controllers/awsCloudTrailController.ts": {
                 "action": ""
@@ -2167,7 +2167,7 @@
           "nestjs": {
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "package.json": {
                 "action": "install"
@@ -2186,7 +2186,7 @@
           "nextjs": {
             "javascript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "app/api/aws/cloudtrail/route.js": {
                 "action": ""
@@ -2200,7 +2200,7 @@
             },
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "app/api/aws/cloudtrail/route.ts": {
                 "action": ""
@@ -2216,7 +2216,7 @@
           "remixjs": {
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "app/routes/api/aws-cloudtrail.ts": {
                 "action": ""
@@ -2234,7 +2234,7 @@
           "expressjs": {
             "javascript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "controllers/codeBuildController.js": {
                 "action": ""
@@ -2254,7 +2254,7 @@
             },
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "controllers/codeBuildController.ts": {
                 "action": ""
@@ -2276,7 +2276,7 @@
           "nestjs": {
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "package.json": {
                 "action": "install"
@@ -2292,7 +2292,7 @@
           "nextjs": {
             "javascript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "app/api/aws/codebuild/route.ts": {
                 "action": ""
@@ -2306,7 +2306,7 @@
             },
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "app/api/aws/codebuild/route.ts": {
                 "action": ""
@@ -2322,7 +2322,7 @@
           "remixjs": {
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "app/routes/api/codebuild.ts": {
                 "action": ""
@@ -2340,7 +2340,7 @@
           "expressjs": {
             "javascript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "controllers/codeDeployController.js": {
                 "action": ""
@@ -2360,7 +2360,7 @@
             },
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "controllers/codeDeployController.ts": {
                 "action": ""
@@ -2382,7 +2382,7 @@
           "nestjs": {
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "package.json": {
                 "action": "install"
@@ -2401,7 +2401,7 @@
           "nextjs": {
             "javascript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "app/api/aws/codedeploy/route.js": {
                 "action": ""
@@ -2415,7 +2415,7 @@
             },
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "app/api/aws/codedeploy/route.ts": {
                 "action": ""
@@ -2431,7 +2431,7 @@
           "remixjs": {
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "app/routes/api/codedeploy.ts": {
                 "action": ""
@@ -2449,7 +2449,7 @@
           "expressjs": {
             "javascript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "controllers/awsCognitoController.js": {
                 "action": ""
@@ -2469,7 +2469,7 @@
             },
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "controllers/awsCognitoController.ts": {
                 "action": ""
@@ -2491,7 +2491,7 @@
           "nestjs": {
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "package.json": {
                 "action": "install"
@@ -2507,7 +2507,7 @@
           "nextjs": {
             "javascript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "app/api/aws/cognito/route.ts": {
                 "action": ""
@@ -2521,7 +2521,7 @@
             },
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "app/api/aws/cognito/route.ts": {
                 "action": ""
@@ -2537,7 +2537,7 @@
           "remixjs": {
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "app/routes/api/aws-cognito.ts": {
                 "action": ""
@@ -2555,7 +2555,7 @@
           "expressjs": {
             "javascript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "controllers/awsEbsController.js": {
                 "action": ""
@@ -2575,7 +2575,7 @@
             },
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "controllers/awsEbsController.ts": {
                 "action": ""
@@ -2597,7 +2597,7 @@
           "nestjs": {
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "package.json": {
                 "action": "install"
@@ -2613,7 +2613,7 @@
           "nextjs": {
             "javascript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "app/api/aws/ebs/route.js": {
                 "action": ""
@@ -2627,7 +2627,7 @@
             },
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "app/api/aws/ebs/route.ts": {
                 "action": ""
@@ -2643,7 +2643,7 @@
           "remixjs": {
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "app/routes/api/aws-ebs.ts": {
                 "action": ""
@@ -2661,7 +2661,7 @@
           "expressjs": {
             "javascript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "controllers/awsEcsController.js": {
                 "action": ""
@@ -2681,7 +2681,7 @@
             },
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "controllers/awsEcsController.ts": {
                 "action": ""
@@ -2703,7 +2703,7 @@
           "nestjs": {
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "package.json": {
                 "action": "install"
@@ -2719,7 +2719,7 @@
           "nextjs": {
             "javascript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "app/api/aws/ecs/route.js": {
                 "action": ""
@@ -2733,7 +2733,7 @@
             },
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "app/api/aws/ecs/route.ts": {
                 "action": ""
@@ -2749,7 +2749,7 @@
           "remixjs": {
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "app/routes/api/aws-ecs.ts": {
                 "action": ""
@@ -2767,7 +2767,7 @@
           "expressjs": {
             "javascript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "controllers/awsElbController.js": {
                 "action": ""
@@ -2787,7 +2787,7 @@
             },
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "controllers/awsElbController.ts": {
                 "action": ""
@@ -2809,7 +2809,7 @@
           "nestjs": {
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "package.json": {
                 "action": "install"
@@ -2825,7 +2825,7 @@
           "nextjs": {
             "javascript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "app/api/aws/elb/route.js": {
                 "action": ""
@@ -2839,7 +2839,7 @@
             },
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "app/api/aws/elb/route.ts": {
                 "action": ""
@@ -2855,7 +2855,7 @@
           "remixjs": {
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "app/routes/api/aws-elb.ts": {
                 "action": ""
@@ -2870,7 +2870,7 @@
           "expressjs": {
             "javascript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "controllers/awsKmsController.js": {
                 "action": ""
@@ -2890,7 +2890,7 @@
             },
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "controllers/awsKmsController.ts": {
                 "action": ""
@@ -2912,7 +2912,7 @@
           "nestjs": {
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "package.json": {
                 "action": "install"
@@ -2928,7 +2928,7 @@
           "nextjs": {
             "javascript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "app/api/aws/kms/route.js": {
                 "action": ""
@@ -2942,7 +2942,7 @@
             },
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "app/api/aws/kms/route.ts": {
                 "action": ""
@@ -2958,7 +2958,7 @@
           "remixjs": {
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "app/routes/api/aws-kms.ts": {
                 "action": ""
@@ -2973,7 +2973,7 @@
           "expressjs": {
             "javascript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "controllers/organizationsController.js": {
                 "action": ""
@@ -2993,7 +2993,7 @@
             },
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "controllers/organizationController.ts": {
                 "action": ""
@@ -3015,7 +3015,7 @@
           "nestjs": {
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "package.json": {
                 "action": "install"
@@ -3034,7 +3034,7 @@
           "nextjs": {
             "javascript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "app/api/aws/organizations/route.ts": {
                 "action": ""
@@ -3048,7 +3048,7 @@
             },
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "app/api/aws/organizations/route.ts": {
                 "action": ""
@@ -3064,7 +3064,7 @@
           "remixjs": {
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "app/routes/api/organizations.ts": {
                 "action": ""
@@ -3082,7 +3082,7 @@
           "expressjs": {
             "javascript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "controllers/awsTrustedAdvisorController.js": {
                 "action": ""
@@ -3102,7 +3102,7 @@
             },
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "controllers/awsTrustedAdvisorController.ts": {
                 "action": ""
@@ -3124,7 +3124,7 @@
           "nestjs": {
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "package.json": {
                 "action": "install"
@@ -3143,7 +3143,7 @@
           "nextjs": {
             "javascript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "app/api/aws/trustedadvisor/route.js": {
                 "action": ""
@@ -3157,7 +3157,7 @@
             },
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "app/api/aws/trustedadvisor/route.ts": {
                 "action": ""
@@ -3173,7 +3173,7 @@
           "remixjs": {
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "app/routes/api/aws-trustedadvisor.ts": {
                 "action": ""
@@ -3860,7 +3860,7 @@
           "expressjs": {
             "javascript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "controllers/paypalControllers.js": {
                 "action": ""
@@ -3877,7 +3877,7 @@
             },
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "controllers/paypalControllers.ts": {
                 "action": ""
@@ -3896,7 +3896,7 @@
           "nestjs": {
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "src/paypal.controller.ts": {
                 "action": ""
@@ -3909,7 +3909,7 @@
           "nextjs": {
             "javascript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "app/api/paypal/capture-payment/route.js": {
                 "action": ""
@@ -3926,7 +3926,7 @@
             },
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "app/api/paypal/capture-payment/route.ts": {
                 "action": ""
@@ -3945,7 +3945,7 @@
           "remixjs": {
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "app/routes/api/paypal.ts": {
                 "action": ""
@@ -3960,7 +3960,7 @@
           "expressjs": {
             "javascript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "controllers/payment.js": {
                 "action": ""
@@ -3977,7 +3977,7 @@
             },
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "controllers/payment.ts": {
                 "action": ""
@@ -3996,7 +3996,7 @@
           "nestjs": {
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "package.json": {
                 "action": "install"
@@ -4009,7 +4009,7 @@
           "nextjs": {
             "javascript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "app/api/payment/route.js": {
                 "action": ""
@@ -4026,7 +4026,7 @@
             },
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "app/api/payment/route.ts": {
                 "action": ""
@@ -4045,7 +4045,7 @@
           "remixjs": {
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "app/routes/api.orders.ts": {
                 "action": ""
@@ -4066,7 +4066,7 @@
           "expressjs": {
             "javascript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "controllers/stripeController.js": {
                 "action": ""
@@ -4083,7 +4083,7 @@
             },
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "controllers/stripeControllers.ts": {
                 "action": ""
@@ -4105,7 +4105,7 @@
           "nestjs": {
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "package.json": {
                 "action": "install"
@@ -4127,7 +4127,7 @@
           "nextjs": {
             "javascript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "app/api/stripe/create-payment-intent/route.js": {
                 "action": ""
@@ -4144,7 +4144,7 @@
             },
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "app/api/stripe/create-payment-intent/route.ts": {
                 "action": ""
@@ -4166,7 +4166,7 @@
           "remixjs": {
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "app/routes/checkout.tsx": {
                 "action": ""
@@ -4240,7 +4240,7 @@
           "expressjs": {
             "javascript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "controllers/cloudinaryControllers.js": {
                 "action": ""
@@ -4260,7 +4260,7 @@
             },
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "controllers/cloudinaryControllers.ts": {
                 "action": ""
@@ -4282,7 +4282,7 @@
           "nestjs": {
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "package.json": {
                 "action": "install"
@@ -4301,7 +4301,7 @@
           "nextjs": {
             "javascript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "app/api/cloudinary/delete/route.js": {
                 "action": ""
@@ -4321,7 +4321,7 @@
             },
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "app/api/cloudinary/delete/route.ts": {
                 "action": ""
@@ -4343,7 +4343,7 @@
           "remixjs": {
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "app/routes/api/cloudinary.ts": {
                 "action": ""
@@ -4361,7 +4361,7 @@
           "expressjs": {
             "javascript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "controllers/gcsControllers.js": {
                 "action": ""
@@ -4381,7 +4381,7 @@
             },
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "controllers/gcsControllers.ts": {
                 "action": ""
@@ -4403,7 +4403,7 @@
           "nestjs": {
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "package.json": {
                 "action": "install"
@@ -4422,7 +4422,7 @@
           "nextjs": {
             "javascript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "app/api/gcs/delete/route.js": {
                 "action": ""
@@ -4442,7 +4442,7 @@
             },
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "app/api/gcs/delete/route.ts": {
                 "action": ""
@@ -4464,7 +4464,7 @@
           "remixjs": {
             "typescript": {
               ".env": {
-                "action": ""
+                "action": "append"
               },
               "package.json": {
                 "action": "install"

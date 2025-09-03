@@ -205,7 +205,39 @@ export async function createProject(providedName?: string, options?: any): Promi
       }
     }
 
-    // Step 13: Generate template name and resolve path
+    // Step 13: Feature selection BEFORE project creation
+    let selectedFeatures: Array<{ feature: string; provider?: string }> = [];
+    console.log('\n' + chalk.hex('#9c88ff')('🎯 Would you like to add any features to your project?'));
+    console.log(chalk.hex('#95afc0')('   Features: Authentication, Database, Docker, Payment, Storage, etc.'));
+    
+    const { wantFeatures } = await inquirer.prompt([
+      {
+        type: 'confirm',
+        name: 'wantFeatures',
+        message: 'Add features to your project?',
+        default: false
+      }
+    ]);
+    
+    if (wantFeatures) {
+      try {
+        // Import features functionality
+        const { selectFeatures } = await import('./add.js');
+        selectedFeatures = await selectFeatures(selectedFramework, selectedLanguage || 'javascript');
+        
+        if (selectedFeatures.length > 0) {
+          console.log(chalk.hex('#10ac84')(`✨ Selected ${selectedFeatures.length} features for integration`));
+          selectedFeatures.forEach(f => {
+            console.log(`   ${chalk.hex('#00d2d3')('•')} ${f.feature}${f.provider ? ` (${f.provider})` : ''}`);
+          });
+        }
+      } catch (error: any) {
+        console.warn(chalk.yellow(`⚠️  Feature selection failed: ${error.message}`));
+        console.log(chalk.hex('#95afc0')('   You can add features after project creation using: pi add'));
+      }
+    }
+
+    // Step 14: Generate template name and resolve path
     let templateName = selectedTemplate || generateTemplateName(selectedFramework, fwConfig, {
       src: useSrc,
       ui: selectedUi,
@@ -223,13 +255,12 @@ export async function createProject(providedName?: string, options?: any): Promi
       src: useSrc,
       tailwind: useTailwind,
       ui: selectedUi,
-      database: selectedDatabase,
-      orm: selectedOrm
+      features: selectedFeatures
     };
 
     const templatePath = resolveTemplatePath(projectOptions, fwConfig, templatesRoot);
 
-    // Step 14: Display configuration summary
+    // Step 15: Display configuration summary
     console.log('\n' + chalk.hex('#ffa502')('📋 Project Configuration Summary:'));
     console.log(chalk.hex('#95afc0')('─'.repeat(50)));
     console.log(`${chalk.hex('#00d2d3')('Project Name:')} ${chalk.bold.hex('#10ac84')(projectName)}`);
@@ -238,13 +269,7 @@ export async function createProject(providedName?: string, options?: any): Promi
     if (selectedLanguage) {
       console.log(`${chalk.hex('#00d2d3')('Language:')} ${chalk.bold.hex('#9c88ff')(selectedLanguage)}`);
     }
-    
-    if (selectedDatabase && selectedDatabase !== 'none') {
-      console.log(`${chalk.hex('#00d2d3')('Database:')} ${chalk.bold.hex('#26de81')(selectedDatabase)}`);
-      if (selectedOrm) {
-        console.log(`${chalk.hex('#00d2d3')('ORM:')} ${chalk.bold.hex('#26de81')(selectedOrm)}`);
-      }
-    }
+  
     
     if (selectedUi) {
       console.log(`${chalk.hex('#00d2d3')('UI Library:')} ${chalk.bold.hex('#fd79a8')(selectedUi)}`);
@@ -262,9 +287,16 @@ export async function createProject(providedName?: string, options?: any): Promi
       console.log(`${chalk.hex('#00d2d3')('Tailwind CSS:')} ${useTailwind ? chalk.green('Yes') : chalk.red('No')}`);
     }
     
+    if (selectedFeatures.length > 0) {
+      console.log(`${chalk.hex('#00d2d3')('Features:')} ${chalk.bold.hex('#26de81')(selectedFeatures.length)} selected`);
+      selectedFeatures.forEach(f => {
+        console.log(`   ${chalk.hex('#95afc0')('•')} ${f.feature}${f.provider ? ` (${f.provider})` : ''}`);
+      });
+    }
+    
     console.log(chalk.hex('#95afc0')('─'.repeat(50)));
 
-    // Step 15: Confirmation
+    // Step 16: Confirmation
     const { proceed } = await inquirer.prompt([
       {
         type: 'confirm',
@@ -279,15 +311,15 @@ export async function createProject(providedName?: string, options?: any): Promi
       return;
     }
 
-    // Step 16: Verify template exists
+    // Step 17: Verify template exists
     if (!fs.existsSync(templatePath)) {
       throw new Error(`Template not found at: ${templatePath}`);
     }
 
-    // Step 17: Save user preferences cache
+    // Step 18: Save user preferences cache
     await saveUserCache(userCache);
 
-    // Step 18: Create project with caching
+    // Step 19: Create project with features integration
     console.log('\n' + chalk.hex('#10ac84')('🔨 Creating your project...'));
     console.log(chalk.hex('#95afc0')('Checking template cache...\n'));
     
@@ -314,12 +346,38 @@ export async function createProject(providedName?: string, options?: any): Promi
       }
     }
     
+    // Step 20: Integrate selected features into the project
+    if (selectedFeatures.length > 0) {
+      console.log('\n' + chalk.hex('#9c88ff')('🔧 Integrating selected features...'));
+      
+      try {
+        // Change to project directory
+        const originalCwd = process.cwd();
+        process.chdir(projectPath);
+        
+        // Import the add command functionality for feature integration
+        const { integrateFeatures } = await import('./add.js');
+        
+        for (const feature of selectedFeatures) {
+          console.log(chalk.hex('#00d2d3')(`   Integrating ${feature.feature}${feature.provider ? ` (${feature.provider})` : ''}...`));
+          await integrateFeatures(feature.feature, feature.provider, selectedFramework, selectedLanguage || 'javascript');
+        }
+        
+        // Change back to original directory
+        process.chdir(originalCwd);
+        
+        console.log(chalk.green('✅ All features integrated successfully!'));
+        
+      } catch (error: any) {
+        console.warn(chalk.yellow(`⚠️  Some features could not be integrated: ${error.message}`));
+        console.log(chalk.hex('#95afc0')('   You can add features later using: pi add'));
+      }
+    }
+    
     // Create options object for template features tracking
     const templateOptions = {
       uiLibrary: selectedUi,
       hasTailwind: useTailwind,
-      database: selectedDatabase,
-      orm: selectedOrm,
       bundler: selectedBundler,
       useSrc: useSrc
     };
@@ -328,8 +386,6 @@ export async function createProject(providedName?: string, options?: any): Promi
     const templateFeatures = [];
     if (templateOptions.uiLibrary) templateFeatures.push(templateOptions.uiLibrary);
     if (templateOptions.hasTailwind) templateFeatures.push('Tailwind CSS');
-    if (templateOptions.database && templateOptions.database !== 'none') templateFeatures.push(templateOptions.database);
-    if (templateOptions.orm) templateFeatures.push(templateOptions.orm);
     if (templateOptions.bundler) templateFeatures.push(templateOptions.bundler);
     if (templateOptions.useSrc) templateFeatures.push('src directory');
     
@@ -364,27 +420,8 @@ export async function createProject(providedName?: string, options?: any): Promi
     ]);
     
     if (wantFeatures) {
-      try {
-        // Import the add command functionality
-        const { addCommand } = await import('./add.js');
-        
-        // Show available features and let user add them
-        console.log('\n' + chalk.hex('#9c88ff')('🔨 Let\'s add some features to your project...'));
-        
-        // Change to the project directory
-        const originalCwd = process.cwd();
-        process.chdir(projectPath);
-        
-        // Run add command interactively
-        await addCommand();
-        
-        // Change back to original directory
-        process.chdir(originalCwd);
-        
-      } catch (error: any) {
-        console.warn(chalk.yellow(`⚠️  Could not add features: ${error.message}`));
-        console.log(chalk.hex('#95afc0')('   You can add features later using: pi add'));
-      }
+      console.log(chalk.hex('#95afc0')('💡 Features were already selected during project creation.'));
+      console.log(chalk.hex('#95afc0')('   You can add more features later using: pi add'));
     }
 
     // Step 20: Record project creation in history
@@ -394,7 +431,7 @@ export async function createProject(providedName?: string, options?: any): Promi
         name: projectName!,
         framework: selectedFramework,
         language: selectedLanguage || 'JavaScript',
-        templateName: templateName,
+        template: templateName,
         path: projectPath,
         features: []
       });
@@ -418,11 +455,15 @@ export async function createProject(providedName?: string, options?: any): Promi
     console.log(`   ${chalk.hex('#ffa502')('Location:')} ${chalk.hex('#95afc0')(projectPath)}\n`);
     
     // Next steps
-    console.log(chalk.hex('#00d2d3')('🚀 Next Steps:'));
+    console.log(chalk.hex('#00d2d3')('\n🚀 Next Steps:'));
     console.log(`   ${chalk.hex('#95afc0')('1.')} ${chalk.hex('#10ac84')(`cd ${projectName}`)}`);
     console.log(`   ${chalk.hex('#95afc0')('2.')} ${chalk.hex('#00d2d3')('Install dependencies:')} ${chalk.hex('#ffa502')('pnpm install')} ${chalk.hex('#95afc0')('(or npm/yarn)')}`);
     console.log(`   ${chalk.hex('#95afc0')('3.')} ${chalk.hex('#00d2d3')('Start developing:')} ${chalk.hex('#ffa502')('pnpm dev')}`);
     console.log(`   ${chalk.hex('#95afc0')('4.')} ${chalk.hex('#00d2d3')('Open in your favorite editor and start coding!')} 🎉\n`);
+    
+    if (selectedFeatures.length === 0) {
+      console.log(chalk.hex('#95afc0')('💡 You can add features later by running: pi add (inside your project folder)'));
+    }
     
     console.log(chalk.hex('#26de81')('Happy coding! 🚀'));
     

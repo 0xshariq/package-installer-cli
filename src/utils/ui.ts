@@ -1,257 +1,315 @@
 /**
- * UI and display utilities
+ * UI and display utilities for Package Installer CLI v3.0.0
+ * Enhanced with modern styling, progress indicators, and better user experience
  */
 
 import chalk from 'chalk';
 import figlet from 'figlet';
 import gradient from 'gradient-string';
 import boxen from 'boxen';
+import cliSpinners from 'cli-spinners';
+import ora from 'ora';
 import path from 'path';
 import * as fs from 'fs';
-import { ProjectOptions } from './types.js';
-
+import { ProjectOptions, FeatureConfig, InstallationProgress, ProgressCallback } from './types.js';
 
 /**
- * Displays the CLI banner with beautiful styling
+ * Enhanced banner display with dynamic statistics
  */
-export function printBanner(version: string, frameworkCount: number): void {
+export function printBanner(version: string, frameworkCount: number, templateCount: number = 0): void {
   console.clear();
 
-  // Create a beautiful rainbow gradient
-  const rainbowGradient = gradient(['#ff6b6b', '#ffa500', '#ffff00', '#32cd32', '#00bfff', '#8a2be2', '#ff1493']);
-  const titleGradient = gradient(['#00d4aa', '#00a8ff', '#7c4dff']);
-  const subtitleGradient = gradient(['#ffa726', '#ff7043']);
+  // Enhanced gradients for better visual appeal
+  const titleGradient = gradient(['#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4']);
+  const subtitleGradient = gradient(['#ffa726', '#ff7043', '#ec407a']);
+  const taglineGradient = gradient(['#667eea', '#764ba2']);
 
-  // Create ASCII art for "Package Installer" - full name
-  const titleArt = [
-    '██████╗  █████╗  ██████╗██╗  ██╗ █████╗  ██████╗ ███████╗',
-    '██╔══██╗██╔══██╗██╔════╝██║ ██╔╝██╔══██╗██╔════╝ ██╔════╝',
-    '██████╔╝███████║██║     █████╔╝ ███████║██║  ███╗█████╗  ',
-    '██╔═══╝ ██╔══██║██║     ██╔═██╗ ██╔══██║██║   ██║██╔══╝  ',
-    '██║     ██║  ██║╚██████╗██║  ██╗██║  ██║╚██████╔╝███████╗',
-    '╚═╝     ╚═╝  ╚═╝ ╚═════╝╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝ ╚══════╝',
-    '',
-    '██╗███╗   ██╗███████╗████████╗ █████╗ ██╗     ██╗     ███████╗██████╗ ',
-    '██║████╗  ██║██╔════╝╚══██╔══╝██╔══██╗██║     ██║     ██╔════╝██╔══██╗',
-    '██║██╔██╗ ██║███████╗   ██║   ███████║██║     ██║     █████╗  ██████╔╝',
-    '██║██║╚██╗██║╚════██║   ██║   ██╔══██║██║     ██║     ██╔══╝  ██╔══██╗',
-    '██║██║ ╚████║███████║   ██║   ██║  ██║███████╗███████╗███████╗██║  ██║',
-    '╚═╝╚═╝  ╚═══╝╚══════╝   ╚═╝   ╚═╝  ╚═╝╚══════╝╚══════╝╚══════╝╚═╝  ╚═╝',
-  ].join('\n');
+  // Modern ASCII art for "Package Installer"
+  const titleArt = figlet.textSync('Package Installer', {
+    font: 'ANSI Shadow',
+    horizontalLayout: 'fitted',
+    verticalLayout: 'default'
+  });
 
-  // Create the main title
-  const subtitle = '🚀 The Ultimate Tool for Creating Modern Web Applications';
-  const tagline = '✨ Fast • Modern • Production-Ready • Beautiful';
+  // Enhanced subtitle and tagline
+  const subtitle = '🚀 The Ultimate Modern Project Scaffolding Tool';
+  const tagline = '✨ Fast • Smart • Feature-Rich • Production-Ready';
+  const description = '💡 Create stunning web applications with integrated features in seconds';
 
-  // Create the banner content
+  // Create the banner content with better spacing
   const bannerContent = 
     titleGradient(titleArt) + '\n\n' +
     subtitleGradient(subtitle) + '\n' +
-    chalk.hex('#95afc0')(tagline);
+    taglineGradient(tagline) + '\n' +
+    chalk.hex('#95afc0')(description);
 
-  // Display banner with enhanced box
+  // Enhanced box with rounded corners and better styling
   console.log('\n' + boxen(
     bannerContent,
     {
-      padding: { top: 1, bottom: 1, left: 3, right: 3 },
+      padding: { top: 1, bottom: 1, left: 4, right: 4 },
       margin: { top: 1, bottom: 1, left: 2, right: 2 },
       borderStyle: 'double',
-      borderColor: 'cyan',
+      borderColor: 'cyanBright',
       backgroundColor: 'black',
       align: 'center'
     }
   ));
 
-  // Version and framework info
-  const statsGradient = gradient(['#667eea', '#764ba2']);
-  const versionBox = boxen(
-    statsGradient(`📦 Version: ${version}`) + '  •  ' + 
-    statsGradient(`🎯 Frameworks: ${frameworkCount}+`) + '  •  ' + 
-    statsGradient(`⚡ Ready to scaffold!`),
+  // Enhanced statistics with more information
+  const statsContent = [
+    `${chalk.bold('📦 Version:')} ${chalk.cyan(version)}`,
+    `${chalk.bold('🎯 Frameworks:')} ${chalk.green(frameworkCount + '+')}`,
+    templateCount > 0 ? `${chalk.bold('📋 Templates:')} ${chalk.blue(templateCount + '+')}` : '',
+    `${chalk.bold('⚡ Status:')} ${chalk.greenBright('Ready to scaffold!')}`
+  ].filter(Boolean).join('  •  ');
+
+  const statsBox = boxen(
+    statsContent,
     {
-      padding: { top: 0, bottom: 0, left: 2, right: 2 },
+      padding: { top: 0, bottom: 0, left: 3, right: 3 },
       margin: { top: 0, bottom: 1, left: 0, right: 0 },
       borderStyle: 'round',
-      borderColor: 'magenta',
+      borderColor: 'magentaBright',
       backgroundColor: 'black',
       align: 'center'
     }
   );
 
-  console.log(versionBox);
+  console.log(statsBox);
 }
 
 /**
- * Displays project configuration summary
+ * Enhanced project configuration summary with features display
  */
-export function showProjectSummary(options: ProjectOptions): void {
-  const { framework, language, bundler, src, tailwind, ui, database, orm } = options;
+export function showProjectSummary(options: ProjectOptions, selectedFeatures: Array<{ feature: string; provider?: string }> = []): void {
+  const { framework, language, bundler, src, tailwind, ui } = options;
   
   console.log(chalk.cyan('\n📋 Project Configuration Summary:'));
-  console.log(chalk.gray('═'.repeat(60)));
-  console.log(`  ${chalk.bold('Project Name:')} ${chalk.cyan(options.projectName || 'N/A')}`);
+  console.log(chalk.gray('═'.repeat(70)));
+  
+  // Basic project information
+  console.log(`  ${chalk.bold('🏷️  Project Name:')} ${chalk.cyan(options.projectName || 'N/A')}`);
+  console.log(`  ${chalk.bold('🚀 Framework:')} ${chalk.green(framework.charAt(0).toUpperCase() + framework.slice(1))}`);
   
   if (language && language !== 'rust') {
-    console.log(`  ${chalk.bold('Language:')} ${chalk.green(language.charAt(0).toUpperCase() + language.slice(1))}`);
+    console.log(`  ${chalk.bold('💻 Language:')} ${chalk.yellow(language.charAt(0).toUpperCase() + language.slice(1))}`);
   }
-  
-  console.log(`  ${chalk.bold('Framework:')} ${chalk.green(framework.charAt(0).toUpperCase() + framework.slice(1))}`);
   
   if (bundler) {
-    console.log(`  ${chalk.bold('Bundler:')} ${chalk.magenta(bundler.charAt(0).toUpperCase() + bundler.slice(1))}`);
+    console.log(`  ${chalk.bold('📦 Bundler:')} ${chalk.magenta(bundler.charAt(0).toUpperCase() + bundler.slice(1))}`);
   }
   
+  // Configuration options
   if (typeof src === 'boolean') {
-    console.log(`  ${chalk.bold('Src directory:')} ${src ? chalk.green('✓ Yes') : chalk.red('✗ No')}`);
+    console.log(`  ${chalk.bold('📁 Src Directory:')} ${src ? chalk.green('✓ Enabled') : chalk.red('✗ Disabled')}`);
   }
   
   if (typeof tailwind === 'boolean') {
-    console.log(`  ${chalk.bold('Tailwind CSS:')} ${tailwind ? chalk.green('✓ Yes') : chalk.red('✗ No')}`);
+    console.log(`  ${chalk.bold('🎨 Tailwind CSS:')} ${tailwind ? chalk.green('✓ Enabled') : chalk.red('✗ Disabled')}`);
   }
   
   if (ui) {
-    console.log(`  ${chalk.bold('UI Library:')} ${chalk.blue(ui.charAt(0).toUpperCase() + ui.slice(1))}`);
+    console.log(`  ${chalk.bold('🎭 UI Library:')} ${chalk.blue(ui.charAt(0).toUpperCase() + ui.slice(1))}`);
   }
-  
-  if (database) {
-    console.log(`  ${chalk.bold('Database:')} ${chalk.cyan(database.charAt(0).toUpperCase() + database.slice(1))}`);
-    if (orm) {
-      console.log(`  ${chalk.bold('ORM:')} ${chalk.blue(orm.charAt(0).toUpperCase() + orm.slice(1))}`);
-    }
+
+  // Enhanced features section
+  if (selectedFeatures.length > 0) {
+    console.log(chalk.gray('─'.repeat(70)));
+    console.log(`  ${chalk.bold('🔧 Selected Features:')} ${chalk.green(`(${selectedFeatures.length} features)`)}`);
+    
+    selectedFeatures.forEach((feature, index) => {
+      const isLast = index === selectedFeatures.length - 1;
+      const prefix = isLast ? '└─' : '├─';
+      console.log(`    ${chalk.gray(prefix)} ${chalk.cyan(feature.feature)} ${chalk.gray(`(${feature.provider || 'default'})`)}`);
+    });
   }
 
   if (framework.includes('+')) {
-    console.log(`  ${chalk.bold('Type:')} ${chalk.green('Combination Template (Pre-configured)')}`);
+    console.log(chalk.gray('─'.repeat(70)));
+    console.log(`  ${chalk.bold('⚙️  Template Type:')} ${chalk.green('Combination Template (Pre-configured)')}`);
   }
   
-  console.log(chalk.gray('═'.repeat(60)));
+  console.log(chalk.gray('═'.repeat(70)));
 }
 
 /**
- * Shows combination template information
+ * Enhanced combination template information display
  */
 export function showCombinationTemplateInfo(framework: string, database?: string, orm?: string): void {
-  console.log(chalk.cyan('\n📋 Template includes:'));
+  console.log(chalk.cyan('\n📦 Template Features:'));
+  
+  const features = [];
   
   if (framework.includes('shadcn')) {
-    console.log(chalk.green('  ✅ Shadcn/ui components'));
+    features.push({ name: 'Shadcn/ui Components', icon: '🎨', description: 'Beautiful, accessible UI components' });
   }
   
   if (framework.includes('expressjs')) {
-    console.log(chalk.green('  ✅ Express.js backend'));
+    features.push({ name: 'Express.js Backend', icon: '🚀', description: 'Fast, minimalist web framework' });
   }
   
   if (framework.includes('nestjs')) {
-    console.log(chalk.green('  ✅ NestJS backend'));
+    features.push({ name: 'NestJS Backend', icon: '🏗️', description: 'Scalable Node.js server-side framework' });
   }
   
   if (framework.includes('reactjs')) {
-    console.log(chalk.green('  ✅ React.js frontend'));
+    features.push({ name: 'React.js Frontend', icon: '⚛️', description: 'Modern JavaScript library for UI' });
   }
   
   if (database) {
-    console.log(chalk.green(`  ✅ ${database.charAt(0).toUpperCase() + database.slice(1)} database`));
+    features.push({ 
+      name: `${database.charAt(0).toUpperCase() + database.slice(1)} Database`, 
+      icon: '🗄️', 
+      description: 'Production-ready database setup' 
+    });
   }
   
   if (orm) {
-    console.log(chalk.green(`  ✅ ${orm.charAt(0).toUpperCase() + orm.slice(1)} ORM`));
+    features.push({ 
+      name: `${orm.charAt(0).toUpperCase() + orm.slice(1)} ORM`, 
+      icon: '🔗', 
+      description: 'Object-relational mapping for database operations' 
+    });
   }
+
+  features.forEach((feature, index) => {
+    const isLast = index === features.length - 1;
+    const prefix = isLast ? '└─' : '├─';
+    console.log(`  ${chalk.gray(prefix)} ${feature.icon} ${chalk.green(feature.name)}`);
+    console.log(`  ${chalk.gray(isLast ? '   ' : '│  ')} ${chalk.dim(feature.description)}`);
+  });
   
-  console.log(chalk.yellow('  💡 All configurations are pre-configured for optimal setup!'));
+  console.log(`\n  ${chalk.yellow('💡 All configurations are pre-configured for optimal development experience!')}`);
 }
 
 /**
- * Displays a beautifully styled success message after project creation
+ * Enhanced success message with better project type detection and commands
  */
 export function showSuccessMessage(
   filename: string, 
   targetPath: string, 
   theme: any, 
   dependenciesInstalled: boolean = false, 
-  framework?: string
+  framework?: string,
+  installedFeatures: Array<{ feature: string; provider?: string }> = []
 ): void {
   console.log();
 
   const isCurrentDirectory = filename === 'current directory' || filename === '.';
   const projectName = isCurrentDirectory ? path.basename(targetPath) : filename;
-  const cdCommand = isCurrentDirectory ? '' : `cd ${filename}\n`;
+  const cdCommand = isCurrentDirectory ? '' : `cd ${filename}`;
 
-  // Determine project type for appropriate command display
+  // Enhanced project type detection
   const isRustProject = framework === 'rust' || fs.existsSync(path.join(targetPath, 'Cargo.toml'));
   const isCombinationTemplate = framework && framework.includes('+');
   const hasBackend = isCombinationTemplate && fs.existsSync(path.join(targetPath, 'backend'));
+  const hasPackageJson = fs.existsSync(path.join(targetPath, 'package.json'));
+  const hasPnpmLock = fs.existsSync(path.join(targetPath, 'pnpm-lock.yaml'));
   
-  // Set appropriate commands based on project type
-  let devCommand, buildCommand, installCommand;
+  // Enhanced command determination
+  let devCommand, buildCommand, installCommand, packageManager;
 
   if (isRustProject) {
-    devCommand = `  cargo run`;
-    buildCommand = `  cargo build`;
-    installCommand = dependenciesInstalled ? '' : `  cargo build\n`;
+    devCommand = `cargo run`;
+    buildCommand = `cargo build --release`;
+    installCommand = dependenciesInstalled ? '' : `cargo build`;
+    packageManager = 'cargo';
   } else if (isCombinationTemplate && hasBackend) {
-    devCommand = `  # Frontend (in project root)\n  npm run dev\n\n  # Backend (in backend folder)\n  cd backend && npm run dev`;
-    buildCommand = `  # Frontend\n  npm run build\n\n  # Backend\n  cd backend && npm run build`;
-    installCommand = dependenciesInstalled ? '' : `  # Install frontend dependencies\n  npm install\n\n  # Install backend dependencies\n  cd backend && npm install\n`;
+    const pm = hasPnpmLock ? 'pnpm' : 'npm';
+    devCommand = `# Frontend\n  ${pm} run dev\n\n  # Backend\n  cd backend && ${pm} run dev`;
+    buildCommand = `# Frontend\n  ${pm} run build\n\n  # Backend\n  cd backend && ${pm} run build`;
+    installCommand = dependenciesInstalled ? '' : `# Install dependencies\n  ${pm} install\n  cd backend && ${pm} install`;
+    packageManager = pm;
   } else {
-    devCommand = `  npm run dev    # or pnpm dev`;
-    buildCommand = `  npm run build  # or pnpm build`;
-    installCommand = dependenciesInstalled ? '' : `  npm install\n`;
+    const pm = hasPnpmLock ? 'pnpm' : 'npm';
+    devCommand = `${pm} run dev`;
+    buildCommand = `${pm} run build`;
+    installCommand = dependenciesInstalled ? '' : `${pm} install`;
+    packageManager = pm;
   }
 
-  // Enhanced success box with gradient and better styling
-  const successBox = boxen(
-    gradient(['#43e97b', '#38f9d7'])(`🎉 Project "${chalk.bold(projectName)}" created successfully!`) + '\n\n' +
-    chalk.white(`${chalk.bold('📁 Location:')} ${chalk.cyan(targetPath)}\n`) +
-    chalk.white(`${chalk.bold('🚀 Next steps:')}\n`) +
-    chalk.gray(cdCommand) +
-    chalk.gray(devCommand + '\n') +
-    chalk.gray(buildCommand + '\n\n') +
-    chalk.yellow('💡 Check the README.md file for detailed instructions!'),
-    {
-      padding: 2,
-      margin: 1,
-      borderStyle: 'round',
-      borderColor: 'green',
-      backgroundColor: '#1a1a1a',
-      title: '✨ Success',
-      titleAlignment: 'center'
-    }
-  );
+  // Main success message with enhanced styling
+  const successTitle = gradient(['#43e97b', '#38f9d7'])(`🎉 Project "${chalk.bold(projectName)}" Created Successfully!`);
+  
+  let successContent = successTitle + '\n\n' +
+    `${chalk.bold('📁 Location:')} ${chalk.cyan(targetPath)}\n` +
+    `${chalk.bold('📦 Package Manager:')} ${chalk.yellow(packageManager || 'N/A')}\n`;
+
+  if (installedFeatures.length > 0) {
+    successContent += `${chalk.bold('🔧 Features Installed:')} ${chalk.green(installedFeatures.length + ' features')}\n`;
+  }
+
+  successContent += `${chalk.bold('⚡ Dependencies:')} ${dependenciesInstalled ? chalk.green('✓ Installed') : chalk.yellow('⏳ Pending')}\n\n`;
+
+  if (cdCommand) {
+    successContent += chalk.white(`${chalk.bold('🚀 Quick Start:')}\n  ${chalk.cyan(cdCommand)}\n`);
+  }
+  
+  if (!dependenciesInstalled && installCommand) {
+    successContent += `  ${chalk.yellow(installCommand)}\n`;
+  }
+  
+  successContent += `  ${chalk.green(devCommand)}\n\n`;
+  successContent += chalk.yellow('💡 Check the README.md file for detailed instructions!');
+
+  const successBox = boxen(successContent, {
+    padding: 2,
+    margin: 1,
+    borderStyle: 'double',
+    borderColor: 'greenBright',
+    backgroundColor: '#0d1117',
+    title: '✨ Success',
+    titleAlignment: 'center'
+  });
 
   console.log(successBox);
 
-  // Enhanced quick commands box
-  const commandsBox = boxen(
-    chalk.white(`${chalk.bold('⚡ Quick Commands:')}\n`) +
-    chalk.gray(cdCommand) +
-    chalk.gray(installCommand) +
-    chalk.gray(isRustProject ? `  cargo run` : isCombinationTemplate && hasBackend ? `  # Start frontend\n  npm run dev\n\n  # Start backend\n  cd backend && npm run dev` : `  npm run dev`),
-    {
-      padding: 1,
-      margin: { top: 1, bottom: 1 },
-      borderStyle: 'round',
-      borderColor: 'blue',
-      backgroundColor: '#1a1a1a',
-      title: '🚀 Ready to Code',
-      titleAlignment: 'center'
-    }
-  );
+  // Enhanced features summary if any features were installed
+  if (installedFeatures.length > 0) {
+    const featuresContent = installedFeatures.map((feature, index) => {
+      const isLast = index === installedFeatures.length - 1;
+      const prefix = isLast ? '└─' : '├─';
+      return `  ${chalk.gray(prefix)} ${chalk.cyan(feature.feature)} ${chalk.gray(`(${feature.provider || 'default'})`)}`;
+    }).join('\n');
 
-  console.log(commandsBox);
+    const featuresBox = boxen(
+      `${chalk.bold('🔧 Installed Features:')}\n\n${featuresContent}`,
+      {
+        padding: 1,
+        margin: { top: 1, bottom: 1 },
+        borderStyle: 'round',
+        borderColor: 'blue',
+        backgroundColor: '#0d1117',
+        title: '🎯 Features',
+        titleAlignment: 'center'
+      }
+    );
 
-  // Tips box
+    console.log(featuresBox);
+  }
+
+  // Enhanced tips with more helpful information
+  const tips = [
+    `Use ${chalk.cyan('Ctrl+C')} to stop the development server`,
+    `Check ${chalk.cyan('package.json')} for all available scripts`,
+    hasBackend ? 'Run frontend and backend in separate terminals for best experience' : 'Use hot reload for faster development',
+    `Visit the ${framework} documentation for advanced features`,
+    installedFeatures.length > 0 ? 'Feature documentation is available in their respective folders' : 'Add more features anytime with the add command'
+  ].filter(Boolean);
+
+  const tipsContent = tips.map((tip, index) => 
+    `  ${chalk.gray('•')} ${chalk.white(tip)}`
+  ).join('\n');
+
   const tipsBox = boxen(
-    chalk.white(`${chalk.bold('💡 Pro Tips:')}\n`) +
-    chalk.gray('• Use ') + chalk.cyan('Ctrl+C') + chalk.gray(' to stop the development server\n') +
-    chalk.gray('• Check ') + chalk.cyan('package.json') + chalk.gray(' for available scripts\n') +
-    (isCombinationTemplate && hasBackend ? chalk.gray('• Run frontend and backend in separate terminals for better development experience\n') : '') +
-    chalk.gray('• Visit the framework docs for advanced features'),
+    `${chalk.bold('💡 Pro Tips:')}\n\n${tipsContent}`,
     {
       padding: 1,
       margin: { top: 1, bottom: 1 },
       borderStyle: 'round',
       borderColor: 'yellow',
-      backgroundColor: '#1a1a1a',
+      backgroundColor: '#0d1117',
       title: '💡 Tips',
       titleAlignment: 'center'
     }
@@ -261,47 +319,215 @@ export function showSuccessMessage(
 }
 
 /**
- * Shows error message with proper styling
+ * Enhanced error display with detailed information
  */
-export function showErrorMessage(title: string, message: string, details?: string): void {
+export function showErrorMessage(title: string, message: string, details?: string, suggestions?: string[]): void {
   console.log();
-  const errorBox = boxen(
-    gradient(['#ff6b6b', '#ee5a24'])(`❌ ${title}`) + '\n\n' +
-    chalk.red(message) + '\n\n' +
-    chalk.gray(details || 'Please check your configuration and try again.'),
-    {
-      padding: 1,
-      margin: 1,
-      borderStyle: 'round',
-      borderColor: 'red',
-      backgroundColor: '#1a1a1a',
-      title: '🚨 Error',
-      titleAlignment: 'center'
-    }
-  );
+  
+  let errorContent = gradient(['#ff6b6b', '#ee5a24'])(`❌ ${title}`) + '\n\n' +
+    chalk.red(message);
+
+  if (details) {
+    errorContent += '\n\n' + chalk.gray(details);
+  }
+
+  if (suggestions && suggestions.length > 0) {
+    errorContent += '\n\n' + chalk.bold('💡 Suggestions:');
+    suggestions.forEach(suggestion => {
+      errorContent += `\n  ${chalk.gray('•')} ${chalk.white(suggestion)}`;
+    });
+  }
+
+  const errorBox = boxen(errorContent, {
+    padding: 2,
+    margin: 1,
+    borderStyle: 'round',
+    borderColor: 'red',
+    backgroundColor: '#1a0000',
+    title: '🚨 Error',
+    titleAlignment: 'center'
+  });
+  
   console.log(errorBox);
 }
 
 /**
- * Shows the main banner (alias for printBanner)
+ * Progress spinner with customizable messages
  */
-export function showBanner(): void {
-  printBanner('2.4.0', 8);
-}
+export class ProgressSpinner {
+  private spinner: any;
 
-/**
- * Logs errors with proper formatting
- */
-export function logError(message: string, error: Error): void {
-  console.error(chalk.red(`❌ ${message}: ${error.message}`));
-  if (process.env.DEBUG) {
-    console.error(chalk.gray(error.stack));
+  constructor(text: string = 'Loading...', spinnerType: keyof typeof cliSpinners = 'dots') {
+    this.spinner = ora({
+      text,
+      spinner: cliSpinners[spinnerType],
+      color: 'cyan'
+    });
+  }
+
+  start(text?: string): void {
+    if (text) this.spinner.text = text;
+    this.spinner.start();
+  }
+
+  succeed(text?: string): void {
+    this.spinner.succeed(text);
+  }
+
+  fail(text?: string): void {
+    this.spinner.fail(text);
+  }
+
+  warn(text?: string): void {
+    this.spinner.warn(text);
+  }
+
+  info(text?: string): void {
+    this.spinner.info(text);
+  }
+
+  updateText(text: string): void {
+    this.spinner.text = text;
+  }
+
+  stop(): void {
+    this.spinner.stop();
   }
 }
 
 /**
- * Logs success messages with proper formatting
+ * Progress bar for file operations
  */
+export function createProgressCallback(operation: string): (progress: number, message: string) => void {
+  let lastPercent = 0;
+  
+  return (progress: number, message: string) => {
+    const currentPercent = Math.round(progress);
+    
+    if (currentPercent > lastPercent) {
+      const bar = '█'.repeat(Math.floor(currentPercent / 2)) + 
+                  '░'.repeat(50 - Math.floor(currentPercent / 2));
+      
+      const statusColor = progress >= 100 ? 'green' : 'cyan';
+      
+      process.stdout.write('\r' + 
+        chalk[statusColor](`${operation}: `) + 
+        `[${chalk.cyan(bar)}] ` +
+        chalk.bold(`${currentPercent}%`) + 
+        (message ? ` - ${chalk.gray(message)}` : '')
+      );
+      
+      if (progress >= 100) {
+        console.log(); // New line after completion
+      }
+      
+      lastPercent = currentPercent;
+    }
+  };
+}
+
+/**
+ * Enhanced banner alias for backward compatibility
+ */
+export function showBanner(): void {
+  printBanner('3.0.0', 12, 50);
+}
+
+/**
+ * Enhanced logging utilities
+ */
+export function logError(message: string, error?: Error | string): void {
+  const errorMsg = error instanceof Error ? error.message : error || 'Unknown error';
+  console.error(chalk.red(`❌ ${message}: ${errorMsg}`));
+  
+  if (error instanceof Error && process.env.DEBUG) {
+    console.error(chalk.gray(error.stack));
+  }
+}
+
 export function logSuccess(message: string): void {
   console.log(chalk.green(`✅ ${message}`));
+}
+
+export function logWarning(message: string): void {
+  console.log(chalk.yellow(`⚠️  ${message}`));
+}
+
+export function logInfo(message: string): void {
+  console.log(chalk.blue(`ℹ️  ${message}`));
+}
+
+/**
+ * Feature selection display helper
+ */
+export function displayFeatureSelection(features: Array<{ name: string; provider?: string; description?: string }>, selectedCount: number = 0): void {
+  console.log(chalk.cyan('\n🔧 Available Features:'));
+  console.log(chalk.gray('─'.repeat(60)));
+  
+  features.forEach((feature, index) => {
+    const providerIcon = getProviderIcon(feature.provider || 'other');
+    console.log(`  ${chalk.dim(String(index + 1).padStart(2))}. ${providerIcon} ${chalk.bold(feature.name)}`);
+    console.log(`      ${chalk.gray(feature.provider || 'default')} • ${chalk.dim(feature.description || 'No description available')}`);
+  });
+  
+  if (selectedCount > 0) {
+    console.log(chalk.gray('─'.repeat(60)));
+    console.log(`  ${chalk.green(`✓ ${selectedCount} feature${selectedCount > 1 ? 's' : ''} selected`)}`);
+  }
+  
+  console.log(chalk.gray('─'.repeat(60)));
+}
+
+/**
+ * Get provider icon based on provider name
+ */
+function getProviderIcon(provider: string): string {
+  const icons: Record<string, string> = {
+    'auth': '🔐',
+    'database': '🗄️',
+    'ui': '🎨',
+    'testing': '🧪',
+    'deployment': '🚀',
+    'monitoring': '📊',
+    'analytics': '📈',
+    'payment': '💳',
+    'email': '📧',
+    'storage': '☁️',
+    'api': '🔌',
+    'seo': '🔍',
+    'pwa': '📱',
+    'cms': '📝',
+    'other': '⚙️'
+  };
+  
+  return icons[provider.toLowerCase()] || icons['other'];
+}
+
+/**
+ * Display installation summary
+ */
+export function showInstallationSummary(
+  installed: string[], 
+  failed: string[], 
+  skipped: string[] = []
+): void {
+  console.log(chalk.cyan('\n📦 Installation Summary:'));
+  console.log(chalk.gray('═'.repeat(50)));
+  
+  if (installed.length > 0) {
+    console.log(chalk.green(`✅ Successfully installed (${installed.length}):`));
+    installed.forEach(item => console.log(`   • ${item}`));
+  }
+  
+  if (failed.length > 0) {
+    console.log(chalk.red(`❌ Failed to install (${failed.length}):`));
+    failed.forEach(item => console.log(`   • ${item}`));
+  }
+  
+  if (skipped.length > 0) {
+    console.log(chalk.yellow(`⏭️  Skipped (${skipped.length}):`));
+    skipped.forEach(item => console.log(`   • ${item}`));
+  }
+  
+  console.log(chalk.gray('═'.repeat(50)));
 }

@@ -1,11 +1,12 @@
 /**
- * History Manager - Track CLI usage for analytics
+ * History Manager - Track CLI usage and store frameworks/features in hidden CLI folder
  */
 
 import fs from 'fs-extra';
 import path from 'path';
 import os from 'os';
 import chalk from 'chalk';
+import crypto from 'crypto';
 
 export interface ProjectHistoryEntry {
   id: string;
@@ -23,10 +24,11 @@ export interface ProjectHistoryEntry {
 
 export interface FeatureHistoryEntry {
   id: string;
-  feature: string;
+  name: string;
   projectPath: string;
   projectName: string;
   framework: string;
+  provider?: string;
   addedAt: string;
   success: boolean;
 }
@@ -41,31 +43,66 @@ export interface CommandHistoryEntry {
   workingDirectory: string;
 }
 
+export interface CloneHistoryEntry {
+  repository: string;
+  projectName: string;
+  provider: string;
+  clonedAt: string;
+  success: boolean;
+  error?: string;
+}
+
+export interface FrameworkUsage {
+  [framework: string]: {
+    count: number;
+    lastUsed: string;
+    languages: Record<string, number>;
+    templates: Record<string, number>;
+  };
+}
+
+export interface FeatureUsage {
+  [feature: string]: {
+    count: number;
+    lastUsed: string;
+    frameworks: Record<string, number>;
+    providers: Record<string, number>;
+  };
+}
+
 export interface CLIHistory {
   version: string;
   lastUpdated: string;
   projects: ProjectHistoryEntry[];
   features: FeatureHistoryEntry[];
   commands: CommandHistoryEntry[];
+  cloneHistory?: CloneHistoryEntry[];
   statistics: {
-    totalProjectsCreated: number;
-    totalFeaturesAdded: number;
-    totalCommandsExecuted: number;
+    totalProjects: number;
+    totalFeatures: number;
+    totalCommands: number;
+    frameworkUsage: FrameworkUsage;
+    featureUsage: FeatureUsage;
     mostUsedFramework: string;
-    mostUsedLanguage: string;
     mostUsedFeature: string;
     lastUsed: string;
+    totalUsageTime: number;
   };
 }
 
 export class HistoryManager {
-  private historyDir: string;
+  private cliDir: string;
   private historyFile: string;
+  private frameworksFile: string;
+  private featuresFile: string;
   private history: CLIHistory;
 
   constructor() {
-    this.historyDir = path.join(os.homedir(), '.pi-cache');
-    this.historyFile = path.join(this.historyDir, '.pi-history.json');
+    // Use the same hidden folder as other cache files
+    this.cliDir = path.join(os.homedir(), '.package-installer-cli');
+    this.historyFile = path.join(this.cliDir, 'history.json');
+    this.frameworksFile = path.join(this.cliDir, 'frameworks.json');
+    this.featuresFile = path.join(this.cliDir, 'features-usage.json');
     this.history = this.getDefaultHistory();
   }
 
@@ -74,7 +111,7 @@ export class HistoryManager {
    */
   async init(): Promise<void> {
     try {
-      await fs.ensureDir(this.historyDir);
+      await fs.ensureDir(this.cliDir);
       
       if (await fs.pathExists(this.historyFile)) {
         const data = await fs.readJson(this.historyFile);
@@ -86,9 +123,40 @@ export class HistoryManager {
       // Update last used timestamp
       this.history.statistics.lastUsed = new Date().toISOString();
       await this.save();
+      
+      // Initialize separate framework and feature files
+      await this.initializeFrameworksFile();
+      await this.initializeFeaturesFile();
+      
     } catch (error) {
       console.warn(chalk.yellow('⚠️  History initialization failed, using memory history'));
       this.history = this.getDefaultHistory();
+    }
+  }
+
+  /**
+   * Initialize frameworks tracking file
+   */
+  private async initializeFrameworksFile(): Promise<void> {
+    if (!await fs.pathExists(this.frameworksFile)) {
+      const frameworks = {
+        lastUpdated: new Date().toISOString(),
+        frameworks: this.history.statistics.frameworkUsage
+      };
+      await fs.writeJson(this.frameworksFile, frameworks, { spaces: 2 });
+    }
+  }
+
+  /**
+   * Initialize features tracking file
+   */
+  private async initializeFeaturesFile(): Promise<void> {
+    if (!await fs.pathExists(this.featuresFile)) {
+      const features = {
+        lastUpdated: new Date().toISOString(),
+        features: this.history.statistics.featureUsage
+      };
+      await fs.writeJson(this.featuresFile, features, { spaces: 2 });
     }
   }
 
@@ -97,196 +165,237 @@ export class HistoryManager {
    */
   private getDefaultHistory(): CLIHistory {
     return {
-      version: '1.0.0',
+      version: '3.0.0',
       lastUpdated: new Date().toISOString(),
       projects: [],
       features: [],
       commands: [],
       statistics: {
-        totalProjectsCreated: 0,
-        totalFeaturesAdded: 0,
-        totalCommandsExecuted: 0,
+        totalProjects: 0,
+        totalFeatures: 0,
+        totalCommands: 0,
+        frameworkUsage: {},
+        featureUsage: {},
         mostUsedFramework: '',
-        mostUsedLanguage: '',
         mostUsedFeature: '',
-        lastUsed: new Date().toISOString()
+        lastUsed: new Date().toISOString(),
+        totalUsageTime: 0
       }
     };
   }
 
   /**
-   * Save history to disk
+   * Record a new project creation
    */
-  private async save(): Promise<void> {
-    try {
-      this.history.lastUpdated = new Date().toISOString();
-      await fs.writeJson(this.historyFile, this.history, { spaces: 2 });
-    } catch (error) {
-      // Silent fail - history will work in memory
-    }
-  }
-
-  /**
-   * Generate unique ID
-   */
-  private generateId(): string {
-    return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-  }
-
-  /**
-   * Record project creation
-   */
-  async recordProject(projectData: {
+  async recordProject(project: {
     name: string;
     path: string;
     framework: string;
     language: string;
     template?: string;
     features?: string[];
-    size: number;
-    dependencies: string[];
   }): Promise<void> {
-    const entry: ProjectHistoryEntry = {
-      id: this.generateId(),
-      name: projectData.name,
-      path: projectData.path,
-      framework: projectData.framework,
-      language: projectData.language,
-      template: projectData.template,
-      features: projectData.features || [],
-      createdAt: new Date().toISOString(),
-      lastModified: new Date().toISOString(),
-      size: projectData.size,
-      dependencies: projectData.dependencies
+    const id = this.generateId();
+    const now = new Date().toISOString();
+
+    const projectEntry: ProjectHistoryEntry = {
+      id,
+      name: project.name,
+      path: project.path,
+      framework: project.framework,
+      language: project.language,
+      template: project.template,
+      features: project.features || [],
+      createdAt: now,
+      lastModified: now,
+      size: 0,
+      dependencies: []
     };
 
-    this.history.projects.push(entry);
-    this.history.statistics.totalProjectsCreated++;
+    this.history.projects.unshift(projectEntry);
     
     // Update statistics
-    this.updateStatistics();
+    this.history.statistics.totalProjects++;
+    this.updateFrameworkUsage(project.framework, project.language, project.template);
+    
     await this.save();
+    await this.saveFrameworksFile();
   }
 
   /**
-   * Record feature addition
+   * Record a feature addition
    */
-  async recordFeature(featureData: {
-    feature: string;
+  async recordFeature(feature: {
+    name: string;
     projectPath: string;
     projectName: string;
     framework: string;
-    success: boolean;
+    provider?: string;
+    success?: boolean;
   }): Promise<void> {
-    const entry: FeatureHistoryEntry = {
-      id: this.generateId(),
-      feature: featureData.feature,
-      projectPath: featureData.projectPath,
-      projectName: featureData.projectName,
-      framework: featureData.framework,
-      addedAt: new Date().toISOString(),
-      success: featureData.success
+    const id = this.generateId();
+    const now = new Date().toISOString();
+
+    const featureEntry: FeatureHistoryEntry = {
+      id,
+      name: feature.name,
+      projectPath: feature.projectPath,
+      projectName: feature.projectName,
+      framework: feature.framework,
+      provider: feature.provider,
+      addedAt: now,
+      success: feature.success !== false
     };
 
-    this.history.features.push(entry);
-    if (featureData.success) {
-      this.history.statistics.totalFeaturesAdded++;
+    this.history.features.unshift(featureEntry);
+    
+    // Update project to include the feature
+    const project = this.history.projects.find(p => p.path === feature.projectPath);
+    if (project && !project.features.includes(feature.name)) {
+      project.features.push(feature.name);
+      project.lastModified = now;
     }
     
-    this.updateStatistics();
+    // Update statistics
+    this.history.statistics.totalFeatures++;
+    this.updateFeatureUsage(feature.name, feature.framework, feature.provider);
+    
     await this.save();
+    await this.saveFeaturesFile();
   }
 
   /**
-   * Record command execution
+   * Record a command execution
    */
-  async recordCommand(commandData: {
+  async recordCommand(command: {
     command: string;
     args: string[];
     success: boolean;
     executionTime: number;
-    workingDirectory: string;
   }): Promise<void> {
-    const entry: CommandHistoryEntry = {
-      id: this.generateId(),
-      command: commandData.command,
-      args: commandData.args,
-      executedAt: new Date().toISOString(),
-      success: commandData.success,
-      executionTime: commandData.executionTime,
-      workingDirectory: commandData.workingDirectory
+    const id = this.generateId();
+    const now = new Date().toISOString();
+
+    const commandEntry: CommandHistoryEntry = {
+      id,
+      command: command.command,
+      args: command.args,
+      executedAt: now,
+      success: command.success,
+      executionTime: command.executionTime,
+      workingDirectory: process.cwd()
     };
 
-    this.history.commands.push(entry);
-    this.history.statistics.totalCommandsExecuted++;
+    this.history.commands.unshift(commandEntry);
     
-    this.updateStatistics();
+    // Keep only last 100 commands
+    if (this.history.commands.length > 100) {
+      this.history.commands = this.history.commands.slice(0, 100);
+    }
+    
+    // Update statistics
+    this.history.statistics.totalCommands++;
+    this.history.statistics.totalUsageTime += command.executionTime;
+    
     await this.save();
   }
 
   /**
-   * Update statistics
+   * Update framework usage statistics
    */
-  private updateStatistics(): void {
-    // Most used framework
-    const frameworkCounts = new Map<string, number>();
-    this.history.projects.forEach(project => {
-      const count = frameworkCounts.get(project.framework) || 0;
-      frameworkCounts.set(project.framework, count + 1);
-    });
-    
-    let maxFramework = '';
-    let maxFrameworkCount = 0;
-    frameworkCounts.forEach((count, framework) => {
-      if (count > maxFrameworkCount) {
-        maxFrameworkCount = count;
-        maxFramework = framework;
-      }
-    });
-    this.history.statistics.mostUsedFramework = maxFramework;
+  private updateFrameworkUsage(framework: string, language: string, template?: string): void {
+    if (!this.history.statistics.frameworkUsage[framework]) {
+      this.history.statistics.frameworkUsage[framework] = {
+        count: 0,
+        lastUsed: new Date().toISOString(),
+        languages: {},
+        templates: {}
+      };
+    }
 
-    // Most used language
-    const languageCounts = new Map<string, number>();
-    this.history.projects.forEach(project => {
-      const count = languageCounts.get(project.language) || 0;
-      languageCounts.set(project.language, count + 1);
-    });
+    const fw = this.history.statistics.frameworkUsage[framework];
+    fw.count++;
+    fw.lastUsed = new Date().toISOString();
     
-    let maxLanguage = '';
-    let maxLanguageCount = 0;
-    languageCounts.forEach((count, language) => {
-      if (count > maxLanguageCount) {
-        maxLanguageCount = count;
-        maxLanguage = language;
-      }
-    });
-    this.history.statistics.mostUsedLanguage = maxLanguage;
+    if (!fw.languages[language]) {
+      fw.languages[language] = 0;
+    }
+    fw.languages[language]++;
+    
+    if (template && !fw.templates[template]) {
+      fw.templates[template] = 0;
+    }
+    if (template) {
+      fw.templates[template]++;
+    }
 
-    // Most used feature
-    const featureCounts = new Map<string, number>();
-    this.history.features.forEach(feature => {
-      if (feature.success) {
-        const count = featureCounts.get(feature.feature) || 0;
-        featureCounts.set(feature.feature, count + 1);
-      }
-    });
-    
-    let maxFeature = '';
-    let maxFeatureCount = 0;
-    featureCounts.forEach((count, feature) => {
-      if (count > maxFeatureCount) {
-        maxFeatureCount = count;
-        maxFeature = feature;
-      }
-    });
-    this.history.statistics.mostUsedFeature = maxFeature;
+    // Update most used framework
+    const frameworks = Object.entries(this.history.statistics.frameworkUsage);
+    const mostUsed = frameworks.reduce((prev, curr) => 
+      prev[1].count > curr[1].count ? prev : curr
+    );
+    this.history.statistics.mostUsedFramework = mostUsed[0];
   }
 
   /**
-   * Get history data
+   * Update feature usage statistics
    */
-  getHistory(): CLIHistory {
-    return this.history;
+  private updateFeatureUsage(feature: string, framework: string, provider?: string): void {
+    if (!this.history.statistics.featureUsage[feature]) {
+      this.history.statistics.featureUsage[feature] = {
+        count: 0,
+        lastUsed: new Date().toISOString(),
+        frameworks: {},
+        providers: {}
+      };
+    }
+
+    const feat = this.history.statistics.featureUsage[feature];
+    feat.count++;
+    feat.lastUsed = new Date().toISOString();
+    
+    if (!feat.frameworks[framework]) {
+      feat.frameworks[framework] = 0;
+    }
+    feat.frameworks[framework]++;
+    
+    if (provider) {
+      if (!feat.providers[provider]) {
+        feat.providers[provider] = 0;
+      }
+      feat.providers[provider]++;
+    }
+
+    // Update most used feature
+    const features = Object.entries(this.history.statistics.featureUsage);
+    if (features.length > 0) {
+      const mostUsed = features.reduce((prev, curr) => 
+        prev[1].count > curr[1].count ? prev : curr
+      );
+      this.history.statistics.mostUsedFeature = mostUsed[0];
+    }
+  }
+
+  /**
+   * Save frameworks data to separate file
+   */
+  private async saveFrameworksFile(): Promise<void> {
+    const frameworks = {
+      lastUpdated: new Date().toISOString(),
+      frameworks: this.history.statistics.frameworkUsage
+    };
+    await fs.writeJson(this.frameworksFile, frameworks, { spaces: 2 });
+  }
+
+  /**
+   * Save features data to separate file
+   */
+  private async saveFeaturesFile(): Promise<void> {
+    const features = {
+      lastUpdated: new Date().toISOString(),
+      features: this.history.statistics.featureUsage
+    };
+    await fs.writeJson(this.featuresFile, features, { spaces: 2 });
   }
 
   /**
@@ -294,57 +403,92 @@ export class HistoryManager {
    */
   getRecentProjects(limit: number = 10): ProjectHistoryEntry[] {
     return this.history.projects
-      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+      .sort((a, b) => new Date(b.lastModified).getTime() - new Date(a.lastModified).getTime())
       .slice(0, limit);
   }
 
   /**
-   * Get feature usage statistics
+   * Get recent features
    */
-  getFeatureStats(): Array<{ feature: string; count: number; frameworks: string[] }> {
-    const stats = new Map<string, { count: number; frameworks: Set<string> }>();
-    
-    this.history.features
-      .filter(f => f.success)
-      .forEach(feature => {
-        if (!stats.has(feature.feature)) {
-          stats.set(feature.feature, { count: 0, frameworks: new Set() });
-        }
-        
-        const stat = stats.get(feature.feature)!;
-        stat.count++;
-        stat.frameworks.add(feature.framework);
-      });
-
-    return Array.from(stats.entries())
-      .map(([feature, data]) => ({
-        feature,
-        count: data.count,
-        frameworks: Array.from(data.frameworks)
-      }))
-      .sort((a, b) => b.count - a.count);
+  getRecentFeatures(limit: number = 10): FeatureHistoryEntry[] {
+    return this.history.features
+      .sort((a, b) => new Date(b.addedAt).getTime() - new Date(a.addedAt).getTime())
+      .slice(0, limit);
   }
 
   /**
    * Get framework usage statistics
    */
-  getFrameworkStats(): Array<{ framework: string; count: number; percentage: number }> {
-    const total = this.history.projects.length;
-    if (total === 0) return [];
-
-    const stats = new Map<string, number>();
-    this.history.projects.forEach(project => {
-      const count = stats.get(project.framework) || 0;
-      stats.set(project.framework, count + 1);
-    });
-
-    return Array.from(stats.entries())
-      .map(([framework, count]) => ({
+  getFrameworkStats(): { framework: string; count: number; languages: string[]; lastUsed: string }[] {
+    return Object.entries(this.history.statistics.frameworkUsage)
+      .map(([framework, data]) => ({
         framework,
-        count,
-        percentage: Math.round((count / total) * 100)
+        count: data.count,
+        languages: Object.keys(data.languages),
+        lastUsed: data.lastUsed
       }))
       .sort((a, b) => b.count - a.count);
+  }
+
+  /**
+   * Get feature usage statistics
+   */
+  getFeatureStats(): { feature: string; count: number; frameworks: string[]; lastUsed: string }[] {
+    return Object.entries(this.history.statistics.featureUsage)
+      .map(([feature, data]) => ({
+        feature,
+        count: data.count,
+        frameworks: Object.keys(data.frameworks),
+        lastUsed: data.lastUsed
+      }))
+      .sort((a, b) => b.count - a.count);
+  }
+
+  /**
+   * Get command usage statistics
+   */
+  getCommandStats(): { command: string; count: number; lastUsed: string }[] {
+    const commandCounts: Record<string, { count: number; lastUsed: string }> = {};
+    
+    this.history.commands.forEach(cmd => {
+      if (!commandCounts[cmd.command]) {
+        commandCounts[cmd.command] = { count: 0, lastUsed: cmd.executedAt };
+      }
+      commandCounts[cmd.command].count++;
+      if (new Date(cmd.executedAt) > new Date(commandCounts[cmd.command].lastUsed)) {
+        commandCounts[cmd.command].lastUsed = cmd.executedAt;
+      }
+    });
+
+    return Object.entries(commandCounts)
+      .map(([command, data]) => ({
+        command,
+        count: data.count,
+        lastUsed: data.lastUsed
+      }))
+      .sort((a, b) => b.count - a.count);
+  }
+
+  /**
+   * Get complete history
+   */
+  getHistory(): CLIHistory {
+    return this.history;
+  }
+
+  /**
+   * Save history to file
+   */
+  private async save(): Promise<void> {
+    this.history.lastUpdated = new Date().toISOString();
+    await fs.writeJson(this.historyFile, this.history, { spaces: 2 });
+  }
+
+  /**
+   * Generate unique ID
+   */
+  private generateId(): string {
+    return crypto.randomBytes(8).toString('hex');
   }
 
   /**
@@ -352,23 +496,121 @@ export class HistoryManager {
    */
   async clearHistory(): Promise<void> {
     // Create backup
-    const backupFile = path.join(this.historyDir, `.pi-history-backup-${Date.now()}.json`);
-    await fs.copy(this.historyFile, backupFile);
+    const backupFile = path.join(this.cliDir, `history-backup-${Date.now()}.json`);
+    if (await fs.pathExists(this.historyFile)) {
+      await fs.copy(this.historyFile, backupFile);
+    }
     
     // Reset history
     this.history = this.getDefaultHistory();
     await this.save();
+    
+    // Clear separate files
+    await fs.remove(this.frameworksFile);
+    await fs.remove(this.featuresFile);
+    await this.initializeFrameworksFile();
+    await this.initializeFeaturesFile();
   }
 
   /**
-   * Check if cache should restart (5 hours)
+   * Export history data
    */
-  shouldRestartCache(): boolean {
-    const lastUsed = new Date(this.history.statistics.lastUsed).getTime();
-    const now = Date.now();
-    const fiveHours = 5 * 60 * 60 * 1000;
+  async exportHistory(outputPath: string): Promise<void> {
+    const exportData = {
+      exportedAt: new Date().toISOString(),
+      version: this.history.version,
+      history: this.history,
+      frameworks: await this.loadFrameworksFile(),
+      features: await this.loadFeaturesFile()
+    };
     
-    return (now - lastUsed) > fiveHours;
+    await fs.writeJson(outputPath, exportData, { spaces: 2 });
+  }
+
+  /**
+   * Load frameworks data
+   */
+  private async loadFrameworksFile(): Promise<any> {
+    try {
+      if (await fs.pathExists(this.frameworksFile)) {
+        return await fs.readJson(this.frameworksFile);
+      }
+    } catch (error) {
+      console.warn('Could not load frameworks file');
+    }
+    return { frameworks: {} };
+  }
+
+  /**
+   * Load features data
+   */
+  private async loadFeaturesFile(): Promise<any> {
+    try {
+      if (await fs.pathExists(this.featuresFile)) {
+        return await fs.readJson(this.featuresFile);
+      }
+    } catch (error) {
+      console.warn('Could not load features file');
+    }
+    return { features: {} };
+  }
+
+  /**
+   * Add clone history entry
+   */
+  async addCloneHistory(entry: CloneHistoryEntry): Promise<void> {
+    try {
+      await this.init();
+      
+      // Create unique ID for the clone entry
+      const id = crypto.randomBytes(8).toString('hex');
+      
+      // Add to history with ID
+      const historyEntry = {
+        id,
+        ...entry
+      };
+      
+      this.history.cloneHistory = this.history.cloneHistory || [];
+      this.history.cloneHistory.unshift(historyEntry);
+      
+      // Keep only last 50 clone entries
+      if (this.history.cloneHistory.length > 50) {
+        this.history.cloneHistory = this.history.cloneHistory.slice(0, 50);
+      }
+      
+      // Update statistics
+      if (entry.success) {
+        this.history.statistics.totalProjects++;
+      }
+      
+      // Save to file
+      await this.save();
+      
+    } catch (error: any) {
+      console.error(chalk.red('Failed to add clone history:'), error.message);
+    }
+  }
+
+  /**
+   * Get clone history
+   */
+  async getCloneHistory(): Promise<CloneHistoryEntry[]> {
+    try {
+      await this.init();
+      return this.history.cloneHistory || [];
+    } catch (error) {
+      console.error('Failed to get clone history');
+      return [];
+    }
+  }
+
+  /**
+   * Get recent clone history (last 10)
+   */
+  async getRecentClones(): Promise<CloneHistoryEntry[]> {
+    const history = await this.getCloneHistory();
+    return history.slice(0, 10);
   }
 }
 
