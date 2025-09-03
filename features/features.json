@@ -2,22 +2,9 @@
   "features": {
     "ai": {
       "description": "AI integration code for enhanced user experiences",
-      "supportedFrameworks": [
-        "nextjs",
-        "expressjs",
-        "nestjs",
-        "remixjs"
-      ],
-      "supportedLanguages": [
-        "javascript"
-      ],
-      "supportedAIs": [
-        "gemini",
-        "grok",
-        "open-ai",
-        "open-router",
-        "claude"
-      ],
+      "supportedFrameworks": ["nextjs", "expressjs", "nestjs", "remixjs"],
+      "supportedLanguages": ["javascript"],
+      "supportedAIs": ["gemini", "grok", "open-ai", "open-router", "claude"],
       "files": {
         "claude": {
           "expressjs": {
@@ -247,16 +234,16 @@
                 "action": "create"
               },
               "index.js": {
-                "action": ""
+                "action": "prepend"
               },
               "package.json": {
                 "action": "install"
               },
               "routes/grokRoutes.js": {
-                "action": ""
+                "action": "create"
               },
               "utils/grok.js": {
-                "action": ""
+                "action": "create"
               }
             },
             "typescript": {
@@ -264,19 +251,19 @@
                 "action": "append"
               },
               "controllers/grokController.ts": {
-                "action": ""
+                "action": "create"
               },
               "index.ts": {
-                "action": ""
+                "action": "prepend"
               },
               "package.json": {
                 "action": "install"
               },
               "routes/grokRoutes.ts": {
-                "action": ""
+                "action": "create"
               },
               "utils/grok.ts": {
-                "action": ""
+                "action": "create"
               }
             }
           },
@@ -289,13 +276,13 @@
                 "action": "install"
               },
               "src/grok/grok.controller.ts": {
-                "action": ""
+                "action": "create"
               },
               "src/grok/grok.module.ts": {
-                "action": ""
+                "action": "create"
               },
               "src/grok/grok.service.ts": {
-                "action": ""
+                "action": "create"
               }
             }
           },
@@ -305,10 +292,10 @@
                 "action": "append"
               },
               "app/api/grok/route.js": {
-                "action": ""
+                "action": "create"
               },
               "lib/grok.js": {
-                "action": ""
+                "action": "create"
               },
               "package.json": {
                 "action": "install"
@@ -319,10 +306,10 @@
                 "action": "append"
               },
               "app/api/grok/route.ts": {
-                "action": ""
+                "action": "create"
               },
               "lib/grok.ts": {
-                "action": ""
+                "action": "create"
               },
               "package.json": {
                 "action": "install"
@@ -335,10 +322,10 @@
                 "action": "append"
               },
               "app/routes/api/grok.ts": {
-                "action": ""
+                "action": "create"
               },
               "app/utils/grok.ts": {
-                "action": ""
+                "action": "create"
               },
               "package.json": {
                 "action": "install"
@@ -353,19 +340,19 @@
                 "action": "append"
               },
               "controllers/openrouterController.js": {
-                "action": ""
+                "action": "create"
               },
               "index.js": {
-                "action": ""
+                "action": "prepend"
               },
               "package.json": {
                 "action": "install"
               },
               "routes/openRouterRoutes.js": {
-                "action": ""
+                "action": "create"
               },
               "utils/openrouter.js": {
-                "action": ""
+                "action": "create"
               }
             },
             "typescript": {
@@ -373,19 +360,19 @@
                 "action": "append"
               },
               "controllers/openrouterController.ts": {
-                "action": ""
+                "action": "create"
               },
               "index.ts": {
-                "action": ""
+                "action": "prepend"
               },
               "package.json": {
                 "action": "install"
               },
               "routes/openRouterRoutes.ts": {
-                "action": ""
+                "action": "create"
               },
               "utils/openrouter.ts": {
-                "action": ""
+                "action": "create"
               }
             }
           },
@@ -398,13 +385,13 @@
                 "action": "install"
               },
               "src/openrouter/openrouter.controller.ts": {
-                "action": ""
+                "action": "create"
               },
               "src/openrouter/openrouter.module.ts": {
-                "action": ""
+                "action": "create"
               },
               "src/openrouter/openrouter.service.ts": {
-                "action": ""
+                "action": "create"
               }
             }
           },
@@ -414,10 +401,10 @@
                 "action": "append"
               },
               "app/api/openrouter/route.js": {
-                "action": ""
+                "action": "create"
               },
               "lib/openrouter.js": {
-                "action": ""
+                "action": "create"
               },
               "package.json": {
                 "action": "install"
@@ -428,10 +415,10 @@
                 "action": "append"
               },
               "app/api/openrouter/route.ts": {
-                "action": ""
+                "action": "create"
               },
               "lib/openrouter.ts": {
-                "action": ""
+                "action": "create"
               },
               "package.json": {
                 "action": "install"
@@ -444,10 +431,10 @@
                 "action": "append"
               },
               "app/routes/api/openrouter.ts": {
-                "action": ""
+                "action": "create"
               },
               "app/utils/openrouter.ts": {
-                "action": ""
+                "action": "create"
               },
               "package.json": {
                 "action": "install"
@@ -462,19 +449,19 @@
                 "action": "append"
               },
               "controllers/openaiController.js": {
-                "action": ""
+                "action": "create"
               },
               "index.js": {
-                "action": ""
+                "action": "prepend"
               },
               "package.json": {
                 "action": "install"
               },
               "routes/openAiRoutes.js": {
-                "action": ""
+                "action": "create"
               },
               "utils/openai.js": {
-                "action": ""
+                "action": "create"
               }
             },
             "typescript": {
@@ -482,19 +469,19 @@
                 "action": "append"
               },
               "controllers/openaiController.ts": {
-                "action": ""
+                "action": "create"
               },
               "index.ts": {
-                "action": ""
+                "action": "prepend"
               },
               "package.json": {
                 "action": "install"
               },
               "routes/openAiRoutes.ts": {
-                "action": ""
+                "action": "create"
               },
               "utils/openai.ts": {
-                "action": ""
+                "action": "create"
               }
             }
           },
@@ -507,13 +494,13 @@
                 "action": "install"
               },
               "src/openai/openai.controller.ts": {
-                "action": ""
+                "action": "create"
               },
               "src/openai/openai.module.ts": {
-                "action": ""
+                "action": "create"
               },
               "src/openai/openai.service.ts": {
-                "action": ""
+                "action": "create"
               }
             }
           },
@@ -523,10 +510,10 @@
                 "action": "append"
               },
               "app/api/openai/route.js": {
-                "action": ""
+                "action": "create"
               },
               "lib/openai.js": {
-                "action": ""
+                "action": "create"
               },
               "package.json": {
                 "action": "install"
@@ -537,10 +524,10 @@
                 "action": "append"
               },
               "app/api/openai/route.ts": {
-                "action": ""
+                "action": "create"
               },
               "lib/openai.ts": {
-                "action": ""
+                "action": "create"
               },
               "package.json": {
                 "action": "install"
@@ -553,10 +540,10 @@
                 "action": "append"
               },
               "app/routes/api/openai.ts": {
-                "action": ""
+                "action": "create"
               },
               "app/utils/openai.ts": {
-                "action": ""
+                "action": "create"
               },
               "package.json": {
                 "action": "install"
@@ -577,14 +564,8 @@
         "vuejs",
         "reactjs"
       ],
-      "supportedLanguages": [
-        "javascript"
-      ],
-      "supportedAuths": [
-        "auth0",
-        "clerk",
-        "next-auth"
-      ],
+      "supportedLanguages": ["javascript"],
+      "supportedAuths": ["auth0", "clerk", "next-auth"],
       "files": {
         "auth0": {
           "angularjs": {
@@ -907,15 +888,8 @@
     },
     "aws": {
       "description": "AWS integration and deployment features",
-      "supportedFrameworks": [
-        "nextjs",
-        "expressjs",
-        "nestjs",
-        "remixjs"
-      ],
-      "supportedLanguages": [
-        "javascript"
-      ],
+      "supportedFrameworks": ["nextjs", "expressjs", "nestjs", "remixjs"],
+      "supportedLanguages": ["javascript"],
       "supportedAwsServices": [
         "cloudfront",
         "cloudwatch",
@@ -3191,49 +3165,21 @@
     },
     "database": {
       "description": "Database integration with orm selection and management features",
-      "supportedFrameworks": [
-        "nextjs",
-        "expressjs",
-        "nestjs",
-        "remixjs"
-      ],
-      "supportedLanguages": [
-        "javascript"
-      ],
-      "supportedDatabases": [
-        "mongodb",
-        "supabase",
-        "neondb"
-      ],
+      "supportedFrameworks": ["nextjs", "expressjs", "nestjs", "remixjs"],
+      "supportedLanguages": ["javascript"],
+      "supportedDatabases": ["mongodb", "supabase", "neondb"],
       "supportedORMs": {
         "mongodb": {
-          "javascript": [
-            "mongoose"
-          ],
-          "typescript": [
-            "mongoose",
-            "typegoose"
-          ]
+          "javascript": ["mongoose"],
+          "typescript": ["mongoose", "typegoose"]
         },
         "supabase": {
-          "javascript": [
-            "typeorm"
-          ],
-          "typescript": [
-            "typeorm",
-            "prisma",
-            "drizzle"
-          ]
+          "javascript": ["typeorm"],
+          "typescript": ["typeorm", "prisma", "drizzle"]
         },
         "neondb": {
-          "javascript": [
-            "typeorm"
-          ],
-          "typescript": [
-            "typeorm",
-            "prisma",
-            "drizzle"
-          ]
+          "javascript": ["typeorm"],
+          "typescript": ["typeorm", "prisma", "drizzle"]
         },
         "mysql": {}
       },
@@ -3687,9 +3633,7 @@
         "vuejs",
         "reactjs"
       ],
-      "supportedLanguages": [
-        "javascript"
-      ],
+      "supportedLanguages": ["javascript"],
       "files": {
         "angularjs": {
           ".dockerignore": {
@@ -3794,17 +3738,8 @@
     },
     "gitignore": {
       "description": "GitIgnore files for various frameworks and languages",
-      "supportedFrameworks": [
-        "nextjs",
-        "angularjs",
-        "nestjs"
-      ],
-      "supportedLanguages": [
-        "javascript",
-        "go",
-        "python",
-        "rust"
-      ],
+      "supportedFrameworks": ["nextjs", "angularjs", "nestjs"],
+      "supportedLanguages": ["javascript", "go", "python", "rust"],
       "files": {
         "angularjs": {
           "angular-gitignore": {
@@ -3847,14 +3782,8 @@
         "remixjs",
         "vuejs"
       ],
-      "supportedLanguages": [
-        "javascript"
-      ],
-      "supportedPayments": [
-        "stripe",
-        "razorpay",
-        "paypal"
-      ],
+      "supportedLanguages": ["javascript"],
+      "supportedPayments": ["stripe", "razorpay", "paypal"],
       "files": {
         "paypal": {
           "expressjs": {
@@ -4205,20 +4134,9 @@
     },
     "storage": {
       "description": "Storage Integration for files, images, and videos",
-      "supportedFrameworks": [
-        "nextjs",
-        "expressjs",
-        "nestjs",
-        "remixjs"
-      ],
-      "supportedLanguages": [
-        "javascript"
-      ],
-      "supportedStorages": [
-        "imagekit.io",
-        "cloudinary",
-        "google-cloud"
-      ],
+      "supportedFrameworks": ["nextjs", "expressjs", "nestjs", "remixjs"],
+      "supportedLanguages": ["javascript"],
+      "supportedStorages": ["imagekit.io", "cloudinary", "google-cloud"],
       "files": {
         "imagekit.io": {
           "expressjs": {
@@ -4482,18 +4400,9 @@
     },
     "ui": {
       "description": "UI Libraries features for various frameworks",
-      "supportedFrameworks": [
-        "nextjs",
-        "angularjs",
-        "reactjs",
-        "vuejs"
-      ],
-      "supportedLanguages": [
-        "javascript"
-      ],
-      "supportedUiLibraries": [
-        "daisy"
-      ],
+      "supportedFrameworks": ["nextjs", "angularjs", "reactjs", "vuejs"],
+      "supportedLanguages": ["javascript"],
+      "supportedUiLibraries": ["daisy"],
       "files": {
         "daisy": {
           "angularjs": {
