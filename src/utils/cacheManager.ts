@@ -21,7 +21,12 @@ export async function initializeCache(): Promise<void> {
  * Check if project has been cached recently
  */
 export async function getCachedProject(projectPath: string): Promise<ProjectCache | null> {
-  return await cacheManagerInstance.getProject(projectPath);
+  try {
+    const cached = await cacheManagerInstance.get(`project:${projectPath}`);
+    return cached || null;
+  } catch (error) {
+    return null;
+  }
 }
 
 /**

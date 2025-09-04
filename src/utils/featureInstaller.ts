@@ -324,7 +324,7 @@ async function processFeatureFile(
   const templateCacheKey = `${featureName}/${provider}/${projectInfo.framework}/${projectInfo.projectLanguage}/${filePath}`;
   
   try {
-    sourceContent = await cacheManager.getCachedTemplateFile(templateCacheKey);
+    sourceContent = await getCachedTemplateFile(templateCacheKey);
   } catch (error) {
     // Cache miss, will load from file system
   }
@@ -338,7 +338,7 @@ async function processFeatureFile(
   if (!sourceContent && await fs.pathExists(sourceFilePath)) {
     sourceContent = await fs.readFile(sourceFilePath, 'utf-8');
     // Cache the template file content for offline use
-    await cacheManager.cacheTemplateFile(templateCacheKey, sourceContent);
+    await cacheTemplateFile(templateCacheKey, sourceContent);
   }
   
   // Handle Next.js src folder structure and automatic folder creation
@@ -409,7 +409,7 @@ async function handlePackageInstallation(
       
       if (depNames.length > 0) {
         console.log(chalk.blue(`📦 Installing packages: ${depNames.join(', ')}`));
-        await installAdditionalPackages(depNames, 'javascript', packageManager);
+        await installPackages(depNames, 'javascript', projectPath);
       }
     }
   } catch (error: any) {
