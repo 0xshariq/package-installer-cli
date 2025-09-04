@@ -8,8 +8,16 @@ import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import chalk from 'chalk';
 import ora from 'ora';
-import { SupportedLanguage, detectProjectLanguage, installAdditionalPackages } from './dependencyInstaller.js';
-import { cacheManager } from './cacheManager.js';
+import { SupportedLanguage, installPackages } from './dependencyInstaller.js';
+import { detectLanguageFromFiles } from './languageConfig.js';
+import { 
+  getCachedFeatures, 
+  cacheFeatures, 
+  getCachedProject, 
+  cacheFeatureUsage,
+  getCachedTemplateFile,
+  cacheTemplateFile
+} from './cacheManager.js';
 
 // Get the directory of this file for proper path resolution
 const __filename = fileURLToPath(import.meta.url);
@@ -45,7 +53,7 @@ let SUPPORTED_FEATURES: { [featureName: string]: FeatureConfig } = {};
 async function loadFeatures(): Promise<void> {
   try {
     // Try to load from cache first
-    const cachedFeatures = await cacheManager.getCachedFeatures();
+    const cachedFeatures = await getCachedFeatures();
     if (cachedFeatures) {
       SUPPORTED_FEATURES = cachedFeatures.features;
       return;
@@ -58,7 +66,7 @@ async function loadFeatures(): Promise<void> {
       SUPPORTED_FEATURES = featuresData.features;
       
       // Cache the features for offline use
-      await cacheManager.cacheFeatures(featuresData);
+      await cacheFeatures(featuresData);
     }
   } catch (error) {
     console.warn(chalk.yellow('⚠️  Could not load features.json, using fallback configuration'));
@@ -84,7 +92,7 @@ export async function detectProjectStack(projectPath: string): Promise<{
 }> {
   try {
     // Check cache first
-    const cachedProject = await cacheManager.getProject(projectPath);
+    const cachedProject = await getCachedProject(projectPath);
     if (cachedProject) {
       const packageManager = await detectPackageManager(projectPath);
       const hasSrcFolder = await fs.pathExists(path.join(projectPath, 'src'));
@@ -99,7 +107,8 @@ export async function detectProjectStack(projectPath: string): Promise<{
     }
     
     // Detect language first
-    const detectedLanguages = await detectProjectLanguage(projectPath);
+    const files = await fs.readdir(projectPath);
+    const detectedLanguages = detectLanguageFromFiles(files);
     const primaryLanguage = detectedLanguages[0];
     
     let framework: string | undefined;
@@ -144,12 +153,18 @@ export async function detectProjectStack(projectPath: string): Promise<{
       }
       
       // Cache the detected information
+      const dependencyList = Object.entries(dependencies).map(([name, version]) => ({
+        name,
+        version: version as string,
+        type: 'dependency' as const,
+      }));
+      
       await cacheManager.setProject({
         path: projectPath,
         name: packageJson.name || path.basename(projectPath),
         language: projectLanguage,
         framework,
-        dependencies: Object.keys(dependencies),
+        dependencies: dependencyList,
         size: 0 // We can calculate this later if needed
       });
     }
@@ -251,7 +266,7 @@ export async function addFeature(
     spinner.succeed(chalk.green(`✅ ${featureName} feature added successfully!`));
     
     // Update cache with feature usage
-    await cacheManager.recordFeatureUsage(featureName, projectInfo.framework);
+    await cacheFeatureUsage(featureName, projectInfo.framework || 'unknown');
     
     // Show setup instructions
     showSetupInstructions(featureName, selectedProvider!);

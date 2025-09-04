@@ -210,7 +210,7 @@ export async function createProject(providedName?: string, options?: any): Promi
     console.log('\n' + chalk.hex('#9c88ff')('🎯 Would you like to add any features to your project?'));
     console.log(chalk.hex('#95afc0')('   Features: Authentication, Database, Docker, Payment, Storage, etc.'));
     
-    const { wantFeatures } = await inquirer.prompt([
+    const { wantFeatures: wantFeaturesInitial } = await inquirer.prompt([
       {
         type: 'confirm',
         name: 'wantFeatures',
@@ -219,7 +219,7 @@ export async function createProject(providedName?: string, options?: any): Promi
       }
     ]);
     
-    if (wantFeatures) {
+    if (wantFeaturesInitial) {
       try {
         // Import features functionality
         const { selectFeatures } = await import('./add.js');
@@ -410,7 +410,7 @@ export async function createProject(providedName?: string, options?: any): Promi
     console.log('\n' + chalk.hex('#00d2d3')('🎯 Would you like to add any features to your project?'));
     console.log(chalk.hex('#95afc0')('   Features: Authentication, Database, Docker, Payment, Storage, etc.'));
     
-    const { wantFeatures } = await inquirer.prompt([
+    const { wantFeatures: wantFeaturesAfter } = await inquirer.prompt([
       {
         type: 'confirm',
         name: 'wantFeatures',
@@ -419,7 +419,7 @@ export async function createProject(providedName?: string, options?: any): Promi
       }
     ]);
     
-    if (wantFeatures) {
+    if (wantFeaturesAfter) {
       console.log(chalk.hex('#95afc0')('💡 Features were already selected during project creation.'));
       console.log(chalk.hex('#95afc0')('   You can add more features later using: pi add'));
     }

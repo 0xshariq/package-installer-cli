@@ -17,7 +17,8 @@ import {
   getSupportedLanguages,
   getLanguageConfig,
   detectLanguageFromFiles,
-  getPreferredPackageManager
+  getPreferredPackageManager,
+  getAllConfigFiles
 } from './languageConfig.js';
 import { DependencyInfo, InstallationProgress, Result } from './types.js';
 
@@ -51,6 +52,7 @@ export interface InstallationResult {
   duration: number;
   logs?: string[];
   errors?: string[];
+  warnings?: string[];
 }
 
 export { SupportedLanguage };
@@ -216,9 +218,16 @@ export async function installProjectDependencies(
           message: 'Installing MCP server tools...'
         });
         
-        await installMcpServerTools(projectPath);
+        await installMcpServerAndInitializeGit(projectPath, languages.includes('javascript'));
       } catch (error) {
         console.warn(chalk.yellow('⚠️  Could not install MCP server tools'));
+      }
+    } else if (!languages.includes('javascript')) {
+      // For non-JavaScript projects, just initialize git with regular commands
+      try {
+        await initializeGitWithRegularCommands(projectPath);
+      } catch (error) {
+        console.warn(chalk.yellow('⚠️  Could not initialize git repository'));
       }
     }
     
@@ -255,6 +264,7 @@ async function installLanguageDependencies(
     const errorResult: InstallationResult = {
       success: false,
       packages: [],
+      language,
       packageManager: 'unknown',
       duration: Date.now() - startTime,
       errors: [`No package manager found for language: ${language}`],
@@ -263,7 +273,9 @@ async function installLanguageDependencies(
     return errorResult;
   }
 
-  const spinner = ora(chalk.hex('#9c88ff')(`Installing ${language} dependencies with ${preferredPackageManager.name}...`)).start();  try {
+  const spinner = ora(chalk.hex('#9c88ff')(`Installing ${language} dependencies with ${preferredPackageManager.name}...`)).start();
+  
+  try {
     // Check if package manager is available
     try {
       await execAsync(preferredPackageManager.detectCommand || `${preferredPackageManager.name} --version`);
@@ -271,17 +283,15 @@ async function installLanguageDependencies(
       spinner.warn(chalk.yellow(`${preferredPackageManager.name} not found, trying alternatives...`));
       const config = getLanguageConfig(language);
       if (config) {
+        // Try fallback package managers
         for (const pm of config.packageManagers.slice(1)) {
-    } catch (error) {
-      spinner.warn(chalk.yellow(`${preferredPackageManager.name} not found, trying alternatives...`));
-      // Try fallback package managers
-      for (const pm of config.packageManagers.slice(1)) {
-        try {
-          await execAsync(pm.detectCommand || `${pm.name} --version`);
-          spinner.text = chalk.hex('#9c88ff')(`Installing ${language} dependencies with ${pm.name}...`);
-          break;
-        } catch {
-          continue;
+          try {
+            await execAsync(pm.detectCommand || `${pm.name} --version`);
+            spinner.text = chalk.hex('#9c88ff')(`Installing ${language} dependencies with ${pm.name}...`);
+            break;
+          } catch {
+            continue;
+          }
         }
       }
     }
@@ -289,9 +299,8 @@ async function installLanguageDependencies(
     // Execute installation command with timeout and retries
     const installCommand = preferredPackageManager.installCommand;
     let commandOutput = '';
-    let lastError: Error;
+    let lastError: Error | null = null;
     const maxRetries = options.retries || 2;
-    let lastError: any;
     
     for (let attempt = 0; attempt <= maxRetries; attempt++) {
       try {
@@ -325,7 +334,9 @@ async function installLanguageDependencies(
       }
     }
     
-    throw lastError;
+    if (lastError) {
+      throw lastError;
+    }
     
   } catch (error: any) {
     const duration = Date.now() - startTime;
@@ -338,7 +349,7 @@ async function installLanguageDependencies(
     } else if (error.message.includes('timeout')) {
       console.log(chalk.yellow('💡 Installation timed out. Try running manually:'));
       console.log(chalk.hex('#95afc0')(`   cd ${path.basename(projectPath)}`));
-      console.log(chalk.hex('#95afc0')(`   ${installCommand}`));
+      console.log(chalk.hex('#95afc0')(`   ${preferredPackageManager.installCommand}`));
     }
     
     return {
@@ -347,9 +358,21 @@ async function installLanguageDependencies(
       language,
       packageManager: preferredPackageManager.name,
       duration,
-      errors: [error.message]
+      errors: [error.message],
+      warnings: []
     };
   }
+
+  // Default return in case all above logic fails (should not happen, but for type safety)
+  return {
+    success: false,
+    packages: [],
+    language,
+    packageManager: preferredPackageManager ? preferredPackageManager.name : 'unknown',
+    duration: Date.now() - startTime,
+    errors: ['Unknown error occurred during dependency installation'],
+    warnings: []
+  };
 }
 
 /**
@@ -491,6 +514,70 @@ export async function installPackages(
     spinner.succeed(chalk.green(`✅ Installed ${packages.join(', ')} for ${language}`));
   } catch (error: any) {
     spinner.fail(chalk.red(`❌ Failed to install ${packages.join(', ')} for ${language}: ${error.message}`));
+    throw error;
+  }
+}
+
+/**
+ * Install MCP server and initialize git with MCP commands for JavaScript projects
+ */
+async function installMcpServerAndInitializeGit(projectPath: string, isJavaScript: boolean): Promise<void> {
+  const spinner = ora(chalk.hex('#9c88ff')('Installing @0xshariq/github-mcp-server...')).start();
+  
+  try {
+    // Install the MCP server globally
+    await execAsync('npm install -g @0xshariq/github-mcp-server', {
+      cwd: projectPath,
+      timeout: 120000 // 2 minutes timeout
+    });
+    
+    spinner.text = chalk.hex('#9c88ff')('Initializing git repository with MCP commands...');
+    
+    // Try MCP commands first
+    try {
+      await execAsync('ginit', { cwd: projectPath });
+      await execAsync('gadd', { cwd: projectPath });
+      await execAsync('gcommit "Initial Commit From Package Installer CLI"', { cwd: projectPath });
+      
+      spinner.succeed(chalk.green('✅ MCP server installed and git initialized with MCP commands'));
+    } catch (mcpError) {
+      // If MCP commands fail, fallback to regular git commands
+      spinner.text = chalk.hex('#ffa502')('MCP commands failed, using regular git commands...');
+      await initializeGitWithRegularCommands(projectPath);
+      spinner.succeed(chalk.green('✅ MCP server installed and git initialized with regular commands'));
+    }
+    
+  } catch (error: any) {
+    spinner.fail(chalk.red('❌ Failed to install MCP server'));
+    console.log(chalk.yellow('💡 Falling back to regular git initialization...'));
+    await initializeGitWithRegularCommands(projectPath);
+  }
+}
+
+/**
+ * Initialize git repository with regular git commands for non-JavaScript projects
+ */
+async function initializeGitWithRegularCommands(projectPath: string): Promise<void> {
+  const spinner = ora(chalk.hex('#f39c12')('Initializing git repository...')).start();
+  
+  try {
+    // Check if git is already initialized
+    const gitExists = await fs.pathExists(path.join(projectPath, '.git'));
+    
+    if (!gitExists) {
+      await execAsync('git init', { cwd: projectPath });
+      spinner.text = chalk.hex('#f39c12')('Adding files to git...');
+      await execAsync('git add .', { cwd: projectPath });
+      spinner.text = chalk.hex('#f39c12')('Creating initial commit...');
+      await execAsync('git commit -m "Initial Commit From Package Installer CLI"', { cwd: projectPath });
+      
+      spinner.succeed(chalk.green('✅ Git repository initialized successfully'));
+    } else {
+      spinner.succeed(chalk.green('✅ Git repository already exists'));
+    }
+    
+  } catch (error: any) {
+    spinner.fail(chalk.red(`❌ Failed to initialize git repository: ${error.message}`));
     throw error;
   }
 }

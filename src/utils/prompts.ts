@@ -112,7 +112,7 @@ export async function promptLanguageSelection(fwConfig: FrameworkConfig, theme: 
       type: 'list',
       message: theme('💻 Choose your language:'),
       choices: fwConfig.languages.map((lang: string) => ({
-        name: `${languageEmojis[lang] || '📄'} ${chalk.bold(capitalize(lang))} ${chalk.hex('#95afc0')(`- ${languageDescriptions[lang] || 'Modern programming language}')}`,
+        name: `${languageEmojis[lang] || '📄'} ${chalk.bold(capitalize(lang))} ${chalk.hex('#95afc0')(`- ${languageDescriptions[lang] || 'Modern programming language'}`)}`,
         value: lang,
         short: lang
       })),
@@ -220,7 +220,7 @@ export async function promptUiSelection(fwConfig: FrameworkConfig, theme: any): 
       type: 'list',
       message: theme('🎨 Choose your UI library:'),
       choices: fwConfig.ui.map((uiLib: string) => ({
-        name: `${uiEmojis[uiLib] || '🎨'} ${chalk.bold(capitalize(uiLib))} ${chalk.hex('#95afc0')(`- ${uiDescriptions[uiLib] || 'UI component library}')}`,
+        name: `${uiEmojis[uiLib] || '🎨'} ${chalk.bold(capitalize(uiLib))} ${chalk.hex('#95afc0')(`- ${uiDescriptions[uiLib] || 'UI component library'}`)}`,
         value: uiLib,
         short: uiLib
       })),
@@ -262,7 +262,7 @@ export async function promptBundlerSelection(fwConfig: FrameworkConfig, theme: a
       type: 'list',
       message: theme('⚙️ Choose your build tool:'),
       choices: fwConfig.bundlers.map((b: string) => ({
-        name: `${bundlerEmojis[b] || '⚙️'} ${chalk.bold(capitalize(b))} ${chalk.hex('#95afc0')(`- ${bundlerDescriptions[b] || 'Build tool}')}`,
+        name: `${bundlerEmojis[b] || '⚙️'} ${chalk.bold(capitalize(b))} ${chalk.hex('#95afc0')(`- ${bundlerDescriptions[b] || 'Build tool'}`)}`,
         value: b,
         short: b
       })),

@@ -1118,5 +1118,25 @@ export function getLanguageMaturityStatus(language: SupportedLanguage): string {
   return config?.maturity || 'unknown';
 }
 
+export function getAllConfigFiles(): string[] {
+  const allConfigFiles = new Set<string>();
+  
+  // Add config files from all languages
+  Object.values(ENHANCED_LANGUAGE_CONFIGS).forEach(config => {
+    config.configFiles.forEach(cf => {
+      allConfigFiles.add(cf.filename);
+    });
+    
+    // Add package manager config files
+    config.packageManagers.forEach(pm => {
+      if (pm.configFiles) {
+        pm.configFiles.forEach(cf => allConfigFiles.add(cf));
+      }
+    });
+  });
+  
+  return Array.from(allConfigFiles);
+}
+
 // Export alias for backward compatibility
 export const LANGUAGE_CONFIGS = ENHANCED_LANGUAGE_CONFIGS;
