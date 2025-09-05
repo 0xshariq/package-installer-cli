@@ -40,14 +40,22 @@ export async function cacheProjectData(
   dependencies: string[],
   size: number
 ): Promise<void> {
-  await cacheManagerInstance.setProject({
+  const dependencyList = dependencies?.map(dep => ({
+    name: dep,
+    version: '*',
+    type: 'dependency' as const
+  })) || [];
+  const projectData: ProjectCache = {
     path: projectPath,
     name,
     language,
     framework,
-    dependencies,
-    size
-  });
+    dependencies: dependencyList,
+    size,
+    lastModified: Date.now(),
+    cacheVersion: '3.0.0'
+  };
+  await cacheManagerInstance.set(`project:${projectPath}`, projectData);
 }
 
 /**

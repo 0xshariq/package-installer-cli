@@ -16,7 +16,8 @@ import {
   getCachedProject, 
   cacheFeatureUsage,
   getCachedTemplateFile,
-  cacheTemplateFile
+  cacheTemplateFile,
+  cacheProjectData
 } from './cacheManager.js';
 
 // Get the directory of this file for proper path resolution
@@ -153,25 +154,19 @@ export async function detectProjectStack(projectPath: string): Promise<{
       }
       
       // Cache the detected information
-      const dependencyList = Object.entries(dependencies).map(([name, version]) => ({
-        name,
-        version: version as string,
-        type: 'dependency' as const,
-      }));
-      
-      await cacheManager.setProject({
-        path: projectPath,
-        name: packageJson.name || path.basename(projectPath),
-        language: projectLanguage,
+      await cacheProjectData(
+        projectPath,
+        packageJson.name || path.basename(projectPath),
+        typeof projectLanguage === 'string' ? projectLanguage : 'unknown',
         framework,
-        dependencies: dependencyList,
-        size: 0 // We can calculate this later if needed
-      });
+        Object.keys(dependencies),
+        0
+      );
     }
     
     return {
       framework,
-      language: primaryLanguage,
+  language: typeof primaryLanguage === 'string' ? (primaryLanguage as SupportedLanguage) : ((primaryLanguage && typeof primaryLanguage.language === 'string') ? (primaryLanguage.language as SupportedLanguage) : undefined),
       projectLanguage,
       isComboTemplate,
       packageManager,
@@ -409,7 +404,7 @@ async function handlePackageInstallation(
       
       if (depNames.length > 0) {
         console.log(chalk.blue(`📦 Installing packages: ${depNames.join(', ')}`));
-        await installPackages(depNames, 'javascript', projectPath);
+  await installPackages(projectPath, 'javascript', depNames);
       }
     }
   } catch (error: any) {

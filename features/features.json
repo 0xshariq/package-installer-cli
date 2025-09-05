@@ -3170,454 +3170,119 @@
       "supportedDatabases": ["mongodb", "supabase", "neondb"],
       "supportedORMs": {
         "mongodb": {
-          "javascript": ["mongoose"],
-          "typescript": ["mongoose", "typegoose"]
+          "mongoose": ["javascript", "typescript"],
+          "typegoose": ["typescript"]
         },
         "supabase": {
-          "javascript": ["typeorm"],
-          "typescript": ["typeorm", "prisma", "drizzle"]
+          "typeorm": ["javascript", "typescript"],
+          "prisma": ["typescript"],
+          "drizzle": ["typescript"]
         },
         "neondb": {
-          "javascript": ["typeorm"],
-          "typescript": ["typeorm", "prisma", "drizzle"]
+          "typeorm": ["javascript", "typescript"],
+          "prisma": ["typescript"],
+          "drizzle": ["typescript"]
         },
         "mysql": {}
       },
       "files": {
         "mongodb": {
-          "javascript": {
-            "mongoose": {
-              "expressjs/javascript/.env": {
-                "action": ""
-              },
-              "expressjs/javascript/package.json": {
-                "action": ""
-              },
-              "expressjs/typescript/.env": {
-                "action": ""
-              },
-              "expressjs/typescript/package.json": {
-                "action": ""
-              },
-              "nestjs/typescript/.env": {
-                "action": ""
-              },
-              "nestjs/typescript/package.json": {
-                "action": ""
-              },
-              "nextjs/javascript/.env": {
-                "action": ""
-              },
-              "nextjs/javascript/package.json": {
-                "action": ""
-              },
-              "nextjs/typescript/.env": {
-                "action": ""
-              },
-              "nextjs/typescript/package.json": {
-                "action": ""
-              },
-              "remixjs/typescript/.env": {
-                "action": ""
-              },
-              "remixjs/typescript/package.json": {
-                "action": ""
-              }
-            }
+          "mongoose": {
+            "javascript": {},
+            "typescript": {}
           },
-          "typescript": {
-            "mongoose": {
-              "expressjs/javascript/.env": {
-                "action": ""
-              },
-              "expressjs/javascript/package.json": {
-                "action": ""
-              },
-              "expressjs/typescript/.env": {
-                "action": ""
-              },
-              "expressjs/typescript/package.json": {
-                "action": ""
-              },
-              "nestjs/typescript/.env": {
-                "action": ""
-              },
-              "nestjs/typescript/package.json": {
-                "action": ""
-              },
-              "nextjs/javascript/.env": {
-                "action": ""
-              },
-              "nextjs/javascript/package.json": {
-                "action": ""
-              },
-              "nextjs/typescript/.env": {
-                "action": ""
-              },
-              "nextjs/typescript/package.json": {
-                "action": ""
-              },
-              "remixjs/typescript/.env": {
-                "action": ""
-              },
-              "remixjs/typescript/package.json": {
-                "action": ""
-              }
-            },
-            "typegoose": {
-              "expressjs/javascript/.env": {
-                "action": ""
-              },
-              "expressjs/javascript/package.json": {
-                "action": ""
-              },
-              "expressjs/typescript/.env": {
-                "action": ""
-              },
-              "expressjs/typescript/package.json": {
-                "action": ""
-              },
-              "nestjs/typescript/.env": {
-                "action": ""
-              },
-              "nestjs/typescript/package.json": {
-                "action": ""
-              },
-              "nextjs/javascript/.env": {
-                "action": ""
-              },
-              "nextjs/javascript/package.json": {
-                "action": ""
-              },
-              "nextjs/typescript/.env": {
-                "action": ""
-              },
-              "nextjs/typescript/package.json": {
-                "action": ""
-              },
-              "remixjs/typescript/.env": {
-                "action": ""
-              },
-              "remixjs/typescript/package.json": {
-                "action": ""
-              }
-            }
+          "typegoose": {
+            "typescript": {}
           }
         },
-        "supabase": {
-          "javascript": {
-            "typeorm": {
-              "expressjs/javascript/.env": {
-                "action": ""
-              },
-              "expressjs/javascript/package.json": {
-                "action": ""
-              },
-              "expressjs/typescript/.env": {
-                "action": ""
-              },
-              "expressjs/typescript/package.json": {
-                "action": ""
-              },
-              "nestjs/typescript/.env": {
-                "action": ""
-              },
-              "nestjs/typescript/package.json": {
-                "action": ""
-              },
-              "nextjs/javascript/.env": {
-                "action": ""
-              },
-              "nextjs/javascript/package.json": {
-                "action": ""
-              },
-              "nextjs/typescript/.env": {
-                "action": ""
-              },
-              "nextjs/typescript/package.json": {
-                "action": ""
-              },
-              "remixjs/typescript/.env": {
-                "action": ""
-              },
-              "remixjs/typescript/package.json": {
-                "action": ""
-              }
+        "mysql": {
+          "typeorm": {
+            "javascript": {
+              "expressjs": {},
+              "nextjs": {}
+            },
+            "typescript": {
+              "expressjs": {},
+              "nestjs": {},
+              "nextjs": {},
+              "remixjs": {}
             }
           },
-          "typescript": {
-            "drizzle": {
-              "expressjs/javascript/.env": {
-                "action": ""
-              },
-              "expressjs/javascript/package.json": {
-                "action": ""
-              },
-              "expressjs/typescript/.env": {
-                "action": ""
-              },
-              "expressjs/typescript/package.json": {
-                "action": ""
-              },
-              "nestjs/typescript/.env": {
-                "action": ""
-              },
-              "nestjs/typescript/package.json": {
-                "action": ""
-              },
-              "nextjs/javascript/.env": {
-                "action": ""
-              },
-              "nextjs/javascript/package.json": {
-                "action": ""
-              },
-              "nextjs/typescript/.env": {
-                "action": ""
-              },
-              "nextjs/typescript/package.json": {
-                "action": ""
-              },
-              "remixjs/typescript/.env": {
-                "action": ""
-              },
-              "remixjs/typescript/package.json": {
-                "action": ""
-              }
-            },
-            "prisma": {
-              "expressjs/javascript/.env": {
-                "action": ""
-              },
-              "expressjs/javascript/package.json": {
-                "action": ""
-              },
-              "expressjs/typescript/.env": {
-                "action": ""
-              },
-              "expressjs/typescript/package.json": {
-                "action": ""
-              },
-              "nestjs/typescript/.env": {
-                "action": ""
-              },
-              "nestjs/typescript/package.json": {
-                "action": ""
-              },
-              "nextjs/javascript/.env": {
-                "action": ""
-              },
-              "nextjs/javascript/package.json": {
-                "action": ""
-              },
-              "nextjs/typescript/.env": {
-                "action": ""
-              },
-              "nextjs/typescript/package.json": {
-                "action": ""
-              },
-              "remixjs/typescript/.env": {
-                "action": ""
-              },
-              "remixjs/typescript/package.json": {
-                "action": ""
-              }
-            },
-            "typeorm": {
-              "expressjs/javascript/.env": {
-                "action": ""
-              },
-              "expressjs/javascript/package.json": {
-                "action": ""
-              },
-              "expressjs/typescript/.env": {
-                "action": ""
-              },
-              "expressjs/typescript/package.json": {
-                "action": ""
-              },
-              "nestjs/typescript/.env": {
-                "action": ""
-              },
-              "nestjs/typescript/package.json": {
-                "action": ""
-              },
-              "nextjs/javascript/.env": {
-                "action": ""
-              },
-              "nextjs/javascript/package.json": {
-                "action": ""
-              },
-              "nextjs/typescript/.env": {
-                "action": ""
-              },
-              "nextjs/typescript/package.json": {
-                "action": ""
-              },
-              "remixjs/typescript/.env": {
-                "action": ""
-              },
-              "remixjs/typescript/package.json": {
-                "action": ""
-              }
+          "prisma": {
+            "typescript": {
+              "expressjs": {},
+              "nestjs": {},
+              "nextjs": {},
+              "remixjs": {}
             }
+          },
+          "drizzle": {
+            "typescript": {
+              "expressjs": {},
+              "nestjs": {},
+              "nextjs": {},
+              "remixjs": {}
+            }
+          },
+          "djangoORM": {
+            "python": {}
+          },
+          "SQLAlchemy": {
+            "python": {}
+          },
+          "Peewee": {
+            "python": {}
+          },
+          "GORM": {
+            "go": {}
+          },
+          "Sequel": {
+            "ruby": {}
           }
         },
-        "neondb": {
-          "javascript": {
-            "typeorm": {
-              "expressjs/javascript/.env": {
-                "action": ""
-              },
-              "expressjs/javascript/package.json": {
-                "action": ""
-              },
-              "expressjs/typescript/.env": {
-                "action": ""
-              },
-              "expressjs/typescript/package.json": {
-                "action": ""
-              },
-              "nestjs/typescript/.env": {
-                "action": ""
-              },
-              "nestjs/typescript/package.json": {
-                "action": ""
-              },
-              "nextjs/javascript/.env": {
-                "action": ""
-              },
-              "nextjs/javascript/package.json": {
-                "action": ""
-              },
-              "nextjs/typescript/.env": {
-                "action": ""
-              },
-              "nextjs/typescript/package.json": {
-                "action": ""
-              },
-              "remixjs/typescript/.env": {
-                "action": ""
-              },
-              "remixjs/typescript/package.json": {
-                "action": ""
-              }
+        "postgres": {
+          "typeorm": {
+            "javascript": {
+              "expressjs": {},
+              "nextjs": {}
+            },
+            "typescript": {
+              "expressjs": {},
+              "nestjs": {},
+              "nextjs": {},
+              "remixjs": {}
             }
           },
-          "typescript": {
-            "drizzle": {
-              "expressjs/javascript/.env": {
-                "action": ""
-              },
-              "expressjs/javascript/package.json": {
-                "action": ""
-              },
-              "expressjs/typescript/.env": {
-                "action": ""
-              },
-              "expressjs/typescript/package.json": {
-                "action": ""
-              },
-              "nestjs/typescript/.env": {
-                "action": ""
-              },
-              "nestjs/typescript/package.json": {
-                "action": ""
-              },
-              "nextjs/javascript/.env": {
-                "action": ""
-              },
-              "nextjs/javascript/package.json": {
-                "action": ""
-              },
-              "nextjs/typescript/.env": {
-                "action": ""
-              },
-              "nextjs/typescript/package.json": {
-                "action": ""
-              },
-              "remixjs/typescript/.env": {
-                "action": ""
-              },
-              "remixjs/typescript/package.json": {
-                "action": ""
-              }
-            },
-            "prisma": {
-              "expressjs/javascript/.env": {
-                "action": ""
-              },
-              "expressjs/javascript/package.json": {
-                "action": ""
-              },
-              "expressjs/typescript/.env": {
-                "action": ""
-              },
-              "expressjs/typescript/package.json": {
-                "action": ""
-              },
-              "nestjs/typescript/.env": {
-                "action": ""
-              },
-              "nestjs/typescript/package.json": {
-                "action": ""
-              },
-              "nextjs/javascript/.env": {
-                "action": ""
-              },
-              "nextjs/javascript/package.json": {
-                "action": ""
-              },
-              "nextjs/typescript/.env": {
-                "action": ""
-              },
-              "nextjs/typescript/package.json": {
-                "action": ""
-              },
-              "remixjs/typescript/.env": {
-                "action": ""
-              },
-              "remixjs/typescript/package.json": {
-                "action": ""
-              }
-            },
-            "typeorm": {
-              "expressjs/javascript/.env": {
-                "action": ""
-              },
-              "expressjs/javascript/package.json": {
-                "action": ""
-              },
-              "expressjs/typescript/.env": {
-                "action": ""
-              },
-              "expressjs/typescript/package.json": {
-                "action": ""
-              },
-              "nestjs/typescript/.env": {
-                "action": ""
-              },
-              "nestjs/typescript/package.json": {
-                "action": ""
-              },
-              "nextjs/javascript/.env": {
-                "action": ""
-              },
-              "nextjs/javascript/package.json": {
-                "action": ""
-              },
-              "nextjs/typescript/.env": {
-                "action": ""
-              },
-              "nextjs/typescript/package.json": {
-                "action": ""
-              },
-              "remixjs/typescript/.env": {
-                "action": ""
-              },
-              "remixjs/typescript/package.json": {
-                "action": ""
-              }
+          "prisma": {
+            "typescript": {
+              "expressjs": {},
+              "nestjs": {},
+              "nextjs": {},
+              "remixjs": {}
             }
+          },
+          "drizzle": {
+            "typescript": {
+              "expressjs": {},
+              "nestjs": {},
+              "nextjs": {},
+              "remixjs": {}
+            }
+          },
+          "djangoORM": {
+            "python": {}
+          },
+          "SQLAlchemy": {
+            "python": {}
+          },
+          "Peewee": {
+            "python": {}
+          },
+          "GORM": {
+            "go": {}
+          },
+          "Sequel": {
+            "ruby": {}
           }
         }
       }
