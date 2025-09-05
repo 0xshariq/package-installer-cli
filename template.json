@@ -98,8 +98,29 @@
       "ui": ["shadcn"],
       "templates": ["react-nest-shadcn-template"]
     },
-    "ruby": {},
-    "django": {},
-    "go": {}
+    "ruby": {
+      "type": "backend",
+      "description": "Dynamic, open source programming language with a focus on simplicity and productivity",
+      "languages": ["ruby"],
+      "templates": ["rails_7_esbuild_hotwire_tailwindcss_starter", "ruby-on-rails-apis-template", "ruby-on-rails-boilerplate-template"]
+    },
+    "django": {
+      "type": "backend",
+      "description": "High-level Python web framework that encourages rapid development and clean, pragmatic design",
+      "languages": ["python"],
+      "templates": ["django-bower-and-gulp-config-template", "django-full-stack-template", "django-inertia-svelte-template", "djangoTemplate"]
+    },
+    "go": {
+      "type": "backend",
+      "description": "Statically typed, compiled language designed for simplicity and performance",
+      "languages": ["go"],
+      "templates": ["go-lang-boilerplate-template"]
+    },
+    "flask":{
+      "type": "backend",
+      "description": "Lightweight WSGI web application framework in Python",
+      "languages": ["python"],
+      "templates": ["flask-cookiecutter-advance-template", "flask-template-bootstrap-2", "flask-template-bootstrap", "flask-template-with-useful-plugins"]
+    }
   }
 }
