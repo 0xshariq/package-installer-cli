@@ -3173,17 +3173,26 @@
           "mongoose": ["javascript", "typescript"],
           "typegoose": ["typescript"]
         },
-        "supabase": {
+        "mysql": {
           "typeorm": ["javascript", "typescript"],
           "prisma": ["typescript"],
-          "drizzle": ["typescript"]
+          "drizzle": ["typescript"],
+          "djangoORM": ["python"],
+          "SQLAlchemy": ["python"],
+          "Peewee": ["python"],
+          "GORM": ["go"],
+          "Sequel": ["ruby"]
         },
-        "neondb": {
+        "postgres": {
           "typeorm": ["javascript", "typescript"],
           "prisma": ["typescript"],
-          "drizzle": ["typescript"]
-        },
-        "mysql": {}
+          "drizzle": ["typescript"],
+          "djangoORM": ["python"],
+          "SQLAlchemy": ["python"],
+          "Peewee": ["python"],
+          "GORM": ["go"],
+          "Sequel": ["ruby"]
+        }
       },
       "files": {
         "mongodb": {
