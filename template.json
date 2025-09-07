@@ -58,14 +58,14 @@
       ]
     },
     "nuxtjs": {
-      "type": "",
-      "description": "",
-      "languages": "",
+      "type": "frontend",
+      "description": "Progressive JavaScript framework for building modern web applications",
+      "languages": ["javascript", "typescript"],
       "templates": []
     },
     "react-native": {
-      "type": "",
-      "description": "",
+      "type": "mobile",
+      "description": "Framework for building native apps using React",
       "languages": "",
       "templates": []
     },
