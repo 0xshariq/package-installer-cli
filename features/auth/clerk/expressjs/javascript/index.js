@@ -1,4 +1,4 @@
-const { clerkMiddleware, clerkClient, requireAuth, getAuth } = require('@clerk/express');
+import { clerkMiddleware, clerkClient, requireAuth, getAuth } from '@clerk/express';
 
 app.use(clerkMiddleware());
 

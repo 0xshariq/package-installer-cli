@@ -574,23 +574,23 @@
                 "action": "install"
               },
               "src/app/login-button.ts": {
-                "action": ""
+                "action": "create"
               },
               "src/app/logout-button.ts": {
-                "action": ""
+                "action": "create"
               },
               "src/app/user-profile.ts": {
-                "action": ""
+                "action": "create"
               },
               "src/main.ts": {
-                "action": ""
+                "action": "overwrite"
               }
             }
           },
           "expressjs": {
             "javascript": {
               "index.js": {
-                "action": ""
+                "action": "prepend"
               },
               "package.json": {
                 "action": "install"
@@ -598,7 +598,7 @@
             },
             "typescript": {
               "index.ts": {
-                "action": ""
+                "action": "prepend"
               },
               "package.json": {
                 "action": "install"
@@ -611,13 +611,13 @@
                 "action": "append"
               },
               "app/page.jsx": {
-                "action": ""
+                "action": "overwrite"
               },
               "lib/auth0.js": {
-                "action": ""
+                "action": "create"
               },
               "middleware.js": {
-                "action": ""
+                "action": "create"
               },
               "package.json": {
                 "action": "install"
@@ -628,13 +628,13 @@
                 "action": "append"
               },
               "app/page.tsx": {
-                "action": ""
+                "action": "overwrite"
               },
               "lib/auth0.ts": {
-                "action": ""
+                "action": "create"
               },
               "middleware.ts": {
-                "action": ""
+                "action": "overwrite"
               },
               "package.json": {
                 "action": "install"
@@ -647,96 +647,63 @@
                 "action": "install"
               },
               "src/components/LoginButton.vue": {
-                "action": ""
+                "action": "create"
               },
               "src/components/LogoutButton.vue": {
-                "action": ""
+                "action": "create"
               },
               "src/components/UserProfile.vue": {
-                "action": ""
+                "action": "create"
               },
               "src/components/login.vue": {
-                "action": ""
+                "action": "create"
               },
               "src/components/logout.vue": {
-                "action": ""
+                "action": "create"
               },
               "src/components/profile.vue": {
-                "action": ""
+                "action": "create"
               },
               "src/main.js": {
-                "action": ""
+                "action": "overwrite"
               }
             },
             "typescript": {
-              "main.ts": {
-                "action": ""
-              },
               "package.json": {
                 "action": "install"
               },
               "src/components/LoginButton.vue": {
-                "action": ""
+                "action": "create"
               },
               "src/components/LogoutButton.vue": {
-                "action": ""
+                "action": "create"
               },
               "src/components/UserProfile.vue": {
-                "action": ""
+                "action": "create"
               },
               "src/components/login.vue": {
-                "action": ""
+                "action": "create"
               },
               "src/components/logout.vue": {
-                "action": ""
+                "action": "create"
               },
               "src/components/profile.vue": {
-                "action": ""
+                "action": "create"
               },
               "src/main.ts": {
-                "action": ""
+                "action": "overwrite"
               }
             }
           }
         },
         "clerk": {
-          "reactjs": {
-            "javascript": {
-              ".env": {
-                "action": "append"
-              },
-              "package.json": {
-                "action": "install"
-              },
-              "src/App.jsx": {
-                "action": ""
-              },
-              "src/main.jsx": {
-                "action": ""
-              }
-            },
-            "typescript": {
-              ".env": {
-                "action": "append"
-              },
-              "package.json": {
-                "action": "install"
-              },
-              "src/App.tsx": {
-                "action": ""
-              },
-              "src/main.tsx": {
-                "action": ""
-              }
-            }
-          },
           "expressjs": {
             "javascript": {
               ".env": {
                 "action": "append"
               },
               "index.js": {
-                "action": ""
+                "action": "prepend"
               },
               "package.json": {
                 "action": "install"
@@ -747,13 +714,13 @@
                 "action": "append"
               },
               "index.ts": {
-                "action": ""
+                "action": "prepend"
               },
               "package.json": {
                 "action": "install"
               },
               "types/global.d.ts": {
-                "action": ""
+                "action": "create"
               }
             }
           },
@@ -763,10 +730,10 @@
                 "action": "append"
               },
               "app/layout.js": {
-                "action": ""
+                "action": "overwrite"
               },
               "middleware.js": {
-                "action": ""
+                "action": "create"
               },
               "package.json": {
                 "action": "install"
@@ -777,13 +744,43 @@
                 "action": "append"
               },
               "app/layout.tsx": {
-                "action": ""
+                "action": "overwrite"
               },
               "middleware.ts": {
-                "action": ""
+                "action": "create"
               },
               "package.json": {
                 "action": "install"
+              }
+            }
+          },
+          "reactjs": {
+            "javascript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              },
+              "src/App.jsx": {
+                "action": "overwrite"
+              },
+              "src/main.jsx": {
+                "action": "overwrite"
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              },
+              "src/App.tsx": {
+                "action": "overwrite"
+              },
+              "src/main.tsx": {
+                "action": "overwrite"
               }
             }
           },
@@ -793,13 +790,13 @@
                 "action": "append"
               },
               "app/root.tsx": {
-                "action": ""
+                "action": "overwrite"
               },
               "package.json": {
                 "action": "install"
               },
               "routes/_index.tsx": {
-                "action": ""
+                "action": "create"
               }
             }
           },
@@ -812,10 +809,10 @@
                 "action": "install"
               },
               "src/App.vue": {
-                "action": ""
+                "action": "overwrite"
               },
               "src/main.js": {
-                "action": ""
+                "action": "overwrite"
               }
             },
             "typescript": {
@@ -826,10 +823,10 @@
                 "action": "install"
               },
               "src/App.vue": {
-                "action": ""
+                "action": "overwrite"
               },
               "src/main.ts": {
-                "action": ""
+                "action": "overwrite"
               }
             }
           }
@@ -841,19 +838,19 @@
                 "action": "append"
               },
               "app/api/auth/[...nextauth]/route.js": {
-                "action": ""
+                "action": "create"
               },
               "app/layout.jsx": {
-                "action": ""
+                "action": "overwrite"
               },
               "lib/auth-provider.jsx": {
-                "action": ""
+                "action": "create"
               },
               "lib/auth.js": {
-                "action": ""
+                "action": "create"
               },
               "middleware.js": {
-                "action": ""
+                "action": "create"
               },
               "package.json": {
                 "action": "install"
@@ -864,19 +861,19 @@
                 "action": "append"
               },
               "app/api/auth/[...nextauth]/route.ts": {
-                "action": ""
+                "action": "create"
               },
               "app/layout.tsx": {
-                "action": ""
+                "action": "overwrite"
               },
               "lib/auth-provider.tsx": {
-                "action": ""
+                "action": "create"
               },
               "lib/auth.ts": {
-                "action": ""
+                "action": "create"
               },
               "middleware.ts": {
-                "action": ""
+                "action": "create"
               },
               "package.json": {
                 "action": "install"
@@ -3466,16 +3463,16 @@
                 "action": "append"
               },
               "controllers/paypalControllers.js": {
-                "action": ""
+                "action": "create"
               },
               "index.js": {
-                "action": ""
+                "action": "prepend"
               },
               "routes/paypalRoutes.js": {
-                "action": ""
+                "action": "create"
               },
               "utils/paypal.js": {
-                "action": ""
+                "action": "create"
               }
             },
             "typescript": {
@@ -3483,16 +3480,16 @@
                 "action": "append"
               },
               "controllers/paypalControllers.ts": {
-                "action": ""
+                "action": "create"
               },
               "index.ts": {
-                "action": ""
+                "action": "prepend"
               },
               "routes/paypalRoutes.ts": {
-                "action": ""
+                "action": "create"
               },
               "utils/paypal.ts": {
-                "action": ""
+                "action": "create"
               }
             }
           },
@@ -3502,10 +3499,10 @@
                 "action": "append"
               },
               "src/paypal.controller.ts": {
-                "action": ""
+                "action": "create"
               },
               "src/paypal.service.ts": {
-                "action": ""
+                "action": "create"
               }
             }
           },
@@ -3515,16 +3512,16 @@
                 "action": "append"
               },
               "app/api/paypal/capture-payment/route.js": {
-                "action": ""
+                "action": "create"
               },
               "app/api/paypal/create-payment/route.js": {
-                "action": ""
+                "action": "create"
               },
               "app/api/paypal/refund/route.ts": {
-                "action": ""
+                "action": "create"
               },
               "app/payment-checkout/page.tsx": {
-                "action": ""
+                "action": "create"
               }
             },
             "typescript": {
@@ -3532,16 +3529,16 @@
                 "action": "append"
               },
               "app/api/paypal/capture-payment/route.ts": {
-                "action": ""
+                "action": "create"
               },
               "app/api/paypal/create-payment/route.ts": {
-                "action": ""
+                "action": "create"
               },
               "app/api/paypal/refund/route.ts": {
-                "action": ""
+                "action": "create"
               },
               "app/payment-checkout/page.tsx": {
-                "action": ""
+                "action": "create"
               }
             }
           },
@@ -3551,10 +3548,10 @@
                 "action": "append"
               },
               "app/routes/api/paypal.ts": {
-                "action": ""
+                "action": "create"
               },
               "app/routes/checkout.tsx": {
-                "action": ""
+                "action": "create"
               }
             }
           }
@@ -3566,16 +3563,16 @@
                 "action": "append"
               },
               "controllers/payment.js": {
-                "action": ""
+                "action": "create"
               },
               "index.js": {
-                "action": ""
+                "action": "prepend"
               },
               "package.json": {
                 "action": "install"
               },
               "routes/payment.js": {
-                "action": ""
+                "action": "create"
               }
             },
             "typescript": {
@@ -3583,16 +3580,16 @@
                 "action": "append"
               },
               "controllers/payment.ts": {
-                "action": ""
+                "action": "create"
               },
               "index.ts": {
-                "action": ""
+                "action": "prepend"
               },
               "package.json": {
                 "action": "install"
               },
               "routes/payment.ts": {
-                "action": ""
+                "action": "create"
               }
             }
           },
@@ -3605,7 +3602,7 @@
                 "action": "install"
               },
               "src/payment.controller.ts": {
-                "action": ""
+                "action": "create"
               }
             }
           },
@@ -3615,13 +3612,13 @@
                 "action": "append"
               },
               "app/api/payment/route.js": {
-                "action": ""
+                "action": "create"
               },
               "app/api/refund/route.js": {
-                "action": ""
+                "action": "create"
               },
               "app/payment-checkout/page.jsx": {
-                "action": ""
+                "action": "create"
               },
               "package.json": {
                 "action": "install"
@@ -3632,13 +3629,13 @@
                 "action": "append"
               },
               "app/api/payment/route.ts": {
-                "action": ""
+                "action": "create"
               },
               "app/api/refund/route.ts": {
-                "action": ""
+                "action": "create"
               },
               "app/payment-checkout/page.tsx": {
-                "action": ""
+                "action": "create"
               },
               "package.json": {
                 "action": "install"
@@ -3651,13 +3648,13 @@
                 "action": "append"
               },
               "app/routes/api.orders.ts": {
-                "action": ""
+                "action": "create"
               },
               "app/routes/api.refunds.ts": {
-                "action": ""
+                "action": "create"
               },
               "app/routes/checkout.tsx": {
-                "action": ""
+                "action": "create"
               },
               "package.json": {
                 "action": "install"
@@ -3672,16 +3669,16 @@
                 "action": "append"
               },
               "controllers/stripeController.js": {
-                "action": ""
+                "action": "create"
               },
               "index.js": {
-                "action": ""
+                "action": "prepend"
               },
               "package.json": {
                 "action": "install"
               },
               "routes/stripeRoutes.js": {
-                "action": ""
+                "action": "create"
               }
             },
             "typescript": {
@@ -3689,19 +3686,19 @@
                 "action": "append"
               },
               "controllers/stripeControllers.ts": {
-                "action": ""
+                "action": "create"
               },
               "index.ts": {
-                "action": ""
+                "action": "prepend"
               },
               "package.json": {
                 "action": "install"
               },
               "routes/stripeRoutes.ts": {
-                "action": ""
+                "action": "create"
               },
               "utils/stripe.ts": {
-                "action": ""
+                "action": "create"
               }
             }
           },
@@ -3714,16 +3711,16 @@
                 "action": "install"
               },
               "src/app.module.ts": {
-                "action": ""
+                "action": "prepend"
               },
               "src/stripe/stripe.controller.ts": {
-                "action": ""
+                "action": "create"
               },
               "src/stripe/stripe.module.ts": {
-                "action": ""
+                "action": "create"
               },
               "src/stripe/stripe.service.ts": {
-                "action": ""
+                "action": "create"
               }
             }
           },
@@ -3733,13 +3730,13 @@
                 "action": "append"
               },
               "app/api/stripe/create-payment-intent/route.js": {
-                "action": ""
+                "action": "create"
               },
               "app/api/stripe/refund/route.js": {
-                "action": ""
+                "action": "create"
               },
               "app/payment-checkout/page.jsx": {
-                "action": ""
+                "action": "create"
               },
               "package.json": {
                 "action": "install"
@@ -3750,16 +3747,16 @@
                 "action": "append"
               },
               "app/api/stripe/create-payment-intent/route.ts": {
-                "action": ""
+                "action": "create"
               },
               "app/api/stripe/refund/route.ts": {
-                "action": ""
+                "action": "create"
               },
               "app/payment-checkout/page.tsx": {
-                "action": ""
+                "action": "create"
               },
               "lib/stripe.ts": {
-                "action": ""
+                "action": "create"
               },
               "package.json": {
                 "action": "install"
@@ -3772,13 +3769,13 @@
                 "action": "append"
               },
               "app/routes/checkout.tsx": {
-                "action": ""
+                "action": "create"
               },
               "app/routes/refund.tsx": {
-                "action": ""
+                "action": "create"
               },
               "app/utils/stripe.server.ts": {
-                "action": ""
+                "action": "create"
               },
               "package.json": {
                 "action": "install"
@@ -3791,7 +3788,7 @@
                 "action": "install"
               },
               "src/components/VueStripe.vue": {
-                "action": ""
+                "action": "create"
               }
             },
             "typescript": {
@@ -3799,7 +3796,7 @@
                 "action": "install"
               },
               "src/components/VueStripe.vue": {
-                "action": ""
+                "action": "create"
               }
             }
           }
@@ -3814,18 +3811,119 @@
       "files": {
         "imagekit.io": {
           "expressjs": {
-            "javascript": {},
-            "typescript": {}
+            "javascript": {
+              ".env": {
+                "action": "append"
+              },
+              "controllers/imageKitControllers.js": {
+                "action": "create"
+              },
+              "routes/imagekitRoutes.js": {
+                "action": "create"
+              },
+              "utils/imagekit.js": {
+                "action": "create"
+              },
+              "index.js": {
+                "action": "prepend"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "controllers/imageKitControllers.ts": {
+                "action": "create"
+              },
+              "routes/imagekitRoutes.ts": {
+                "action": "create"
+              },
+              "utils/imagekit.ts": {
+                "action": "create"
+              },
+              "index.ts": {
+                "action": "prepend"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "nestjs": {
-            "typescript": {}
+            "typescript": {
+              "src/imagekit/imagekit.controller.ts": {
+                "action": "create"
+              },
+              "src/imagekit/imagekit.module.ts": {
+                "action": "create"
+              },
+              "src/imagekit/imagekit.service.ts": {
+                "action": "create"
+              },
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "nextjs": {
-            "javascript": {},
-            "typescript": {}
+            "javascript": {
+              "app/api/imagekit/delete/route.js": {
+                "action": "create"
+              },
+              "app/api/imagekit/upload/route.js": {
+                "action": "create"
+              },
+              "app/api/imagekit/list/route.js": {
+                "action": "create"
+              },
+              "lib/imagekit.js": {},
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            },
+            "typescript": {
+              "app/api/imagekit/delete/route.ts": {
+                "action": "create"
+              },
+              "app/api/imagekit/upload/route.ts": {
+                "action": "create"
+              },
+              "app/api/imagekit/list/route.ts": {
+                "action": "create"
+              },
+              "lib/imagekit.ts": {},
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "remixjs": {
-            "typescript": {}
+            "typescript": {
+              "app/routes/api/imagekit.ts": {
+                "action": "create"
+              },
+              "app/utils/imagekit.ts": {
+                "action": "create"
+              },
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           }
         },
         "cloudinary": {
@@ -3835,19 +3933,19 @@
                 "action": "append"
               },
               "controllers/cloudinaryControllers.js": {
-                "action": ""
+                "action": "create"
               },
               "index.js": {
-                "action": ""
+                "action": "prepend"
               },
               "package.json": {
                 "action": "install"
               },
               "routes/cloudinaryRoutes.js": {
-                "action": ""
+                "action": "create"
               },
               "utils/cloudinary.js": {
-                "action": ""
+                "action": "create"
               }
             },
             "typescript": {
@@ -3855,19 +3953,19 @@
                 "action": "append"
               },
               "controllers/cloudinaryControllers.ts": {
-                "action": ""
+                "action": "create"
               },
               "index.ts": {
-                "action": ""
+                "action": "prepend"
               },
               "package.json": {
                 "action": "install"
               },
               "routes/cloudinaryRoutes.ts": {
-                "action": ""
+                "action": "create"
               },
               "utils/cloudinary.ts": {
-                "action": ""
+                "action": "create"
               }
             }
           },
@@ -3880,13 +3978,13 @@
                 "action": "install"
               },
               "src/cloudinary/cloudinary.controller.ts": {
-                "action": ""
+                "action": "create"
               },
               "src/cloudinary/cloudinary.module.ts": {
-                "action": ""
+                "action": "create"
               },
               "src/cloudinary/cloudinary.service.ts": {
-                "action": ""
+                "action": "create"
               }
             }
           },
@@ -3896,16 +3994,16 @@
                 "action": "append"
               },
               "app/api/cloudinary/delete/route.js": {
-                "action": ""
+                "action": "create"
               },
               "app/api/cloudinary/list/route.js": {
-                "action": ""
+                "action": "create"
               },
               "app/api/cloudinary/upload/route.js": {
-                "action": ""
+                "action": "create"
               },
               "lib/cloudinary.js": {
-                "action": ""
+                "action": "create"
               },
               "package.json": {
                 "action": "install"
@@ -3916,16 +4014,16 @@
                 "action": "append"
               },
               "app/api/cloudinary/delete/route.ts": {
-                "action": ""
+                "action": "create"
               },
               "app/api/cloudinary/list/route.ts": {
-                "action": ""
+                "action": "create"
               },
               "app/api/cloudinary/upload/route.ts": {
-                "action": ""
+                "action": "create"
               },
               "lib/cloudinary.ts": {
-                "action": ""
+                "action": "create"
               },
               "package.json": {
                 "action": "install"
@@ -3938,10 +4036,10 @@
                 "action": "append"
               },
               "app/routes/api/cloudinary.ts": {
-                "action": ""
+                "action": "create"
               },
               "app/utils/cloudinary.ts": {
-                "action": ""
+                "action": "create"
               },
               "package.json": {
                 "action": "install"
@@ -3956,19 +4054,19 @@
                 "action": "append"
               },
               "controllers/gcsControllers.js": {
-                "action": ""
+                "action": "create"
               },
               "index.js": {
-                "action": ""
+                "action": "prepend"
               },
               "package.json": {
                 "action": "install"
               },
               "routes/gcsRoutes.js": {
-                "action": ""
+                "action": "create"
               },
               "utils/gcs.js": {
-                "action": ""
+                "action": "create"
               }
             },
             "typescript": {
@@ -3976,19 +4074,19 @@
                 "action": "append"
               },
               "controllers/gcsControllers.ts": {
-                "action": ""
+                "action": "create"
               },
               "index.ts": {
-                "action": ""
+                "action": "prepend"
               },
               "package.json": {
                 "action": "install"
               },
               "routes/gcsRoutes.ts": {
-                "action": ""
+                "action": "create"
               },
               "utils/gcs.ts": {
-                "action": ""
+                "action": "create"
               }
             }
           },
@@ -4001,13 +4099,13 @@
                 "action": "install"
               },
               "src/gcs/gcs.controller.ts": {
-                "action": ""
+                "action": "create"
               },
               "src/gcs/gcs.module.ts": {
-                "action": ""
+                "action": "create"
               },
               "src/gcs/gcs.service.ts": {
-                "action": ""
+                "action": "create"
               }
             }
           },
@@ -4017,16 +4115,16 @@
                 "action": "append"
               },
               "app/api/gcs/delete/route.js": {
-                "action": ""
+                "action": "create"
               },
               "app/api/gcs/list/route.js": {
-                "action": ""
+                "action": "create"
               },
               "app/api/gcs/upload/route.js": {
-                "action": ""
+                "action": "create"
               },
               "lib/gcs.js": {
-                "action": ""
+                "action": "create"
               },
               "package.json": {
                 "action": "install"
@@ -4037,16 +4135,16 @@
                 "action": "append"
               },
               "app/api/gcs/delete/route.ts": {
-                "action": ""
+                "action": "create"
               },
               "app/api/gcs/list/route.ts": {
-                "action": ""
+                "action": "create"
               },
               "app/api/gcs/upload/route.ts": {
-                "action": ""
+                "action": "create"
               },
               "lib/gcs.ts": {
-                "action": ""
+                "action": "create"
               },
               "package.json": {
                 "action": "install"
@@ -4062,10 +4160,10 @@
                 "action": "install"
               },
               "routes/api/gcs.ts": {
-                "action": ""
+                "action": "create"
               },
               "utils/gcs.ts": {
-                "action": ""
+                "action": "create"
               }
             }
           }
@@ -4122,10 +4220,10 @@
                 "action": "install"
               },
               "src/index.css": {
-                "action": ""
+                "action": "prepend"
               },
               "vite.config.js": {
-                "action": ""
+                "action": "overwrite"
               }
             },
             "typescript": {
