@@ -892,6 +892,7 @@
         "app-sync",
         "athena",
         "aurora",
+        "backup-gateway",
         "braket",
         "cloudformation",
         "cloudfront",
@@ -919,6 +920,7 @@
         "elb",
         "event-bridge",
         "fargate",
+        "firehose",
         "forecast",
         "glue",
         "iam",
@@ -930,7 +932,6 @@
         "medialive",
         "mediastore",
         "neptune",
-        "opsworks",
         "organizations",
         "personalize",
         "pinpoint",
@@ -942,13 +943,15 @@
         "s3-glacier",
         "s3-glacier-deep-archive",
         "secrets-manager",
-        "server-migration-service",
         "service-catalog",
         "shield",
         "simple-email-service",
         "snowball",
         "snowmobile",
+        "sso",
         "storage-gateway",
+        "sts",
+        "systems-manager",
         "textract",
         "translate",
         "trustedAdvisor",
@@ -1006,6 +1009,22 @@
           }
         },
         "aurora": {
+          "expressjs": {
+            "javascript": {},
+            "typescript": {}
+          },
+          "nestjs": {
+            "typescript": {}
+          },
+          "nextjs": {
+            "javascript": {},
+            "typescript": {}
+          },
+          "remixjs": {
+            "typescript": {}
+          }
+        },
+        "backup-gateway": {
           "expressjs": {
             "javascript": {},
             "typescript": {}
@@ -2735,6 +2754,22 @@
             "typescript": {}
           }
         },
+        "firehose": {
+          "expressjs": {
+            "javascript": {},
+            "typescript": {}
+          },
+          "nestjs": {
+            "typescript": {}
+          },
+          "nextjs": {
+            "javascript": {},
+            "typescript": {}
+          },
+          "remixjs": {
+            "typescript": {}
+          }
+        },
         "forecast": {
           "expressjs": {
             "javascript": {},
@@ -3163,22 +3198,6 @@
           }
         },
         "neptune": {
-          "expressjs": {
-            "javascript": {},
-            "typescript": {}
-          },
-          "nestjs": {
-            "typescript": {}
-          },
-          "nextjs": {
-            "javascript": {},
-            "typescript": {}
-          },
-          "remixjs": {
-            "typescript": {}
-          }
-        },
-        "opsworks": {
           "expressjs": {
             "javascript": {},
             "typescript": {}
@@ -3658,7 +3677,55 @@
             "typescript": {}
           }
         },
+        "sso": {
+          "expressjs": {
+            "javascript": {},
+            "typescript": {}
+          },
+          "nestjs": {
+            "typescript": {}
+          },
+          "nextjs": {
+            "javascript": {},
+            "typescript": {}
+          },
+          "remixjs": {
+            "typescript": {}
+          }
+        },
         "storage-gateway": {
+          "expressjs": {
+            "javascript": {},
+            "typescript": {}
+          },
+          "nestjs": {
+            "typescript": {}
+          },
+          "nextjs": {
+            "javascript": {},
+            "typescript": {}
+          },
+          "remixjs": {
+            "typescript": {}
+          }
+        },
+        "sts": {
+          "expressjs": {
+            "javascript": {},
+            "typescript": {}
+          },
+          "nestjs": {
+            "typescript": {}
+          },
+          "nextjs": {
+            "javascript": {},
+            "typescript": {}
+          },
+          "remixjs": {
+            "typescript": {}
+          }
+        },
+        "systems-manager": {
           "expressjs": {
             "javascript": {},
             "typescript": {}
