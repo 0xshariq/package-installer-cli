@@ -2,23 +2,9 @@
   "features": {
     "ai": {
       "description": "AI integration code for enhanced user experiences",
-      "supportedFrameworks": [
-        "nextjs",
-        "expressjs",
-        "nestjs",
-        "remixjs"
-      ],
-      "supportedLanguages": [
-        "javascript",
-        "typescript"
-      ],
-      "supportedAIs": [
-        "gemini",
-        "grok",
-        "open-ai",
-        "open-router",
-        "claude"
-      ],
+      "supportedFrameworks": ["nextjs", "expressjs", "nestjs", "remixjs"],
+      "supportedLanguages": ["javascript", "typescript"],
+      "supportedAIs": ["gemini", "grok", "open-ai", "open-router", "claude"],
       "files": {
         "claude": {
           "expressjs": {
@@ -581,17 +567,8 @@
         "go",
         "ruby-on-rails"
       ],
-      "supportedLanguages": [
-        "javascript",
-        "typescript",
-        "backend",
-        "web-app"
-      ],
-      "supportedAuths": [
-        "auth0",
-        "clerk",
-        "next-auth"
-      ],
+      "supportedLanguages": ["javascript", "typescript", "backend", "web-app"],
+      "supportedAuths": ["auth0", "clerk", "next-auth"],
       "files": {
         "auth0": {
           "angularjs": {
@@ -931,16 +908,8 @@
     },
     "aws": {
       "description": "AWS integration and deployment features",
-      "supportedFrameworks": [
-        "nextjs",
-        "expressjs",
-        "nestjs",
-        "remixjs"
-      ],
-      "supportedLanguages": [
-        "javascript",
-        "typescript"
-      ],
+      "supportedFrameworks": ["nextjs", "expressjs", "nestjs", "remixjs"],
+      "supportedLanguages": ["javascript", "typescript"],
       "supportedAwsServices": [
         "api-gateway",
         "app-sync",
@@ -6262,74 +6231,31 @@
         "python",
         "ruby"
       ],
-      "supportedDatabases": [
-        "mongodb",
-        "supabase",
-        "neondb"
-      ],
+      "supportedDatabases": ["mongodb", "supabase", "neondb"],
       "supportedORMs": {
         "mongodb": {
-          "mongoose": [
-            "javascript",
-            "typescript"
-          ],
-          "typegoose": [
-            "typescript"
-          ]
+          "mongoose": ["javascript", "typescript"],
+          "typegoose": ["typescript"]
         },
         "mysql": {
-          "typeorm": [
-            "javascript",
-            "typescript"
-          ],
-          "prisma": [
-            "typescript"
-          ],
-          "drizzle": [
-            "typescript"
-          ],
-          "djangoORM": [
-            "python"
-          ],
-          "SQLAlchemy": [
-            "python"
-          ],
-          "Peewee": [
-            "python"
-          ],
-          "GORM": [
-            "go"
-          ],
-          "Sequel": [
-            "ruby"
-          ]
+          "typeorm": ["javascript", "typescript"],
+          "prisma": ["typescript"],
+          "drizzle": ["typescript"],
+          "djangoORM": ["python"],
+          "SQLAlchemy": ["python"],
+          "Peewee": ["python"],
+          "GORM": ["go"],
+          "Sequel": ["ruby"]
         },
         "postgres": {
-          "typeorm": [
-            "javascript",
-            "typescript"
-          ],
-          "prisma": [
-            "typescript"
-          ],
-          "drizzle": [
-            "typescript"
-          ],
-          "djangoORM": [
-            "python"
-          ],
-          "SQLAlchemy": [
-            "python"
-          ],
-          "Peewee": [
-            "python"
-          ],
-          "GORM": [
-            "go"
-          ],
-          "Sequel": [
-            "ruby"
-          ]
+          "typeorm": ["javascript", "typescript"],
+          "prisma": ["typescript"],
+          "drizzle": ["typescript"],
+          "djangoORM": ["python"],
+          "SQLAlchemy": ["python"],
+          "Peewee": ["python"],
+          "GORM": ["go"],
+          "Sequel": ["ruby"]
         }
       },
       "files": {
@@ -6766,9 +6692,7 @@
         "vuejs",
         "reactjs"
       ],
-      "supportedLanguages": [
-        "javascript"
-      ],
+      "supportedLanguages": ["javascript"],
       "files": {
         "angularjs": {
           ".dockerignore": {
@@ -6880,17 +6804,8 @@
     },
     "gitignore": {
       "description": "GitIgnore files for various frameworks and languages",
-      "supportedFrameworks": [
-        "nextjs",
-        "angularjs",
-        "nestjs"
-      ],
-      "supportedLanguages": [
-        "javascript",
-        "go",
-        "python",
-        "rust"
-      ],
+      "supportedFrameworks": ["nextjs", "angularjs", "nestjs"],
+      "supportedLanguages": ["javascript", "go", "python", "rust"],
       "files": {
         "angularjs": {
           ".gitignore": {
@@ -6934,15 +6849,8 @@
         "remixjs",
         "vuejs"
       ],
-      "supportedLanguages": [
-        "javascript",
-        "typescript"
-      ],
-      "supportedPayments": [
-        "stripe",
-        "razorpay",
-        "paypal"
-      ],
+      "supportedLanguages": ["javascript", "typescript"],
+      "supportedPayments": ["stripe", "razorpay", "paypal"],
       "files": {
         "paypal": {
           "expressjs": {
@@ -7293,21 +7201,9 @@
     },
     "storage": {
       "description": "Storage Integration for files, images, and videos",
-      "supportedFrameworks": [
-        "nextjs",
-        "expressjs",
-        "nestjs",
-        "remixjs"
-      ],
-      "supportedLanguages": [
-        "javascript",
-        "typescript"
-      ],
-      "supportedStorages": [
-        "imagekit.io",
-        "cloudinary",
-        "google-cloud"
-      ],
+      "supportedFrameworks": ["nextjs", "expressjs", "nestjs", "remixjs"],
+      "supportedLanguages": ["javascript", "typescript"],
+      "supportedStorages": ["imagekit.io", "cloudinary", "google-cloud"],
       "files": {
         "imagekit.io": {
           "expressjs": {
@@ -7676,6 +7572,27 @@
         }
       }
     },
+    "monitoring": {
+      "description": "Monitoring integration for enhanced functionality",
+      "supportedFrameworks": ["nextjs", "expressjs", "nestjs", "remixjs"],
+      "supportedLanguages": ["javascript"],
+      "files": {
+        "sentry": {},
+        "datadog": {},
+        "opentelemetry": {}
+      }
+    },
+    "testing": {
+      "description": "Testing integration for enhanced functionality",
+      "supportedFrameworks": ["nextjs", "expressjs", "nestjs", "remixjs"],
+      "supportedLanguages": ["javascript"],
+      "files": {
+        "jest": {},
+        "cypress": {},
+        "mocha": {},
+        "playwright": {}
+      }
+    },
     "ui": {
       "description": "UI Libraries features for various frameworks",
       "supportedFrameworks": [
@@ -7686,13 +7603,8 @@
         "django",
         "nuxtjs"
       ],
-      "supportedLanguages": [
-        "javascript",
-        "typescript"
-      ],
-      "supportedUiLibraries": [
-        "daisy"
-      ],
+      "supportedLanguages": ["javascript", "python"],
+      "supportedUiLibraries": ["daisy"],
       "files": {
         "daisy": {
           "angularjs": {
@@ -7784,29 +7696,6 @@
           "nuxtjs": {}
         }
       }
-    },
-    "monitoring": {
-      "description": "Monitoring integration for enhanced functionality",
-      "supportedFrameworks": [],
-      "supportedLanguages": [],
-      "files": {
-        "sentry": {},
-        "datadog": {},
-        "opentelemetry": {}
-      }
-    },
-    "testing": {
-      "description": "Testing integration for enhanced functionality",
-      "supportedFrameworks": [],
-      "supportedLanguages": [],
-      "files": {
-        "jest": {},
-        "cypress": {},
-        "mocha": {},
-        "playwright": {}
-      }
     }
-  },
-  "version": "3.0.0",
-  "lastUpdated": "2025-09-10T12:32:12.967Z"
+  }
 }
