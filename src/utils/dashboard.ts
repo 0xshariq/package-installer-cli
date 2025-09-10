@@ -10,7 +10,7 @@ import Table from 'cli-table3';
 import boxen from 'boxen';
 import fs from 'fs-extra';
 import path from 'path';
-import { detectProjectLanguage } from './dependencyInstaller.js';
+import { detectLanguageFromFiles } from './languageConfig.js';
 
 export interface DashboardStats {
   totalProjects: number;
@@ -707,6 +707,23 @@ function formatDate(date: Date): string {
 }
 
 /**
+ * Detect project languages in a directory
+ */
+async function detectProjectLanguage(projectPath: string): Promise<string[]> {
+  try {
+    const files = await fs.readdir(projectPath);
+    const detectionResults = detectLanguageFromFiles(files);
+    
+    return detectionResults
+      .filter(result => result.confidence > 50)
+      .sort((a, b) => b.confidence - a.confidence)
+      .map(result => result.language);
+  } catch (error) {
+    return [];
+  }
+}
+
+/**
  * Get project statistics from workspace
  */
 /**
@@ -791,7 +808,7 @@ export async function gatherProjectStats(workspacePath: string = process.cwd()):
     // Detect current project languages and frameworks if in a project directory
     try {
       const languages = await detectProjectLanguage(workspacePath);
-      languages.forEach(lang => {
+      languages.forEach((lang: string) => {
         stats.languageBreakdown[lang] = (stats.languageBreakdown[lang] || 0) + 1;
       });
       

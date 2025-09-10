@@ -326,7 +326,8 @@ export class AdvancedCacheManager {
 
       // Check if compressed
       if (data[0] === 0x1f && data[1] === 0x8b) {
-        data = await decompress(data as Buffer);
+        const decompressed = await decompress(data);
+        data = Buffer.from(decompressed);
       }
 
       return JSON.parse(data.toString());
@@ -348,7 +349,8 @@ export class AdvancedCacheManager {
 
       // Compress if above threshold
       if (buffer.length > this.compressionThreshold) {
-        buffer = await compress(buffer) as Buffer;
+        const compressed = await compress(buffer);
+        buffer = Buffer.from(compressed);
       }
 
       await fs.writeFile(this.cacheFile, buffer);

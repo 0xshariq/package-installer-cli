@@ -18,13 +18,22 @@ import {
  * Enhanced framework selection with better descriptions and categorization
  */
 export async function promptFrameworkSelection(templateConfig: any): Promise<string> {
+  const availableFrameworks = Object.keys(templateConfig.frameworks).filter(fw => {
+    const fwConfig = templateConfig.frameworks[fw];
+    return fwConfig && typeof fwConfig === 'object';
+  });
+
+  if (availableFrameworks.length === 0) {
+    throw new Error('No frameworks available in template configuration');
+  }
+
   const { framework } = await inquirer.prompt([
     {
       name: 'framework',
       type: 'list',
       message: chalk.hex('#10ac84')('🚀 Choose your framework:'),
       pageSize: 12,
-      choices: Object.keys(templateConfig.frameworks).map(fw => {
+      choices: availableFrameworks.map(fw => {
         const fwConfig = templateConfig.frameworks[fw];
         const type = fwConfig.type || 'framework';
         const description = fwConfig.description || 'Modern, Fast, Production-ready';

@@ -30,7 +30,7 @@ export function getTemplateDir(
 
 /**
  * Resolves the complete template directory path based on project options
- * Simplified to match the new templates structure without database paths
+ * Updated to match actual templates directory structure
  */
 export function resolveTemplatePath(
   options: ProjectOptions,
@@ -45,19 +45,23 @@ export function resolveTemplatePath(
     return path.join(templatesRoot, frameworkDir, language ?? '', templateName);
   }
 
-  // Handle framework-specific template paths based on new structure
+  // Handle framework-specific template paths based on actual structure
   switch (framework) {
     case 'rust':
       // Rust templates are directly in the rust folder
       return path.join(templatesRoot, 'rust', templateName);
       
     case 'django':
-      // Django templates with language structure
-      return path.join(templatesRoot, 'django', language ?? '', templateName);
+      // Django templates are directly under django folder (no language subfolder)
+      return path.join(templatesRoot, 'django', templateName);
+      
+    case 'flask':
+      // Flask templates are directly under flask folder
+      return path.join(templatesRoot, 'flask', templateName);
       
     case 'expressjs':
       // Express.js templates with language structure
-      return path.join(templatesRoot, 'express', language ?? '', templateName);
+      return path.join(templatesRoot, 'expressjs', language ?? '', templateName);
       
     case 'nestjs':
       // Nest.js templates (typically TypeScript only)
@@ -74,9 +78,9 @@ export function resolveTemplatePath(
     case 'reactjs':
       // React templates with bundler structure (Vite)
       if (bundler) {
-        return path.join(templatesRoot, 'reactjs', bundler, language ?? '', templateName);
+        return path.join(templatesRoot, 'reactjs', bundler, language ?? '');
       }
-      return path.join(templatesRoot, 'reactjs', 'vite', language ?? '', templateName);
+      return path.join(templatesRoot, 'reactjs', 'vite', language ?? '');
       
     case 'nextjs':
       // Next.js templates with language structure
@@ -85,6 +89,14 @@ export function resolveTemplatePath(
     case 'remixjs':
       // Remix templates with language structure
       return path.join(templatesRoot, 'remixjs', language ?? '', templateName);
+      
+    case 'go':
+      // Go templates are directly under go folder
+      return path.join(templatesRoot, 'go', templateName);
+      
+    case 'ruby':
+      // Ruby templates are directly under ruby folder
+      return path.join(templatesRoot, 'ruby', templateName);
       
     default:
       return getTemplateDir(framework, language ?? '', templateName, bundler);
@@ -122,7 +134,25 @@ export function generateTemplateName(
   }
 
   if (framework === 'django') {
-    return 'django-template'; // Simplified naming
+    // Django has specific template names based on available templates
+    const djangoTemplates = [
+      'django-bower-and-gulp-config-template',
+      'django-full-stack-template', 
+      'django-inertia-svelte-template',
+      'djangoTemplate'
+    ];
+    return djangoTemplates[0]; // Default to first available
+  }
+
+  if (framework === 'flask') {
+    // Flask templates
+    const flaskTemplates = [
+      'flask-cookiecutter-advance-template',
+      'flask-template-bootstrap',
+      'flask-template-bootstrap-2',
+      'flask-template-with-useful-plugins'
+    ];
+    return flaskTemplates[0]; // Default to first available
   }
 
   // Handle Angular-specific naming (Material UI variants)
@@ -132,7 +162,7 @@ export function generateTemplateName(
     } else if (ui && !tailwind) {
       return 'material-ui-no-tailwind-template';
     } else {
-      return 'basic-angular-template';
+      return 'no-material-no-tailwind-template';
     }
   }
 
@@ -212,6 +242,7 @@ export async function validateTemplatePath(templatePath: string): Promise<boolea
 
 /**
  * Gets all available templates for a given framework and language
+ * Updated to handle the actual template directory structure
  */
 export async function getAvailableTemplates(
   framework: string, 
@@ -225,17 +256,26 @@ export async function getAvailableTemplates(
     // Construct template directory path based on framework
     switch (framework) {
       case 'rust':
-        templateDir = path.join(templatesRoot, 'rust');
+      case 'django':
+      case 'flask':
+      case 'go':
+      case 'ruby':
+        // These frameworks have templates directly under framework folder
+        templateDir = path.join(templatesRoot, framework);
         break;
       case 'reactjs':
-        templateDir = path.join(templatesRoot, 'reactjs', bundler || 'vite', language);
+        if (bundler) {
+          templateDir = path.join(templatesRoot, 'reactjs', bundler, language);
+        } else {
+          templateDir = path.join(templatesRoot, 'reactjs', 'vite', language);
+        }
         break;
       case 'nextjs':
       case 'vuejs':
       case 'angularjs':
       case 'expressjs':
       case 'nestjs':
-      case 'django':
+      case 'remixjs':
         templateDir = path.join(templatesRoot, framework, language);
         break;
       default:
@@ -243,6 +283,7 @@ export async function getAvailableTemplates(
     }
 
     if (!await fs.pathExists(templateDir)) {
+      console.warn(`Template directory not found: ${templateDir}`);
       return [];
     }
 
@@ -250,11 +291,18 @@ export async function getAvailableTemplates(
     const templates = entries
       .filter(entry => entry.isDirectory())
       .map(entry => entry.name)
-      .filter(name => name.includes('template')); // Only return template directories
+      .filter(name => {
+        // For frameworks without language subfolders, include all directories
+        if (['rust', 'django', 'flask', 'go', 'ruby'].includes(framework)) {
+          return true;
+        }
+        // For other frameworks, look for template directories
+        return name.includes('template') || name === 'template';
+      });
 
     return templates.sort();
   } catch (error) {
-    console.warn(`Could not read templates for ${framework}/${language}`);
+    console.warn(`Could not read templates for ${framework}/${language}: ${error}`);
     return [];
   }
 }

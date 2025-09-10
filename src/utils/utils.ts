@@ -91,12 +91,12 @@ export function getFrameworkTheme(framework: string) {
     sveltekit: chalk.hex('#ff6600'),
     solid: chalk.blue,
     solidjs: chalk.blue,
-    qwik: chalk.purple,
+    qwik: chalk.magenta,
     astro: chalk.magenta,
     default: chalk.blueBright
   };
   
-  return themes[framework.toLowerCase()] || themes.default;
+  return themes[framework.toLowerCase() as keyof typeof themes] || themes.default;
 }
 
 export function getLanguageIcon(language: string): string {
@@ -114,7 +114,7 @@ export function getLanguageIcon(language: string): string {
     dart: '🎯'
   };
   
-  return icons[language.toLowerCase()] || '📄';
+  return icons[language.toLowerCase() as keyof typeof icons] || '📄';
 }
 
 export function getFrameworkIcon(framework: string): string {
@@ -138,7 +138,7 @@ export function getFrameworkIcon(framework: string): string {
     astro: '🚀'
   };
   
-  return icons[framework.toLowerCase()] || '📦';
+  return icons[framework.toLowerCase() as keyof typeof icons] || '📦';
 }
 
 /**
@@ -272,19 +272,15 @@ export function extractTemplateMetadata(templatePath: string): TemplateMetadata 
 
     return {
       name: packageJson.name || path.basename(templatePath),
-      version: packageJson.version || '1.0.0',
-      description: packageJson.description || extractDescriptionFromReadme(readmeContent),
-      author: packageJson.author || 'Unknown',
-      license: packageJson.license || 'MIT',
-      keywords: packageJson.keywords || [],
-      dependencies: Object.keys(packageJson.dependencies || {}),
-      devDependencies: Object.keys(packageJson.devDependencies || {}),
-      scripts: Object.keys(packageJson.scripts || {}),
-      hasReadme: fs.existsSync(readmePath),
-      hasLicense: fs.existsSync(path.join(templatePath, 'LICENSE')),
-      hasGitignore: fs.existsSync(path.join(templatePath, '.gitignore')),
-      frameworks: detectFrameworks(packageJson.dependencies || {}),
-      languages: detectLanguages(templatePath)
+      framework: detectFrameworks(packageJson.dependencies || {})[0] || 'unknown',
+      language: detectLanguages(templatePath)[0] || 'javascript',
+      bundler: packageJson.bundler || undefined,
+      ui: packageJson.ui || undefined,
+      features: packageJson.keywords || [],
+      hasSrc: fs.existsSync(path.join(templatePath, 'src')),
+      hasTailwind: Boolean(packageJson.dependencies?.tailwindcss || packageJson.devDependencies?.tailwindcss),
+      createdAt: new Date().toISOString(),
+      size: 0 // Could calculate actual directory size if needed
     };
   } catch (error) {
     console.warn(`Failed to extract template metadata from ${templatePath}:`, error);
@@ -372,32 +368,29 @@ export function validateFeatureConfig(feature: FeatureConfig): ValidationResult<
   const errors: string[] = [];
   const warnings: string[] = [];
 
-  if (!feature.name || feature.name.trim().length === 0) {
-    errors.push('Feature name is required');
+  if (!feature.description || feature.description.trim().length === 0) {
+    errors.push('Feature description is required');
   }
 
-  if (!feature.provider || feature.provider.trim().length === 0) {
-    errors.push('Feature provider is required');
+  if (!feature.supportedFrameworks || !Array.isArray(feature.supportedFrameworks) || feature.supportedFrameworks.length === 0) {
+    errors.push('Feature must support at least one framework');
   }
 
-  if (!feature.files || !Array.isArray(feature.files) || feature.files.length === 0) {
-    errors.push('Feature must have at least one file');
+  if (!feature.supportedLanguages || !Array.isArray(feature.supportedLanguages) || feature.supportedLanguages.length === 0) {
+    errors.push('Feature must support at least one language');
   }
 
-  // Validate file paths
-  if (feature.files) {
-    feature.files.forEach((file, index) => {
-      if (typeof file !== 'string' || file.trim().length === 0) {
-        errors.push(`File at index ${index} must be a non-empty string`);
+  // Validate files structure
+  if (!feature.files || typeof feature.files !== 'object') {
+    errors.push('Feature must have a files configuration object');
+  } else {
+    // Validate the nested structure of files
+    Object.keys(feature.files).forEach(provider => {
+      const providerFiles = feature.files[provider];
+      if (!providerFiles || typeof providerFiles !== 'object') {
+        errors.push(`Provider ${provider} must have a valid files configuration`);
       }
     });
-  }
-
-  // Validate dependencies if present
-  if (feature.dependencies) {
-    if (typeof feature.dependencies !== 'object') {
-      errors.push('Dependencies must be an object');
-    }
   }
 
   return {
@@ -594,10 +587,10 @@ export function deepMerge<T extends Record<string, any>>(target: T, source: Part
   const result = { ...target };
   
   for (const key in source) {
-    if (source[key] instanceof Object && target[key] instanceof Object) {
-      result[key] = deepMerge(target[key], source[key]);
-    } else {
-      result[key] = source[key] as T[Extract<keyof T, string>];
+    if (source[key] && typeof source[key] === 'object' && target[key] && typeof target[key] === 'object') {
+      result[key] = deepMerge(target[key], source[key] as any);
+    } else if (source[key] !== undefined) {
+      result[key] = source[key] as any;
     }
   }
   

@@ -487,18 +487,6 @@ export async function installPackages(
       }
       break;
       
-    case 'go':
-      command = `go get ${packages.join(' ')}`;
-      break;
-      
-    case 'ruby':
-      // For Ruby, packages are usually added to Gemfile manually
-      throw new Error('Ruby package installation requires manual Gemfile editing');
-      
-    case 'php':
-      command = `composer require ${isDev ? '--dev' : ''} ${packages.join(' ')}`;
-      break;
-      
     default:
       throw new Error(`Unsupported language: ${language}`);
   }

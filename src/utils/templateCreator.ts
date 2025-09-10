@@ -13,7 +13,7 @@ import ora from 'ora';
 const execAsync = promisify(exec);
 
 /**
- * Create a project from a template with progress indicators and features support
+ * Create a project from a template with progress indicators and error handling
  * @param projectName - Name of the project to create
  * @param templatePath - Path to the template directory
  * @param features - Optional features to integrate during creation
@@ -37,8 +37,15 @@ export async function createProjectFromTemplate(
 
         // Validate template path
         if (!await fs.pathExists(templatePath)) {
-            spinner.fail(chalk.red('Template path does not exist'));
+            spinner.fail(chalk.red(`Template not found at: ${templatePath}`));
             throw new Error(`Template not found at: ${templatePath}`);
+        }
+
+        // Check template contents
+        const templateContents = await fs.readdir(templatePath);
+        if (templateContents.length === 0) {
+            spinner.fail(chalk.red('Template directory is empty'));
+            throw new Error('Template directory is empty');
         }
 
         // Copy template files with filtering
@@ -177,15 +184,18 @@ async function processConfigurationFiles(projectPath: string, projectName: strin
  */
 export async function installDependenciesForCreate(projectPath: string): Promise<void> {
     try {
-        const { installProjectDependencies } = await import('./dependencyInstaller.js');
-        const projectName = path.basename(projectPath);
-        
         // Check if this is a Node.js project
         const packageJsonPath = path.join(projectPath, 'package.json');
         const hasPackageJson = await fs.pathExists(packageJsonPath);
         
         if (hasPackageJson) {
-            await installProjectDependencies(projectPath, projectName, true); // Install MCP server for created projects
+            console.log(chalk.hex('#10ac84')('📦 Installing dependencies...'));
+            
+            const { installProjectDependencies } = await import('./dependencyInstaller.js');
+            const projectName = path.basename(projectPath);
+            
+            await installProjectDependencies(projectPath, projectName, false); // Don't install MCP server for basic projects
+            console.log(chalk.green('✅ Dependencies installed successfully'));
         } else {
             console.log(chalk.hex('#95afc0')('📦 No package.json found, skipping dependency installation'));
         }
@@ -194,8 +204,8 @@ export async function installDependenciesForCreate(projectPath: string): Promise
         await initializeGitRepositoryForCreate(projectPath);
         
     } catch (installError: any) {
-        // Only show manual installation message if auto-installation failed
-        console.log(chalk.yellow('⚠️  Auto-installation failed. You can install dependencies manually:'));
+        console.log(chalk.yellow(`⚠️  Auto-installation failed: ${installError.message}`));
+        console.log(chalk.yellow('You can install dependencies manually:'));
         
         try {
             const packageJsonPath = path.join(projectPath, 'package.json');

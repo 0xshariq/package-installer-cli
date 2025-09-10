@@ -123,7 +123,7 @@ export async function createProject(providedName?: string, options?: any): Promi
     // Step 1: Get project name with intelligent suggestions
     let projectName = providedName;
     if (!projectName) {
-      const suggestions = generateProjectNameSuggestions(userCache);
+      const suggestions = await generateProjectNameSuggestions(userCache.framework);
       const { name } = await inquirer.prompt([
         {
           type: 'input',
@@ -132,7 +132,10 @@ export async function createProject(providedName?: string, options?: any): Promi
           default: suggestions[0],
           validate: (input: string) => {
             const validation = validateProjectName(input.trim());
-            return validation === true ? true : chalk.hex('#ff4757')(validation);
+            if (typeof validation === 'boolean') {
+              return validation;
+            }
+            return chalk.hex('#ff4757')(validation);
           }
         }
       ]);
@@ -221,16 +224,9 @@ export async function createProject(providedName?: string, options?: any): Promi
     
     if (wantFeaturesInitial) {
       try {
-        // Import features functionality
-        const { selectFeatures } = await import('./add.js');
-        selectedFeatures = await selectFeatures(selectedFramework, selectedLanguage || 'javascript');
-        
-        if (selectedFeatures.length > 0) {
-          console.log(chalk.hex('#10ac84')(`✨ Selected ${selectedFeatures.length} features for integration`));
-          selectedFeatures.forEach(f => {
-            console.log(`   ${chalk.hex('#00d2d3')('•')} ${f.feature}${f.provider ? ` (${f.provider})` : ''}`);
-          });
-        }
+        // Feature selection will be added in a future version
+        console.log(chalk.yellow('⚠️  Feature selection during project creation is coming soon!'));
+        console.log(chalk.hex('#95afc0')('   You can add features after project creation using: pi add'));
       } catch (error: any) {
         console.warn(chalk.yellow(`⚠️  Feature selection failed: ${error.message}`));
         console.log(chalk.hex('#95afc0')('   You can add features after project creation using: pi add'));
@@ -355,18 +351,12 @@ export async function createProject(providedName?: string, options?: any): Promi
         const originalCwd = process.cwd();
         process.chdir(projectPath);
         
-        // Import the add command functionality for feature integration
-        const { integrateFeatures } = await import('./add.js');
-        
-        for (const feature of selectedFeatures) {
-          console.log(chalk.hex('#00d2d3')(`   Integrating ${feature.feature}${feature.provider ? ` (${feature.provider})` : ''}...`));
-          await integrateFeatures(feature.feature, feature.provider, selectedFramework, selectedLanguage || 'javascript');
-        }
+        // Feature integration will be available in future version
+        console.log(chalk.yellow('⚠️  Feature integration during project creation is coming soon!'));
+        console.log(chalk.hex('#95afc0')('   You can add features later using: pi add'));
         
         // Change back to original directory
         process.chdir(originalCwd);
-        
-        console.log(chalk.green('✅ All features integrated successfully!'));
         
       } catch (error: any) {
         console.warn(chalk.yellow(`⚠️  Some features could not be integrated: ${error.message}`));

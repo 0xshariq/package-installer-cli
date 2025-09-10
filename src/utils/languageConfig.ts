@@ -7,11 +7,7 @@ import { LanguageDetectionResult, PackageManagerDetectionResult } from './types.
 
 export type SupportedLanguage = 
   | 'javascript' | 'typescript' | 'nodejs'
-  | 'rust' | 'python' | 'go' | 'ruby' | 'php' 
-  | 'java' | 'kotlin' | 'scala' | 'csharp' 
-  | 'swift' | 'dart' | 'cpp' | 'c' | 'zig'
-  | 'elixir' | 'haskell' | 'ocaml' | 'clojure'
-  | 'lua' | 'nim' | 'crystal' | 'vlang';
+  | 'rust' | 'python';
 
 export type PackageManagerType = 
   | 'npm' | 'pnpm' | 'yarn' | 'bun'

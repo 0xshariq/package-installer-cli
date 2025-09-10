@@ -16,6 +16,10 @@ export interface UserCacheData {
   ui?: string;
   useSrc?: boolean;
   useTailwind?: boolean;
+  projectCount?: number;
+  projectName?: string;
+  srcDirectory?: boolean;
+  tailwindCss?: boolean;
   preferences: {
     skipDisclaimer?: boolean;
     autoInstallDependencies?: boolean;
@@ -71,7 +75,7 @@ export class UserCacheManager {
   private getDefaultCache(): UserCacheData {
     return {
       version: '3.0.0',
-      createdAt: new Date().toISOString(),
+      lastUpdated: new Date().toISOString(),
       preferences: {
         skipDisclaimer: false,
         autoInstallDependencies: true,
