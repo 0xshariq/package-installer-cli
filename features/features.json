@@ -2,9 +2,23 @@
   "features": {
     "ai": {
       "description": "AI integration code for enhanced user experiences",
-      "supportedFrameworks": ["nextjs", "expressjs", "nestjs", "remixjs"],
-      "supportedLanguages": ["javascript"],
-      "supportedAIs": ["gemini", "grok", "open-ai", "open-router", "claude"],
+      "supportedFrameworks": [
+        "nextjs",
+        "expressjs",
+        "nestjs",
+        "remixjs"
+      ],
+      "supportedLanguages": [
+        "javascript",
+        "typescript"
+      ],
+      "supportedAIs": [
+        "gemini",
+        "grok",
+        "open-ai",
+        "open-router",
+        "claude"
+      ],
       "files": {
         "claude": {
           "expressjs": {
@@ -562,10 +576,22 @@
         "remixjs",
         "angularjs",
         "vuejs",
-        "reactjs"
+        "reactjs",
+        "django",
+        "go",
+        "ruby-on-rails"
       ],
-      "supportedLanguages": ["javascript"],
-      "supportedAuths": ["auth0", "clerk", "next-auth"],
+      "supportedLanguages": [
+        "javascript",
+        "typescript",
+        "backend",
+        "web-app"
+      ],
+      "supportedAuths": [
+        "auth0",
+        "clerk",
+        "next-auth"
+      ],
       "files": {
         "auth0": {
           "angularjs": {
@@ -692,8 +718,23 @@
               },
               "src/main.ts": {
                 "action": "overwrite"
+              },
+              "main.ts": {
+                "action": "prepend"
               }
             }
+          },
+          "django": {
+            "backend": {},
+            "web-app": {}
+          },
+          "go": {
+            "backend": {},
+            "web-app": {}
+          },
+          "ruby-on-rails": {
+            "backend": {},
+            "web-app": {}
           }
         },
         "clerk": {
@@ -797,6 +838,9 @@
               },
               "routes/_index.tsx": {
                 "action": "create"
+              },
+              "app/routes/_index.tsx": {
+                "action": "prepend"
               }
             }
           },
@@ -829,7 +873,9 @@
                 "action": "overwrite"
               }
             }
-          }
+          },
+          "go": {},
+          "ruby-on-rails": {}
         },
         "next-auth": {
           "nextjs": {
@@ -885,8 +931,16 @@
     },
     "aws": {
       "description": "AWS integration and deployment features",
-      "supportedFrameworks": ["nextjs", "expressjs", "nestjs", "remixjs"],
-      "supportedLanguages": ["javascript"],
+      "supportedFrameworks": [
+        "nextjs",
+        "expressjs",
+        "nestjs",
+        "remixjs"
+      ],
+      "supportedLanguages": [
+        "javascript",
+        "typescript"
+      ],
       "supportedAwsServices": [
         "api-gateway",
         "app-sync",
@@ -962,114 +1016,408 @@
       "files": {
         "api-gateway": {
           "expressjs": {
-            "javascript": {},
-            "typescript": {}
+            "javascript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "nestjs": {
-            "typescript": {}
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "nextjs": {
-            "javascript": {},
-            "typescript": {}
+            "javascript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "remixjs": {
-            "typescript": {}
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           }
         },
         "app-sync": {
           "expressjs": {
-            "javascript": {},
-            "typescript": {}
+            "javascript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "nestjs": {
-            "typescript": {}
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "nextjs": {
-            "javascript": {},
-            "typescript": {}
+            "javascript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "remixjs": {
-            "typescript": {}
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           }
         },
         "athena": {
           "expressjs": {
-            "javascript": {},
-            "typescript": {}
+            "javascript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "nestjs": {
-            "typescript": {}
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "nextjs": {
-            "javascript": {},
-            "typescript": {}
+            "javascript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "remixjs": {
-            "typescript": {}
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           }
         },
         "aurora": {
           "expressjs": {
-            "javascript": {},
-            "typescript": {}
+            "javascript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "nestjs": {
-            "typescript": {}
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "nextjs": {
-            "javascript": {},
-            "typescript": {}
+            "javascript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "remixjs": {
-            "typescript": {}
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           }
         },
         "backup-gateway": {
           "expressjs": {
-            "javascript": {},
-            "typescript": {}
+            "javascript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "nestjs": {
-            "typescript": {}
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "nextjs": {
-            "javascript": {},
-            "typescript": {}
+            "javascript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "remixjs": {
-            "typescript": {}
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           }
         },
         "braket": {
           "expressjs": {
-            "javascript": {},
-            "typescript": {}
+            "javascript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "nestjs": {
-            "typescript": {}
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "nextjs": {
-            "javascript": {},
-            "typescript": {}
+            "javascript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "remixjs": {
-            "typescript": {}
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           }
         },
         "cloudformation": {
           "expressjs": {
-            "javascript": {},
-            "typescript": {}
+            "javascript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "nestjs": {
-            "typescript": {}
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "nextjs": {
-            "javascript": {},
-            "typescript": {}
+            "javascript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "remixjs": {
-            "typescript": {}
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           }
         },
         "cloudfront": {
@@ -2040,114 +2388,408 @@
         },
         "connect": {
           "expressjs": {
-            "javascript": {},
-            "typescript": {}
+            "javascript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "nestjs": {
-            "typescript": {}
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "nextjs": {
-            "javascript": {},
-            "typescript": {}
+            "javascript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "remixjs": {
-            "typescript": {}
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           }
         },
         "control-tower": {
           "expressjs": {
-            "javascript": {},
-            "typescript": {}
+            "javascript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "nestjs": {
-            "typescript": {}
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "nextjs": {
-            "javascript": {},
-            "typescript": {}
+            "javascript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "remixjs": {
-            "typescript": {}
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           }
         },
         "data-pipeline": {
           "expressjs": {
-            "javascript": {},
-            "typescript": {}
+            "javascript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "nestjs": {
-            "typescript": {}
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "nextjs": {
-            "javascript": {},
-            "typescript": {}
+            "javascript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "remixjs": {
-            "typescript": {}
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           }
         },
         "database-migration-service": {
           "expressjs": {
-            "javascript": {},
-            "typescript": {}
+            "javascript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "nestjs": {
-            "typescript": {}
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "nextjs": {
-            "javascript": {},
-            "typescript": {}
+            "javascript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "remixjs": {
-            "typescript": {}
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           }
         },
         "datasync": {
           "expressjs": {
-            "javascript": {},
-            "typescript": {}
+            "javascript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "nestjs": {
-            "typescript": {}
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "nextjs": {
-            "javascript": {},
-            "typescript": {}
+            "javascript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "remixjs": {
-            "typescript": {}
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           }
         },
         "documentdb": {
           "expressjs": {
-            "javascript": {},
-            "typescript": {}
+            "javascript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "nestjs": {
-            "typescript": {}
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "nextjs": {
-            "javascript": {},
-            "typescript": {}
+            "javascript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "remixjs": {
-            "typescript": {}
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           }
         },
         "dynamodb": {
           "expressjs": {
-            "javascript": {},
-            "typescript": {}
+            "javascript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "nestjs": {
-            "typescript": {}
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "nextjs": {
-            "javascript": {},
-            "typescript": {}
+            "javascript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "remixjs": {
-            "typescript": {}
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           }
         },
         "ebs": {
@@ -2361,18 +3003,60 @@
         },
         "ec2-auto-scaling": {
           "expressjs": {
-            "javascript": {},
-            "typescript": {}
+            "javascript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "nestjs": {
-            "typescript": {}
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "nextjs": {
-            "javascript": {},
-            "typescript": {}
+            "javascript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "remixjs": {
-            "typescript": {}
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           }
         },
         "ecs": {
@@ -2589,34 +3273,118 @@
         },
         "eks": {
           "expressjs": {
-            "javascript": {},
-            "typescript": {}
+            "javascript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "nestjs": {
-            "typescript": {}
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "nextjs": {
-            "javascript": {},
-            "typescript": {}
+            "javascript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "remixjs": {
-            "typescript": {}
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           }
         },
         "elasticache": {
           "expressjs": {
-            "javascript": {},
-            "typescript": {}
+            "javascript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "nestjs": {
-            "typescript": {}
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "nextjs": {
-            "javascript": {},
-            "typescript": {}
+            "javascript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "remixjs": {
-            "typescript": {}
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           }
         },
         "elb": {
@@ -2724,82 +3492,292 @@
         },
         "event-bridge": {
           "expressjs": {
-            "javascript": {},
-            "typescript": {}
+            "javascript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "nestjs": {
-            "typescript": {}
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "nextjs": {
-            "javascript": {},
-            "typescript": {}
+            "javascript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "remixjs": {
-            "typescript": {}
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           }
         },
         "fargate": {
           "expressjs": {
-            "javascript": {},
-            "typescript": {}
+            "javascript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "nestjs": {
-            "typescript": {}
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "nextjs": {
-            "javascript": {},
-            "typescript": {}
+            "javascript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "remixjs": {
-            "typescript": {}
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           }
         },
         "firehose": {
           "expressjs": {
-            "javascript": {},
-            "typescript": {}
+            "javascript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "nestjs": {
-            "typescript": {}
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "nextjs": {
-            "javascript": {},
-            "typescript": {}
+            "javascript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "remixjs": {
-            "typescript": {}
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           }
         },
         "forecast": {
           "expressjs": {
-            "javascript": {},
-            "typescript": {}
+            "javascript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "nestjs": {
-            "typescript": {}
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "nextjs": {
-            "javascript": {},
-            "typescript": {}
+            "javascript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "remixjs": {
-            "typescript": {}
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           }
         },
         "glue": {
           "expressjs": {
-            "javascript": {},
-            "typescript": {}
+            "javascript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "nestjs": {
-            "typescript": {}
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "nextjs": {
-            "javascript": {},
-            "typescript": {}
+            "javascript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "remixjs": {
-            "typescript": {}
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           }
         },
         "iam": {
@@ -2910,18 +3888,60 @@
         },
         "kinesis": {
           "expressjs": {
-            "javascript": {},
-            "typescript": {}
+            "javascript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "nestjs": {
-            "typescript": {}
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "nextjs": {
-            "javascript": {},
-            "typescript": {}
+            "javascript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "remixjs": {
-            "typescript": {}
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           }
         },
         "kms": {
@@ -3135,82 +4155,292 @@
         },
         "lex": {
           "expressjs": {
-            "javascript": {},
-            "typescript": {}
+            "javascript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "nestjs": {
-            "typescript": {}
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "nextjs": {
-            "javascript": {},
-            "typescript": {}
+            "javascript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "remixjs": {
-            "typescript": {}
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           }
         },
         "mediaconvert": {
           "expressjs": {
-            "javascript": {},
-            "typescript": {}
+            "javascript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "nestjs": {
-            "typescript": {}
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "nextjs": {
-            "javascript": {},
-            "typescript": {}
+            "javascript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "remixjs": {
-            "typescript": {}
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           }
         },
         "medialive": {
           "expressjs": {
-            "javascript": {},
-            "typescript": {}
+            "javascript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "nestjs": {
-            "typescript": {}
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "nextjs": {
-            "javascript": {},
-            "typescript": {}
+            "javascript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "remixjs": {
-            "typescript": {}
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           }
         },
         "mediastore": {
           "expressjs": {
-            "javascript": {},
-            "typescript": {}
+            "javascript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "nestjs": {
-            "typescript": {}
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "nextjs": {
-            "javascript": {},
-            "typescript": {}
+            "javascript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "remixjs": {
-            "typescript": {}
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           }
         },
         "neptune": {
           "expressjs": {
-            "javascript": {},
-            "typescript": {}
+            "javascript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "nestjs": {
-            "typescript": {}
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "nextjs": {
-            "javascript": {},
-            "typescript": {}
+            "javascript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "remixjs": {
-            "typescript": {}
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           }
         },
         "organizations": {
@@ -3324,98 +4554,350 @@
         },
         "personalize": {
           "expressjs": {
-            "javascript": {},
-            "typescript": {}
+            "javascript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "nestjs": {
-            "typescript": {}
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "nextjs": {
-            "javascript": {},
-            "typescript": {}
+            "javascript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "remixjs": {
-            "typescript": {}
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           }
         },
         "pinpoint": {
           "expressjs": {
-            "javascript": {},
-            "typescript": {}
+            "javascript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "nestjs": {
-            "typescript": {}
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "nextjs": {
-            "javascript": {},
-            "typescript": {}
+            "javascript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "remixjs": {
-            "typescript": {}
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           }
         },
         "quicksight": {
           "expressjs": {
-            "javascript": {},
-            "typescript": {}
+            "javascript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "nestjs": {
-            "typescript": {}
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "nextjs": {
-            "javascript": {},
-            "typescript": {}
+            "javascript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "remixjs": {
-            "typescript": {}
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           }
         },
         "rds": {
           "expressjs": {
-            "javascript": {},
-            "typescript": {}
+            "javascript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "nestjs": {
-            "typescript": {}
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "nextjs": {
-            "javascript": {},
-            "typescript": {}
+            "javascript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "remixjs": {
-            "typescript": {}
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           }
         },
         "redshift": {
           "expressjs": {
-            "javascript": {},
-            "typescript": {}
+            "javascript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "nestjs": {
-            "typescript": {}
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "nextjs": {
-            "javascript": {},
-            "typescript": {}
+            "javascript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "remixjs": {
-            "typescript": {}
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           }
         },
         "route-53": {
           "expressjs": {
-            "javascript": {},
-            "typescript": {}
+            "javascript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "nestjs": {
-            "typescript": {}
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "nextjs": {
-            "javascript": {},
-            "typescript": {}
+            "javascript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "remixjs": {
-            "typescript": {}
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           }
         },
         "s3": {
@@ -3486,10 +4968,10 @@
                 "action": "append"
               },
               "app/api/aws/s3/list/route.js": {
-                "action": ""
+                "action": "create"
               },
               "app/api/aws/s3/upload/route.js": {
-                "action": ""
+                "action": "create"
               },
               "package.json": {
                 "action": "install"
@@ -3503,10 +4985,10 @@
                 "action": "append"
               },
               "app/api/aws/s3/list/route.ts": {
-                "action": ""
+                "action": "create"
               },
               "app/api/aws/s3/upload/route.ts": {
-                "action": ""
+                "action": "create"
               },
               "package.json": {
                 "action": "install"
@@ -3535,50 +5017,176 @@
         },
         "s3-glacier": {
           "expressjs": {
-            "javascript": {},
-            "typescript": {}
+            "javascript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "nestjs": {
-            "typescript": {}
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "nextjs": {
-            "javascript": {},
-            "typescript": {}
+            "javascript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "remixjs": {
-            "typescript": {}
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           }
         },
         "s3-glacier-deep-archive": {
           "expressjs": {
-            "javascript": {},
-            "typescript": {}
+            "javascript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "nestjs": {
-            "typescript": {}
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "nextjs": {
-            "javascript": {},
-            "typescript": {}
+            "javascript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "remixjs": {
-            "typescript": {}
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           }
         },
         "secrets-manager": {
           "expressjs": {
-            "javascript": {},
-            "typescript": {}
+            "javascript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "nestjs": {
-            "typescript": {}
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "nextjs": {
-            "javascript": {},
-            "typescript": {}
+            "javascript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "remixjs": {
-            "typescript": {}
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           }
         },
         "server-migration-service": {
@@ -3599,178 +5207,640 @@
         },
         "service-catalog": {
           "expressjs": {
-            "javascript": {},
-            "typescript": {}
+            "javascript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "nestjs": {
-            "typescript": {}
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "nextjs": {
-            "javascript": {},
-            "typescript": {}
+            "javascript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "remixjs": {
-            "typescript": {}
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           }
         },
         "shield": {
           "expressjs": {
-            "javascript": {},
-            "typescript": {}
+            "javascript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "nestjs": {
-            "typescript": {}
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "nextjs": {
-            "javascript": {},
-            "typescript": {}
+            "javascript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "remixjs": {
-            "typescript": {}
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           }
         },
         "simple-email-service": {
           "expressjs": {
-            "javascript": {},
-            "typescript": {}
+            "javascript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "nestjs": {
-            "typescript": {}
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "nextjs": {
-            "javascript": {},
-            "typescript": {}
+            "javascript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "remixjs": {
-            "typescript": {}
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           }
         },
         "snowball": {
           "expressjs": {
-            "javascript": {},
-            "typescript": {}
+            "javascript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "nestjs": {
-            "typescript": {}
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "nextjs": {
-            "javascript": {},
-            "typescript": {}
+            "javascript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "remixjs": {
-            "typescript": {}
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           }
         },
         "snowmobile": {
           "expressjs": {
-            "javascript": {},
-            "typescript": {}
+            "javascript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "nestjs": {
-            "typescript": {}
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "nextjs": {
-            "javascript": {},
-            "typescript": {}
+            "javascript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "remixjs": {
-            "typescript": {}
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           }
         },
         "sso": {
           "expressjs": {
-            "javascript": {},
-            "typescript": {}
+            "javascript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "nestjs": {
-            "typescript": {}
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "nextjs": {
-            "javascript": {},
-            "typescript": {}
+            "javascript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "remixjs": {
-            "typescript": {}
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           }
         },
         "storage-gateway": {
           "expressjs": {
-            "javascript": {},
-            "typescript": {}
+            "javascript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "nestjs": {
-            "typescript": {}
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "nextjs": {
-            "javascript": {},
-            "typescript": {}
+            "javascript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "remixjs": {
-            "typescript": {}
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           }
         },
         "sts": {
           "expressjs": {
-            "javascript": {},
-            "typescript": {}
+            "javascript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "nestjs": {
-            "typescript": {}
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "nextjs": {
-            "javascript": {},
-            "typescript": {}
+            "javascript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "remixjs": {
-            "typescript": {}
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           }
         },
         "systems-manager": {
           "expressjs": {
-            "javascript": {},
-            "typescript": {}
+            "javascript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "nestjs": {
-            "typescript": {}
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "nextjs": {
-            "javascript": {},
-            "typescript": {}
+            "javascript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "remixjs": {
-            "typescript": {}
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           }
         },
         "textract": {
           "expressjs": {
-            "javascript": {},
-            "typescript": {}
+            "javascript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "nestjs": {
-            "typescript": {}
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "nextjs": {
-            "javascript": {},
-            "typescript": {}
+            "javascript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "remixjs": {
-            "typescript": {}
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           }
         },
         "translate": {
           "expressjs": {
-            "javascript": {},
-            "typescript": {}
+            "javascript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "nestjs": {
-            "typescript": {}
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "nextjs": {
-            "javascript": {},
-            "typescript": {}
+            "javascript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "remixjs": {
-            "typescript": {}
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           }
         },
         "trustedAdvisor": {
@@ -3884,34 +5954,118 @@
         },
         "vpc": {
           "expressjs": {
-            "javascript": {},
-            "typescript": {}
+            "javascript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "nestjs": {
-            "typescript": {}
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "nextjs": {
-            "javascript": {},
-            "typescript": {}
+            "javascript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "remixjs": {
-            "typescript": {}
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           }
         },
         "waf": {
           "expressjs": {
-            "javascript": {},
-            "typescript": {}
+            "javascript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "nestjs": {
-            "typescript": {}
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "nextjs": {
-            "javascript": {},
-            "typescript": {}
+            "javascript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           },
           "remixjs": {
-            "typescript": {}
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
           }
         },
         "x-ray": {
@@ -4022,48 +6176,347 @@
               }
             }
           }
+        },
+        "backup": {
+          "expressjs": {
+            "javascript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
+          },
+          "nestjs": {
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
+          },
+          "nextjs": {
+            "javascript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
+          },
+          "remixjs": {
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
+          }
         }
       }
     },
     "database": {
       "description": "Database integration with orm selection and management features",
-      "supportedFrameworks": ["nextjs", "expressjs", "nestjs", "remixjs"],
-      "supportedLanguages": ["javascript"],
-      "supportedDatabases": ["mongodb", "supabase", "neondb"],
+      "supportedFrameworks": [
+        "nextjs",
+        "expressjs",
+        "nestjs",
+        "remixjs",
+        "mongoose",
+        "typegoose",
+        "GORM",
+        "Peewee",
+        "SQLAlchemy",
+        "Sequel",
+        "djangoORM",
+        "drizzle",
+        "prisma",
+        "typeorm"
+      ],
+      "supportedLanguages": [
+        "javascript",
+        "typescript",
+        "go",
+        "python",
+        "ruby"
+      ],
+      "supportedDatabases": [
+        "mongodb",
+        "supabase",
+        "neondb"
+      ],
       "supportedORMs": {
         "mongodb": {
-          "mongoose": ["javascript", "typescript"],
-          "typegoose": ["typescript"]
+          "mongoose": [
+            "javascript",
+            "typescript"
+          ],
+          "typegoose": [
+            "typescript"
+          ]
         },
         "mysql": {
-          "typeorm": ["javascript", "typescript"],
-          "prisma": ["typescript"],
-          "drizzle": ["typescript"],
-          "djangoORM": ["python"],
-          "SQLAlchemy": ["python"],
-          "Peewee": ["python"],
-          "GORM": ["go"],
-          "Sequel": ["ruby"]
+          "typeorm": [
+            "javascript",
+            "typescript"
+          ],
+          "prisma": [
+            "typescript"
+          ],
+          "drizzle": [
+            "typescript"
+          ],
+          "djangoORM": [
+            "python"
+          ],
+          "SQLAlchemy": [
+            "python"
+          ],
+          "Peewee": [
+            "python"
+          ],
+          "GORM": [
+            "go"
+          ],
+          "Sequel": [
+            "ruby"
+          ]
         },
         "postgres": {
-          "typeorm": ["javascript", "typescript"],
-          "prisma": ["typescript"],
-          "drizzle": ["typescript"],
-          "djangoORM": ["python"],
-          "SQLAlchemy": ["python"],
-          "Peewee": ["python"],
-          "GORM": ["go"],
-          "Sequel": ["ruby"]
+          "typeorm": [
+            "javascript",
+            "typescript"
+          ],
+          "prisma": [
+            "typescript"
+          ],
+          "drizzle": [
+            "typescript"
+          ],
+          "djangoORM": [
+            "python"
+          ],
+          "SQLAlchemy": [
+            "python"
+          ],
+          "Peewee": [
+            "python"
+          ],
+          "GORM": [
+            "go"
+          ],
+          "Sequel": [
+            "ruby"
+          ]
         }
       },
       "files": {
         "mongodb": {
           "mongoose": {
-            "javascript": {},
-            "typescript": {}
+            "javascript": {
+              "expressjs/.env": {
+                "action": "append"
+              },
+              "expressjs/controllers/userController.js": {
+                "action": "create"
+              },
+              "expressjs/index.js": {
+                "action": "prepend"
+              },
+              "expressjs/models/User.js": {
+                "action": "create"
+              },
+              "expressjs/package.json": {
+                "action": "install"
+              },
+              "expressjs/routes/userRoutes.js": {
+                "action": "create"
+              },
+              "expressjs/utils/mongodb.js": {
+                "action": "create"
+              },
+              "nextjs/.env": {
+                "action": "append"
+              },
+              "nextjs/app/api/users/route.js": {
+                "action": "create"
+              },
+              "nextjs/lib/mongodb.js": {
+                "action": "create"
+              },
+              "nextjs/models/User.js": {
+                "action": "create"
+              },
+              "nextjs/package.json": {
+                "action": "install"
+              }
+            },
+            "typescript": {
+              "expressjs/.env": {
+                "action": "append"
+              },
+              "expressjs/controllers/userController.ts": {
+                "action": "create"
+              },
+              "expressjs/index.ts": {
+                "action": "prepend"
+              },
+              "expressjs/models/User.ts": {
+                "action": "create"
+              },
+              "expressjs/package.json": {
+                "action": "install"
+              },
+              "expressjs/routes/userRoutes.ts": {
+                "action": "create"
+              },
+              "expressjs/utils/mongodb.ts": {
+                "action": "create"
+              },
+              "nestjs/.env": {
+                "action": "append"
+              },
+              "nestjs/package.json": {
+                "action": "install"
+              },
+              "nestjs/src/user/user.controller.ts": {
+                "action": "create"
+              },
+              "nestjs/src/user/user.module.ts": {
+                "action": "create"
+              },
+              "nestjs/src/user/user.schema.ts": {
+                "action": "create"
+              },
+              "nestjs/src/user/user.service.ts": {
+                "action": "create"
+              },
+              "nextjs/.env": {
+                "action": "append"
+              },
+              "nextjs/app/api/users/route.ts": {
+                "action": "create"
+              },
+              "nextjs/lib/mongodb.ts": {
+                "action": "create"
+              },
+              "nextjs/models/User.ts": {
+                "action": "create"
+              },
+              "nextjs/package.json": {
+                "action": "install"
+              },
+              "remixjs/.env": {
+                "action": "append"
+              },
+              "remixjs/app/models/User.ts": {
+                "action": "create"
+              },
+              "remixjs/app/routes/api.users.ts": {
+                "action": "create"
+              },
+              "remixjs/app/utils/mongodb.ts": {
+                "action": "create"
+              },
+              "remixjs/package.json": {
+                "action": "install"
+              }
+            }
           },
           "typegoose": {
-            "typescript": {}
+            "typescript": {
+              "expressjs/.env": {
+                "action": "append"
+              },
+              "expressjs/controllers/userController.ts": {
+                "action": "create"
+              },
+              "expressjs/index.ts": {
+                "action": "prepend"
+              },
+              "expressjs/models/User.ts": {
+                "action": "create"
+              },
+              "expressjs/package.json": {
+                "action": "install"
+              },
+              "expressjs/routes/userRoutes.ts": {
+                "action": "create"
+              },
+              "expressjs/utils/mongodb.ts": {
+                "action": "create"
+              },
+              "nestjs/.env": {
+                "action": "append"
+              },
+              "nestjs/package.json": {
+                "action": "install"
+              },
+              "nestjs/src/user/user.controller.ts": {
+                "action": "create"
+              },
+              "nestjs/src/user/user.model.ts": {
+                "action": "create"
+              },
+              "nestjs/src/user/user.module.ts": {
+                "action": "create"
+              },
+              "nestjs/src/user/user.service.ts": {
+                "action": "create"
+              },
+              "nextjs/.env": {
+                "action": "append"
+              },
+              "nextjs/app/api/users/route.ts": {
+                "action": "create"
+              },
+              "nextjs/lib/mongodb.ts": {
+                "action": "create"
+              },
+              "nextjs/models/User.ts": {
+                "action": "create"
+              },
+              "nextjs/package.json": {
+                "action": "install"
+              },
+              "remixjs/.env": {
+                "action": "append"
+              },
+              "remixjs/app/models/User.ts": {
+                "action": "create"
+              },
+              "remixjs/app/routes/api.users.ts": {
+                "action": "create"
+              },
+              "remixjs/app/utils/mongodb.ts": {
+                "action": "create"
+              },
+              "remixjs/package.json": {
+                "action": "install"
+              }
+            }
           }
         },
         "mysql": {
@@ -4084,7 +6537,79 @@
               "expressjs": {},
               "nestjs": {},
               "nextjs": {},
-              "remixjs": {}
+              "remixjs": {},
+              "expressjs/.env": {
+                "action": "append"
+              },
+              "expressjs/controllers/prismaController.ts": {
+                "action": "create"
+              },
+              "expressjs/index.ts": {
+                "action": "prepend"
+              },
+              "expressjs/package.json": {
+                "action": "install"
+              },
+              "expressjs/prisma/schema.prisma": {
+                "action": "create"
+              },
+              "expressjs/routes/prismaRoutes.ts": {
+                "action": "create"
+              },
+              "expressjs/utils/prisma.ts": {
+                "action": "create"
+              },
+              "nestjs/.env": {
+                "action": "append"
+              },
+              "nestjs/package.json": {
+                "action": "install"
+              },
+              "nestjs/prisma/schema.prisma": {
+                "action": "create"
+              },
+              "nestjs/src/prisma.service.ts": {
+                "action": "create"
+              },
+              "nestjs/src/user/user.controller.ts": {
+                "action": "create"
+              },
+              "nestjs/src/user/user.module.ts": {
+                "action": "create"
+              },
+              "nestjs/src/user/user.service.ts": {
+                "action": "create"
+              },
+              "nextjs/.env": {
+                "action": "append"
+              },
+              "nextjs/app/api/users/route.ts": {
+                "action": "create"
+              },
+              "nextjs/lib/prisma.ts": {
+                "action": "create"
+              },
+              "nextjs/package.json": {
+                "action": "install"
+              },
+              "nextjs/prisma/schema.prisma": {
+                "action": "create"
+              },
+              "remixjs/.env": {
+                "action": "append"
+              },
+              "remixjs/app/prisma/schema.prisma": {
+                "action": "create"
+              },
+              "remixjs/app/routes/api.users.ts": {
+                "action": "create"
+              },
+              "remixjs/app/utils/prisma.ts": {
+                "action": "create"
+              },
+              "remixjs/package.json": {
+                "action": "install"
+              }
             }
           },
           "drizzle": {
@@ -4129,7 +6654,79 @@
               "expressjs": {},
               "nestjs": {},
               "nextjs": {},
-              "remixjs": {}
+              "remixjs": {},
+              "expressjs/.env": {
+                "action": "append"
+              },
+              "expressjs/controllers/prismaController.ts": {
+                "action": "create"
+              },
+              "expressjs/index.ts": {
+                "action": "prepend"
+              },
+              "expressjs/package.json": {
+                "action": "install"
+              },
+              "expressjs/prisma/schema.prisma": {
+                "action": "create"
+              },
+              "expressjs/routes/prismaRoutes.ts": {
+                "action": "create"
+              },
+              "expressjs/utils/prisma.ts": {
+                "action": "create"
+              },
+              "nestjs/.env": {
+                "action": "append"
+              },
+              "nestjs/package.json": {
+                "action": "install"
+              },
+              "nestjs/prisma/schema.prisma": {
+                "action": "create"
+              },
+              "nestjs/src/prisma.service.ts": {
+                "action": "create"
+              },
+              "nestjs/src/user/user.controller.ts": {
+                "action": "create"
+              },
+              "nestjs/src/user/user.module.ts": {
+                "action": "create"
+              },
+              "nestjs/src/user/user.service.ts": {
+                "action": "create"
+              },
+              "nextjs/.env": {
+                "action": "append"
+              },
+              "nextjs/app/api/users/route.ts": {
+                "action": "create"
+              },
+              "nextjs/lib/prisma.ts": {
+                "action": "create"
+              },
+              "nextjs/package.json": {
+                "action": "install"
+              },
+              "nextjs/prisma/schema.prisma": {
+                "action": "create"
+              },
+              "remixjs/.env": {
+                "action": "append"
+              },
+              "remixjs/app/prisma/schema.prisma": {
+                "action": "create"
+              },
+              "remixjs/app/routes/api.users.ts": {
+                "action": "create"
+              },
+              "remixjs/app/utils/prisma.ts": {
+                "action": "create"
+              },
+              "remixjs/package.json": {
+                "action": "install"
+              }
             }
           },
           "drizzle": {
@@ -4169,7 +6766,9 @@
         "vuejs",
         "reactjs"
       ],
-      "supportedLanguages": ["javascript"],
+      "supportedLanguages": [
+        "javascript"
+      ],
       "files": {
         "angularjs": {
           ".dockerignore": {
@@ -4269,44 +6868,61 @@
           "Dockerfile": {
             "action": "create"
           }
-        }
+        },
+        "django": {},
+        "flask": {},
+        "go": {},
+        "nuxtjs": {},
+        "react-native": {},
+        "ruby": {},
+        "rust": {}
       }
     },
     "gitignore": {
       "description": "GitIgnore files for various frameworks and languages",
-      "supportedFrameworks": ["nextjs", "angularjs", "nestjs"],
-      "supportedLanguages": ["javascript", "go", "python", "rust"],
+      "supportedFrameworks": [
+        "nextjs",
+        "angularjs",
+        "nestjs"
+      ],
+      "supportedLanguages": [
+        "javascript",
+        "go",
+        "python",
+        "rust"
+      ],
       "files": {
         "angularjs": {
-          "angular-gitignore": {
+          ".gitignore": {
             "action": "create"
           }
         },
         "go": {
-          "go-gitignore": {
+          ".gitignore": {
             "action": "create"
           }
         },
         "nestjs": {
-          "nestjs-gitignore": {
+          ".gitignore": {
             "action": "create"
           }
         },
         "nextjs": {
-          "nextjs-gitignore": {
+          ".gitignore": {
             "action": "create"
           }
         },
         "python": {
-          "python-gitignore": {
+          ".gitignore": {
             "action": "create"
           }
         },
         "rust": {
-          "rust-gitignore": {
+          ".gitignore": {
             "action": "create"
           }
-        }
+        },
+        "angular": {}
       }
     },
     "payment": {
@@ -4318,8 +6934,15 @@
         "remixjs",
         "vuejs"
       ],
-      "supportedLanguages": ["javascript"],
-      "supportedPayments": ["stripe", "razorpay", "paypal"],
+      "supportedLanguages": [
+        "javascript",
+        "typescript"
+      ],
+      "supportedPayments": [
+        "stripe",
+        "razorpay",
+        "paypal"
+      ],
       "files": {
         "paypal": {
           "expressjs": {
@@ -4670,9 +7293,21 @@
     },
     "storage": {
       "description": "Storage Integration for files, images, and videos",
-      "supportedFrameworks": ["nextjs", "expressjs", "nestjs", "remixjs"],
-      "supportedLanguages": ["javascript"],
-      "supportedStorages": ["imagekit.io", "cloudinary", "google-cloud"],
+      "supportedFrameworks": [
+        "nextjs",
+        "expressjs",
+        "nestjs",
+        "remixjs"
+      ],
+      "supportedLanguages": [
+        "javascript",
+        "typescript"
+      ],
+      "supportedStorages": [
+        "imagekit.io",
+        "cloudinary",
+        "google-cloud"
+      ],
       "files": {
         "imagekit.io": {
           "expressjs": {
@@ -4694,6 +7329,9 @@
               },
               "package.json": {
                 "action": "install"
+              },
+              "controllers/imagekitControllers.js": {
+                "action": "create"
               }
             },
             "typescript": {
@@ -4714,6 +7352,9 @@
               },
               "package.json": {
                 "action": "install"
+              },
+              "controllers/imagekitControllers.ts": {
+                "action": "create"
               }
             }
           },
@@ -5037,9 +7678,21 @@
     },
     "ui": {
       "description": "UI Libraries features for various frameworks",
-      "supportedFrameworks": ["nextjs", "angularjs", "reactjs", "vuejs"],
-      "supportedLanguages": ["javascript"],
-      "supportedUiLibraries": ["daisy"],
+      "supportedFrameworks": [
+        "nextjs",
+        "angularjs",
+        "reactjs",
+        "vuejs",
+        "django",
+        "nuxtjs"
+      ],
+      "supportedLanguages": [
+        "javascript",
+        "typescript"
+      ],
+      "supportedUiLibraries": [
+        "daisy"
+      ],
       "files": {
         "daisy": {
           "angularjs": {
@@ -5126,9 +7779,34 @@
                 "action": "overwrite"
               }
             }
-          }
+          },
+          "django": {},
+          "nuxtjs": {}
         }
       }
+    },
+    "monitoring": {
+      "description": "Monitoring integration for enhanced functionality",
+      "supportedFrameworks": [],
+      "supportedLanguages": [],
+      "files": {
+        "sentry": {},
+        "datadog": {},
+        "opentelemetry": {}
+      }
+    },
+    "testing": {
+      "description": "Testing integration for enhanced functionality",
+      "supportedFrameworks": [],
+      "supportedLanguages": [],
+      "files": {
+        "jest": {},
+        "cypress": {},
+        "mocha": {},
+        "playwright": {}
+      }
     }
-  }
+  },
+  "version": "3.0.0",
+  "lastUpdated": "2025-09-10T12:32:12.967Z"
 }
