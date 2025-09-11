@@ -12,18 +12,20 @@ import ora from 'ora';
 
 const execAsync = promisify(exec);
 
+export interface CreateProjectOptions {
+  projectName: string;
+  framework: string;
+  language: string;
+  templateName: string;
+  templatePath: string;
+  options?: Record<string, any>;
+}
+
 /**
  * Create a project from a template with progress indicators and error handling
- * @param projectName - Name of the project to create
- * @param templatePath - Path to the template directory
- * @param features - Optional features to integrate during creation
- * @returns Promise<string> - Path to the created project
  */
-export async function createProjectFromTemplate(
-    projectName: string, 
-    templatePath: string,
-    features?: Array<{ feature: string; provider?: string }>
-): Promise<string> {
+export async function createProjectFromTemplate(options: CreateProjectOptions): Promise<string> {
+    const { projectName, templatePath } = options;
     const spinner = ora(chalk.hex('#10ac84')('Creating project structure...')).start();
     
     try {

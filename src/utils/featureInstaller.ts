@@ -11,12 +11,10 @@ import ora from 'ora';
 import { SupportedLanguage, installPackages } from './dependencyInstaller.js';
 import { detectLanguageFromFiles } from './languageConfig.js';
 import { 
-  getCachedFeatures, 
-  cacheFeatures, 
-  getCachedProject, 
-  cacheFeatureUsage,
-  getCachedTemplateFile,
-  cacheTemplateFile,
+  updateTemplateUsage, 
+  getCachedTemplateFiles, 
+  cacheTemplateFiles, 
+  getDirectorySize,
   cacheProjectData
 } from './cacheManager.js';
 
