@@ -16,7 +16,12 @@
       "type": "backend",
       "description": "High-level Python web framework that encourages rapid development and clean, pragmatic design",
       "languages": ["python"],
-      "templates": ["django-bower-and-gulp-config-template", "django-full-stack-template", "django-inertia-svelte-template", "djangoTemplate"]
+      "templates": [
+        "django-bower-and-gulp-config-template",
+        "django-full-stack-template",
+        "django-inertia-svelte-template",
+        "djangoTemplate"
+      ]
     },
     "expressjs": {
       "type": "backend",
@@ -24,11 +29,16 @@
       "languages": ["javascript", "typescript"],
       "templates": ["advance-expressjs-template", "basic-expressjs-template"]
     },
-    "flask":{
+    "flask": {
       "type": "backend",
       "description": "Lightweight WSGI web application framework in Python",
       "languages": ["python"],
-      "templates": ["flask-cookiecutter-advance-template", "flask-template-bootstrap-2", "flask-template-bootstrap", "flask-template-with-useful-plugins"]
+      "templates": [
+        "flask-cookiecutter-advance-template",
+        "flask-template-bootstrap-2",
+        "flask-template-bootstrap",
+        "flask-template-with-useful-plugins"
+      ]
     },
     "go": {
       "type": "backend",
@@ -115,7 +125,11 @@
       "type": "backend",
       "description": "Dynamic, open source programming language with a focus on simplicity and productivity",
       "languages": ["ruby"],
-      "templates": ["rails_7_esbuild_hotwire_tailwindcss_starter", "ruby-on-rails-apis-template", "ruby-on-rails-boilerplate-template"]
+      "templates": [
+        "rails_7_esbuild_hotwire_tailwindcss_starter",
+        "ruby-on-rails-apis-template",
+        "ruby-on-rails-boilerplate-template"
+      ]
     },
     "rust": {
       "type": "backend",

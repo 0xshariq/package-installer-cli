@@ -2,22 +2,9 @@
   "features": {
     "ai": {
       "description": "AI integration code for enhanced user experiences",
-      "supportedFrameworks": [
-        "nextjs",
-        "expressjs",
-        "nestjs",
-        "remixjs"
-      ],
-      "supportedLanguages": [
-        "javascript"
-      ],
-      "supportedAIs": [
-        "gemini",
-        "grok",
-        "open-ai",
-        "open-router",
-        "claude"
-      ],
+      "supportedFrameworks": ["nextjs", "expressjs", "nestjs", "remixjs"],
+      "supportedLanguages": ["javascript"],
+      "supportedAIs": ["gemini", "grok", "open-ai", "open-router", "claude"],
       "files": {
         "claude": {
           "expressjs": {
@@ -568,19 +555,9 @@
     },
     "analytics": {
       "description": "Analytics integration for enhanced functionality",
-      "supportedFrameworks": [
-        "nextjs",
-        "expressjs",
-        "nestjs",
-        "remixjs"
-      ],
-      "supportedLanguages": [
-        "javascript"
-      ],
-      "supportedAnalytics": [
-        "plausible",
-        "posthog"
-      ],
+      "supportedFrameworks": ["nextjs", "expressjs", "nestjs", "remixjs"],
+      "supportedLanguages": ["javascript"],
+      "supportedAnalytics": ["plausible", "posthog"],
       "files": {
         "plausible": {},
         "posthog": {}
@@ -600,14 +577,8 @@
         "go",
         "ruby-on-rails"
       ],
-      "supportedLanguages": [
-        "javascript"
-      ],
-      "supportedAuths": [
-        "auth0",
-        "clerk",
-        "next-auth"
-      ],
+      "supportedLanguages": ["javascript"],
+      "supportedAuths": ["auth0", "clerk", "next-auth"],
       "files": {
         "auth0": {
           "angularjs": {
@@ -947,15 +918,8 @@
     },
     "aws": {
       "description": "AWS integration and deployment features",
-      "supportedFrameworks": [
-        "nextjs",
-        "expressjs",
-        "nestjs",
-        "remixjs"
-      ],
-      "supportedLanguages": [
-        "javascript"
-      ],
+      "supportedFrameworks": ["nextjs", "expressjs", "nestjs", "remixjs"],
+      "supportedLanguages": ["javascript"],
       "supportedAwsServices": [
         "api-gateway",
         "app-sync",
@@ -1261,6 +1225,64 @@
             }
           }
         },
+        "backup": {
+          "expressjs": {
+            "javascript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
+          },
+          "nestjs": {
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
+          },
+          "nextjs": {
+            "javascript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            },
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
+          },
+          "remixjs": {
+            "typescript": {
+              ".env": {
+                "action": "append"
+              },
+              "package.json": {
+                "action": "install"
+              }
+            }
+          }
+        },
         "backup-gateway": {
           "expressjs": {
             "javascript": {
@@ -1442,19 +1464,19 @@
                 "action": "append"
               },
               "controllers/awsCloudFrontController.js": {
-                "action": ""
+                "action": "create"
               },
               "index.js": {
-                "action": ""
+                "action": "prepend"
               },
               "package.json": {
                 "action": "install"
               },
               "routes/awsCloudFrontRoutes.js": {
-                "action": ""
+                "action": "create"
               },
               "utils/awsCloudFront.js": {
-                "action": ""
+                "action": "create"
               }
             },
             "typescript": {
@@ -1462,19 +1484,19 @@
                 "action": "append"
               },
               "controllers/awsCloudFrontController.ts": {
-                "action": ""
+                "action": "create"
               },
               "index.ts": {
-                "action": ""
+                "action": "prepend"
               },
               "package.json": {
                 "action": "install"
               },
               "routes/awsCloudFrontRoutes.ts": {
-                "action": ""
+                "action": "create"
               },
               "utils/awsCloudFront.ts": {
-                "action": ""
+                "action": "create"
               }
             }
           },
@@ -1487,10 +1509,10 @@
                 "action": "install"
               },
               "src/aws-cloudfront/aws-cloudfront.controller.ts": {
-                "action": ""
+                "action": "create"
               },
               "src/aws-cloudfront/aws-cloudfront.service.ts": {
-                "action": ""
+                "action": "create"
               }
             }
           },
@@ -1500,10 +1522,10 @@
                 "action": "append"
               },
               "app/api/aws/cloudfront/route.js": {
-                "action": ""
+                "action": "create"
               },
               "lib/awsCloudFront.js": {
-                "action": ""
+                "action": "create"
               },
               "package.json": {
                 "action": "install"
@@ -1514,10 +1536,10 @@
                 "action": "append"
               },
               "app/api/aws/cloudfront/route.ts": {
-                "action": ""
+                "action": "create"
               },
               "lib/awsCloudFront.ts": {
-                "action": ""
+                "action": "create"
               },
               "package.json": {
                 "action": "install"
@@ -1530,7 +1552,7 @@
                 "action": "append"
               },
               "app/routes/api/aws-cloudfront.ts": {
-                "action": ""
+                "action": "create"
               },
               "package.json": {
                 "action": "install"
@@ -1545,19 +1567,19 @@
                 "action": "append"
               },
               "controllers/cloudtrailController.js": {
-                "action": ""
+                "action": "create"
               },
               "index.js": {
-                "action": ""
+                "action": "prepend"
               },
               "package.json": {
                 "action": "install"
               },
               "routes/awsCloudTrailRoutes.js": {
-                "action": ""
+                "action": "create"
               },
               "utils/aws-cloudtrail.js": {
-                "action": ""
+                "action": "create"
               }
             },
             "typescript": {
@@ -1565,19 +1587,19 @@
                 "action": "append"
               },
               "controllers/awsCloudTrailController.ts": {
-                "action": ""
+                "action": "create"
               },
               "index.ts": {
-                "action": ""
+                "action": "prepend"
               },
               "package.json": {
                 "action": "install"
               },
               "routes/awsCloudTrailRoutes.ts": {
-                "action": ""
+                "action": "create"
               },
               "utils/aws-cloudtrail.ts": {
-                "action": ""
+                "action": "create"
               }
             }
           },
@@ -1590,13 +1612,13 @@
                 "action": "install"
               },
               "src/cloudtrail/cloudtrail.controller.ts": {
-                "action": ""
+                "action": "create"
               },
               "src/cloudtrail/cloudtrail.module.ts": {
-                "action": ""
+                "action": "create"
               },
               "src/cloudtrail/cloudtrail.service.ts": {
-                "action": ""
+                "action": "create"
               }
             }
           },
@@ -1606,10 +1628,10 @@
                 "action": "append"
               },
               "app/api/aws/cloudtrail/route.js": {
-                "action": ""
+                "action": "create"
               },
               "lib/aws-cloudtrail.js": {
-                "action": ""
+                "action": "create"
               },
               "package.json": {
                 "action": "install"
@@ -1620,10 +1642,10 @@
                 "action": "append"
               },
               "app/api/aws/cloudtrail/route.ts": {
-                "action": ""
+                "action": "create"
               },
               "lib/aws-cloudtrail.ts": {
-                "action": ""
+                "action": "create"
               },
               "package.json": {
                 "action": "install"
@@ -1636,10 +1658,10 @@
                 "action": "append"
               },
               "app/routes/api/aws-cloudtrail.ts": {
-                "action": ""
+                "action": "create"
               },
               "app/utils/aws-cloudtrail.ts": {
-                "action": ""
+                "action": "create"
               },
               "package.json": {
                 "action": "install"
@@ -1654,19 +1676,19 @@
                 "action": "append"
               },
               "controllers/awsCloudWatchController.js": {
-                "action": ""
+                "action": "create"
               },
               "index.js": {
-                "action": ""
+                "action": "prepend"
               },
               "package.json": {
                 "action": "install"
               },
               "routes/awsCloudWatchRoutes.js": {
-                "action": ""
+                "action": "create"
               },
               "utils/aws-cloudwatch.js": {
-                "action": ""
+                "action": "create"
               }
             },
             "typescript": {
@@ -1674,19 +1696,19 @@
                 "action": "append"
               },
               "controllers/awsCloudWatchController.ts": {
-                "action": ""
+                "action": "create"
               },
               "index.ts": {
-                "action": ""
+                "action": "prepend"
               },
               "package.json": {
                 "action": "install"
               },
               "routes/awsCloudWatchRoutes.ts": {
-                "action": ""
+                "action": "create"
               },
               "utils/aws-cloudwatch.ts": {
-                "action": ""
+                "action": "create"
               }
             }
           },
@@ -1699,13 +1721,13 @@
                 "action": "install"
               },
               "src/cloudwatch/aws-cloudwatch.controller.ts": {
-                "action": ""
+                "action": "create"
               },
               "src/cloudwatch/aws-cloudwatch.module.ts": {
-                "action": ""
+                "action": "create"
               },
               "src/cloudwatch/aws-cloudwatch.service.ts": {
-                "action": ""
+                "action": "create"
               }
             }
           },
@@ -1715,10 +1737,10 @@
                 "action": "append"
               },
               "app/api/aws/cloudwatch/route.js": {
-                "action": ""
+                "action": "create"
               },
               "lib/aws-cloudwatch.js": {
-                "action": ""
+                "action": "create"
               },
               "package.json": {
                 "action": "install"
@@ -1729,10 +1751,10 @@
                 "action": "append"
               },
               "app/api/aws/cloudwatch/route.ts": {
-                "action": ""
+                "action": "create"
               },
               "lib/aws-cloudwatch.ts": {
-                "action": ""
+                "action": "create"
               },
               "package.json": {
                 "action": "install"
@@ -1745,10 +1767,10 @@
                 "action": "append"
               },
               "app/routes/api/aws-cloudwatch.ts": {
-                "action": ""
+                "action": "create"
               },
               "app/utils/aws-cloudwatch.ts": {
-                "action": ""
+                "action": "create"
               },
               "package.json": {
                 "action": "install"
@@ -1763,19 +1785,19 @@
                 "action": "append"
               },
               "controllers/codeBuildController.js": {
-                "action": ""
+                "action": "create"
               },
               "index.js": {
-                "action": ""
+                "action": "prepend"
               },
               "package.json": {
                 "action": "install"
               },
               "routes/codeBuildRoutes.js": {
-                "action": ""
+                "action": "create"
               },
               "utils/codeBuild.js": {
-                "action": ""
+                "action": "create"
               }
             },
             "typescript": {
@@ -1783,19 +1805,19 @@
                 "action": "append"
               },
               "controllers/codeBuildController.ts": {
-                "action": ""
+                "action": "create"
               },
               "index.ts": {
-                "action": ""
+                "action": "prepend"
               },
               "package.json": {
                 "action": "install"
               },
               "routes/codeBuildRoutes.ts": {
-                "action": ""
+                "action": "create"
               },
               "utils/codeBuild.ts": {
-                "action": ""
+                "action": "create"
               }
             }
           },
@@ -1808,10 +1830,10 @@
                 "action": "install"
               },
               "src/codebuild/codebuild.controller.ts": {
-                "action": ""
+                "action": "create"
               },
               "src/codebuild/codebuild.service.ts": {
-                "action": ""
+                "action": "create"
               }
             }
           },
@@ -1821,10 +1843,10 @@
                 "action": "append"
               },
               "app/api/aws/codebuild/route.ts": {
-                "action": ""
+                "action": "create"
               },
               "lib/codeBuild.js": {
-                "action": ""
+                "action": "create"
               },
               "package.json": {
                 "action": "install"
@@ -1835,10 +1857,10 @@
                 "action": "append"
               },
               "app/api/aws/codebuild/route.ts": {
-                "action": ""
+                "action": "create"
               },
               "lib/codeBuild.ts": {
-                "action": ""
+                "action": "create"
               },
               "package.json": {
                 "action": "install"
@@ -1851,10 +1873,10 @@
                 "action": "append"
               },
               "app/routes/api/codebuild.ts": {
-                "action": ""
+                "action": "create"
               },
               "app/utils/codeBuild.ts": {
-                "action": ""
+                "action": "create"
               },
               "package.json": {
                 "action": "install"
@@ -1869,19 +1891,19 @@
                 "action": "append"
               },
               "controllers/codeCommitController.js": {
-                "action": ""
+                "action": "create"
               },
               "index.js": {
-                "action": ""
+                "action": "prepend"
               },
               "package.json": {
                 "action": "install"
               },
               "routes/codeCommitRoutes.js": {
-                "action": ""
+                "action": "create"
               },
               "utils/codeCommit.js": {
-                "action": ""
+                "action": "create"
               }
             },
             "typescript": {
@@ -1889,19 +1911,19 @@
                 "action": "append"
               },
               "controllers/codeCommitController.ts": {
-                "action": ""
+                "action": "create"
               },
               "index.ts": {
-                "action": ""
+                "action": "prepend"
               },
               "package.json": {
                 "action": "install"
               },
               "routes/codeCommitRoutes.ts": {
-                "action": ""
+                "action": "create"
               },
               "utils/codeCommit.ts": {
-                "action": ""
+                "action": "create"
               }
             }
           },
@@ -1914,10 +1936,10 @@
                 "action": "install"
               },
               "src/codecommit/codecommit.controller.ts": {
-                "action": ""
+                "action": "create"
               },
               "src/codecommit/codecommit.service.ts": {
-                "action": ""
+                "action": "create"
               }
             }
           },
@@ -1927,10 +1949,10 @@
                 "action": "append"
               },
               "app/api/aws/codecommit/route.js": {
-                "action": ""
+                "action": "create"
               },
               "lib/codeCommit.js": {
-                "action": ""
+                "action": "create"
               },
               "package.json": {
                 "action": "install"
@@ -1941,10 +1963,10 @@
                 "action": "append"
               },
               "app/api/aws/codecommit/route.ts": {
-                "action": ""
+                "action": "create"
               },
               "lib/codeCommit.ts": {
-                "action": ""
+                "action": "create"
               },
               "package.json": {
                 "action": "install"
@@ -1957,10 +1979,10 @@
                 "action": "append"
               },
               "app/routes/api/aws-codecommit.ts": {
-                "action": ""
+                "action": "create"
               },
               "app/utils/awsCodeCommit.ts": {
-                "action": ""
+                "action": "create"
               },
               "package.json": {
                 "action": "install"
@@ -1975,19 +1997,19 @@
                 "action": "append"
               },
               "controllers/codeDeployController.js": {
-                "action": ""
+                "action": "create"
               },
               "index.js": {
-                "action": ""
+                "action": "prepend"
               },
               "package.json": {
                 "action": "install"
               },
               "routes/codeDeployRoutes.js": {
-                "action": ""
+                "action": "create"
               },
               "utils/codeDeploy.js": {
-                "action": ""
+                "action": "create"
               }
             },
             "typescript": {
@@ -1995,19 +2017,19 @@
                 "action": "append"
               },
               "controllers/codeDeployController.ts": {
-                "action": ""
+                "action": "create"
               },
               "index.ts": {
-                "action": ""
+                "action": "prepend"
               },
               "package.json": {
                 "action": "install"
               },
               "routes/codeDeployRoutes.ts": {
-                "action": ""
+                "action": "create"
               },
               "utils/codeDeploy.ts": {
-                "action": ""
+                "action": "create"
               }
             }
           },
@@ -2020,13 +2042,13 @@
                 "action": "install"
               },
               "src/codedeploy/codedeploy.controller.ts": {
-                "action": ""
+                "action": "create"
               },
               "src/codedeploy/codedeploy.module.ts": {
-                "action": ""
+                "action": "create"
               },
               "src/codedeploy/codedeploy.service.ts": {
-                "action": ""
+                "action": "create"
               }
             }
           },
@@ -2036,10 +2058,10 @@
                 "action": "append"
               },
               "app/api/aws/codedeploy/route.js": {
-                "action": ""
+                "action": "create"
               },
               "lib/codeDeploy.js": {
-                "action": ""
+                "action": "create"
               },
               "package.json": {
                 "action": "install"
@@ -2050,10 +2072,10 @@
                 "action": "append"
               },
               "app/api/aws/codedeploy/route.ts": {
-                "action": ""
+                "action": "create"
               },
               "lib/codeDeploy.ts": {
-                "action": ""
+                "action": "create"
               },
               "package.json": {
                 "action": "install"
@@ -2066,10 +2088,10 @@
                 "action": "append"
               },
               "app/routes/api/codedeploy.ts": {
-                "action": ""
+                "action": "create"
               },
               "app/utils/codeDeploy.ts": {
-                "action": ""
+                "action": "create"
               },
               "package.json": {
                 "action": "install"
@@ -2084,19 +2106,19 @@
                 "action": "append"
               },
               "controllers/codePipelineController.js": {
-                "action": ""
+                "action": "create"
               },
               "index.js": {
-                "action": ""
+                "action": "prepend"
               },
               "package.json": {
                 "action": "install"
               },
               "routes/codePipelineRoutes.js": {
-                "action": ""
+                "action": "create"
               },
               "utils/codePipeline.js": {
-                "action": ""
+                "action": "create"
               }
             },
             "typescript": {
@@ -2104,19 +2126,19 @@
                 "action": "append"
               },
               "controllers/codePipelineController.ts": {
-                "action": ""
+                "action": "create"
               },
               "index.ts": {
-                "action": ""
+                "action": "prepend"
               },
               "package.json": {
                 "action": "install"
               },
               "routes/codePipelineRoutes.ts": {
-                "action": ""
+                "action": "create"
               },
               "utils/codePipeline.ts": {
-                "action": ""
+                "action": "create"
               }
             }
           },
@@ -2129,13 +2151,13 @@
                 "action": "install"
               },
               "src/codepipeline/codepipeline.controller.ts": {
-                "action": ""
+                "action": "create"
               },
               "src/codepipeline/codepipeline.module.ts": {
-                "action": ""
+                "action": "create"
               },
               "src/codepipeline/codepipeline.service.ts": {
-                "action": ""
+                "action": "create"
               }
             }
           },
@@ -2145,10 +2167,10 @@
                 "action": "append"
               },
               "app/api/aws/codepipeline/route.js": {
-                "action": ""
+                "action": "create"
               },
               "lib/codePipeline.js": {
-                "action": ""
+                "action": "create"
               },
               "package.json": {
                 "action": "install"
@@ -2159,10 +2181,10 @@
                 "action": "append"
               },
               "app/api/aws/codepipeline/route.ts": {
-                "action": ""
+                "action": "create"
               },
               "lib/codePipeline.ts": {
-                "action": ""
+                "action": "create"
               },
               "package.json": {
                 "action": "install"
@@ -2175,10 +2197,10 @@
                 "action": "append"
               },
               "app/routes/api/codepipeline.ts": {
-                "action": ""
+                "action": "create"
               },
               "app/utils/codePipeline.ts": {
-                "action": ""
+                "action": "create"
               },
               "package.json": {
                 "action": "install"
@@ -2193,19 +2215,19 @@
                 "action": "append"
               },
               "controllers/awsCognitoController.js": {
-                "action": ""
+                "action": "create"
               },
               "index.js": {
-                "action": ""
+                "action": "prepend"
               },
               "package.json": {
                 "action": "install"
               },
               "routes/awsCognitoRoutes.js": {
-                "action": ""
+                "action": "create"
               },
               "utils/awsCognito.js": {
-                "action": ""
+                "action": "create"
               }
             },
             "typescript": {
@@ -2213,19 +2235,19 @@
                 "action": "append"
               },
               "controllers/awsCognitoController.ts": {
-                "action": ""
+                "action": "create"
               },
               "index.ts": {
-                "action": ""
+                "action": "prepend"
               },
               "package.json": {
                 "action": "install"
               },
               "routes/awsCognitoRoutes.ts": {
-                "action": ""
+                "action": "create"
               },
               "utils/awsCognito.ts": {
-                "action": ""
+                "action": "create"
               }
             }
           },
@@ -2238,10 +2260,10 @@
                 "action": "install"
               },
               "src/aws-cognito/aws-cognito.controller.ts": {
-                "action": ""
+                "action": "create"
               },
               "src/aws-cognito/aws-cognito.service.ts": {
-                "action": ""
+                "action": "create"
               }
             }
           },
@@ -2251,10 +2273,10 @@
                 "action": "append"
               },
               "app/api/aws/cognito/route.ts": {
-                "action": ""
+                "action": "create"
               },
               "lib/awsCognito.js": {
-                "action": ""
+                "action": "create"
               },
               "package.json": {
                 "action": "install"
@@ -2265,10 +2287,10 @@
                 "action": "append"
               },
               "app/api/aws/cognito/route.ts": {
-                "action": ""
+                "action": "create"
               },
               "lib/awsCognito.ts": {
-                "action": ""
+                "action": "create"
               },
               "package.json": {
                 "action": "install"
@@ -2281,10 +2303,10 @@
                 "action": "append"
               },
               "app/routes/api/aws-cognito.ts": {
-                "action": ""
+                "action": "create"
               },
               "app/utils/awsCognito.ts": {
-                "action": ""
+                "action": "create"
               },
               "package.json": {
                 "action": "install"
@@ -2299,19 +2321,19 @@
                 "action": "append"
               },
               "controllers/configController.js": {
-                "action": ""
+                "action": "create"
               },
               "index.js": {
-                "action": ""
+                "action": "prepend"
               },
               "package.json": {
                 "action": "install"
               },
               "routes/configRoutes.js": {
-                "action": ""
+                "action": "create"
               },
               "utils/aws-config.js": {
-                "action": ""
+                "action": "create"
               }
             },
             "typescript": {
@@ -2319,19 +2341,19 @@
                 "action": "append"
               },
               "controllers/configController.ts": {
-                "action": ""
+                "action": "create"
               },
               "index.ts": {
-                "action": ""
+                "action": "prepend"
               },
               "package.json": {
                 "action": "install"
               },
               "routes/configRoutes.ts": {
-                "action": ""
+                "action": "create"
               },
               "utils/aws-config.ts": {
-                "action": ""
+                "action": "create"
               }
             }
           },
@@ -2344,13 +2366,13 @@
                 "action": "install"
               },
               "src/config/config.controller.ts": {
-                "action": ""
+                "action": "create"
               },
               "src/config/config.module.ts": {
-                "action": ""
+                "action": "create"
               },
               "src/config/config.service.ts": {
-                "action": ""
+                "action": "create"
               }
             }
           },
@@ -2360,10 +2382,10 @@
                 "action": "append"
               },
               "app/api/aws/config/route.js": {
-                "action": ""
+                "action": "create"
               },
               "lib/aws-config.js": {
-                "action": ""
+                "action": "create"
               },
               "package.json": {
                 "action": "install"
@@ -2374,10 +2396,10 @@
                 "action": "append"
               },
               "app/api/aws/config/route.ts": {
-                "action": ""
+                "action": "create"
               },
               "lib/aws-config.ts": {
-                "action": ""
+                "action": "create"
               },
               "package.json": {
                 "action": "install"
@@ -2390,10 +2412,10 @@
                 "action": "append"
               },
               "app/routes/api/config.ts": {
-                "action": ""
+                "action": "create"
               },
               "app/utils/aws-config.ts": {
-                "action": ""
+                "action": "create"
               },
               "package.json": {
                 "action": "install"
@@ -2814,19 +2836,19 @@
                 "action": "append"
               },
               "controllers/awsEbsController.js": {
-                "action": ""
+                "action": "create"
               },
               "index.js": {
-                "action": ""
+                "action": "prepend"
               },
               "package.json": {
                 "action": "install"
               },
               "routes/awsEbsRoutes.js": {
-                "action": ""
+                "action": "create"
               },
               "utils/awsEbs.js": {
-                "action": ""
+                "action": "create"
               }
             },
             "typescript": {
@@ -2834,19 +2856,19 @@
                 "action": "append"
               },
               "controllers/awsEbsController.ts": {
-                "action": ""
+                "action": "create"
               },
               "index.ts": {
-                "action": ""
+                "action": "prepend"
               },
               "package.json": {
                 "action": "install"
               },
               "routes/awsEbsRoutes.ts": {
-                "action": ""
+                "action": "create"
               },
               "utils/awsEbs.ts": {
-                "action": ""
+                "action": "create"
               }
             }
           },
@@ -2859,10 +2881,10 @@
                 "action": "install"
               },
               "src/aws-ebs/aws-ebs.controller.ts": {
-                "action": ""
+                "action": "create"
               },
               "src/aws-ebs/aws-ebs.service.ts": {
-                "action": ""
+                "action": "create"
               }
             }
           },
@@ -2872,10 +2894,10 @@
                 "action": "append"
               },
               "app/api/aws/ebs/route.js": {
-                "action": ""
+                "action": "create"
               },
               "lib/awsEbs.js": {
-                "action": ""
+                "action": "create"
               },
               "package.json": {
                 "action": "install"
@@ -2886,10 +2908,10 @@
                 "action": "append"
               },
               "app/api/aws/ebs/route.ts": {
-                "action": ""
+                "action": "create"
               },
               "lib/awsEbs.ts": {
-                "action": ""
+                "action": "create"
               },
               "package.json": {
                 "action": "install"
@@ -2902,10 +2924,10 @@
                 "action": "append"
               },
               "app/routes/api/aws-ebs.ts": {
-                "action": ""
+                "action": "create"
               },
               "app/utils/awsEbs.ts": {
-                "action": ""
+                "action": "create"
               },
               "package.json": {
                 "action": "install"
@@ -2920,19 +2942,19 @@
                 "action": "append"
               },
               "controllers/awsEc2Controller.js": {
-                "action": ""
+                "action": "create"
               },
               "index.js": {
-                "action": ""
+                "action": "create"
               },
               "package.json": {
                 "action": "install"
               },
               "routes/awsEc2Routes.js": {
-                "action": ""
+                "action": "create"
               },
               "utils/awsEc2.js": {
-                "action": ""
+                "action": "create"
               }
             },
             "typescript": {
@@ -2940,19 +2962,19 @@
                 "action": "append"
               },
               "controllers/awsEc2Controller.ts": {
-                "action": ""
+                "action": "create"
               },
               "index.ts": {
-                "action": ""
+                "action": "create"
               },
               "package.json": {
                 "action": "install"
               },
               "routes/awsEc2Routes.ts": {
-                "action": ""
+                "action": "create"
               },
               "utils/awsEc2.ts": {
-                "action": ""
+                "action": "create"
               }
             }
           },
@@ -2965,10 +2987,10 @@
                 "action": "install"
               },
               "src/aws-ec2/aws-ec2.controller.ts": {
-                "action": ""
+                "action": "create"
               },
               "src/aws-ec2/aws-ec2.service.ts": {
-                "action": ""
+                "action": "create"
               }
             }
           },
@@ -2978,10 +3000,10 @@
                 "action": "append"
               },
               "app/api/aws/ec2/route.js": {
-                "action": ""
+                "action": "create"
               },
               "lib/awsEc2.js": {
-                "action": ""
+                "action": "create"
               },
               "package.json": {
                 "action": "install"
@@ -2992,10 +3014,10 @@
                 "action": "append"
               },
               "app/api/aws/ec2/route.ts": {
-                "action": ""
+                "action": "create"
               },
               "lib/awsEc2.ts": {
-                "action": ""
+                "action": "create"
               },
               "package.json": {
                 "action": "install"
@@ -3008,7 +3030,7 @@
                 "action": "append"
               },
               "app/routes/api/aws-ec2.ts": {
-                "action": ""
+                "action": "create"
               },
               "package.json": {
                 "action": "install"
@@ -3081,19 +3103,19 @@
                 "action": "append"
               },
               "controllers/awsEcsController.js": {
-                "action": ""
+                "action": "create"
               },
               "index.js": {
-                "action": ""
+                "action": "prepend"
               },
               "package.json": {
                 "action": "install"
               },
               "routes/awsEcsRoutes.js": {
-                "action": ""
+                "action": "create"
               },
               "utils/awsEcs.js": {
-                "action": ""
+                "action": "create"
               }
             },
             "typescript": {
@@ -3101,19 +3123,19 @@
                 "action": "append"
               },
               "controllers/awsEcsController.ts": {
-                "action": ""
+                "action": "create"
               },
               "index.ts": {
-                "action": ""
+                "action": "prepend"
               },
               "package.json": {
                 "action": "install"
               },
               "routes/awsEcsRoutes.ts": {
-                "action": ""
+                "action": "create"
               },
               "utils/awsEcs.ts": {
-                "action": ""
+                "action": "create"
               }
             }
           },
@@ -3126,10 +3148,10 @@
                 "action": "install"
               },
               "src/aws-ecs/aws-ecs.controller.ts": {
-                "action": ""
+                "action": "create"
               },
               "src/aws-ecs/aws-ecs.service.ts": {
-                "action": ""
+                "action": "create"
               }
             }
           },
@@ -3139,10 +3161,10 @@
                 "action": "append"
               },
               "app/api/aws/ecs/route.js": {
-                "action": ""
+                "action": "create"
               },
               "lib/awsEcs.js": {
-                "action": ""
+                "action": "create"
               },
               "package.json": {
                 "action": "install"
@@ -3153,10 +3175,10 @@
                 "action": "append"
               },
               "app/api/aws/ecs/route.ts": {
-                "action": ""
+                "action": "create"
               },
               "lib/awsEcs.ts": {
-                "action": ""
+                "action": "create"
               },
               "package.json": {
                 "action": "install"
@@ -3169,10 +3191,10 @@
                 "action": "append"
               },
               "app/routes/api/aws-ecs.ts": {
-                "action": ""
+                "action": "create"
               },
               "app/utils/awsEcs.ts": {
-                "action": ""
+                "action": "create"
               },
               "package.json": {
                 "action": "install"
@@ -3187,19 +3209,19 @@
                 "action": "append"
               },
               "controllers/awsEfsController.js": {
-                "action": ""
+                "action": "create"
               },
               "index.js": {
-                "action": ""
+                "action": "prepend"
               },
               "package.json": {
                 "action": "install"
               },
               "routes/awsEfsRoutes.js": {
-                "action": ""
+                "action": "create"
               },
               "utils/awsEfs.js": {
-                "action": ""
+                "action": "create"
               }
             },
             "typescript": {
@@ -3207,19 +3229,19 @@
                 "action": "append"
               },
               "controllers/awsEfsController.ts": {
-                "action": ""
+                "action": "create"
               },
               "index.ts": {
-                "action": ""
+                "action": "prepend"
               },
               "package.json": {
                 "action": "install"
               },
               "routes/awsEfsRoutes.ts": {
-                "action": ""
+                "action": "create"
               },
               "utils/awsEfs.ts": {
-                "action": ""
+                "action": "create"
               }
             }
           },
@@ -3232,10 +3254,10 @@
                 "action": "install"
               },
               "src/aws-efs/aws-efs.controller.ts": {
-                "action": ""
+                "action": "create"
               },
               "src/aws-efs/aws-efs.service.ts": {
-                "action": ""
+                "action": "create"
               }
             }
           },
@@ -3245,10 +3267,10 @@
                 "action": "append"
               },
               "app/api/aws/efs/route.js": {
-                "action": ""
+                "action": "create"
               },
               "lib/awsEfs.js": {
-                "action": ""
+                "action": "create"
               },
               "package.json": {
                 "action": "install"
@@ -3259,10 +3281,10 @@
                 "action": "append"
               },
               "app/api/aws/efs/route.ts": {
-                "action": ""
+                "action": "create"
               },
               "lib/awsEfs.ts": {
-                "action": ""
+                "action": "create"
               },
               "package.json": {
                 "action": "install"
@@ -3275,10 +3297,10 @@
                 "action": "append"
               },
               "app/routes/api/aws-efs.ts": {
-                "action": ""
+                "action": "create"
               },
               "app/utils/awsEfs.ts": {
-                "action": ""
+                "action": "create"
               },
               "package.json": {
                 "action": "install"
@@ -3409,19 +3431,19 @@
                 "action": "append"
               },
               "controllers/awsElbController.js": {
-                "action": ""
+                "action": "create"
               },
               "index.js": {
-                "action": ""
+                "action": "prepend"
               },
               "package.json": {
                 "action": "install"
               },
               "routes/awsElbRoutes.js": {
-                "action": ""
+                "action": "create"
               },
               "utils/awsElb.js": {
-                "action": ""
+                "action": "create"
               }
             },
             "typescript": {
@@ -3429,19 +3451,19 @@
                 "action": "append"
               },
               "controllers/awsElbController.ts": {
-                "action": ""
+                "action": "create"
               },
               "index.ts": {
-                "action": ""
+                "action": "prepend"
               },
               "package.json": {
                 "action": "install"
               },
               "routes/awsElbRoutes.ts": {
-                "action": ""
+                "action": "create"
               },
               "utils/awsElb.ts": {
-                "action": ""
+                "action": "create"
               }
             }
           },
@@ -3454,10 +3476,10 @@
                 "action": "install"
               },
               "src/aws-elb/aws-elb.controller.ts": {
-                "action": ""
+                "action": "create"
               },
               "src/aws-elb/aws-elb.service.ts": {
-                "action": ""
+                "action": "create"
               }
             }
           },
@@ -3467,10 +3489,10 @@
                 "action": "append"
               },
               "app/api/aws/elb/route.js": {
-                "action": ""
+                "action": "create"
               },
               "lib/awsElb.js": {
-                "action": ""
+                "action": "create"
               },
               "package.json": {
                 "action": "install"
@@ -3481,10 +3503,10 @@
                 "action": "append"
               },
               "app/api/aws/elb/route.ts": {
-                "action": ""
+                "action": "create"
               },
               "lib/awsElb.ts": {
-                "action": ""
+                "action": "create"
               },
               "package.json": {
                 "action": "install"
@@ -3497,7 +3519,7 @@
                 "action": "append"
               },
               "app/routes/api/aws-elb.ts": {
-                "action": ""
+                "action": "create"
               },
               "package.json": {
                 "action": "install"
@@ -3802,19 +3824,19 @@
                 "action": "append"
               },
               "controllers/iamControllers.js": {
-                "action": ""
+                "action": "create"
               },
               "index.js": {
-                "action": ""
+                "action": "prepend"
               },
               "package.json": {
                 "action": "install"
               },
               "routes/iamRoutes.js": {
-                "action": ""
+                "action": "create"
               },
               "utils/awsIam.js": {
-                "action": ""
+                "action": "create"
               }
             },
             "typescript": {
@@ -3822,19 +3844,19 @@
                 "action": "append"
               },
               "controllers/iamControllers.ts": {
-                "action": ""
+                "action": "create"
               },
               "index.ts": {
-                "action": ""
+                "action": "prepend"
               },
               "package.json": {
                 "action": "install"
               },
               "routes/iamRoutes.ts": {
-                "action": ""
+                "action": "create"
               },
               "utils/awsIam.ts": {
-                "action": ""
+                "action": "create"
               }
             }
           },
@@ -3847,13 +3869,13 @@
                 "action": "install"
               },
               "src/aws-iam/aws-iam.controller.ts": {
-                "action": ""
+                "action": "create"
               },
               "src/aws-iam/aws-iam.module.ts": {
-                "action": ""
+                "action": "create"
               },
               "src/aws-iam/aws-iam.service.ts": {
-                "action": ""
+                "action": "create"
               }
             }
           },
@@ -3863,10 +3885,10 @@
                 "action": "append"
               },
               "app/api/aws/iam/route.js": {
-                "action": ""
+                "action": "create"
               },
               "lib/awsIam.js": {
-                "action": ""
+                "action": "create"
               },
               "package.json": {
                 "action": "install"
@@ -3877,10 +3899,10 @@
                 "action": "append"
               },
               "app/api/aws/iam/route.ts": {
-                "action": ""
+                "action": "create"
               },
               "lib/awsIam.ts": {
-                "action": ""
+                "action": "create"
               },
               "package.json": {
                 "action": "install"
@@ -3893,7 +3915,7 @@
                 "action": "append"
               },
               "app/routes/api/aws-iam.ts": {
-                "action": ""
+                "action": "create"
               },
               "package.json": {
                 "action": "install"
@@ -3966,19 +3988,19 @@
                 "action": "append"
               },
               "controllers/awsKmsController.js": {
-                "action": ""
+                "action": "create"
               },
               "index.js": {
-                "action": ""
+                "action": "prepend"
               },
               "package.json": {
                 "action": "install"
               },
               "routes/awsKmsRoutes.js": {
-                "action": ""
+                "action": "create"
               },
               "utils/awsKms.js": {
-                "action": ""
+                "action": "create"
               }
             },
             "typescript": {
@@ -3986,19 +4008,19 @@
                 "action": "append"
               },
               "controllers/awsKmsController.ts": {
-                "action": ""
+                "action": "create"
               },
               "index.ts": {
-                "action": ""
+                "action": "prepend"
               },
               "package.json": {
                 "action": "install"
               },
               "routes/awsKmsRoutes.ts": {
-                "action": ""
+                "action": "create"
               },
               "utils/awsKms.ts": {
-                "action": ""
+                "action": "create"
               }
             }
           },
@@ -4011,10 +4033,10 @@
                 "action": "install"
               },
               "src/aws-kms/aws-kms.controller.ts": {
-                "action": ""
+                "action": "create"
               },
               "src/aws-kms/aws-kms.service.ts": {
-                "action": ""
+                "action": "create"
               }
             }
           },
@@ -4024,10 +4046,10 @@
                 "action": "append"
               },
               "app/api/aws/kms/route.js": {
-                "action": ""
+                "action": "create"
               },
               "lib/awsKms.js": {
-                "action": ""
+                "action": "create"
               },
               "package.json": {
                 "action": "install"
@@ -4038,10 +4060,10 @@
                 "action": "append"
               },
               "app/api/aws/kms/route.ts": {
-                "action": ""
+                "action": "create"
               },
               "lib/awsKms.ts": {
-                "action": ""
+                "action": "create"
               },
               "package.json": {
                 "action": "install"
@@ -4054,7 +4076,7 @@
                 "action": "append"
               },
               "app/routes/api/aws-kms.ts": {
-                "action": ""
+                "action": "create"
               },
               "package.json": {
                 "action": "install"
@@ -4069,19 +4091,19 @@
                 "action": "append"
               },
               "controllers/awsLambdaController.js": {
-                "action": ""
+                "action": "create"
               },
               "index.js": {
-                "action": ""
+                "action": "prepend"
               },
               "package.json": {
                 "action": "install"
               },
               "routes/awsLambdaRoutes.js": {
-                "action": ""
+                "action": "create"
               },
               "utils/awsLambda.js": {
-                "action": ""
+                "action": "create"
               }
             },
             "typescript": {
@@ -4089,19 +4111,19 @@
                 "action": "append"
               },
               "controllers/awsLambdaController.ts": {
-                "action": ""
+                "action": "create"
               },
               "index.ts": {
-                "action": ""
+                "action": "prepend"
               },
               "package.json": {
                 "action": "install"
               },
               "routes/awsLambdaRoutes.ts": {
-                "action": ""
+                "action": "create"
               },
               "utils/awsLambda.ts": {
-                "action": ""
+                "action": "create"
               }
             }
           },
@@ -4114,10 +4136,10 @@
                 "action": "install"
               },
               "src/aws-lambda/aws-lambda.controller.ts": {
-                "action": ""
+                "action": "create"
               },
               "src/aws-lambda/aws-lambda.service.ts": {
-                "action": ""
+                "action": "create"
               }
             }
           },
@@ -4127,10 +4149,10 @@
                 "action": "append"
               },
               "app/api/aws/lambda/route.js": {
-                "action": ""
+                "action": "create"
               },
               "lib/awsLambda.js": {
-                "action": ""
+                "action": "create"
               },
               "package.json": {
                 "action": "install"
@@ -4157,10 +4179,10 @@
                 "action": "append"
               },
               "app/routes/api/aws-lambda.ts": {
-                "action": ""
+                "action": "create"
               },
               "app/utils/awsLambda.ts": {
-                "action": ""
+                "action": "create"
               },
               "package.json": {
                 "action": "install"
@@ -4465,19 +4487,19 @@
                 "action": "append"
               },
               "controllers/organizationsController.js": {
-                "action": ""
+                "action": "create"
               },
               "index.js": {
-                "action": ""
+                "action": "prepend"
               },
               "package.json": {
                 "action": "install"
               },
               "routes/organizationsRoutes.js": {
-                "action": ""
+                "action": "create"
               },
               "utils/aws-organizations.js": {
-                "action": ""
+                "action": "create"
               }
             },
             "typescript": {
@@ -4485,19 +4507,19 @@
                 "action": "append"
               },
               "controllers/organizationController.ts": {
-                "action": ""
+                "action": "create"
               },
               "index.ts": {
-                "action": ""
+                "action": "prepend"
               },
               "package.json": {
                 "action": "install"
               },
               "routes/organizationsRoutes.ts": {
-                "action": ""
+                "action": "create"
               },
               "utils/aws-organizations.ts": {
-                "action": ""
+                "action": "create"
               }
             }
           },
@@ -4510,13 +4532,13 @@
                 "action": "install"
               },
               "src/organizations/organizations.controller.ts": {
-                "action": ""
+                "action": "create"
               },
               "src/organizations/organizations.module.ts": {
-                "action": ""
+                "action": "create"
               },
               "src/organizations/organizations.service.ts": {
-                "action": ""
+                "action": "create"
               }
             }
           },
@@ -4526,10 +4548,10 @@
                 "action": "append"
               },
               "app/api/aws/organizations/route.ts": {
-                "action": ""
+                "action": "create"
               },
               "lib/aws-organizations.js": {
-                "action": ""
+                "action": "create"
               },
               "package.json": {
                 "action": "install"
@@ -4540,10 +4562,10 @@
                 "action": "append"
               },
               "app/api/aws/organizations/route.ts": {
-                "action": ""
+                "action": "create"
               },
               "lib/aws-organizations.ts": {
-                "action": ""
+                "action": "create"
               },
               "package.json": {
                 "action": "install"
@@ -4556,10 +4578,10 @@
                 "action": "append"
               },
               "app/routes/api/organizations.ts": {
-                "action": ""
+                "action": "create"
               },
               "app/utils/aws-organizations.ts": {
-                "action": ""
+                "action": "create"
               },
               "package.json": {
                 "action": "install"
@@ -4922,19 +4944,19 @@
                 "action": "append"
               },
               "controllers/s3Controllers.js": {
-                "action": ""
+                "action": "create"
               },
               "index.js": {
-                "action": ""
+                "action": "prepend"
               },
               "package.json": {
                 "action": "install"
               },
               "routes/s3Routes.js": {
-                "action": ""
+                "action": "create"
               },
               "utils/s3.js": {
-                "action": ""
+                "action": "create"
               }
             },
             "typescript": {
@@ -4942,19 +4964,19 @@
                 "action": "append"
               },
               "controllers/s3Controllers.ts": {
-                "action": ""
+                "action": "create"
               },
               "index.ts": {
-                "action": ""
+                "action": "prepend"
               },
               "package.json": {
                 "action": "install"
               },
               "routes/s3Routes.ts": {
-                "action": ""
+                "action": "create"
               },
               "utils/s3.ts": {
-                "action": ""
+                "action": "create"
               }
             }
           },
@@ -4967,13 +4989,13 @@
                 "action": "install"
               },
               "src/s3/s3.controller.ts": {
-                "action": ""
+                "action": "create"
               },
               "src/s3/s3.module.ts": {
-                "action": ""
+                "action": "create"
               },
               "src/s3/s3.service.ts": {
-                "action": ""
+                "action": "create"
               }
             }
           },
@@ -4992,7 +5014,7 @@
                 "action": "install"
               },
               "utils/s3.js": {
-                "action": ""
+                "action": "create"
               }
             },
             "typescript": {
@@ -5009,7 +5031,7 @@
                 "action": "install"
               },
               "utils/s3.ts": {
-                "action": ""
+                "action": "create"
               }
             }
           },
@@ -5019,10 +5041,10 @@
                 "action": "append"
               },
               "app/routes/api/s3.ts": {
-                "action": ""
+                "action": "create"
               },
               "app/utils/s3.ts": {
-                "action": ""
+                "action": "create"
               },
               "package.json": {
                 "action": "install"
@@ -5202,22 +5224,6 @@
                 "action": "install"
               }
             }
-          }
-        },
-        "server-migration-service": {
-          "expressjs": {
-            "javascript": {},
-            "typescript": {}
-          },
-          "nestjs": {
-            "typescript": {}
-          },
-          "nextjs": {
-            "javascript": {},
-            "typescript": {}
-          },
-          "remixjs": {
-            "typescript": {}
           }
         },
         "service-catalog": {
@@ -5865,19 +5871,19 @@
                 "action": "append"
               },
               "controllers/awsTrustedAdvisorController.js": {
-                "action": ""
+                "action": "create"
               },
               "index.js": {
-                "action": ""
+                "action": "prepend"
               },
               "package.json": {
                 "action": "install"
               },
               "routes/awsTrustedAdvisorRoutes.js": {
-                "action": ""
+                "action": "create"
               },
               "utils/aws-trustedadvisor.js": {
-                "action": ""
+                "action": "create"
               }
             },
             "typescript": {
@@ -5885,19 +5891,19 @@
                 "action": "append"
               },
               "controllers/awsTrustedAdvisorController.ts": {
-                "action": ""
+                "action": "create"
               },
               "index.ts": {
-                "action": ""
+                "action": "prepend"
               },
               "package.json": {
                 "action": "install"
               },
               "routes/awsTrustedAdvisorRoutes.ts": {
-                "action": ""
+                "action": "create"
               },
               "utils/aws-trustedadvisor.ts": {
-                "action": ""
+                "action": "create"
               }
             }
           },
@@ -5910,13 +5916,13 @@
                 "action": "install"
               },
               "src/trustedadvisor/aws-trustedadvisor.controller.ts": {
-                "action": ""
+                "action": "create"
               },
               "src/trustedadvisor/aws-trustedadvisor.module.ts": {
-                "action": ""
+                "action": "create"
               },
               "src/trustedadvisor/aws-trustedadvisor.service.ts": {
-                "action": ""
+                "action": "create"
               }
             }
           },
@@ -5926,10 +5932,10 @@
                 "action": "append"
               },
               "app/api/aws/trustedadvisor/route.js": {
-                "action": ""
+                "action": "create"
               },
               "lib/aws-trustedadvisor.js": {
-                "action": ""
+                "action": "create"
               },
               "package.json": {
                 "action": "install"
@@ -5940,10 +5946,10 @@
                 "action": "append"
               },
               "app/api/aws/trustedadvisor/route.ts": {
-                "action": ""
+                "action": "create"
               },
               "lib/aws-trustedadvisor.ts": {
-                "action": ""
+                "action": "create"
               },
               "package.json": {
                 "action": "install"
@@ -5956,10 +5962,10 @@
                 "action": "append"
               },
               "app/routes/api/aws-trustedadvisor.ts": {
-                "action": ""
+                "action": "create"
               },
               "app/utils/aws-trustedadvisor.ts": {
-                "action": ""
+                "action": "create"
               },
               "package.json": {
                 "action": "install"
@@ -6090,19 +6096,19 @@
                 "action": "append"
               },
               "controllers/xrayController.js": {
-                "action": ""
+                "action": "create"
               },
               "index.js": {
-                "action": ""
+                "action": "prepend"
               },
               "package.json": {
                 "action": "install"
               },
               "routes/xrayRoutes.js": {
-                "action": ""
+                "action": "create"
               },
               "utils/xray.js": {
-                "action": ""
+                "action": "create"
               }
             },
             "typescript": {
@@ -6110,19 +6116,19 @@
                 "action": "append"
               },
               "controllers/xrayController.ts": {
-                "action": ""
+                "action": "create"
               },
               "index.ts": {
-                "action": ""
+                "action": "prepend"
               },
               "package.json": {
                 "action": "install"
               },
               "routes/xrayRoutes.ts": {
-                "action": ""
+                "action": "create"
               },
               "utils/xray.ts": {
-                "action": ""
+                "action": "create"
               }
             }
           },
@@ -6135,13 +6141,13 @@
                 "action": "install"
               },
               "src/xray/xray.controller.ts": {
-                "action": ""
+                "action": "create"
               },
               "src/xray/xray.module.ts": {
-                "action": ""
+                "action": "create"
               },
               "src/xray/xray.service.ts": {
-                "action": ""
+                "action": "create"
               }
             }
           },
@@ -6151,10 +6157,10 @@
                 "action": "append"
               },
               "app/api/aws/xray/route.js": {
-                "action": ""
+                "action": "create"
               },
               "lib/xray.js": {
-                "action": ""
+                "action": "create"
               },
               "package.json": {
                 "action": "install"
@@ -6165,10 +6171,10 @@
                 "action": "append"
               },
               "app/api/aws/xray/route.ts": {
-                "action": ""
+                "action": "create"
               },
               "lib/xray.ts": {
-                "action": ""
+                "action": "create"
               },
               "package.json": {
                 "action": "install"
@@ -6181,68 +6187,10 @@
                 "action": "append"
               },
               "app/routes/api/xray.ts": {
-                "action": ""
+                "action": "create"
               },
               "app/utils/xray.ts": {
-                "action": ""
-              },
-              "package.json": {
-                "action": "install"
-              }
-            }
-          }
-        },
-        "backup": {
-          "expressjs": {
-            "javascript": {
-              ".env": {
-                "action": "append"
-              },
-              "package.json": {
-                "action": "install"
-              }
-            },
-            "typescript": {
-              ".env": {
-                "action": "append"
-              },
-              "package.json": {
-                "action": "install"
-              }
-            }
-          },
-          "nestjs": {
-            "typescript": {
-              ".env": {
-                "action": "append"
-              },
-              "package.json": {
-                "action": "install"
-              }
-            }
-          },
-          "nextjs": {
-            "javascript": {
-              ".env": {
-                "action": "append"
-              },
-              "package.json": {
-                "action": "install"
-              }
-            },
-            "typescript": {
-              ".env": {
-                "action": "append"
-              },
-              "package.json": {
-                "action": "install"
-              }
-            }
-          },
-          "remixjs": {
-            "typescript": {
-              ".env": {
-                "action": "append"
+                "action": "create"
               },
               "package.json": {
                 "action": "install"
@@ -6270,80 +6218,32 @@
         "prisma",
         "typeorm"
       ],
-      "supportedLanguages": [
-        "javascript",
-        "go",
-        "python",
-        "ruby"
-      ],
-      "supportedDatabases": [
-        "mongodb",
-        "supabase",
-        "neondb"
-      ],
+      "supportedLanguages": ["javascript", "go", "python", "ruby"],
+      "supportedDatabases": ["mongodb", "supabase", "neondb"],
       "supportedORMs": {
         "mongodb": {
-          "mongoose": [
-            "javascript",
-            "typescript"
-          ],
-          "typegoose": [
-            "typescript"
-          ]
+          "mongoose": ["javascript", "typescript"],
+          "typegoose": ["typescript"]
         },
         "mysql": {
-          "typeorm": [
-            "javascript",
-            "typescript"
-          ],
-          "prisma": [
-            "typescript"
-          ],
-          "drizzle": [
-            "typescript"
-          ],
-          "djangoORM": [
-            "python"
-          ],
-          "SQLAlchemy": [
-            "python"
-          ],
-          "Peewee": [
-            "python"
-          ],
-          "GORM": [
-            "go"
-          ],
-          "Sequel": [
-            "ruby"
-          ]
+          "typeorm": ["javascript", "typescript"],
+          "prisma": ["typescript"],
+          "drizzle": ["typescript"],
+          "djangoORM": ["python"],
+          "SQLAlchemy": ["python"],
+          "Peewee": ["python"],
+          "GORM": ["go"],
+          "Sequel": ["ruby"]
         },
         "postgres": {
-          "typeorm": [
-            "javascript",
-            "typescript"
-          ],
-          "prisma": [
-            "typescript"
-          ],
-          "drizzle": [
-            "typescript"
-          ],
-          "djangoORM": [
-            "python"
-          ],
-          "SQLAlchemy": [
-            "python"
-          ],
-          "Peewee": [
-            "python"
-          ],
-          "GORM": [
-            "go"
-          ],
-          "Sequel": [
-            "ruby"
-          ]
+          "typeorm": ["javascript", "typescript"],
+          "prisma": ["typescript"],
+          "drizzle": ["typescript"],
+          "djangoORM": ["python"],
+          "SQLAlchemy": ["python"],
+          "Peewee": ["python"],
+          "GORM": ["go"],
+          "Sequel": ["ruby"]
         }
       },
       "files": {
@@ -6900,13 +6800,7 @@
         "vuejs",
         "reactjs"
       ],
-      "supportedLanguages": [
-        "javascript",
-        "go",
-        "python",
-        "ruby",
-        "rust"
-      ],
+      "supportedLanguages": ["javascript", "go", "python", "ruby", "rust"],
       "files": {
         "angularjs": {
           ".dockerignore": {
@@ -7018,17 +6912,8 @@
     },
     "gitignore": {
       "description": "GitIgnore files for various frameworks and languages",
-      "supportedFrameworks": [
-        "nextjs",
-        "angularjs",
-        "nestjs"
-      ],
-      "supportedLanguages": [
-        "javascript",
-        "go",
-        "python",
-        "rust"
-      ],
+      "supportedFrameworks": ["nextjs", "angularjs", "nestjs"],
+      "supportedLanguages": ["javascript", "go", "python", "rust"],
       "files": {
         "angularjs": {
           ".gitignore": {
@@ -7071,20 +6956,9 @@
     },
     "monitoring": {
       "description": "Monitoring integration for enhanced functionality",
-      "supportedFrameworks": [
-        "nextjs",
-        "expressjs",
-        "nestjs",
-        "remixjs"
-      ],
-      "supportedLanguages": [
-        "javascript"
-      ],
-      "supportedMonitoring": [
-        "sentry",
-        "datadog",
-        "opentelemetry"
-      ],
+      "supportedFrameworks": ["nextjs", "expressjs", "nestjs", "remixjs"],
+      "supportedLanguages": ["javascript"],
+      "supportedMonitoring": ["sentry", "datadog", "opentelemetry"],
       "files": {
         "sentry": {},
         "datadog": {},
@@ -7100,14 +6974,8 @@
         "remixjs",
         "vuejs"
       ],
-      "supportedLanguages": [
-        "javascript"
-      ],
-      "supportedPayments": [
-        "stripe",
-        "razorpay",
-        "paypal"
-      ],
+      "supportedLanguages": ["javascript"],
+      "supportedPayments": ["stripe", "razorpay", "paypal"],
       "files": {
         "paypal": {
           "expressjs": {
@@ -7458,20 +7326,9 @@
     },
     "storage": {
       "description": "Storage Integration for files, images, and videos",
-      "supportedFrameworks": [
-        "nextjs",
-        "expressjs",
-        "nestjs",
-        "remixjs"
-      ],
-      "supportedLanguages": [
-        "javascript"
-      ],
-      "supportedStorages": [
-        "imagekit.io",
-        "cloudinary",
-        "google-cloud"
-      ],
+      "supportedFrameworks": ["nextjs", "expressjs", "nestjs", "remixjs"],
+      "supportedLanguages": ["javascript"],
+      "supportedStorages": ["imagekit.io", "cloudinary", "google-cloud"],
       "files": {
         "imagekit.io": {
           "expressjs": {
@@ -7846,21 +7703,9 @@
     },
     "testing": {
       "description": "Testing integration for enhanced functionality",
-      "supportedFrameworks": [
-        "nextjs",
-        "expressjs",
-        "nestjs",
-        "remixjs"
-      ],
-      "supportedLanguages": [
-        "javascript"
-      ],
-      "supportedTesting": [
-        "jest",
-        "cypress",
-        "mocha",
-        "playwright"
-      ],
+      "supportedFrameworks": ["nextjs", "expressjs", "nestjs", "remixjs"],
+      "supportedLanguages": ["javascript"],
+      "supportedTesting": ["jest", "cypress", "mocha", "playwright"],
       "files": {
         "jest": {},
         "cypress": {},
@@ -7878,13 +7723,8 @@
         "django",
         "nuxtjs"
       ],
-      "supportedLanguages": [
-        "javascript",
-        "python"
-      ],
-      "supportedUiLibraries": [
-        "daisy"
-      ],
+      "supportedLanguages": ["javascript", "python"],
+      "supportedUiLibraries": ["daisy"],
       "files": {
         "daisy": {
           "angularjs": {
