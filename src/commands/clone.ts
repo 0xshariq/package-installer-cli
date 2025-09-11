@@ -70,26 +70,21 @@ export async function cloneRepo(userRepo: string, projectName?: string, options:
     
     // Track the clone operation in history
     if (result) {
-      const historyManager = HistoryManager.getInstance();
-      await historyManager.addCloneHistory({
-        repository: userRepo,
-        projectName: result.projectName || projectName || 'unknown',
-        provider: result.provider || 'github',
-        clonedAt: new Date().toISOString(),
-        success: true
+      const historyManager = new HistoryManager();
+      await historyManager.init();
+      await historyManager.recordProject({
+        name: result.projectName || projectName || 'unknown',
+        framework: 'unknown',
+        language: 'unknown',
+        template: 'cloned',
+        path: process.cwd(),
+        features: []
       });
     }
   } catch (error: any) {
     // Track failed clone attempts too
-    const historyManager = HistoryManager.getInstance();
-    await historyManager.addCloneHistory({
-      repository: userRepo,
-      projectName: projectName || 'unknown',
-      provider: 'unknown',
-      clonedAt: new Date().toISOString(),
-      success: false,
-      error: error.message
-    });
+    const historyManager = new HistoryManager();
+    await historyManager.init();
     
     throw error;
   }

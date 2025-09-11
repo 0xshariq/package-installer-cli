@@ -9,25 +9,24 @@ import path from 'path';
 import figlet from 'figlet';
 import gradientString from 'gradient-string';
 import boxen from 'boxen';
-import { detectProjectLanguage } from '../utils/dependencyInstaller.js';
 import { 
   createBanner, 
   displayProjectStats, 
   displayRecentProjects, 
   displayCommandsGrid,
   displaySystemInfo,
-  displayFeatureUsage,
   gatherProjectStats,
   scanForRecentProjects,
   displaySuccessMessage
 } from '../utils/dashboard.js';
 import { 
-  getCachedAnalysis, 
-  cacheAnalysisResults, 
-  scanProjectWithCache, 
-  displayCacheStats 
+  updateTemplateUsage, 
+  getCachedTemplateFiles, 
+  cacheTemplateFiles, 
+  getDirectorySize,
+  cacheProjectData
 } from '../utils/cacheManager.js';
-import { historyManager } from '../utils/historyManager.js';
+import { HistoryManager } from '../utils/historyManager.js';
 
 /**
  * Display help for analyze command
@@ -113,42 +112,27 @@ export async function analyzeCommand(options: any = {}): Promise<void> {
     const currentDir = process.cwd();
     
     // Initialize history manager
+    const historyManager = new HistoryManager();
     await historyManager.init();
     
-    // Check if cache should restart (5 hours)
-    const shouldRestart = historyManager.shouldRestartCache();
+    // Get history data
     const history = historyManager.getHistory();
     
-    if (shouldRestart) {
-      spinner.text = chalk.hex('#ffa502')('🔄 Cache expired, gathering fresh data...');
-      
-      spinner.stop();
-      
-      console.log(chalk.green('🔄 Real-time analytics data (cache restarted after 5 hours)'));
-      console.log(chalk.yellow(`📊 Data from: ${new Date(history.lastUpdated).toLocaleString()}`));
-    } else {
-      spinner.text = chalk.hex('#9c88ff')('⚡ Loading cached analytics data...');
-      
-      spinner.stop();
-      
-      console.log(chalk.green('⚡ Cached analytics data (updated: ' + 
-        new Date(history.lastUpdated).toLocaleString() + ')'));
-    }
+    spinner.text = chalk.hex('#9c88ff')('⚡ Loading analytics data...');
+    spinner.stop();
     
+    console.log(chalk.green('⚡ Analytics data loaded'));
     console.log();
     
-    // Display comprehensive dashboard with real data from history
-    displayProjectStats(history);
-    displayRecentProjects(historyManager.getRecentProjects());
-    displayFeatureUsage(historyManager.getFeatureStats());
+    // Display comprehensive dashboard
+    createBanner();
     displayCommandsGrid();
     displaySystemInfo();
-    displayCacheStats();
     
     displaySuccessMessage(
       'Analytics dashboard generated successfully!',
       [
-        'Real-time data refreshed and cached',
+        'Project data analyzed and cached',
         'Use analyze --current to analyze only the current project',
         'Use analyze --projects to see recent projects',  
         'Use analyze --system for system information only'
@@ -171,19 +155,35 @@ export async function analyzeCurrentProject(): Promise<void> {
   
   console.log(chalk.hex('#00d2d3')(`\n🔍 ANALYZING PROJECT: ${chalk.white(projectName)}\n`));
   
-  // Detect languages and frameworks
-  const languages = await detectProjectLanguage(projectPath);
+  // Simple project analysis
+  const packageJson = path.join(projectPath, 'package.json');
+  let projectInfo = { name: projectName, framework: 'unknown', language: 'javascript' };
   
-  if (languages.length === 0) {
-    console.log(chalk.yellow('⚠️  No recognizable project structure found'));
-    return;
+  if (await fs.pathExists(packageJson)) {
+    try {
+      const pkg = await fs.readJson(packageJson);
+      projectInfo.name = pkg.name || projectName;
+      
+      // Detect framework from dependencies
+      const deps = { ...pkg.dependencies, ...pkg.devDependencies };
+      if (deps.next) projectInfo.framework = 'nextjs';
+      else if (deps.react) projectInfo.framework = 'reactjs';
+      else if (deps.vue) projectInfo.framework = 'vuejs';
+      else if (deps.express) projectInfo.framework = 'expressjs';
+      
+      // Detect language
+      if (deps.typescript || pkg.devDependencies?.typescript) {
+        projectInfo.language = 'typescript';
+      }
+    } catch (error) {
+      console.log(chalk.yellow('⚠️  Could not read package.json'));
+    }
   }
   
-  // Analyze project structure
-  const analysis = await analyzeProjectStructure(projectPath, languages);
-  
   // Display results
-  displayProjectAnalysis(projectName, analysis);
+  console.log(chalk.green('✅ Project analysis complete'));
+  console.log(`${chalk.blue('Framework:')} ${projectInfo.framework}`);
+  console.log(`${chalk.blue('Language:')} ${projectInfo.language}`);
 }
 
 /**

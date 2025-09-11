@@ -1,11 +1,14 @@
 import chalk from 'chalk';
 import ora, { type Ora } from 'ora';
-import { detectProjectLanguage, installAdditionalPackages } from '../utils/dependencyInstaller.js';
+import fs from 'fs-extra';
+import path from 'path';
 import { displaySuccessMessage, displayErrorMessage, createBanner } from '../utils/dashboard.js';
 import { 
-  getCachedPackageVersion, 
-  cachePackageVersion,
-  scanProjectWithCache 
+  updateTemplateUsage, 
+  getCachedTemplateFiles, 
+  cacheTemplateFiles, 
+  getDirectorySize,
+  cacheProjectData
 } from '../utils/cacheManager.js';
 import { 
   getSupportedLanguages,
@@ -14,8 +17,6 @@ import {
 } from '../utils/languageConfig.js';
 import { exec } from 'child_process';
 import { promisify } from 'util';
-import fs from 'fs-extra';
-import path from 'path';
 
 const execAsync = promisify(exec);
 
@@ -54,16 +55,22 @@ ${chalk.bgHex('#00c6ff').hex('#fff').bold(' DATER ')}
   const spinner = ora(chalk.hex('#9c88ff')('🔍 Analyzing project structure...')).start();
   
   try {
-    // Use cached project analysis for faster performance
-    const cachedProject = await scanProjectWithCache(projectPath);
-    let languages: string[];
+    // Simple project detection
+    const packageJson = path.join(projectPath, 'package.json');
+    const cargoToml = path.join(projectPath, 'Cargo.toml');
+    const requirementsTxt = path.join(projectPath, 'requirements.txt');
     
-    if (cachedProject.fromCache) {
-      languages = [cachedProject.language];
-      spinner.text = chalk.hex('#9c88ff')('⚡ Using cached project analysis...');
-    } else {
-      // Detect project languages fresh
-      languages = await detectProjectLanguage(projectPath);
+    let languages: string[] = [];
+    
+    if (await fs.pathExists(packageJson)) {
+      languages = ['javascript'];
+      spinner.text = chalk.hex('#9c88ff')('📦 Node.js project detected...');
+    } else if (await fs.pathExists(cargoToml)) {
+      languages = ['rust'];
+      spinner.text = chalk.hex('#9c88ff')('🦀 Rust project detected...');
+    } else if (await fs.pathExists(requirementsTxt)) {
+      languages = ['python'];
+      spinner.text = chalk.hex('#9c88ff')('🐍 Python project detected...');
     }
     
     if (languages.length === 0) {
@@ -72,7 +79,7 @@ ${chalk.bgHex('#00c6ff').hex('#fff').bold(' DATER ')}
         'Could not detect any supported project types',
         [
           'Make sure you are in a project directory',
-          `Supported: ${getSupportedLanguages().map(lang => getLanguageConfig(lang)!.displayName).join(', ')} projects`,
+          'Supported: JavaScript/TypeScript, Rust, Python projects',
           'Look for files like package.json, Cargo.toml, requirements.txt, etc.'
           ]
         );

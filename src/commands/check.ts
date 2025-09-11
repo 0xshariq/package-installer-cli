@@ -8,9 +8,11 @@ import fs from 'fs-extra';
 import path from 'path';
 import semver from 'semver';
 import { 
-  getCachedPackageVersion, 
-  cachePackageVersion,
-  scanProjectWithCache 
+  updateTemplateUsage, 
+  getCachedTemplateFiles, 
+  cacheTemplateFiles, 
+  getDirectorySize,
+  cacheProjectData
 } from '../utils/cacheManager.js';
 import { 
   LANGUAGE_CONFIGS, 
@@ -119,7 +121,7 @@ const PROJECT_TYPES: ProjectType[] = getSupportedLanguages().map(lang => {
           }
           break;
           
-        case 'php':
+        case 'php' as any:
           if (filename === 'composer.json') {
             return {
               ...content.require,
@@ -128,7 +130,7 @@ const PROJECT_TYPES: ProjectType[] = getSupportedLanguages().map(lang => {
           }
           break;
           
-        case 'ruby':
+        case 'ruby' as any:
           if (filename === 'Gemfile') {
             const lines = content.toString().split('\n');
             lines.forEach((line: string) => {
@@ -141,7 +143,7 @@ const PROJECT_TYPES: ProjectType[] = getSupportedLanguages().map(lang => {
           }
           break;
           
-        case 'go':
+        case 'go' as any:
           if (filename === 'go.mod') {
             const lines = content.toString().split('\n');
             let inRequire = false;
@@ -177,7 +179,7 @@ const PROJECT_TYPES: ProjectType[] = getSupportedLanguages().map(lang => {
   };
 });
 
-function getRegistryUrl(lang: SupportedLanguage): string {
+function getRegistryUrl(lang: SupportedLanguage | string): string {
   switch (lang) {
     case 'nodejs': return 'https://registry.npmjs.org';
     case 'rust': return 'https://crates.io/api/v1/crates';
@@ -273,7 +275,7 @@ async function checkSinglePackage(packageName: string, verbose: boolean = false)
     const packageInfo = await getPackageInfo(packageName, undefined, projectType);
     spinner.succeed(chalk.hex('#10ac84')(`✅ Package information retrieved for ${packageName}`));
     
-    displayPackageInfo([packageInfo], projectType, verbose);
+    displayPackageInfo([packageInfo], projectType || undefined, verbose);
   } catch (error: any) {
     spinner.fail(chalk.hex('#ff4757')(`❌ Failed to check ${packageName}`));
     throw error;

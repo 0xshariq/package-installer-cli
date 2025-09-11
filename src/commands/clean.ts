@@ -110,7 +110,7 @@ export async function cleanCommand(options: any = {}): Promise<void> {
     }
   } catch (error) {
     spinner.fail(chalk.red('❌ Failed to clean project'));
-    console.error(chalk.red(`Error: ${error.message}`));
+    console.error(chalk.red(`Error: ${error instanceof Error ? error.message : String(error)}`));
     process.exit(1);
   }
 }
