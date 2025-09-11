@@ -17,78 +17,56 @@ import {
 /**
  * Enhanced framework selection with better descriptions and categorization
  */
-export async function promptFrameworkSelection(templateConfig: any): Promise<string> {
-  const availableFrameworks = Object.keys(templateConfig.frameworks).filter(fw => {
-    const fwConfig = templateConfig.frameworks[fw];
-    return fwConfig && typeof fwConfig === 'object';
-  });
-
-  if (availableFrameworks.length === 0) {
-    throw new Error('No frameworks available in template configuration');
-  }
-
+export async function promptFrameworkSelection(): Promise<string> {
+  const frameworks = getAvailableFrameworks();
+  
   const { framework } = await inquirer.prompt([
     {
-      name: 'framework',
       type: 'list',
-      message: chalk.hex('#10ac84')('🚀 Choose your framework:'),
-      pageSize: 12,
-      choices: availableFrameworks.map(fw => {
-        const fwConfig = templateConfig.frameworks[fw];
-        const type = fwConfig.type || 'framework';
-        const description = fwConfig.description || 'Modern, Fast, Production-ready';
-        
-        // Enhanced color coding and emojis based on framework type
-        let typeIcon, typeColor, frameworkEmoji;
-        switch (type) {
-          case 'frontend':
-            typeColor = chalk.hex('#00d2d3');
-            typeIcon = '🌐';
-            break;
-          case 'backend':
-            typeColor = chalk.hex('#9c88ff');
-            typeIcon = '⚡';
-            break;
-          case 'fullstack':
-            typeColor = chalk.hex('#10ac84');
-            typeIcon = '🚀';
-            break;
-          case 'mobile':
-            typeColor = chalk.hex('#fd79a8');
-            typeIcon = '📱';
-            break;
-          case 'system':
-            typeColor = chalk.hex('#ff6b6b');
-            typeIcon = '🔧';
-            break;
-          default:
-            typeColor = chalk.hex('#95afc0');
-            typeIcon = '📦';
-        }
-        
-        // Framework-specific emojis
-        switch (fw) {
-          case 'nextjs': frameworkEmoji = '▲'; break;
-          case 'reactjs': frameworkEmoji = '⚛️'; break;
-          case 'vuejs': frameworkEmoji = '💚'; break;
-          case 'angularjs': frameworkEmoji = '🅰️'; break;
-          case 'expressjs': frameworkEmoji = '🚂'; break;
-          case 'nestjs': frameworkEmoji = '🐈'; break;
-          case 'rust': frameworkEmoji = '🦀'; break;
-          case 'django': frameworkEmoji = '🐍'; break;
-          default: frameworkEmoji = typeIcon;
-        }
-        
-        return {
-          name: `${frameworkEmoji} ${chalk.bold(capitalize(fw))} ${typeColor(`[${type.toUpperCase()}]`)} ${chalk.hex('#95afc0')(`- ${description}`)}`,
-          value: fw,
-          short: fw
-        };
-      }),
-    },
+      name: 'framework',
+      message: '🚀 Choose your framework:',
+      choices: frameworks.map(fw => ({
+        name: `${fw.charAt(0).toUpperCase() + fw.slice(1)} - ${getFrameworkDescription(fw)}`,
+        value: fw
+      })),
+      pageSize: 10
+    }
   ]);
-  
+
   return framework;
+}
+
+export async function promptTemplateSelection(framework: string): Promise<string> {
+  const config = getFrameworkConfig(framework);
+  
+  if (!config) {
+    console.log(chalk.red(`❌ Framework ${framework} not found`));
+    return '';
+  }
+
+  // Check if framework has templates field for dropdown selection
+  if (config.templates && !config.options) {
+    if (config.templates.length === 1) {
+      return config.templates[0];
+    }
+
+    const { template } = await inquirer.prompt([
+      {
+        type: 'list',
+        name: 'template',
+        message: `� Choose a template for ${framework}:`,
+        choices: config.templates.map(template => ({
+          name: template.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
+          value: template
+        }))
+      }
+    ]);
+
+    return template;
+  }
+
+  // For frameworks with options, return empty string (template name will be generated)
+  return '';
 }
 
 /**
