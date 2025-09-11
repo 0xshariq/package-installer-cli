@@ -22,7 +22,7 @@
       "type": "backend",
       "description": "Fast, unopinionated web framework for Node.js",
       "languages": ["javascript", "typescript"],
-      "options": ["basic", "advance"]
+      "templates": ["advance-expressjs-template", "basic-expressjs-template"]
     },
     "flask":{
       "type": "backend",
@@ -121,7 +121,7 @@
       "type": "backend",
       "description": "Systems programming language focused on safety and performance",
       "languages": ["rust"],
-      "options": ["basic", "advance"]
+      "templates": ["advance-rust-template", "basic-rust-template"]
     },
     "vuejs": {
       "type": "frontend",
