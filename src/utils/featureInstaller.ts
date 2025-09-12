@@ -15,7 +15,8 @@ import {
   getCachedTemplateFiles, 
   cacheTemplateFiles, 
   getDirectorySize,
-  cacheProjectData
+  cacheProjectData,
+  getCachedProject
 } from './cacheManager.js';
 
 // Get the directory of this file for proper path resolution
@@ -51,21 +52,11 @@ let SUPPORTED_FEATURES: { [featureName: string]: FeatureConfig } = {};
  */
 async function loadFeatures(): Promise<void> {
   try {
-    // Try to load from cache first
-    const cachedFeatures = await getCachedFeatures();
-    if (cachedFeatures) {
-      SUPPORTED_FEATURES = cachedFeatures.features;
-      return;
-    }
-    
-    // Fallback to direct file access
+    // Load directly from file system (simplified approach)
     const featuresPath = path.join(__dirname, '../../features/features.json');
     if (await fs.pathExists(featuresPath)) {
       const featuresData = await fs.readJson(featuresPath);
       SUPPORTED_FEATURES = featuresData.features;
-      
-      // Cache the features for offline use
-      await cacheFeatures(featuresData);
     }
   } catch (error) {
     console.warn(chalk.yellow('⚠️  Could not load features.json, using fallback configuration'));
@@ -259,7 +250,7 @@ export async function addFeature(
     spinner.succeed(chalk.green(`✅ ${featureName} feature added successfully!`));
     
     // Update cache with feature usage
-    await cacheFeatureUsage(featureName, projectInfo.framework || 'unknown');
+    console.log(chalk.gray(`📊 Feature ${featureName} used for ${projectInfo.framework || 'unknown'} project`));
     
     // Show setup instructions
     showSetupInstructions(featureName, selectedProvider!);
@@ -312,26 +303,17 @@ async function processFeatureFile(
 ): Promise<void> {
   const { action } = fileConfig;
   
-  // Try to get template content from cache first
+  // Try to get template content from file system
   let sourceContent: string | null = null;
-  const templateCacheKey = `${featureName}/${provider}/${projectInfo.framework}/${projectInfo.projectLanguage}/${filePath}`;
-  
-  try {
-    sourceContent = await getCachedTemplateFile(templateCacheKey);
-  } catch (error) {
-    // Cache miss, will load from file system
-  }
   
   // Get the CLI root path for accessing feature templates
   const cliRoot = getCliRootPath();
   const featureTemplatePath = path.join(cliRoot, 'features', featureName, provider, projectInfo.framework, projectInfo.projectLanguage);
   const sourceFilePath = path.join(featureTemplatePath, filePath);
   
-  // If not in cache, load from file system and cache it
-  if (!sourceContent && await fs.pathExists(sourceFilePath)) {
+  // Load from file system
+  if (await fs.pathExists(sourceFilePath)) {
     sourceContent = await fs.readFile(sourceFilePath, 'utf-8');
-    // Cache the template file content for offline use
-    await cacheTemplateFile(templateCacheKey, sourceContent);
   }
   
   // Handle Next.js src folder structure and automatic folder creation

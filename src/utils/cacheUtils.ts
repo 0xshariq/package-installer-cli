@@ -231,6 +231,7 @@ export class AdvancedCacheManager {
   private cacheDir: string;
   private cacheFile: string;
   private lockFile: string;
+  private historyFile: string;
   private encryptionKey: string;
   private cache: CacheData;
   private strategy: CacheStrategy;
@@ -246,6 +247,7 @@ export class AdvancedCacheManager {
     this.cacheDir = path.join(os.homedir(), '.package-installer-cli', 'cache');
     this.cacheFile = path.join(this.cacheDir, 'advanced-cache.json');
     this.lockFile = path.join(this.cacheDir, 'cache.lock');
+    this.historyFile = path.join(os.homedir(), '.package-installer-cli', 'history.json');
     this.strategy = options.strategy || 'lru';
     this.maxSize = options.maxSize || 100 * 1024 * 1024; // 100MB default
     this.compressionThreshold = options.compressionThreshold || 1024; // 1KB threshold
