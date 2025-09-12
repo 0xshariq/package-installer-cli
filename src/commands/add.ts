@@ -3,8 +3,10 @@ import inquirer from 'inquirer';
 import gradient from 'gradient-string';
 import boxen from 'boxen';
 import path from 'path';
+import fs from 'fs-extra';
 import { addFeature, detectProjectStack, SUPPORTED_FEATURES, FeatureConfig } from '../utils/featureInstaller.js';
 import { historyManager } from '../utils/historyManager.js';
+import { getCachedProject, cacheProjectData } from '../utils/cacheManager.js';
 
 /**
  * List available features from features.json with descriptions
@@ -148,16 +150,59 @@ export async function addCommand(
 
     console.log(chalk.hex('#9c88ff')('\n🔮 Adding features to your project...'));
 
-    // Check if we're in a valid project
-    const projectInfo = await detectProjectStack(process.cwd());
+    // Check if we're in a valid project with enhanced detection
+    const projectPath = process.cwd();
+    let projectInfo = await getCachedProject(projectPath);
     
-    if (!projectInfo.framework) {
+    if (!projectInfo) {
+      console.log(chalk.yellow('🔍 Analyzing project structure...'));
+      projectInfo = await detectProjectStack(projectPath);
+      
+      // Cache the detected project info
+      if (projectInfo.framework && projectInfo.language) {
+        try {
+          const packageJsonPath = path.join(projectPath, 'package.json');
+          const projectName = await fs.pathExists(packageJsonPath) 
+            ? (await fs.readJson(packageJsonPath)).name || path.basename(projectPath)
+            : path.basename(projectPath);
+            
+          await cacheProjectData(
+            projectPath,
+            projectName,
+            projectInfo.projectLanguage || 'unknown',
+            projectInfo.framework,
+            [],
+            0
+          );
+        } catch (error) {
+          console.warn(chalk.yellow('⚠️  Could not cache project info'));
+        }
+      }
+    }
+    
+    if (!projectInfo || !projectInfo.framework) {
       console.log(chalk.red('❌ No supported framework detected in current directory'));
+      console.log(chalk.yellow('💡 Supported frameworks: Next.js, React, Express, NestJS, Vue, Angular, Remix'));
       console.log(chalk.yellow('💡 Make sure you\'re in a project root with package.json'));
+      
+      // Show detected files for debugging
+      const files = await fs.readdir(projectPath);
+      const relevantFiles = files.filter(f => f.endsWith('.json') || f.startsWith('package') || f.startsWith('tsconfig'));
+      if (relevantFiles.length > 0) {
+        console.log(chalk.gray(`📁 Found files: ${relevantFiles.join(', ')}`));
+      }
       return;
     }
 
-    console.log(chalk.green(`✅ Detected ${projectInfo.framework} project (${projectInfo.projectLanguage})`));
+    console.log(chalk.green(`✅ Detected ${projectInfo.framework} project (${projectInfo.projectLanguage || projectInfo.language})`));
+    
+    // Show additional project details
+    if (projectInfo.packageManager) {
+      console.log(chalk.gray(`📦 Package manager: ${projectInfo.packageManager}`));
+    }
+    if (projectInfo.hasSrcFolder) {
+      console.log(chalk.gray(`📁 Source structure: src folder detected`));
+    }
 
     let selectedFeature = feature;
     let selectedProvider = provider;
@@ -167,7 +212,8 @@ export async function addCommand(
       const availableFeatures = Object.keys(SUPPORTED_FEATURES).filter(key => {
         const featureConfig = SUPPORTED_FEATURES[key];
         const frameworkSupported = featureConfig.supportedFrameworks.includes(projectInfo.framework!);
-        const languageSupported = featureConfig.supportedLanguages.includes(projectInfo.projectLanguage!);
+        const projectLang = projectInfo.projectLanguage || projectInfo.language || 'javascript';
+        const languageSupported = featureConfig.supportedLanguages.includes(projectLang);
         return frameworkSupported && languageSupported;
       });
 
@@ -217,8 +263,8 @@ export async function addCommand(
       return;
     }
 
-    if (!featureConfig.supportedLanguages.includes(projectInfo.projectLanguage!)) {
-      console.log(chalk.red(`❌ Feature '${selectedFeature}' is not supported for ${projectInfo.projectLanguage} projects`));
+    if (!featureConfig.supportedLanguages.includes(projectInfo.projectLanguage || projectInfo.language || 'javascript')) {
+      console.log(chalk.red(`❌ Feature '${selectedFeature}' is not supported for ${projectInfo.projectLanguage || projectInfo.language} projects`));
       return;
     }
 

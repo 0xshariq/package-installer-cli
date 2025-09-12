@@ -24,9 +24,13 @@ import {
   getCachedTemplateFiles, 
   cacheTemplateFiles, 
   getDirectorySize,
-  cacheProjectData
+  cacheProjectData,
+  getCachedProject,
+  getCacheStats
 } from '../utils/cacheManager.js';
 import { HistoryManager } from '../utils/historyManager.js';
+import { detectProjectStack } from '../utils/featureInstaller.js';
+import { SupportedLanguage } from '../utils/dependencyInstaller.js';
 
 /**
  * Display help for analyze command
@@ -118,16 +122,67 @@ export async function analyzeCommand(options: any = {}): Promise<void> {
     // Get history data
     const history = historyManager.getHistory();
     
+    spinner.text = chalk.hex('#9c88ff')('📊 Analyzing project data...');
+    
+    // Check for cached analysis first
+    let projectAnalysis = await getCachedProject(currentDir);
+    
+    if (!projectAnalysis || Date.now() - (projectAnalysis.timestamp || 0) > 3600000) {
+      // Perform fresh analysis if cache is older than 1 hour
+      spinner.text = chalk.hex('#9c88ff')('🔍 Performing fresh project analysis...');
+      projectAnalysis = await analyzeCurrentProject();
+      
+      // Cache the analysis
+      if (projectAnalysis) {
+        await cacheProjectData(
+          currentDir,
+          projectAnalysis.name || path.basename(currentDir),
+          projectAnalysis.language || 'unknown',
+          projectAnalysis.framework,
+          projectAnalysis.dependencies || [],
+          projectAnalysis.size || 0
+        );
+      }
+    }
+    
     spinner.text = chalk.hex('#9c88ff')('⚡ Loading analytics data...');
     spinner.stop();
     
     console.log(chalk.green('⚡ Analytics data loaded'));
     console.log();
     
+    // Handle specific options
+    if (options.current) {
+      await displayCurrentProjectInfo(projectAnalysis);
+      return;
+    }
+    
+    if (options.system) {
+      displaySystemInfo();
+      return;
+    }
+    
+    if (options.projects) {
+      await displayRecentProjectsInfo(history);
+      return;
+    }
+    
+    if (options.commands) {
+      displayCommandsGrid();
+      return;
+    }
+    
     // Display comprehensive dashboard
     createBanner();
+    
+    if (projectAnalysis) {
+      await displayCurrentProjectInfo(projectAnalysis);
+    }
+    
     displayCommandsGrid();
     displaySystemInfo();
+    await displayCacheInfo();
+    await displayRecentProjectsInfo(history);
     
     displaySuccessMessage(
       'Analytics dashboard generated successfully!',
@@ -149,41 +204,71 @@ export async function analyzeCommand(options: any = {}): Promise<void> {
 /**
  * Analyze the current project in detail
  */
-export async function analyzeCurrentProject(): Promise<void> {
+export async function analyzeCurrentProject(): Promise<any> {
   const projectPath = process.cwd();
   const projectName = path.basename(projectPath);
   
   console.log(chalk.hex('#00d2d3')(`\n🔍 ANALYZING PROJECT: ${chalk.white(projectName)}\n`));
   
-  // Simple project analysis
-  const packageJson = path.join(projectPath, 'package.json');
-  let projectInfo = { name: projectName, framework: 'unknown', language: 'javascript' };
+  // Use enhanced project detection
+  let projectInfo = await detectProjectStack(projectPath);
   
-  if (await fs.pathExists(packageJson)) {
-    try {
-      const pkg = await fs.readJson(packageJson);
-      projectInfo.name = pkg.name || projectName;
-      
-      // Detect framework from dependencies
-      const deps = { ...pkg.dependencies, ...pkg.devDependencies };
-      if (deps.next) projectInfo.framework = 'nextjs';
-      else if (deps.react) projectInfo.framework = 'reactjs';
-      else if (deps.vue) projectInfo.framework = 'vuejs';
-      else if (deps.express) projectInfo.framework = 'expressjs';
-      
-      // Detect language
-      if (deps.typescript || pkg.devDependencies?.typescript) {
-        projectInfo.language = 'typescript';
+  // Fallback to simple analysis if detectProjectStack fails
+  if (!projectInfo.framework) {
+    const packageJson = path.join(projectPath, 'package.json');
+    projectInfo = { 
+      framework: 'unknown', 
+      language: 'javascript' as SupportedLanguage,
+      projectLanguage: 'javascript' as 'javascript' | 'typescript',
+      packageManager: 'npm',
+      hasSrcFolder: false
+    } as any;
+    
+    if (await fs.pathExists(packageJson)) {
+      try {
+        const pkg = await fs.readJson(packageJson);
+        (projectInfo as any).name = pkg.name || projectName;
+        
+        // Detect framework from dependencies
+        const deps = { ...pkg.dependencies, ...pkg.devDependencies };
+        if (deps.next) projectInfo.framework = 'nextjs';
+        else if (deps.react) projectInfo.framework = 'reactjs';
+        else if (deps.vue) projectInfo.framework = 'vuejs';
+        else if (deps.express) projectInfo.framework = 'expressjs';
+        else if (deps['@nestjs/core']) projectInfo.framework = 'nestjs';
+        
+        // Detect language
+        if (deps.typescript || pkg.devDependencies?.typescript) {
+          projectInfo.language = 'typescript';
+          projectInfo.projectLanguage = 'typescript';
+        }
+        
+        // Detect package manager
+        if (await fs.pathExists(path.join(projectPath, 'pnpm-lock.yaml'))) {
+          projectInfo.packageManager = 'pnpm';
+        } else if (await fs.pathExists(path.join(projectPath, 'yarn.lock'))) {
+          projectInfo.packageManager = 'yarn';
+        }
+        
+        // Check for src folder
+        projectInfo.hasSrcFolder = await fs.pathExists(path.join(projectPath, 'src'));
+        
+      } catch (error) {
+        console.log(chalk.yellow('⚠️  Could not read package.json'));
       }
-    } catch (error) {
-      console.log(chalk.yellow('⚠️  Could not read package.json'));
     }
   }
   
   // Display results
   console.log(chalk.green('✅ Project analysis complete'));
   console.log(`${chalk.blue('Framework:')} ${projectInfo.framework}`);
-  console.log(`${chalk.blue('Language:')} ${projectInfo.language}`);
+  console.log(`${chalk.blue('Language:')} ${projectInfo.language || projectInfo.projectLanguage}`);
+  console.log(`${chalk.blue('Package Manager:')} ${projectInfo.packageManager}`);
+  
+  // Add timestamp for cache expiry
+  (projectInfo as any).timestamp = Date.now();
+  
+  return projectInfo;
 }
 
 /**
@@ -533,5 +618,86 @@ function displayProjectAnalysis(projectName: string, analysis: any): void {
       console.log(chalk.gray(`${index + 1}. ${rec}`));
     });
     console.log();
+  }
+}
+
+/**
+ * Display current project information
+ */
+async function displayCurrentProjectInfo(projectInfo: any): Promise<void> {
+  if (!projectInfo) {
+    console.log(chalk.yellow('⚠️  No project information available'));
+    return;
+  }
+  
+  console.log(chalk.hex('#00d2d3')('\n📊 CURRENT PROJECT ANALYSIS\n'));
+  
+  const projectBox = boxen(
+    `${chalk.bold.white('Project:')} ${projectInfo.name || 'Unknown'}\n` +
+    `${chalk.bold.cyan('Framework:')} ${projectInfo.framework || 'Unknown'}\n` +
+    `${chalk.bold.green('Language:')} ${projectInfo.language || projectInfo.projectLanguage || 'Unknown'}\n` +
+    `${chalk.bold.yellow('Package Manager:')} ${projectInfo.packageManager || 'npm'}\n` +
+    `${chalk.bold.magenta('Has Src Folder:')} ${projectInfo.hasSrcFolder ? 'Yes' : 'No'}`,
+    {
+      padding: 1,
+      margin: 1,
+      borderStyle: 'round',
+      borderColor: 'blue'
+    }
+  );
+  
+  console.log(projectBox);
+}
+
+/**
+ * Display recent projects information
+ */
+async function displayRecentProjectsInfo(history: any): Promise<void> {
+  console.log(chalk.hex('#00d2d3')('\n📁 RECENT PROJECTS\n'));
+  
+  if (!history.projects || history.projects.length === 0) {
+    console.log(chalk.yellow('⚠️  No recent projects found'));
+    return;
+  }
+  
+  const recentProjects = history.projects.slice(0, 5);
+  
+  recentProjects.forEach((project: any, index: number) => {
+    console.log(
+      `${chalk.gray(`${index + 1}.`)} ${chalk.white(project.name)} ` +
+      `${chalk.gray('(')}${chalk.cyan(project.framework)}${chalk.gray(')')} ` +
+      `${chalk.gray('-')} ${chalk.blue(project.language)}`
+    );
+  });
+  
+  console.log(chalk.gray(`\nShowing ${recentProjects.length} of ${history.projects.length} projects`));
+}
+
+/**
+ * Display cache information
+ */
+async function displayCacheInfo(): Promise<void> {
+  console.log(chalk.hex('#00d2d3')('\n🗄️  CACHE INFORMATION\n'));
+  
+  try {
+    const stats = getCacheStats();
+    
+    const cacheBox = boxen(
+      `${chalk.bold.white('Cached Projects:')} ${stats.projects?.length || 0}\n` +
+      `${chalk.bold.cyan('Template Files:')} ${Object.keys(stats.templateFiles || {}).length}\n` +
+      `${chalk.bold.green('Cache Hits:')} ${stats.hits || 0}\n` +
+      `${chalk.bold.yellow('Cache Misses:')} ${stats.misses || 0}\n` +
+      `${chalk.bold.magenta('Hit Ratio:')} ${((stats.hits || 0) / Math.max(1, (stats.hits || 0) + (stats.misses || 0)) * 100).toFixed(1)}%`,
+      {
+        padding: 1,
+        margin: 1,
+        borderStyle: 'round',
+        borderColor: 'cyan'
+      }
+    );
+    
+    console.log(cacheBox);
+  } catch (error) {
+    console.log(chalk.yellow('⚠️  Cache information not available'));
   }
 }
