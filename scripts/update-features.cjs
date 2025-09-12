@@ -117,6 +117,8 @@ async function detectAllFeatures() {
       const featurePath = path.join(featuresDir, featureName);
       const feature = {
         description: `${featureName.charAt(0).toUpperCase() + featureName.slice(1)} integration for enhanced functionality`,
+        supportedFrameworks: [],
+        supportedLanguages: [],
         files: {}
       };
       
@@ -142,6 +144,14 @@ async function detectAllFeatures() {
           console.log(chalk.hex("#26de81")(`    🔧 Framework: ${framework.name}`));
           const frameworkPath = path.join(providerPath, framework.name);
           
+          // Add framework to supported list if not already present
+          if (!feature.supportedFrameworks.includes(framework.name)) {
+            feature.supportedFrameworks.push(framework.name);
+          }
+          
+          if (!feature.files[provider.name]) {
+            feature.files[provider.name] = {};
+          }
           if (!feature.files[provider.name][framework.name]) {
             feature.files[provider.name][framework.name] = {};
           }
@@ -155,8 +165,22 @@ async function detectAllFeatures() {
             console.log(chalk.hex("#fd79a8")(`      🌐 Language: ${language.name}`));
             const languagePath = path.join(frameworkPath, language.name);
             
+            // Add language to supported list if not already present
+            if (!feature.supportedLanguages.includes(language.name)) {
+              feature.supportedLanguages.push(language.name);
+            }
+            
             // Scan files in this language directory
             const files = await scanDirectoryWithActions(languagePath);
+            
+            // Ensure the nested structure is properly created
+            if (!feature.files[provider.name]) {
+              feature.files[provider.name] = {};
+            }
+            if (!feature.files[provider.name][framework.name]) {
+              feature.files[provider.name][framework.name] = {};
+            }
+            
             feature.files[provider.name][framework.name][language.name] = files;
           }
         }
@@ -338,7 +362,7 @@ async function cacheTemplates() {
   const templateCacheDir = path.join(cacheDir, "templates");
   await fs.ensureDir(templateCacheDir);
 
-  console.log(chalk.blue("\n Caching templates for offline use..."));
+  console.log(chalk.blue("\n🗄️  Caching templates for offline use..."));
 
   try {
     const frameworks = await fs.readdir(templatesDir, { withFileTypes: true });
@@ -346,7 +370,7 @@ async function cacheTemplates() {
     for (const framework of frameworks) {
       if (!framework.isDirectory()) continue;
 
-      console.log(chalk.hex("#9c88ff")("  Framework: "));
+      console.log(chalk.hex("#9c88ff")(`  📁 Framework: ${framework.name}`));
 
       const frameworkPath = path.join(templatesDir, framework.name);
       const languages = await fs.readdir(frameworkPath, {
@@ -356,6 +380,7 @@ async function cacheTemplates() {
       for (const language of languages) {
         if (!language.isDirectory()) continue;
 
+        console.log(chalk.hex("#00d2d3")(`    🌐 Language: ${language.name}`));
         const languagePath = path.join(frameworkPath, language.name);
         const templates = await fs.readdir(languagePath, {
           withFileTypes: true,
@@ -370,7 +395,7 @@ async function cacheTemplates() {
             `${framework.name}--${language.name}--${template.name}`
           );
 
-          console.log(chalk.hex("#00d2d3")(`  Caching: ${cacheTemplatePath}`));
+          console.log(chalk.hex("#26de81")(`      📄 Caching: ${framework.name}/${language.name}/${template.name}`));
 
           try {
             await fs.copy(templatePath, cacheTemplatePath, {
@@ -383,20 +408,24 @@ async function cacheTemplates() {
                   !relativePath.includes(".git") &&
                   !relativePath.includes("dist") &&
                   !relativePath.includes(".next") &&
-                  !relativePath.includes("build")
+                  !relativePath.includes("build") &&
+                  !relativePath.includes(".cache") &&
+                  !relativePath.includes("coverage")
                 );
               },
             });
 
-            console.log(chalk.green("Cached successfully"));
+            console.log(chalk.green("        ✅ Cached successfully"));
           } catch (error) {
-            console.log(chalk.red("  Failed to cache: "));
+            console.log(chalk.red(`        ❌ Failed to cache: ${error.message}`));
           }
         }
       }
     }
+    
+    console.log(chalk.green(`\n✅ Template caching completed. Cache stored in: ${templateCacheDir}`));
   } catch (error) {
-    console.log(chalk.red("\n Error caching templates: "));
+    console.log(chalk.red(`\n❌ Error caching templates: ${error.message}`));
   }
 }
 
