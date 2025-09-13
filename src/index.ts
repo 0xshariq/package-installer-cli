@@ -212,40 +212,17 @@ program
 program
   .command('add')
   .description(chalk.hex('#9c88ff')('➕ ') + chalk.hex('#4facfe')('Add new features to your project'))
-  .argument('[feature]', chalk.hex('#95afc0')('Feature to add (auth, docker) or --list to show all'))
-  .option('-l, --list', chalk.hex('#95afc0')('list all available features'))
+  .argument('[feature]', chalk.hex('#95afc0')('Feature to add (auth, docker, aws, etc.) or use --list to show all'))
+  .argument('[provider]', chalk.hex('#95afc0')('Provider for the feature (optional)'))
+  .option('-l, --list', chalk.hex('#95afc0')('List all available features'))
+  .option('-v, --verbose', chalk.hex('#95afc0')('Show detailed output'))
   .on('--help', () => {
-    const piGradient = gradient(['#00c6ff', '#0072ff']);
-    const headerGradient = gradient(['#4facfe', '#00f2fe']);
-
-    console.log('\n' + boxen(
-      headerGradient('➕ Add Command') + '\n\n' +
-      chalk.white('Add powerful features to your existing project like authentication and Docker support.') + '\n\n' +
-      chalk.cyan('Examples:') + '\n' +
-      chalk.gray(`  ${piGradient('pi')} ${chalk.hex('#9c88ff')('add')}                       # Interactive feature selection`) + '\n' +
-      chalk.gray(`  ${piGradient('pi')} ${chalk.hex('#9c88ff')('add')} --list               # List all available features`) + '\n' +
-      chalk.gray(`  ${piGradient('pi')} ${chalk.hex('#9c88ff')('add')} auth                 # Add authentication`) + '\n' +
-      chalk.gray(`  ${piGradient('pi')} ${chalk.hex('#9c88ff')('add')} docker               # Add Docker configuration`) + '\n\n' +
-      chalk.hex('#00d2d3')('💡 Available Features:') + '\n' +
-      chalk.hex('#95afc0')('  • auth - Authentication (Clerk, Auth0, NextAuth)') + '\n' +
-      chalk.hex('#95afc0')('  • docker - Docker containerization') + '\n\n' +
-      chalk.hex('#ffa502')('🎯 Supported Frameworks:') + '\n' +
-      chalk.hex('#95afc0')('  Next.js, React, Express, NestJS, Vue.js, Angular, Remix, Rust'),
-      {
-        padding: 1,
-        borderStyle: 'round',
-        borderColor: 'cyan',
-        backgroundColor: '#0a0a0a'
-      }
-    ));
+    const { showAddHelp } = require('./commands/add.js');
+    showAddHelp();
   })
-  .action(async (feature, options) => {
-    if (options.list) {
-      feature = '--list';
-    }
-
+  .action(async (feature, provider, options) => {
     try {
-      await addCommand(feature);
+      await addCommand(feature, provider, options);
     } catch (error) {
       handleCommandError('add feature', error as Error);
     }
