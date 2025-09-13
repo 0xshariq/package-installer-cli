@@ -4,7 +4,7 @@
  */
 
 import fs from 'fs-extra';
-import path from 'path';
+import * as path from 'path';
 import os from 'os';
 import chalk from 'chalk';
 import zlib from 'zlib';
@@ -858,6 +858,191 @@ export class AdvancedCacheManager {
    */
   getCache(): CacheData {
     return this.cache;
+  }
+
+  /**
+   * Add project to history
+   */
+  async addProjectToHistory(projectData: {
+    name: string;
+    path: string;
+    framework?: string;
+    language?: string;
+    features?: string[];
+    createdAt?: string;
+  }): Promise<void> {
+    try {
+      await fs.ensureDir(path.dirname(this.historyFile));
+      
+      let history: any = { projects: [], features: [], commands: [] };
+      
+      if (await fs.pathExists(this.historyFile)) {
+        history = await fs.readJson(this.historyFile);
+      }
+      
+      // Ensure arrays exist
+      if (!history.projects) history.projects = [];
+      if (!history.features) history.features = [];
+      if (!history.commands) history.commands = [];
+      
+      // Add project with timestamp
+      const projectEntry = {
+        ...projectData,
+        createdAt: projectData.createdAt || new Date().toISOString(),
+        lastAccessed: new Date().toISOString(),
+        id: crypto.randomBytes(8).toString('hex')
+      };
+      
+      // Remove existing entry for same path
+      history.projects = history.projects.filter((p: any) => p.path !== projectData.path);
+      
+      // Add to beginning of array
+      history.projects.unshift(projectEntry);
+      
+      // Keep only last 50 projects
+      history.projects = history.projects.slice(0, 50);
+      
+      await fs.writeJson(this.historyFile, history, { spaces: 2 });
+      
+    } catch (error) {
+      console.warn('Failed to update project history:', error);
+    }
+  }
+
+  /**
+   * Add feature usage to history
+   */
+  async addFeatureToHistory(featureData: {
+    name: string;
+    provider?: string;
+    projectName: string;
+    projectPath: string;
+    framework: string;
+    success: boolean;
+  }): Promise<void> {
+    try {
+      await fs.ensureDir(path.dirname(this.historyFile));
+      
+      let history: any = { projects: [], features: [], commands: [] };
+      
+      if (await fs.pathExists(this.historyFile)) {
+        history = await fs.readJson(this.historyFile);
+      }
+      
+      if (!history.features) history.features = [];
+      
+      const featureEntry = {
+        ...featureData,
+        usedAt: new Date().toISOString(),
+        id: crypto.randomBytes(8).toString('hex')
+      };
+      
+      history.features.unshift(featureEntry);
+      
+      // Keep only last 100 feature usages
+      history.features = history.features.slice(0, 100);
+      
+      await fs.writeJson(this.historyFile, history, { spaces: 2 });
+      
+    } catch (error) {
+      console.warn('Failed to update feature history:', error);
+    }
+  }
+
+  /**
+   * Add command usage to history
+   */
+  async addCommandToHistory(commandData: {
+    command: string;
+    args?: string[];
+    projectPath?: string;
+    success: boolean;
+    duration?: number;
+  }): Promise<void> {
+    try {
+      await fs.ensureDir(path.dirname(this.historyFile));
+      
+      let history: any = { projects: [], features: [], commands: [] };
+      
+      if (await fs.pathExists(this.historyFile)) {
+        history = await fs.readJson(this.historyFile);
+      }
+      
+      if (!history.commands) history.commands = [];
+      
+      const commandEntry = {
+        ...commandData,
+        executedAt: new Date().toISOString(),
+        id: crypto.randomBytes(8).toString('hex')
+      };
+      
+      history.commands.unshift(commandEntry);
+      
+      // Keep only last 200 command executions
+      history.commands = history.commands.slice(0, 200);
+      
+      await fs.writeJson(this.historyFile, history, { spaces: 2 });
+      
+    } catch (error) {
+      console.warn('Failed to update command history:', error);
+    }
+  }
+
+  /**
+   * Get complete history data
+   */
+  async getHistory(): Promise<any> {
+    try {
+      if (await fs.pathExists(this.historyFile)) {
+        return await fs.readJson(this.historyFile);
+      }
+      return { projects: [], features: [], commands: [] };
+    } catch (error) {
+      console.warn('Failed to read history:', error);
+      return { projects: [], features: [], commands: [] };
+    }
+  }
+
+  /**
+   * Get recent projects from history
+   */
+  async getRecentProjects(limit: number = 10): Promise<any[]> {
+    try {
+      const history = await this.getHistory();
+      return (history.projects || []).slice(0, limit);
+    } catch (error) {
+      console.warn('Failed to get recent projects:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Get feature usage statistics
+   */
+  async getFeatureStats(): Promise<any> {
+    try {
+      const history = await this.getHistory();
+      const features = history.features || [];
+      
+      const stats = {
+        totalUsages: features.length,
+        uniqueFeatures: [...new Set(features.map((f: any) => f.name))].length,
+        mostUsedFeatures: {} as Record<string, number>,
+        recentFeatures: features.slice(0, 10),
+        successRate: features.filter((f: any) => f.success).length / Math.max(1, features.length) * 100
+      };
+      
+      // Calculate most used features
+      features.forEach((f: any) => {
+        const key = f.provider ? `${f.name}/${f.provider}` : f.name;
+        stats.mostUsedFeatures[key] = (stats.mostUsedFeatures[key] || 0) + 1;
+      });
+      
+      return stats;
+    } catch (error) {
+      console.warn('Failed to get feature stats:', error);
+      return { totalUsages: 0, uniqueFeatures: 0, mostUsedFeatures: {}, recentFeatures: [], successRate: 0 };
+    }
   }
 }
 

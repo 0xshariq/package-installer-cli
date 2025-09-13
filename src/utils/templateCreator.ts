@@ -29,12 +29,34 @@ export async function createProjectFromTemplate(options: CreateProjectOptions): 
     const spinner = ora(chalk.hex('#10ac84')('Creating project structure...')).start();
     
     try {
-        const projectPath = path.resolve(process.cwd(), projectName);
+        // Handle "." as project name - create in current directory
+        let projectPath: string;
+        let actualProjectName: string;
         
-        // Check if directory already exists
-        if (await fs.pathExists(projectPath)) {
-            spinner.fail(chalk.red(`Directory ${projectName} already exists`));
-            throw new Error(`Directory ${projectName} already exists`);
+        if (projectName === '.') {
+            projectPath = process.cwd();
+            actualProjectName = path.basename(process.cwd());
+            
+            // Check if current directory is empty
+            const currentDirContents = await fs.readdir(projectPath);
+            if (currentDirContents.length > 0) {
+                const hasImportantFiles = currentDirContents.some(file => 
+                    !file.startsWith('.') && file !== 'node_modules'
+                );
+                if (hasImportantFiles) {
+                    spinner.fail(chalk.red('Current directory is not empty'));
+                    throw new Error('Current directory is not empty. Please use an empty directory or specify a different project name.');
+                }
+            }
+        } else {
+            projectPath = path.resolve(process.cwd(), projectName);
+            actualProjectName = projectName;
+            
+            // Check if directory already exists
+            if (await fs.pathExists(projectPath)) {
+                spinner.fail(chalk.red(`Directory ${projectName} already exists`));
+                throw new Error(`Directory ${projectName} already exists`);
+            }
         }
 
         // Validate template path
@@ -52,12 +74,19 @@ export async function createProjectFromTemplate(options: CreateProjectOptions): 
 
         // Copy template files with filtering
         spinner.text = chalk.hex('#00d2d3')('Copying template files...');
-        await copyTemplateFiles(templatePath, projectPath);
+        if (projectName === '.') {
+            // Copy files directly to current directory
+            await copyTemplateFilesToCurrentDir(templatePath, projectPath);
+        } else {
+            // Create directory and copy files
+            await fs.ensureDir(projectPath);
+            await copyTemplateFiles(templatePath, projectPath);
+        }
         
         spinner.succeed(chalk.green('✅ Project structure created'));
 
         // Process template files (replace placeholders, etc.)
-        await processTemplateFiles(projectPath, projectName);
+        await processTemplateFiles(projectPath, actualProjectName);
 
         // Install dependencies if any configuration files exist
         await installDependenciesForCreate(projectPath);
@@ -98,6 +127,40 @@ async function copyTemplateFiles(templatePath: string, projectPath: string): Pro
             return true;
         }
     });
+}
+
+/**
+ * Copy template files to current directory (for "." project name)
+ */
+async function copyTemplateFilesToCurrentDir(templatePath: string, projectPath: string): Promise<void> {
+    const templateContents = await fs.readdir(templatePath);
+    
+    for (const item of templateContents) {
+        const sourcePath = path.join(templatePath, item);
+        const destPath = path.join(projectPath, item);
+        
+        const stats = await fs.stat(sourcePath);
+        
+        if (stats.isDirectory()) {
+            // Skip common directories that shouldn't be copied
+            if (item === 'node_modules' || item === '.git' || 
+                item === 'dist' || item === 'build' || item === '.next') {
+                continue;
+            }
+            await fs.copy(sourcePath, destPath, {
+                filter: (src) => {
+                    const fileName = path.basename(src);
+                    return fileName !== '.DS_Store' && fileName !== 'Thumbs.db' && fileName !== '.gitkeep';
+                }
+            });
+        } else {
+            // Skip system files
+            if (item === '.DS_Store' || item === 'Thumbs.db' || item === '.gitkeep') {
+                continue;
+            }
+            await fs.copy(sourcePath, destPath);
+        }
+    }
 }
 
 /**

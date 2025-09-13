@@ -44,21 +44,51 @@ function capitalize(str: string): string {
 }
 
 /**
- * Framework selection prompt
+ * Project name prompt with enhanced styling
+ */
+export async function promptProjectName(): Promise<string> {
+  console.log(chalk.hex('#00d2d3')('\n📝 Project Setup\n'));
+  
+  const { projectName } = await inquirer.prompt([
+    {
+      type: 'input',
+      name: 'projectName',
+      message: `${chalk.blue('❯')} Enter your project name:`,
+      validate: (input: string) => {
+        if (!input.trim()) {
+          return chalk.red('Project name is required');
+        }
+        if (!/^[a-zA-Z0-9-_\.]+$/.test(input)) {
+          return chalk.red('Project name can only contain letters, numbers, hyphens, underscores, and dots');
+        }
+        return true;
+      },
+      transformer: (input: string) => chalk.cyan(input)
+    }
+  ]);
+
+  return projectName.trim();
+}
+
+/**
+ * Framework selection prompt with enhanced styling
  */
 export async function promptFrameworkSelection(): Promise<string> {
   const frameworks = getAvailableFrameworks();
+  
+  console.log(chalk.hex('#00d2d3')('\n🚀 Framework Selection\n'));
   
   const { framework } = await inquirer.prompt([
     {
       type: 'list',
       name: 'framework',
-      message: '🚀 Choose your framework:',
+      message: `${chalk.blue('❯')} Choose your framework:`,
       choices: frameworks.map(fw => ({
-        name: `${fw.charAt(0).toUpperCase() + fw.slice(1)} - ${getFrameworkDescription(fw)}`,
-        value: fw
+        name: `${chalk.green('●')} ${chalk.bold(capitalize(fw))} ${chalk.gray('- ' + getFrameworkDescription(fw))}`,
+        value: fw,
+        short: capitalize(fw)
       })),
-      pageSize: 10
+      pageSize: 12
     }
   ]);
 
@@ -66,137 +96,18 @@ export async function promptFrameworkSelection(): Promise<string> {
 }
 
 /**
- * Template selection - only for frameworks that have templates field without options
- */
-export async function promptTemplateSelection(framework: string): Promise<string> {
-  const config = getFrameworkConfig(framework);
-  
-  if (!config) {
-    console.log(chalk.red(`❌ Framework ${framework} not found`));
-    return '';
-  }
-
-  // Check if framework has templates field for dropdown selection
-  if (config.templates && !config.options) {
-    if (config.templates.length === 1) {
-      return config.templates[0];
-    }
-
-    const { template } = await inquirer.prompt([
-      {
-        type: 'list',
-        name: 'template',
-        message: `📋 Choose a template for ${framework}:`,
-        choices: config.templates.map((template: string) => ({
-          name: template.replace(/-/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase()),
-          value: template
-        }))
-      }
-    ]);
-
-    return template;
-  }
-
-  // For frameworks with options, return empty string (template name will be generated)
-  return '';
-}
-
-/**
- * Framework options prompt - for frameworks with configurable options
- */
-export async function promptFrameworkOptions(framework: string): Promise<FrameworkOptions> {
-  const config = getFrameworkConfig(framework);
-  
-  if (!config || !config.options) {
-    return {};
-  }
-
-  const options: FrameworkOptions = {};
-
-  // Prompt for available options
-  if (config.options.includes('tailwind')) {
-    const { tailwind } = await inquirer.prompt([
-      {
-        type: 'confirm',
-        name: 'tailwind',
-        message: '🎨 Do you want to use Tailwind CSS?',
-        default: true
-      }
-    ]);
-    options.tailwind = tailwind;
-  }
-
-  if (config.options.includes('src')) {
-    const { src } = await inquirer.prompt([
-      {
-        type: 'confirm',
-        name: 'src',
-        message: '📁 Do you want to use src/ directory structure?',
-        default: true
-      }
-    ]);
-    options.src = src;
-  }
-
-  // Prompt for UI library if available
-  if (config.ui && config.ui.length > 0) {
-    if (config.ui.length === 1) {
-      options.ui = config.ui[0];
-    } else {
-      const { ui } = await inquirer.prompt([
-        {
-          type: 'list',
-          name: 'ui',
-          message: '💎 Choose a UI library:',
-          choices: [
-            { name: 'None', value: 'none' },
-            ...config.ui.map((uiLib: string) => ({
-              name: uiLib.charAt(0).toUpperCase() + uiLib.slice(1),
-              value: uiLib
-            }))
-          ]
-        }
-      ]);
-      options.ui = ui === 'none' ? undefined : ui;
-    }
-  }
-
-  // Prompt for bundler if available (only for react-based frameworks)
-  if (config.bundlers && config.bundlers.length > 0) {
-    const { bundler } = await inquirer.prompt([
-      {
-        type: 'list',
-        name: 'bundler',
-        message: '📦 Choose a bundler:',
-        choices: config.bundlers.map((bundler: string) => ({
-          name: bundler.charAt(0).toUpperCase() + bundler.slice(1),
-          value: bundler
-        }))
-      }
-    ]);
-    options.bundler = bundler;
-  }
-
-  return options;
-}
-
-/**
- * Language selection prompt
+ * Language selection prompt - framework specific from template.json
  */
 export async function promptLanguageSelection(framework: string): Promise<string> {
   const config = getFrameworkConfig(framework);
   
   if (!config.languages || config.languages.length <= 1) {
-    return config.languages?.[0] || 'javascript';
+    const defaultLang = config.languages?.[0] || 'javascript';
+    console.log(chalk.cyan(`💻 Using ${chalk.bold(defaultLang)} as default language`));
+    return defaultLang;
   }
 
-  const languageDescriptions: Record<string, string> = {
-    javascript: 'Dynamic, flexible, widely supported',
-    typescript: 'Type-safe JavaScript with enhanced tooling',
-    python: 'Readable, powerful, extensive ecosystem',
-    rust: 'Memory-safe, performance-focused systems language',
-    go: 'Simple, fast, concurrent programming language'
-  };
+  console.log(chalk.hex('#00d2d3')('\n💻 Language Selection\n'));
 
   const languageEmojis: Record<string, string> = {
     javascript: '📜',
@@ -210,12 +121,13 @@ export async function promptLanguageSelection(framework: string): Promise<string
     {
       name: 'language',
       type: 'list',
-      message: '💻 Choose your language:',
+      message: `${chalk.blue('❯')} Choose your language for ${chalk.bold(framework)}:`,
       choices: config.languages.map((lang: string) => ({
-        name: `${languageEmojis[lang] || '📄'} ${chalk.bold(capitalize(lang))} ${chalk.hex('#95afc0')(`- ${languageDescriptions[lang] || 'Modern programming language'}`)}`,
+        name: `${languageEmojis[lang] || '📄'} ${chalk.bold(capitalize(lang))}`,
         value: lang,
         short: lang
       })),
+      pageSize: 6
     },
   ]);
   
@@ -223,41 +135,275 @@ export async function promptLanguageSelection(framework: string): Promise<string
 }
 
 /**
- * Project name prompt
+ * Template selection with enhanced styling
  */
-export async function promptProjectName(): Promise<string> {
-  const { projectName } = await inquirer.prompt([
+export async function promptTemplateSelection(framework: string): Promise<string> {
+  const config = getFrameworkConfig(framework);
+  
+  if (!config || !config.templates) {
+    return '';
+  }
+
+  if (config.templates.length === 1) {
+    console.log(chalk.cyan(`📋 Using ${chalk.bold(config.templates[0])} template`));
+    return config.templates[0];
+  }
+
+  console.log(chalk.hex('#00d2d3')('\n📋 Template Selection\n'));
+
+  const { template } = await inquirer.prompt([
     {
-      type: 'input',
-      name: 'projectName',
-      message: '📝 Enter your project name:',
-      validate: (input: string) => {
-        if (!input.trim()) {
-          return 'Project name is required';
-        }
-        if (!/^[a-zA-Z0-9-_]+$/.test(input)) {
-          return 'Project name can only contain letters, numbers, hyphens, and underscores';
-        }
-        return true;
-      }
+      type: 'list',
+      name: 'template',
+      message: `${chalk.blue('❯')} Choose a template for ${chalk.bold(framework)}:`,
+      choices: config.templates.map((template: string) => ({
+        name: `${chalk.green('▸')} ${template.replace(/-/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())}`,
+        value: template,
+        short: template
+      })),
+      pageSize: 8
     }
   ]);
 
-  return projectName.trim();
+  return template;
 }
 
 /**
- * Check if framework uses options-based configuration
+ * Framework options prompt - handles UI, bundlers, and other options
+ */
+export async function promptFrameworkOptions(framework: string): Promise<FrameworkOptions> {
+  const config = getFrameworkConfig(framework);
+  
+  if (!config || (!config.ui && !config.options && !config.bundlers)) {
+    return {};
+  }
+
+  console.log(chalk.hex('#00d2d3')(`\n⚙️  ${capitalize(framework)} Configuration\n`));
+
+  const options: FrameworkOptions = {};
+
+  // 1. UI Library selection (if available)
+  if (config.ui && config.ui.length > 0) {
+    if (config.ui.length === 1) {
+      options.ui = config.ui[0];
+      console.log(chalk.cyan(`💎 Using ${chalk.bold(config.ui[0])} as UI library`));
+    } else {
+      const { ui } = await inquirer.prompt([
+        {
+          type: 'list',
+          name: 'ui',
+          message: `${chalk.blue('❯')} Choose a UI library:`,
+          choices: [
+            { 
+              name: `${chalk.gray('◯')} None - Build your own UI`, 
+              value: 'none' 
+            },
+            ...config.ui.map((uiLib: string) => ({
+              name: `${chalk.green('●')} ${capitalize(uiLib)}`,
+              value: uiLib
+            }))
+          ],
+          pageSize: 8
+        }
+      ]);
+      options.ui = ui === 'none' ? undefined : ui;
+    }
+  }
+
+  // 2. Tailwind CSS (if available in options)
+  if (config.options?.includes('tailwind')) {
+    const { tailwind } = await inquirer.prompt([
+      {
+        type: 'confirm',
+        name: 'tailwind',
+        message: `${chalk.blue('❯')} Add ${chalk.blue('Tailwind CSS')} for styling?`,
+        default: true
+      }
+    ]);
+    options.tailwind = tailwind;
+  }
+
+  // 3. Src directory (only for Next.js)
+  if (framework === 'nextjs' && config.options?.includes('src')) {
+    const { src } = await inquirer.prompt([
+      {
+        type: 'confirm',
+        name: 'src',
+        message: `${chalk.blue('❯')} Use ${chalk.yellow('src/')} directory structure?`,
+        default: true
+      }
+    ]);
+    options.src = src;
+  }
+
+  // 4. Bundler selection (only for React-based frameworks)
+  if (config.bundlers && config.bundlers.length > 0) {
+    const { bundler } = await inquirer.prompt([
+      {
+        type: 'list',
+        name: 'bundler',
+        message: `${chalk.blue('❯')} Choose a bundler:`,
+        choices: config.bundlers.map((bundler: string) => ({
+          name: `${chalk.blue('▸')} ${capitalize(bundler)}`,
+          value: bundler
+        })),
+        pageSize: 6
+      }
+    ]);
+    options.bundler = bundler;
+  }
+
+  return options;
+}
+
+/**
+ * Template creation confirmation
+ */
+export async function promptTemplateConfirmation(framework: string, language: string, templateName: string, options: FrameworkOptions): Promise<boolean> {
+  console.log(chalk.hex('#00d2d3')('\n✅ Project Summary\n'));
+  
+  console.log(chalk.white('📦 Project Configuration:'));
+  console.log(`   Framework: ${chalk.green(framework)}`);
+  console.log(`   Language: ${chalk.blue(language)}`);
+  if (templateName) {
+    console.log(`   Template: ${chalk.yellow(templateName)}`);
+  }
+  if (options.ui) {
+    console.log(`   UI Library: ${chalk.magenta(options.ui)}`);
+  }
+  if (options.tailwind) {
+    console.log(`   Styling: ${chalk.cyan('Tailwind CSS')}`);
+  }
+  if (options.src) {
+    console.log(`   Structure: ${chalk.yellow('src/ directory')}`);
+  }
+  if (options.bundler) {
+    console.log(`   Bundler: ${chalk.blue(options.bundler)}`);
+  }
+  
+  const { confirm } = await inquirer.prompt([
+    {
+      type: 'confirm',
+      name: 'confirm',
+      message: `${chalk.blue('❯')} Create project with these settings?`,
+      default: true
+    }
+  ]);
+
+  return confirm;
+}
+
+/**
+ * Features selection prompt for post-creation
+ */
+export async function promptFeatureSelection(): Promise<string[]> {
+  console.log(chalk.hex('#00d2d3')('\n🚀 Feature Enhancement\n'));
+  
+  const { addFeatures } = await inquirer.prompt([
+    {
+      type: 'confirm',
+      name: 'addFeatures',
+      message: `${chalk.blue('❯')} Would you like to add features to your project?`,
+      default: true
+    }
+  ]);
+
+  if (!addFeatures) {
+    return [];
+  }
+
+  // Get available feature categories from features.json
+  const featuresPath = path.join(process.cwd(), 'features', 'features.json');
+  if (!fs.existsSync(featuresPath)) {
+    console.log(chalk.yellow('⚠️  Features configuration not found'));
+    return [];
+  }
+
+  const featuresConfig = JSON.parse(fs.readFileSync(featuresPath, 'utf-8'));
+  const categories = Object.keys(featuresConfig);
+
+  const { selectedCategories } = await inquirer.prompt([
+    {
+      type: 'checkbox',
+      name: 'selectedCategories',
+      message: `${chalk.blue('❯')} Select feature categories to add:`,
+      choices: categories.map(category => ({
+        name: `${chalk.green('□')} ${capitalize(category)}`,
+        value: category,
+        checked: false
+      })),
+      pageSize: 10
+    }
+  ]);
+
+  return selectedCategories;
+}
+
+/**
+ * Specific feature provider selection
+ */
+export async function promptFeatureProvider(category: string, framework: string): Promise<string | null> {
+  const featuresPath = path.join(process.cwd(), 'features', 'features.json');
+  const featuresConfig = JSON.parse(fs.readFileSync(featuresPath, 'utf-8'));
+  
+  if (!featuresConfig[category]) {
+    return null;
+  }
+
+  const providers = Object.keys(featuresConfig[category]);
+  
+  if (providers.length === 0) {
+    console.log(chalk.yellow(`⚠️  No providers found for ${category}`));
+    return null;
+  }
+
+  if (providers.length === 1) {
+    console.log(chalk.cyan(`🔧 Using ${chalk.bold(providers[0])} for ${category}`));
+    return providers[0];
+  }
+
+  const { provider } = await inquirer.prompt([
+    {
+      type: 'list',
+      name: 'provider',
+      message: `${chalk.blue('❯')} Choose a ${category} provider:`,
+      choices: providers.map(provider => ({
+        name: `${chalk.green('▸')} ${capitalize(provider)}`,
+        value: provider,
+        short: provider
+      })),
+      pageSize: 8
+    }
+  ]);
+
+  return provider;
+}
+
+/**
+ * Helper functions to check framework capabilities
  */
 export function hasFrameworkOptions(framework: string): boolean {
   const config = getFrameworkConfig(framework);
   return !!(config?.options && config.options.length > 0);
 }
 
-/**
- * Check if framework uses template dropdown selection
- */
+export function hasUIOptions(framework: string): boolean {
+  const config = getFrameworkConfig(framework);
+  return !!(config?.ui && config.ui.length > 0);
+}
+
+export function hasBundlerOptions(framework: string): boolean {
+  const config = getFrameworkConfig(framework);
+  return !!(config?.bundlers && config.bundlers.length > 0);
+}
+
 export function hasTemplateSelection(framework: string): boolean {
   const config = getFrameworkConfig(framework);
-  return !!(config?.templates && !config.options);
+  return !!(config?.templates && config.templates.length > 0);
+}
+
+export function shouldShowTemplates(framework: string): boolean {
+  const config = getFrameworkConfig(framework);
+  // Show templates only if framework has templates but no options or UI
+  return !!(config?.templates && config.templates.length > 0 && !config.options && !config.ui);
 }

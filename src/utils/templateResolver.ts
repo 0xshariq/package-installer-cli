@@ -74,7 +74,7 @@ export function generateTemplateName(framework: string, options: FrameworkOption
  * Resolve template directory path based on framework and template name
  */
 export function resolveTemplatePath(projectInfo: ProjectInfo): string {
-  const { framework, templateName } = projectInfo;
+  const { framework, language, templateName } = projectInfo;
   const templatesRoot = path.join(process.cwd(), 'templates');
   
   // Handle combination templates (like reactjs+expressjs+shadcn)
@@ -83,12 +83,27 @@ export function resolveTemplatePath(projectInfo: ProjectInfo): string {
     return path.join(templatesRoot, frameworkDir);
   }
   
-  // Standard framework templates
+  // For frameworks with specific template names (like angularjs)
   if (templateName) {
-    return path.join(templatesRoot, framework);
+    // Check if language subdirectory exists and is required
+    const languageSubdirPath = path.join(templatesRoot, framework, language || 'typescript');
+    if (fs.existsSync(languageSubdirPath)) {
+      return path.join(languageSubdirPath, templateName);
+    }
+    
+    // Otherwise, use direct framework directory with template name
+    return path.join(templatesRoot, framework, templateName);
   }
   
-  // For frameworks with options, use the framework directory directly
+  // For frameworks with options but no specific template name, use language subdirectory if available
+  if (language) {
+    const languageSubdirPath = path.join(templatesRoot, framework, language);
+    if (fs.existsSync(languageSubdirPath)) {
+      return languageSubdirPath;
+    }
+  }
+  
+  // Default: use the framework directory directly
   return path.join(templatesRoot, framework);
 }
 
