@@ -9,16 +9,17 @@ import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 
 // Import command handlers
-import { createProject } from './commands/create.js';
-import { checkCommand } from './commands/check.js';
-import { cloneRepo } from './commands/clone.js';
-import { addCommand } from './commands/add.js';
-import { upgradeCliCommand } from './commands/upgrade-cli.js';
-import { analyzeCommand } from './commands/analyze.js';
+import { createProject, showCreateHelp } from './commands/create.js';
+import { checkCommand, showCheckHelp } from './commands/check.js';
+import { cloneRepo, showCloneHelp } from './commands/clone.js';
+import { addCommand, showAddHelp } from './commands/add.js';
+import { showUpgradeHelp, upgradeCliCommand } from './commands/upgrade-cli.js';
+import { updateCommand, showUpdateHelp } from './commands/update.js';
+import { analyzeCommand, showAnalyzeHelp } from './commands/analyze.js';
 import { deployCommand } from './commands/deploy.js';
-import { cleanCommand } from './commands/clean.js';
-import { environmentCommand } from './commands/env.js';
-import { doctorCommand } from './commands/doctor.js';
+import { cleanCommand, showCleanHelp } from './commands/clean.js';
+import { environmentCommand, showEnvironmentHelp } from './commands/env.js';
+import { doctorCommand, showDoctorHelp } from './commands/doctor.js';
 
 // Import utilities
 import { printBanner, logError, showBanner } from './utils/ui.js';
@@ -83,34 +84,9 @@ program
     helpWidth: 120,
   })
   .on('--help', () => {
-    const piGradient = gradient(['#00c6ff', '#0072ff']);
-    const headerGradient = gradient(['#4facfe', '#00f2fe']);
-
-    console.log('\n' + boxen(
-      headerGradient('🚀 Create Command') + '\n\n' +
-      chalk.white('Create a new project from our curated collection of modern templates.') + '\n' +
-      chalk.white('Choose from React, Next.js, Express, Nest.js, Rust, and more!') + '\n\n' +
-      chalk.cyan('Examples:') + '\n' +
-      chalk.gray(`  ${piGradient('pi')} ${chalk.hex('#10ac84')('create')} my-awesome-app    # Create with specific name`) + '\n' +
-      chalk.gray(`  ${piGradient('pi')} ${chalk.hex('#10ac84')('create')}                   # Interactive mode - will prompt for name`) + '\n\n' +
-      chalk.hex('#00d2d3')('💡 Available Templates:') + '\n' +
-      chalk.hex('#95afc0')('  • React (Vite) - JavaScript/TypeScript variants') + '\n' +
-      chalk.hex('#95afc0')('  • Next.js - App Router with multiple configurations') + '\n' +
-      chalk.hex('#95afc0')('  • Express - RESTful APIs with authentication') + '\n' +
-      chalk.hex('#95afc0')('  • Nest.js - Enterprise-grade Node.js framework') + '\n' +
-      chalk.hex('#95afc0')('  • Angular - Modern Angular applications') + '\n' +
-      chalk.hex('#95afc0')('  • Vue.js - Progressive Vue.js applications') + '\n' +
-      chalk.hex('#95afc0')('  • Rust - Systems programming templates') + '\n' +
-      chalk.hex('#95afc0')('  • Django - Python web framework'),
-      {
-        padding: 1,
-        borderStyle: 'round',
-        borderColor: 'cyan',
-        backgroundColor: '#0a0a0a'
-      }
-    ));
-  })
-  .action(async (projectName) => {
+    showCreateHelp();
+  })      
+  .action(async (projectName: string | undefined) => {
     try {
       showBanner();
       await createProject(projectName);
@@ -125,30 +101,7 @@ program
   .description(chalk.hex('#f39c12')('🔍 ') + chalk.hex('#ffa500')('Check package versions and get update suggestions'))
   .argument('[package-name]', chalk.hex('#95afc0')('Specific package to check (optional)'))
   .on('--help', () => {
-    const piGradient = gradient(['#00c6ff', '#0072ff']);
-    const headerGradient = gradient(['#4facfe', '#00f2fe']);
-
-    console.log('\n' + boxen(
-      headerGradient('🔍 Check Command') + '\n\n' +
-      chalk.white('Check package versions in your project and get suggestions for updates.') + '\n' +
-      chalk.white('Helps you keep your dependencies up-to-date and secure.') + '\n\n' +
-      chalk.cyan('Examples:') + '\n' +
-      chalk.gray(`  ${piGradient('pi')} ${chalk.hex('#f39c12')('check')}                    # Check all packages in current project`) + '\n' +
-      chalk.gray(`  ${piGradient('pi')} ${chalk.hex('#f39c12')('check')} react              # Check specific package version`) + '\n' +
-      chalk.gray(`  ${piGradient('pi')} ${chalk.hex('#f39c12')('check')} @types/node        # Check scoped packages`) + '\n\n' +
-      chalk.hex('#00d2d3')('💡 Supported Package Managers:') + '\n' +
-      chalk.hex('#95afc0')('  • npm, pnpm, yarn (Node.js)') + '\n' +
-      chalk.hex('#95afc0')('  • pip, pipenv, poetry (Python)') + '\n' +
-      chalk.hex('#95afc0')('  • cargo (Rust)') + '\n' +
-      chalk.hex('#95afc0')('  • go modules (Go)') + '\n' +
-      chalk.hex('#95afc0')('  • composer (PHP)'),
-      {
-        padding: 1,
-        borderStyle: 'round',
-        borderColor: 'cyan',
-        backgroundColor: '#0a0a0a'
-      }
-    ));
+    showCheckHelp();
   })
   .action(async (packageName) => {
     try {
@@ -165,30 +118,7 @@ program
   .argument('[user/repo]', chalk.hex('#95afc0')('Repository in format "user/repo" or "provider:user/repo"'))
   .argument('[project-name]', chalk.hex('#95afc0')('Custom project name (defaults to repo name)'))
   .on('--help', () => {
-    const piGradient = gradient(['#00c6ff', '#0072ff']);
-    const headerGradient = gradient(['#4facfe', '#00f2fe']);
-
-    console.log('\n' + boxen(
-      headerGradient('📥 Clone Command') + '\n\n' +
-      chalk.white('Clone any public repository from GitHub, GitLab, BitBucket, or SourceHut.') + '\n' +
-      chalk.white('Automatically installs dependencies and creates .env file from templates.') + '\n\n' +
-      chalk.cyan('Examples:') + '\n' +
-      chalk.gray(`  ${piGradient('pi')} ${chalk.hex('#00d2d3')('clone')} facebook/react my-react-copy      # Clone from GitHub with custom name`) + '\n' +
-      chalk.gray(`  ${piGradient('pi')} ${chalk.hex('#00d2d3')('clone')} gitlab:user/project               # Clone from GitLab`) + '\n' +
-      chalk.gray(`  ${piGradient('pi')} ${chalk.hex('#00d2d3')('clone')} bitbucket:user/repo               # Clone from BitBucket`) + '\n' +
-      chalk.gray(`  ${piGradient('pi')} ${chalk.hex('#00d2d3')('clone')} sourcehut:user/repo               # Clone from SourceHut`) + '\n\n' +
-      chalk.hex('#00d2d3')('💡 Supported Platforms:') + '\n' +
-      chalk.hex('#95afc0')('  • GitHub (default): user/repo') + '\n' +
-      chalk.hex('#95afc0')('  • GitLab: gitlab:user/repo') + '\n' +
-      chalk.hex('#95afc0')('  • BitBucket: bitbucket:user/repo') + '\n' +
-      chalk.hex('#95afc0')('  • SourceHut: sourcehut:user/repo'),
-      {
-        padding: 1,
-        borderStyle: 'round',
-        borderColor: 'cyan',
-        backgroundColor: '#0a0a0a'
-      }
-    ));
+    showCloneHelp();
   })
   .action(async (userRepo, projectName) => {
     if (!userRepo) {
@@ -217,7 +147,6 @@ program
   .option('-l, --list', chalk.hex('#95afc0')('List all available features'))
   .option('-v, --verbose', chalk.hex('#95afc0')('Show detailed output'))
   .on('--help', () => {
-    const { showAddHelp } = require('./commands/add.js');
     showAddHelp();
   })
   .action(async (feature, provider, options) => {
@@ -233,7 +162,7 @@ program
   .command('upgrade-cli')
   .description(chalk.hex('#ff6b6b')('🚀 ') + chalk.hex('#fd79a8')('Update Package Installer CLI to the latest version'))
   .on('--help', () => {
-    // Help is handled in the command file
+    showUpgradeHelp();
   })
   .action(async () => {
     try {
@@ -248,7 +177,7 @@ program
   .command('analyze')
   .description(chalk.hex('#667eea')('📊 ') + chalk.hex('#4facfe')('Show CLI usage analytics and framework statistics'))
   .on('--help', () => {
-    // Help is handled in the command file
+    showAnalyzeHelp();
   })
   .action(async () => {
     try {
@@ -262,18 +191,14 @@ program
 program
   .command('update')
   .alias('u')
-  .description(chalk.hex('#ff6b6b')('🔄 ') + chalk.hex('#fd79a8')('Update packages to their latest versions'))
-  .option('-p, --packages <packages...>', 'Specific packages to update (space separated)')
-  .option('-d, --dev', 'Update only development dependencies')
-  .option('-g, --global', 'Update global packages')
-  .option('--major', 'Allow major version updates (potentially breaking)')
-  .option('--dry-run', 'Show what would be updated without actually updating')
-  .option('-f, --force', 'Force update even if there are potential conflicts')
-  .option('--interactive', 'Interactive mode to select which packages to update')
+  .description(chalk.hex('#ff6b6b')('🔄 ') + chalk.hex('#fd79a8')('Update CLI, dependencies, and cache'))
+  .option('-h, --help', 'Show help for update command')
+  .on('--help', () => {
+    showUpdateHelp();
+  })
   .action(async (options) => {
     try {
-      const { updateCommand: updateFunc } = await import('./commands/update.js');
-      await updateFunc(options);
+      await updateCommand(options);
     } catch (error) {
       handleCommandError('update', error as Error);
     }
@@ -291,6 +216,9 @@ program
   .option('--all', 'Clean everything (safe)')
   .option('--deep', 'Deep clean (includes lock files)')
   .option('--dry-run', 'Preview what would be cleaned')
+  .on("--help", () => {
+    showCleanHelp();
+  })
   .action(async (options) => {
     try {
       showBanner();
@@ -304,15 +232,18 @@ program
 program
   .command('env')
   .alias('environment')
-  .description(chalk.hex('#10ac84')('🌍 ') + chalk.hex('#00b894')('Analyze development environment'))
-  .option('--check', 'Check for missing or outdated tools')
-  .option('--versions', 'Show versions of all detected tools')
-  .option('--paths', 'Show installation paths')
+  .description(chalk.hex('#10ac84')('🌍 ') + chalk.hex('#00b894')('Analyze and manage development environment'))
+  .option('--check', 'Check development tools and versions')
+  .option('--generate', 'Generate .env template for project')
+  .option('--validate', 'Validate existing .env file')
   .option('--export', 'Export environment info to file')
-  .option('--minimal', 'Show minimal environment info')
+  .option('--system', 'Show system information only')
+  .option('-h, --help', 'Show help for environment command')
+  .on('--help', () => {
+    showEnvironmentHelp();
+  })
   .action(async (options) => {
     try {
-      showBanner();
       await environmentCommand(options);
     } catch (error) {
       handleCommandError('environment', error as Error);
@@ -325,13 +256,16 @@ program
   .alias('diagnose')
   .description(chalk.hex('#ff6b6b')('🩺 ') + chalk.hex('#e17055')('Diagnose and fix development issues'))
   .option('--fix', 'Automatically fix detected issues')
-  .option('--check-deps', 'Check for dependency issues')
-  .option('--check-config', 'Check configuration files')
-  .option('--check-tools', 'Check development tools')
+  .option('--node', 'Check Node.js and npm setup only')
+  .option('--deps', 'Check project dependencies only')
+  .option('--tools', 'Check development tools only')
   .option('--verbose', 'Show detailed diagnostic information')
+  .option('-h, --help', 'Show help for doctor command')
+  .on('--help', () => {
+    showDoctorHelp();
+  })
   .action(async (options) => {
     try {
-      showBanner();
       await doctorCommand(options);
     } catch (error) {
       handleCommandError('doctor', error as Error);
