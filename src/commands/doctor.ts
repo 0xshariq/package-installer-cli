@@ -7,7 +7,214 @@ import ora from 'ora';
 import { execSync } from 'child_process';
 import fs from 'fs-extra';
 import path from 'path';
-import { createBanner, displaySuccessMessage } from '../utils/dashboard.js';
+import boxen from 'boxen';
+import gradient from 'gradient-string';
+import inquirer from 'inquirer';
+import { createBanner, displaySuccessMessage, displayErrorMessage } from '../utils/dashboard.js';
+import { detectProjectStack } from '../utils/featureInstaller.js';
+
+// Diagnostic types
+interface DiagnosticIssue {
+  type: 'error' | 'warning' | 'info';
+  category: string;
+  title: string;
+  description: string;
+  solution?: string;
+  autoFixable: boolean;
+}
+
+interface DiagnosticResult {
+  passed: boolean;
+  issues: DiagnosticIssue[];
+  summary: {
+    total: number;
+    errors: number;
+    warnings: number;
+    info: number;
+  };
+}
+
+/**
+ * Check if command exists
+ */
+function commandExists(command: string): boolean {
+  try {
+    execSync(`which ${command}`, { stdio: 'ignore' });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Check Node.js and npm installation
+ */
+async function checkNodeSetup(): Promise<DiagnosticIssue[]> {
+  const issues: DiagnosticIssue[] = [];
+
+  // Check Node.js
+  if (!commandExists('node')) {
+    issues.push({
+      type: 'error',
+      category: 'Node.js',
+      title: 'Node.js not installed',
+      description: 'Node.js is required for JavaScript/TypeScript development',
+      solution: 'Install Node.js from https://nodejs.org/',
+      autoFixable: false
+    });
+  } else {
+    try {
+      const nodeVersion = execSync('node --version', { encoding: 'utf8' }).trim();
+      const majorVersion = parseInt(nodeVersion.slice(1).split('.')[0]);
+      
+      if (majorVersion < 16) {
+        issues.push({
+          type: 'warning',
+          category: 'Node.js',
+          title: 'Outdated Node.js version',
+          description: `Node.js ${nodeVersion} is outdated. Recommended: v18 or higher`,
+          solution: 'Update Node.js to the latest LTS version',
+          autoFixable: false
+        });
+      }
+    } catch (error) {
+      issues.push({
+        type: 'error',
+        category: 'Node.js',
+        title: 'Node.js version check failed',
+        description: 'Could not determine Node.js version',
+        autoFixable: false
+      });
+    }
+  }
+
+  // Check npm
+  if (!commandExists('npm')) {
+    issues.push({
+      type: 'error',
+      category: 'Package Manager',
+      title: 'npm not installed',
+      description: 'npm is required for package management',
+      solution: 'npm is typically installed with Node.js',
+      autoFixable: false
+    });
+  }
+
+  return issues;
+}
+
+/**
+ * Check project dependencies
+ */
+async function checkProjectDependencies(projectPath: string): Promise<DiagnosticIssue[]> {
+  const issues: DiagnosticIssue[] = [];
+  const packageJsonPath = path.join(projectPath, 'package.json');
+
+  if (!await fs.pathExists(packageJsonPath)) {
+    issues.push({
+      type: 'info',
+      category: 'Dependencies',
+      title: 'No package.json found',
+      description: 'This directory does not appear to be a Node.js project',
+      autoFixable: false
+    });
+    return issues;
+  }
+
+  try {
+    const packageJson = await fs.readJson(packageJsonPath);
+    const nodeModulesPath = path.join(projectPath, 'node_modules');
+
+    // Check if node_modules exists
+    if (!await fs.pathExists(nodeModulesPath)) {
+      issues.push({
+        type: 'warning',
+        category: 'Dependencies',
+        title: 'Dependencies not installed',
+        description: 'node_modules directory is missing',
+        solution: 'Run npm install to install dependencies',
+        autoFixable: true
+      });
+    }
+
+    // Check for vulnerabilities (simplified check)
+    try {
+      const auditResult = execSync('npm audit --json', { 
+        cwd: projectPath, 
+        encoding: 'utf8',
+        stdio: 'pipe'
+      });
+      const audit = JSON.parse(auditResult);
+      
+      if (audit.metadata && audit.metadata.vulnerabilities) {
+        const vulns = audit.metadata.vulnerabilities;
+        const totalVulns = Object.values(vulns).reduce((sum: number, count: any) => sum + count, 0);
+        
+        if (totalVulns > 0) {
+          issues.push({
+            type: 'warning',
+            category: 'Security',
+            title: `${totalVulns} security vulnerabilities found`,
+            description: 'Dependencies have known security vulnerabilities',
+            solution: 'Run npm audit fix to fix automatically, or npm audit for details',
+            autoFixable: true
+          });
+        }
+      }
+    } catch (error) {
+      // npm audit might fail, but that's okay
+    }
+
+  } catch (error) {
+    issues.push({
+      type: 'error',
+      category: 'Dependencies',
+      title: 'Invalid package.json',
+      description: 'Could not parse package.json file',
+      solution: 'Fix syntax errors in package.json',
+      autoFixable: false
+    });
+  }
+
+  return issues;
+}
+
+/**
+ * Auto-fix common issues
+ */
+async function autoFixIssue(issue: DiagnosticIssue, projectPath: string): Promise<boolean> {
+  const spinner = ora(`Fixing: ${issue.title}`).start();
+
+  try {
+    switch (issue.category) {
+      case 'Dependencies':
+        if (issue.title.includes('not installed')) {
+          execSync('npm install', { cwd: projectPath, stdio: 'ignore' });
+          spinner.succeed(`Fixed: ${issue.title}`);
+          return true;
+        }
+        break;
+
+      case 'Security':
+        if (issue.title.includes('vulnerabilities')) {
+          execSync('npm audit fix', { cwd: projectPath, stdio: 'ignore' });
+          spinner.succeed(`Fixed: ${issue.title}`);
+          return true;
+        }
+        break;
+
+      default:
+        spinner.fail(`Cannot auto-fix: ${issue.title}`);
+        return false;
+    }
+  } catch (error) {
+    spinner.fail(`Failed to fix: ${issue.title}`);
+    return false;
+  }
+
+  spinner.fail(`No auto-fix available for: ${issue.title}`);
+  return false;
+}
 
 /**
  * Display help for doctor command
@@ -15,66 +222,285 @@ import { createBanner, displaySuccessMessage } from '../utils/dashboard.js';
 export function showDoctorHelp(): void {
   console.clear();
   
-  console.log(chalk.hex('#9c88ff')('🩺 DOCTOR COMMAND HELP\n'));
+  const helpContent = boxen(
+    gradient(['#ff6b6b', '#4ecdc4'])('🩺 Doctor Command Help') + '\n\n' +
+    chalk.white('Diagnose and fix common development issues') + '\n\n' +
+    
+    chalk.cyan('Usage:') + '\n' +
+    chalk.white('  pi doctor [options]') + '\n' +
+    chalk.white('  pi diagnose [options]') + chalk.gray(' (alias)') + '\n\n' +
+    
+    chalk.cyan('Description:') + '\n' +
+    chalk.white('  Comprehensive health check for your development environment') + '\n' +
+    chalk.white('  and project setup. Detects and fixes common issues.') + '\n\n' +
+    
+    chalk.cyan('Options:') + '\n' +
+    chalk.white('  --fix') + chalk.gray('          Automatically fix detected issues') + '\n' +
+    chalk.white('  --node') + chalk.gray('         Check Node.js and npm setup only') + '\n' +
+    chalk.white('  --deps') + chalk.gray('         Check project dependencies only') + '\n' +
+    chalk.white('  --tools') + chalk.gray('        Check development tools only') + '\n' +
+    chalk.white('  --verbose') + chalk.gray('      Show detailed diagnostic information') + '\n' +
+    chalk.white('  -h, --help') + chalk.gray('     Show this help message') + '\n\n' +
+    
+    chalk.cyan('Examples:') + '\n' +
+    chalk.gray('  # Complete health check') + '\n' +
+    chalk.white('  pi doctor') + '\n\n' +
+    chalk.gray('  # Check and auto-fix issues') + '\n' +
+    chalk.white('  pi doctor --fix') + '\n\n' +
+    chalk.gray('  # Check dependencies only') + '\n' +
+    chalk.white('  pi doctor --deps'),
+    {
+      padding: 1,
+      margin: 1,
+      borderStyle: 'round',
+      borderColor: 'green'
+    }
+  );
   
-  console.log(chalk.hex('#00d2d3')('Usage:'));
-  console.log(chalk.white('  pi doctor [options]'));
-  console.log(chalk.white('  pi diagnose [options]') + chalk.gray(' (alias)\n'));
-  
-  console.log(chalk.hex('#00d2d3')('Description:'));
-  console.log(chalk.white('  Diagnose and fix common development environment issues'));
-  console.log(chalk.white('  Performs comprehensive health checks and suggests fixes\n'));
-  
-  console.log(chalk.hex('#00d2d3')('Options:'));
-  console.log(chalk.white('  --fix') + chalk.gray('          Automatically fix detected issues'));
-  console.log(chalk.white('  --check-deps') + chalk.gray('    Check for dependency issues'));
-  console.log(chalk.white('  --check-config') + chalk.gray('  Check configuration files'));
-  console.log(chalk.white('  --check-tools') + chalk.gray('   Check development tools'));
-  console.log(chalk.white('  --verbose') + chalk.gray('       Show detailed diagnostic information'));
-  console.log(chalk.white('  -h, --help') + chalk.gray('      Show this help message\n'));
-  
-  console.log(chalk.hex('#00d2d3')('Examples:'));
-  console.log(chalk.gray('  # Run complete diagnosis'));
-  console.log(chalk.white('  pi doctor\n'));
-  console.log(chalk.gray('  # Automatically fix issues'));
-  console.log(chalk.white('  pi doctor --fix\n'));
-  console.log(chalk.gray('  # Check dependencies only'));
-  console.log(chalk.white('  pi doctor --check-deps\n'));
+  console.log(helpContent);
 }
 
 /**
  * Main doctor command function
  */
 export async function doctorCommand(options: any = {}): Promise<void> {
-  createBanner('Development Doctor');
-  
-  const spinner = ora(chalk.hex('#9c88ff')('🩺 Running diagnostics...')).start();
-  
+  if (options.help || options['--help'] || options['-h']) {
+    showDoctorHelp();
+    return;
+  }
+
+  console.clear();
+  const banner = boxen(
+    gradient(['#ff6b6b', '#4ecdc4'])('🩺 Development Doctor') + '\n\n' +
+    chalk.white('Running comprehensive health checks...'),
+    {
+      padding: 1,
+      margin: 1,
+      borderStyle: 'round',
+      borderColor: 'green'
+    }
+  );
+  console.log(banner);
+
+  const projectPath = process.cwd();
+
   try {
-    const issues = await runDiagnostics(options);
-    spinner.stop();
+    // Handle specific checks
+    if (options.node) {
+      await performNodeCheck();
+      return;
+    }
+
+    if (options.deps) {
+      await performDependencyCheck(projectPath);
+      return;
+    }
+
+    if (options.tools) {
+      await performToolsCheck();
+      return;
+    }
+
+    // Run comprehensive diagnostics
+    const allIssues = await runComprehensiveDiagnostics(projectPath);
     
-    if (issues.length === 0) {
+    if (allIssues.length === 0) {
       displaySuccessMessage(
-        'No issues detected!',
-        ['Your development environment is healthy 🎉']
+        'Perfect health! 🎉',
+        ['No issues detected in your development environment']
       );
       return;
     }
-    
-    displayIssues(issues);
-    
+
+    // Display issues
+    displayDiagnosticResults(allIssues);
+
+    // Handle auto-fix
     if (options.fix) {
-      await attemptFixes(issues);
+      await performAutoFix(allIssues, projectPath);
     } else {
-      console.log(chalk.hex('#ffa502')('\n💡 Run with --fix to automatically resolve some issues'));
+      const autoFixableCount = allIssues.filter(issue => issue.autoFixable).length;
+      if (autoFixableCount > 0) {
+        console.log(chalk.yellow(`\n💡 ${autoFixableCount} issues can be auto-fixed. Run with --fix to resolve them.`));
+      }
     }
-    
+
   } catch (error: any) {
-    spinner.fail(chalk.red('❌ Diagnostics failed'));
-    console.error(chalk.red(`Error: ${error.message}`));
-    process.exit(1);
+    displayErrorMessage(
+      'Diagnostic failed',
+      ['An error occurred during health check', String(error)]
+    );
   }
+}
+
+/**
+ * Run comprehensive diagnostics
+ */
+async function runComprehensiveDiagnostics(projectPath: string): Promise<DiagnosticIssue[]> {
+  const spinner = ora('Running health checks...').start();
+  const allIssues: DiagnosticIssue[] = [];
+
+  try {
+    spinner.text = 'Checking Node.js setup...';
+    const nodeIssues = await checkNodeSetup();
+    allIssues.push(...nodeIssues);
+
+    spinner.text = 'Checking project dependencies...';
+    const depIssues = await checkProjectDependencies(projectPath);
+    allIssues.push(...depIssues);
+
+    spinner.text = 'Checking development tools...';
+    const toolIssues = await checkDevelopmentTools();
+    allIssues.push(...toolIssues);
+
+    spinner.succeed(`Health check completed - ${allIssues.length} issues found`);
+  } catch (error) {
+    spinner.fail('Health check failed');
+    throw error;
+  }
+
+  return allIssues;
+}
+
+/**
+ * Perform Node.js specific check
+ */
+async function performNodeCheck(): Promise<void> {
+  console.log(chalk.blue('\n🔍 Checking Node.js setup...\n'));
+  
+  const issues = await checkNodeSetup();
+  
+  if (issues.length === 0) {
+    console.log(chalk.green('✅ Node.js setup is healthy'));
+  } else {
+    displayDiagnosticResults(issues);
+  }
+}
+
+/**
+ * Perform dependency specific check
+ */
+async function performDependencyCheck(projectPath: string): Promise<void> {
+  console.log(chalk.blue('\n🔍 Checking project dependencies...\n'));
+  
+  const issues = await checkProjectDependencies(projectPath);
+  
+  if (issues.length === 0) {
+    console.log(chalk.green('✅ Dependencies are healthy'));
+  } else {
+    displayDiagnosticResults(issues);
+  }
+}
+
+/**
+ * Perform tools specific check
+ */
+async function performToolsCheck(): Promise<void> {
+  console.log(chalk.blue('\n🔍 Checking development tools...\n'));
+  
+  const issues = await checkDevelopmentTools();
+  
+  if (issues.length === 0) {
+    console.log(chalk.green('✅ Development tools are healthy'));
+  } else {
+    displayDiagnosticResults(issues);
+  }
+}
+
+/**
+ * Display diagnostic results
+ */
+function displayDiagnosticResults(issues: DiagnosticIssue[]): void {
+  const errors = issues.filter(issue => issue.type === 'error');
+  const warnings = issues.filter(issue => issue.type === 'warning');
+  const info = issues.filter(issue => issue.type === 'info');
+
+  if (errors.length > 0) {
+    console.log(chalk.red('\n❌ Errors:'));
+    errors.forEach(issue => {
+      console.log(chalk.red(`  • ${issue.title}`));
+      console.log(chalk.gray(`    ${issue.description}`));
+      if (issue.solution) {
+        console.log(chalk.blue(`    💡 ${issue.solution}`));
+      }
+    });
+  }
+
+  if (warnings.length > 0) {
+    console.log(chalk.yellow('\n⚠️  Warnings:'));
+    warnings.forEach(issue => {
+      console.log(chalk.yellow(`  • ${issue.title}`));
+      console.log(chalk.gray(`    ${issue.description}`));
+      if (issue.solution) {
+        console.log(chalk.blue(`    💡 ${issue.solution}`));
+      }
+    });
+  }
+
+  if (info.length > 0) {
+    console.log(chalk.blue('\nℹ️  Information:'));
+    info.forEach(issue => {
+      console.log(chalk.blue(`  • ${issue.title}`));
+      console.log(chalk.gray(`    ${issue.description}`));
+    });
+  }
+}
+
+/**
+ * Perform auto-fix for fixable issues
+ */
+async function performAutoFix(issues: DiagnosticIssue[], projectPath: string): Promise<void> {
+  const fixableIssues = issues.filter(issue => issue.autoFixable);
+  
+  if (fixableIssues.length === 0) {
+    console.log(chalk.yellow('\n⚠️  No auto-fixable issues found'));
+    return;
+  }
+
+  console.log(chalk.blue(`\n🔧 Attempting to fix ${fixableIssues.length} issues...\n`));
+
+  let fixedCount = 0;
+  for (const issue of fixableIssues) {
+    const fixed = await autoFixIssue(issue, projectPath);
+    if (fixed) {
+      fixedCount++;
+    }
+  }
+
+  if (fixedCount > 0) {
+    displaySuccessMessage(
+      `Fixed ${fixedCount} issues!`,
+      ['Your development environment is now healthier']
+    );
+  }
+}
+
+/**
+ * Check development tools
+ */
+async function checkDevelopmentTools(): Promise<DiagnosticIssue[]> {
+  const issues: DiagnosticIssue[] = [];
+
+  const tools = [
+    { command: 'git', name: 'Git', required: true },
+    { command: 'code', name: 'VS Code', required: false },
+    { command: 'docker', name: 'Docker', required: false }
+  ];
+
+  for (const tool of tools) {
+    if (!commandExists(tool.command)) {
+      issues.push({
+        type: tool.required ? 'error' : 'info',
+        category: 'Development Tools',
+        title: `${tool.name} not installed`,
+        description: `${tool.name} is ${tool.required ? 'required' : 'recommended'} for development`,
+        solution: `Install ${tool.name}`,
+        autoFixable: false
+      });
+    }
+  }
+
+  return issues;
 }
 
 /**

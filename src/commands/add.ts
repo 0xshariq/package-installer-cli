@@ -4,23 +4,147 @@ import gradient from 'gradient-string';
 import boxen from 'boxen';
 import path from 'path';
 import fs from 'fs-extra';
-import { addFeature, detectProjectStack, SUPPORTED_FEATURES, FeatureConfig } from '../utils/featureInstaller.js';
+import { fileURLToPath } from 'url';
+import { addFeature, detectProjectStack, SUPPORTED_FEATURES, FeatureConfig, getCliRootPath } from '../utils/featureInstaller.js';
 import { historyManager } from '../utils/historyManager.js';
 import { getCachedProject, cacheProjectData } from '../utils/cacheManager.js';
+
+/**
+ * Resolve CLI installation paths for both local and global installations
+ */
+function resolveCLIPath(): string {
+  // Get the current file's directory
+  const currentFile = fileURLToPath(import.meta.url);
+  const currentDir = path.dirname(currentFile);
+  
+  // Try to find package root by looking for package.json
+  let packageRoot = currentDir;
+  while (packageRoot !== path.dirname(packageRoot)) {
+    const packageJsonPath = path.join(packageRoot, 'package.json');
+    if (fs.existsSync(packageJsonPath)) {
+      try {
+        const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
+        if (packageJson.name === '@0xshariq/package-installer') {
+          return packageRoot;
+        }
+      } catch (error) {
+        // Continue searching
+      }
+    }
+    packageRoot = path.dirname(packageRoot);
+  }
+  
+  // Fallback: use current working directory if we're in development
+  if (fs.existsSync(path.join(process.cwd(), 'features'))) {
+    return process.cwd();
+  }
+  
+  // Final fallback: try node_modules resolution
+  try {
+    const nodeModulesPath = path.join(currentDir, '../../../');
+    if (fs.existsSync(path.join(nodeModulesPath, 'features'))) {
+      return nodeModulesPath;
+    }
+  } catch (error) {
+    // Ignore
+  }
+  
+  return process.cwd();
+}
+
+/**
+ * Helper function to capitalize strings
+ */
+function capitalize(str: string): string {
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+/**
+ * Get features.json configuration
+ */
+function getFeaturesConfig(): Record<string, any> {
+  try {
+    // Get the CLI root path first
+    const cliRoot = getCliRootPath();
+    const featuresPath = path.join(cliRoot, 'features', 'features.json');
+    
+    if (fs.existsSync(featuresPath)) {
+      return JSON.parse(fs.readFileSync(featuresPath, 'utf-8'));
+    }
+
+    // Fallback to trying different paths for local vs global installation
+    const possiblePaths = [
+      path.join(process.cwd(), 'features', 'features.json'),
+      path.join(__dirname, '..', '..', 'features', 'features.json'),
+      path.join(__dirname, '..', '..', '..', 'features', 'features.json'),
+    ];
+
+    for (const fallbackPath of possiblePaths) {
+      if (fs.existsSync(fallbackPath)) {
+        return JSON.parse(fs.readFileSync(fallbackPath, 'utf-8'));
+      }
+    }
+
+    console.warn(chalk.yellow('⚠️  features.json not found, using fallback'));
+    return { features: {} };
+  } catch (error) {
+    console.warn(chalk.yellow('⚠️  Error reading features.json, using fallback'));
+    return { features: {} };
+  }
+}
+
+/**
+ * Get available feature categories
+ */
+function getAvailableFeatures(): string[] {
+  const config = getFeaturesConfig();
+  return Object.keys(config);
+}
+
+/**
+ * Get sub-features for a category
+ */
+function getSubFeatures(category: string): string[] {
+  const config = getFeaturesConfig();
+  const categoryConfig = config[category];
+  
+  if (!categoryConfig || typeof categoryConfig !== 'object') {
+    return [];
+  }
+  
+  return Object.keys(categoryConfig);
+}
 
 /**
  * List available features from features.json with descriptions
  */
 function listAvailableFeatures(): void {
+  const featuresConfig = getFeaturesConfig();
+  
+  if (!featuresConfig.features || Object.keys(featuresConfig.features).length === 0) {
+    console.log(chalk.yellow('⚠️  No features found in configuration'));
+    return;
+  }
+
+  const featuresData = Object.entries(featuresConfig.features).map(([key, config]: [string, any]) => {
+    const providers = Object.keys(config).filter(k => k !== 'description' && k !== 'supportedFrameworks');
+    const description = config.description || 'No description available';
+    const frameworks = config.supportedFrameworks ? config.supportedFrameworks.join(', ') : 'All frameworks';
+    
+    return {
+      name: key,
+      description,
+      providers: providers.length > 0 ? providers : ['No providers'],
+      frameworks,
+      status: providers.length > 0 ? '✅' : '🚧'
+    };
+  });
+
   console.log('\n' + boxen(
     gradient(['#4facfe', '#00f2fe'])('🔮 Available Features') + '\n\n' +
-    Object.entries(SUPPORTED_FEATURES).map(([key, config]) => {
-      const frameworks = Array.isArray(config.supportedFrameworks) 
-        ? config.supportedFrameworks.join(', ') 
-        : 'Unknown';
-      const status = Object.keys(config.files || {}).length > 0 ? '✅' : '🚧';
-      const description = (config as any).description || 'No description available';
-      return `${status} ${chalk.bold.cyan(key)}\n  ${chalk.gray(description)}\n  ${chalk.dim('Frameworks: ' + frameworks)}`;
+    featuresData.map(feature => {
+      const providersList = feature.providers.join(', ');
+      return `${feature.status} ${chalk.bold.cyan(feature.name)}\n  ${chalk.gray(feature.description)}\n  ${chalk.dim('Providers: ' + providersList)}\n  ${chalk.dim('Frameworks: ' + feature.frameworks)}`;
     }).join('\n\n'),
     {
       padding: 1,
@@ -57,26 +181,149 @@ function showFeatureDisclaimer(): void {
 }
 
 /**
- * Get sub-features for a main feature (e.g., AWS services, AI providers)
+ * Prompt for feature category selection
  */
-function getSubFeatures(featureName: string, featureConfig: FeatureConfig): string[] {
-  // Check for different sub-feature types based on feature name
-  switch (featureName) {
-    case 'aws':
-      return (featureConfig as any).supportedAwsServices || [];
-    case 'ai':
-      return (featureConfig as any).supportedAIs || [];
+async function promptFeatureCategory(availableFeatures: string[]): Promise<string | null> {
+  const { feature } = await inquirer.prompt([
+    {
+      type: 'list',
+      name: 'feature',
+      message: `${chalk.blue('❯')} Choose a feature category to add:`,
+      choices: availableFeatures.map(feature => ({
+        name: `${chalk.green('▸')} ${capitalize(feature)}`,
+        value: feature,
+        short: feature
+      })),
+      pageSize: 12
+    }
+  ]);
+  
+  return feature;
+}
+
+/**
+ * Prompt for feature provider selection
+ */
+async function promptFeatureProvider(category: string, providers: string[]): Promise<string | null> {
+  const { provider } = await inquirer.prompt([
+    {
+      type: 'list',
+      name: 'provider',
+      message: `${chalk.blue('❯')} Choose a ${category} provider:`,
+      choices: providers.map(provider => ({
+        name: `${chalk.green('▸')} ${capitalize(provider.replace(/-/g, ' '))}`,
+        value: provider,
+        short: provider
+      })),
+      pageSize: 10
+    }
+  ]);
+  
+  return provider;
+}
+
+/**
+ * Get available providers for a feature from features.json
+ */
+function getFeatureProviders(feature: string, featureConfig: any): string[] {
+  if (!featureConfig.files) return [];
+  return Object.keys(featureConfig.files);
+}
+
+/**
+ * Check if framework is supported for a feature
+ */
+function isFrameworkSupported(featureConfig: any, framework: string): boolean {
+  if (!featureConfig.supportedFrameworks) return true;
+  return featureConfig.supportedFrameworks.includes(framework);
+}
+
+/**
+ * Show enhanced setup instructions for specific features
+ */
+function showEnhancedSetupInstructions(feature: string, provider: string): void {
+  console.log(chalk.green(`\n🔧 Setup Instructions for ${chalk.bold(provider)} (${feature}):`));
+  
+  switch (feature) {
     case 'auth':
-      return Object.keys(featureConfig.files || {});
+      console.log(chalk.hex('#95afc0')('1. Configure authentication provider credentials'));
+      console.log(chalk.hex('#95afc0')('2. Add environment variables to .env file'));
+      console.log(chalk.hex('#95afc0')('3. Set up authentication routes and middleware'));
+      console.log(chalk.hex('#95afc0')('4. Update your app configuration'));
+      break;
+      
+    case 'ai':
+      console.log(chalk.hex('#95afc0')('1. Get API key from your AI provider'));
+      console.log(chalk.hex('#95afc0')('2. Add API key to .env file'));
+      console.log(chalk.hex('#95afc0')('3. Test AI integration endpoints'));
+      console.log(chalk.hex('#95afc0')('4. Configure rate limiting and error handling'));
+      break;
+      
     case 'database':
-      return Object.keys(featureConfig.files || {});
-    case 'storage':
-      return (featureConfig as any).supportedStorageProviders || [];
+      console.log(chalk.hex('#95afc0')('1. Set up your database connection'));
+      console.log(chalk.hex('#95afc0')('2. Update connection string in .env'));
+      console.log(chalk.hex('#95afc0')('3. Run migrations if needed'));
+      console.log(chalk.hex('#95afc0')('4. Test database connectivity'));
+      break;
+      
+    case 'aws':
+      console.log(chalk.hex('#95afc0')('1. Configure AWS credentials (AWS CLI or IAM roles)'));
+      console.log(chalk.hex('#95afc0')('2. Set up required AWS permissions'));
+      console.log(chalk.hex('#95afc0')('3. Update AWS region in configuration'));
+      console.log(chalk.hex('#95afc0')('4. Test AWS service integration'));
+      break;
+      
     case 'payment':
-      return (featureConfig as any).supportedPaymentProviders || [];
+      console.log(chalk.hex('#95afc0')('1. Get API keys from payment provider'));
+      console.log(chalk.hex('#95afc0')('2. Add keys to .env file (separate test/live keys)'));
+      console.log(chalk.hex('#95afc0')('3. Configure webhooks for payment events'));
+      console.log(chalk.hex('#95afc0')('4. Test payment flow in sandbox mode'));
+      break;
+      
+    case 'storage':
+      console.log(chalk.hex('#95afc0')('1. Configure storage provider credentials'));
+      console.log(chalk.hex('#95afc0')('2. Set up bucket/container permissions'));
+      console.log(chalk.hex('#95afc0')('3. Add storage configuration to .env'));
+      console.log(chalk.hex('#95afc0')('4. Test file upload/download functionality'));
+      break;
+      
+    case 'monitoring':
+      console.log(chalk.hex('#95afc0')('1. Get monitoring service API key'));
+      console.log(chalk.hex('#95afc0')('2. Add configuration to .env file'));
+      console.log(chalk.hex('#95afc0')('3. Set up error tracking and alerts'));
+      console.log(chalk.hex('#95afc0')('4. Configure performance monitoring'));
+      break;
+      
+    case 'analytics':
+      console.log(chalk.hex('#95afc0')('1. Get analytics service tracking ID'));
+      console.log(chalk.hex('#95afc0')('2. Add tracking configuration'));
+      console.log(chalk.hex('#95afc0')('3. Set up custom events and goals'));
+      console.log(chalk.hex('#95afc0')('4. Verify data collection'));
+      break;
+      
+    case 'docker':
+      console.log(chalk.hex('#95afc0')('1. Install Docker on your system'));
+      console.log(chalk.hex('#95afc0')('2. Run: docker-compose up -d'));
+      console.log(chalk.hex('#95afc0')('3. Your app will be available at the configured port'));
+      console.log(chalk.hex('#95afc0')('4. Check logs: docker-compose logs'));
+      break;
+      
+    case 'testing':
+      console.log(chalk.hex('#95afc0')('1. Configure test environment variables'));
+      console.log(chalk.hex('#95afc0')('2. Set up test database/services'));
+      console.log(chalk.hex('#95afc0')('3. Run tests: npm test'));
+      console.log(chalk.hex('#95afc0')('4. Set up CI/CD test automation'));
+      break;
+      
     default:
-      return Object.keys(featureConfig.files || {});
+      console.log(chalk.hex('#95afc0')(`1. Check the ${feature} configuration files`));
+      console.log(chalk.hex('#95afc0')('2. Update .env file with necessary variables'));
+      console.log(chalk.hex('#95afc0')('3. Test the integration'));
+      console.log(chalk.hex('#95afc0')('4. Review documentation for advanced setup'));
   }
+  
+  console.log(chalk.hex('#95afc0')('\n💡 Check your project files for any additional setup instructions'));
+  console.log(chalk.hex('#95afc0')('🔗 Refer to the provider\'s official documentation for detailed configuration'));
 }
 
 /**
@@ -84,39 +331,55 @@ function getSubFeatures(featureName: string, featureConfig: FeatureConfig): stri
  */
 export function showAddHelp(): void {
   const piGradient = gradient(['#00c6ff', '#0072ff']);
+  const featuresConfig = getFeaturesConfig();
+  const availableFeatures = Object.keys(featuresConfig.features || {});
   
   console.log('\n' + boxen(
     piGradient.multiline([
       '📦 Package Installer CLI - Add Features',
       '',
       'USAGE:',
-      '  pi add                    # Interactive feature selection',
-      '  pi add <feature>          # Add feature with provider selection',
-      '  pi add <feature> <provider>  # Add specific feature provider',
+      '  pi add                         # Interactive feature selection',
+      '  pi add <feature>               # Add feature with provider selection',
+      '  pi add <feature> <provider>    # Add specific feature provider',
+      '  pi add --list                  # List all available features',
+      '  pi add --help                  # Show this help message',
       '',
       'EXAMPLES:',
-      '  pi add                    # Show all features in dropdown',
-      '  pi add auth               # Show auth providers dropdown',
-      '  pi add auth clerk         # Add Clerk authentication',
-      '  pi add aws                # Show AWS services dropdown',  
-      '  pi add aws ec2            # Add AWS EC2 integration',
-      '  pi add ai openai          # Add OpenAI integration',
-      '  pi add database prisma    # Add Prisma database integration',
+      '  pi add                         # Show all features in dropdown',
+      '  pi add auth                    # Show auth providers dropdown',
+      '  pi add auth clerk              # Add Clerk authentication',
+      '  pi add aws                     # Show AWS services dropdown',  
+      '  pi add aws ec2                 # Add AWS EC2 integration',
+      '  pi add ai openai               # Add OpenAI integration',
+      '  pi add database postgres       # Add PostgreSQL integration',
+      '  pi add payment stripe          # Add Stripe payment integration',
       '',
       'OPTIONS:',
-      '  -h, --help               Show this help message',
-      '  -l, --list              List all available features',
-      '  -v, --verbose           Show detailed output',
+      '  -l, --list                     List all available features',
+      '  -v, --verbose                  Show detailed output',
+      '  -h, --help                     Show this help message',
       '',
-      'FEATURES:',
-      '  • Authentication (auth)   - Clerk, Auth0, NextAuth',
-      '  • AWS Services (aws)      - EC2, S3, Lambda, and more',
-      '  • AI Integration (ai)     - OpenAI, Claude, Gemini',
-      '  • Database (database)     - Prisma, Mongoose, Drizzle',
-      '  • Storage (storage)       - AWS S3, Cloudinary, Firebase',
-      '  • Payments (payment)      - Stripe, PayPal, Razorpay',
-      '  • Docker (docker)         - Containerization configs',
-      '  • UI Libraries (ui)       - Component libraries'
+      `AVAILABLE FEATURES (${availableFeatures.length}):`,
+      availableFeatures.length > 0 
+        ? availableFeatures.map(feature => `  • ${feature}`).join('\n')
+        : '  No features configured',
+      '',
+      'SUPPORTED FRAMEWORKS:',
+      '  • Next.js                      App Router & Pages Router',
+      '  • React                        Create React App & Vite',
+      '  • Express.js                   Node.js backend framework',
+      '  • NestJS                       TypeScript backend framework',
+      '  • Vue.js                       Vue 3 with Composition API',
+      '  • Angular                      Angular 15+',
+      '  • Remix                        Full-stack React framework',
+      '  • And more coming soon...',
+      '',
+      'NOTES:',
+      '  • Features are automatically configured for your framework',
+      '  • Environment variables are added to .env files',
+      '  • TypeScript and JavaScript are both supported',
+      '  • Use "pi add --list" to see detailed feature information'
     ].join('\n')),
     {
       padding: 1,
@@ -128,73 +391,189 @@ export function showAddHelp(): void {
 }
 
 /**
- * Main add command handler
+ * Main add command handler with enhanced syntax support
+ * Supports: 
+ * - pi add (interactive dropdown)
+ * - pi add <category> (show providers for category)
+ * - pi add <category> <provider> (direct installation)
+ * - pi add --list (list all available features)
+ * - pi add --help (show help information)
  */
 export async function addCommand(
   feature?: string,
   provider?: string,
-  options: { list?: boolean; verbose?: boolean } = {}
+  options: { list?: boolean; verbose?: boolean; framework?: string; projectPath?: string; help?: boolean } = {}
 ): Promise<void> {
   try {
+    // Handle help flag
+    if (options.help || feature === '--help' || feature === '-h') {
+      showAddHelp();
+      return;
+    }
+
+    // Handle list flag
+    if (options.list || feature === '--list' || feature === '-l') {
+      listAvailableFeatures();
+      return;
+    }
+
     // Initialize history manager
     await historyManager.init();
 
     // Show disclaimer
     showFeatureDisclaimer();
 
-    // List features if requested
-    if (options.list) {
-      listAvailableFeatures();
-      return;
-    }
-
     console.log(chalk.hex('#9c88ff')('\n🔮 Adding features to your project...'));
 
-    // Check if we're in a valid project with enhanced detection
-    const projectPath = process.cwd();
-    let projectInfo = await getCachedProject(projectPath);
-    
-    if (!projectInfo) {
-      console.log(chalk.yellow('🔍 Analyzing project structure...'));
-      projectInfo = await detectProjectStack(projectPath);
+    // Use provided project path or current directory
+    const projectPath = options.projectPath || process.cwd();
+    let projectInfo: any;
+
+    // If framework is provided (from create command), use it directly
+    if (options.framework) {
+      console.log(chalk.green(`✅ Using ${options.framework} framework (from project creation)`));
+      projectInfo = {
+        framework: options.framework,
+        projectLanguage: 'typescript', // Default, can be improved
+        language: 'typescript'
+      };
+    } else {
+      // Standalone add command - detect framework from project files
+      projectInfo = await getCachedProject(projectPath);
       
-      // Cache the detected project info
-      if (projectInfo.framework && projectInfo.language) {
-        try {
-          const packageJsonPath = path.join(projectPath, 'package.json');
-          const projectName = await fs.pathExists(packageJsonPath) 
-            ? (await fs.readJson(packageJsonPath)).name || path.basename(projectPath)
-            : path.basename(projectPath);
-            
-          await cacheProjectData(
-            projectPath,
-            projectName,
-            projectInfo.projectLanguage || 'unknown',
-            projectInfo.framework,
-            [],
-            0
-          );
-        } catch (error) {
-          console.warn(chalk.yellow('⚠️  Could not cache project info'));
+      if (!projectInfo) {
+        console.log(chalk.yellow('🔍 Analyzing project structure...'));
+        projectInfo = await detectProjectStack(projectPath);
+        
+        // Cache the detected project info
+        if (projectInfo.framework && projectInfo.language) {
+          try {
+            const packageJsonPath = path.join(projectPath, 'package.json');
+            const projectName = await fs.pathExists(packageJsonPath) 
+              ? (await fs.readJson(packageJsonPath)).name || path.basename(projectPath)
+              : path.basename(projectPath);
+              
+            await cacheProjectData(
+              projectPath,
+              projectName,
+              projectInfo.projectLanguage || 'unknown',
+              projectInfo.framework,
+              [],
+              0
+            );
+          } catch (error) {
+            console.warn(chalk.yellow('⚠️  Could not cache project info'));
+          }
         }
       }
-    }
-    
-    if (!projectInfo || !projectInfo.framework) {
-      console.log(chalk.red('❌ No supported framework detected in current directory'));
-      console.log(chalk.yellow('💡 Supported frameworks: Next.js, React, Express, NestJS, Vue, Angular, Remix'));
-      console.log(chalk.yellow('💡 Make sure you\'re in a project root with package.json'));
       
-      // Show detected files for debugging
-      const files = await fs.readdir(projectPath);
-      const relevantFiles = files.filter(f => f.endsWith('.json') || f.startsWith('package') || f.startsWith('tsconfig'));
-      if (relevantFiles.length > 0) {
-        console.log(chalk.gray(`📁 Found files: ${relevantFiles.join(', ')}`));
+      if (!projectInfo || !projectInfo.framework) {
+        console.log(chalk.red('❌ No supported framework detected in current directory'));
+        console.log(chalk.yellow('💡 Supported frameworks: Next.js, React, Express, NestJS, Vue, Angular, Remix'));
+        console.log(chalk.yellow('💡 Make sure you\'re in a project root with package.json'));
+        
+        // Show detected files for debugging
+        const files = await fs.readdir(projectPath);
+        const relevantFiles = files.filter(f => f.endsWith('.json') || f.startsWith('package') || f.startsWith('tsconfig'));
+        if (relevantFiles.length > 0) {
+          console.log(chalk.gray(`📁 Found files: ${relevantFiles.join(', ')}`));
+        }
+        return;
       }
+
+      console.log(chalk.green(`✅ Detected ${projectInfo.framework} project (${projectInfo.projectLanguage || projectInfo.language})`));
+    }
+
+    // Validate that framework features exist in features directory
+    const frameworkFeaturesPath = path.join(process.cwd(), 'features');
+    if (!await fs.pathExists(frameworkFeaturesPath)) {
+      console.log(chalk.red('❌ Features directory not found'));
+      console.log(chalk.yellow('💡 Make sure you\'re running this from the Package Installer CLI root directory'));
       return;
     }
 
-    console.log(chalk.green(`✅ Detected ${projectInfo.framework} project (${projectInfo.projectLanguage || projectInfo.language})`));
+    // Load features configuration
+    const featuresConfigPath = path.join(frameworkFeaturesPath, 'features.json');
+    if (!await fs.pathExists(featuresConfigPath)) {
+      console.log(chalk.red('❌ Features configuration not found'));
+      return;
+    }
+
+    const featuresConfig = JSON.parse(await fs.readFile(featuresConfigPath, 'utf-8'));
+    const availableFeatures = Object.keys(featuresConfig.features);
+
+    // Handle different command syntax cases
+    if (!feature) {
+      // Case 1: "pi add" - Show interactive dropdown for all features
+      const selectedFeature = await promptFeatureCategory(availableFeatures);
+      if (!selectedFeature) return;
+      feature = selectedFeature;
+    }
+
+    // Validate feature exists
+    if (!availableFeatures.includes(feature)) {
+      console.log(chalk.red(`❌ Feature '${feature}' not found`));
+      console.log(chalk.yellow(`💡 Available features: ${availableFeatures.join(', ')}`));
+      return;
+    }
+
+    const currentFeatureConfig = featuresConfig.features[feature];
+    
+    if (!provider) {
+      // Case 2: "pi add <category>" - Show providers for category
+      const providers = getFeatureProviders(feature, currentFeatureConfig);
+      if (providers.length === 0) {
+        console.log(chalk.yellow(`⚠️  No providers found for ${feature}`));
+        return;
+      }
+      
+      if (providers.length === 1) {
+        provider = providers[0];
+        console.log(chalk.cyan(`🔧 Using ${chalk.bold(provider)} (only provider available)`));
+      } else {
+        const selectedProvider = await promptFeatureProvider(feature, providers);
+        if (!selectedProvider) return;
+        provider = selectedProvider;
+      }
+    }
+
+    // Case 3: "pi add <category> <provider>" - Direct installation
+    // Validate provider exists for feature
+    const providers = getFeatureProviders(feature, currentFeatureConfig);
+    if (!providers.includes(provider)) {
+      console.log(chalk.red(`❌ Provider '${provider}' not found for ${feature}`));
+      console.log(chalk.yellow(`💡 Available providers: ${providers.join(', ')}`));
+      return;
+    }
+
+    // Check framework compatibility
+    if (!isFrameworkSupported(currentFeatureConfig, projectInfo.framework)) {
+      console.log(chalk.red(`❌ ${feature} (${provider}) is not supported for ${projectInfo.framework}`));
+      console.log(chalk.yellow(`💡 Supported frameworks: ${currentFeatureConfig.supportedFrameworks?.join(', ') || 'Not specified'}`));
+      return;
+    }
+
+    // Install the feature
+    console.log(chalk.hex('#00d2d3')(`\n🚀 Installing ${feature} (${provider})...\n`));
+    
+    try {
+      await addFeature(feature, provider, projectPath);
+      console.log(chalk.green(`\n✅ Successfully added ${feature} (${provider})`));
+      
+      // Show setup instructions
+      showEnhancedSetupInstructions(feature, provider);
+      
+      // Update history (if available)
+      try {
+        if ('addFeature' in historyManager && typeof historyManager.addFeature === 'function') {
+          await (historyManager as any).addFeature(feature, provider, projectPath);
+        }
+      } catch (error) {
+        // History update is optional
+      }
+    } catch (error) {
+      console.log(chalk.red(`\n❌ Failed to add ${feature} (${provider}): ${error}`));
+    }
     
     // Show additional project details
     if (projectInfo.packageManager) {
@@ -276,15 +655,15 @@ export async function addCommand(
     }
 
     // Get available sub-features/providers
-    const subFeatures = getSubFeatures(selectedFeature!, featureConfig);
+    const subFeatures = getSubFeatures(selectedFeature!);
 
     // If no provider specified and multiple providers available, show selection
     if (!selectedProvider && subFeatures.length > 1) {
-      const providerChoices = subFeatures.map(subFeature => {
+      const providerChoices = subFeatures.map((subFeature: string) => {
         // Try to get provider description or use formatted name
         const formattedName = subFeature
           .split('-')
-          .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+          .map((word: string) => word.charAt(0).toUpperCase() + word.slice(1))
           .join(' ');
         
         return {
@@ -453,4 +832,31 @@ function showNextSteps(feature: string, provider?: string): void {
   }
   
   console.log(chalk.hex('#95afc0')('\n💡 Check your project files for any additional setup instructions'));
+}
+
+/**
+ * Add feature to project from create command integration
+ */
+export async function addFeatureToProject(
+  projectPath: string,
+  category: string,
+  provider: string,
+  framework: string
+): Promise<boolean> {
+  try {
+    console.log(chalk.cyan(`🔧 Adding ${provider} for ${category}...`));
+    
+    // Call the main add command with framework override
+    await addCommand(category, provider, {
+      framework,
+      projectPath,
+      list: false,
+      verbose: false
+    });
+    
+    return true;
+  } catch (error) {
+    console.log(chalk.red(`❌ Failed to add ${provider} for ${category}: ${error}`));
+    return false;
+  }
 }

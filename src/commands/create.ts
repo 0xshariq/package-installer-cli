@@ -9,14 +9,19 @@ import fs from 'fs-extra';
 import gradient from 'gradient-string';
 import boxen from 'boxen';
 import { 
-  promptFrameworkSelection,
+  promptProjectName, 
+  promptFrameworkSelection, 
+  promptLanguageSelection, 
   promptTemplateSelection,
   promptFrameworkOptions,
-  promptLanguageSelection,
-  promptProjectName,
+  promptTemplateConfirmation,
+  promptFeatureSelection,
+  promptFeatureProvider,
   hasFrameworkOptions,
-  hasTemplateSelection,
-  FrameworkOptions
+  hasUIOptions,
+  hasBundlerOptions,
+  shouldShowTemplates,
+  type FrameworkOptions 
 } from '../utils/prompts.js';
 import { 
   resolveTemplatePath, 
@@ -32,6 +37,8 @@ import {
   getDirectorySize,
   cacheProjectData
 } from '../utils/cacheManager.js';
+import { CacheManager } from '../utils/cacheUtils.js';
+import { addFeatureToProject } from './add.js';
 
 /**
  * Display help for create command
@@ -80,6 +87,9 @@ export function showCreateHelp(): void {
  * Main create project function with comprehensive prompt system
  */
 export async function createProject(providedName?: string, options?: any): Promise<void> {
+  const startTime = Date.now();
+  const cacheManager = new CacheManager();
+  
   // Check for special flags
   if (providedName === '--help' || providedName === '-h' || options?.help || options?.['--help'] || options?.['-h']) {
     showCreateHelp();
@@ -89,35 +99,48 @@ export async function createProject(providedName?: string, options?: any): Promi
   try {
     console.log('\n' + chalk.hex('#10ac84')('🚀 Welcome to Package Installer CLI!'));
     console.log(chalk.hex('#95afc0')('Let\'s create something amazing together...'));
-    console.log('');
 
-    // Step 1: Get project name
+    // Step 1: Get project name (if not provided)
     let projectName = providedName;
     if (!projectName) {
       projectName = await promptProjectName();
     }
+    
+    // Handle "." as project name - use current directory name
+    if (projectName === '.') {
+      projectName = path.basename(process.cwd());
+      console.log(chalk.cyan(`\n✅ Using current directory name: ${chalk.bold(projectName)}`));
+    }
 
     // Step 2: Framework selection
     const selectedFramework = await promptFrameworkSelection();
-    console.log(`\n${chalk.green('✨ Great choice!')} Let's configure your ${chalk.bold(selectedFramework)} project...\n`);
+    console.log(`\n${chalk.green('✨ Great choice!')} Let's configure your ${chalk.bold(selectedFramework)} project...`);
 
-    // Step 3: Language selection
+    // Step 3: Language selection (framework-specific from template.json)
     const selectedLanguage = await promptLanguageSelection(selectedFramework);
     
-    // Step 4: Handle template selection based on framework type
-    let templateName = '';
+    // Step 4: Framework-specific options (UI, Tailwind, bundlers, etc.)
     let options: FrameworkOptions = {};
-    
-    if (hasTemplateSelection(selectedFramework)) {
-      // Framework has predefined templates for dropdown selection
-      templateName = await promptTemplateSelection(selectedFramework);
-    } else if (hasFrameworkOptions(selectedFramework)) {
-      // Framework has configurable options
+    if (hasFrameworkOptions(selectedFramework) || hasUIOptions(selectedFramework) || hasBundlerOptions(selectedFramework)) {
       options = await promptFrameworkOptions(selectedFramework);
+    }
+    
+    // Step 5: Template selection (only if framework has no options/UI but has templates)
+    let templateName = '';
+    if (shouldShowTemplates(selectedFramework)) {
+      templateName = await promptTemplateSelection(selectedFramework);
+    } else if (hasFrameworkOptions(selectedFramework) && !templateName) {
+      // Generate template name from options if not selected from predefined list
       templateName = generateTemplateName(selectedFramework, options);
     }
 
-    // Step 5: Prepare project info
+    // Step 6: Confirmation before creating project
+    const confirmed = await promptTemplateConfirmation(selectedFramework, selectedLanguage, templateName, options);
+    if (!confirmed) {
+      console.log(chalk.yellow('\n❌ Project creation cancelled.'));
+      return;
+    }
+    // Step 7: Prepare project info
     const projectInfo: ProjectInfo = {
       framework: selectedFramework,
       language: selectedLanguage,
@@ -125,21 +148,19 @@ export async function createProject(providedName?: string, options?: any): Promi
       options
     };
 
-    // Step 6: Resolve template path
+    // Step 8: Resolve template path
     const templatePath = resolveTemplatePath(projectInfo);
-    console.log(chalk.blue(`📁 Using template path: ${templatePath}`));
+    console.log(chalk.hex('#00d2d3')(`\n🔨 Creating your project...\n`));
+    console.log(chalk.blue(`📁 Using template: ${templatePath}`));
 
-    // Step 7: Check if template exists
+    // Step 9: Check if template exists
     if (!templateExists(templatePath)) {
       console.log(chalk.red(`❌ Template not found at: ${templatePath}`));
-      console.log(chalk.yellow('Available templates for this framework:'));
-      // List available templates or suggest alternatives
+      console.log(chalk.yellow('📋 Please check your template configuration'));
       return;
     }
 
-    // Step 8: Create project
-    console.log(chalk.hex('#00d2d3')('\n🔨 Creating your project...\n'));
-    
+    // Step 10: Create project from template
     const projectPath = await createProjectFromTemplate({
       projectName,
       framework: selectedFramework,
@@ -149,14 +170,103 @@ export async function createProject(providedName?: string, options?: any): Promi
       options
     });
 
-    // Step 9: Install dependencies
+    // Step 11: Install dependencies
     await installDependenciesForCreate(projectPath);
 
+    // Step 11.5: Cache template usage and project data
+    try {
+      await updateTemplateUsage(
+        templateName || selectedFramework, 
+        selectedFramework, 
+        selectedLanguage, 
+        []  // Features will be updated after adding them
+      );
+      
+      const templateFiles = await getCachedTemplateFiles(templateName || selectedFramework);
+      await cacheTemplateFiles(
+        templateName || selectedFramework,
+        templatePath,
+        templateFiles || {},
+        await getDirectorySize(projectPath)
+      );
+      
+      await cacheProjectData(
+        projectPath,
+        projectName,
+        selectedLanguage,
+        selectedFramework,
+        [], // Features will be added next
+        await getDirectorySize(projectPath)
+      );
+    } catch (error) {
+      console.warn(chalk.yellow('⚠️  Could not cache project data'));
+    }
+
+    // Step 12: Add features if requested
+    const selectedFeatures = await promptFeatureSelection();
+    if (selectedFeatures.length > 0) {
+      console.log(chalk.hex('#00d2d3')('\n🚀 Adding Features...\n'));
+      
+      for (const category of selectedFeatures) {
+        const provider = await promptFeatureProvider(category, selectedFramework);
+        if (provider) {
+          console.log(chalk.cyan(`🔧 Adding ${provider} for ${category}...`));
+          
+          const success = await addFeatureToProject(projectPath, category, provider, selectedFramework);
+          if (success) {
+            console.log(chalk.green(`✅ Successfully added ${provider} for ${category}`));
+          } else {
+            console.log(chalk.yellow(`⚠️  Failed to add ${provider} for ${category}, skipping...`));
+          }
+        }
+      }
+    }
+
+    // Step 13: Update cache and history
+    await cacheManager.addProjectToHistory({
+      name: projectName,
+      path: projectPath,
+      framework: selectedFramework,
+      language: selectedLanguage,
+      features: selectedFeatures,
+      createdAt: new Date().toISOString()
+    });
+
+    // Track command completion
+    const duration = Date.now() - startTime;
+    await cacheManager.addCommandToHistory({
+      command: 'create',
+      args: [projectName, selectedFramework, selectedLanguage],
+      projectPath: projectPath,
+      success: true,
+      duration
+    });
+
     // Success message
-    console.log('\n' + chalk.green('🎉 Project created successfully!'));
-    console.log(chalk.hex('#95afc0')(`Navigate to your project: ${chalk.bold(`cd ${projectName}`)}`));
+    console.log(chalk.hex('#00d2d3')('\n🎉 Project created successfully!\n'));
+    console.log(chalk.white('📦 Project Details:'));
+    console.log(`   ${chalk.gray('Path:')} ${chalk.cyan(projectPath)}`);
+    console.log(`   ${chalk.gray('Framework:')} ${chalk.green(selectedFramework)}`);
+    console.log(`   ${chalk.gray('Language:')} ${chalk.blue(selectedLanguage)}`);
+    if (templateName) {
+      console.log(`   ${chalk.gray('Template:')} ${chalk.yellow(templateName)}`);
+    }
+    if (selectedFeatures.length > 0) {
+      console.log(`   ${chalk.gray('Features:')} ${chalk.magenta(selectedFeatures.join(', '))}`);
+    }
+    console.log(`\n${chalk.hex('#95afc0')('Navigate to your project:')} ${chalk.bold(`cd ${projectName}`)}`);
     
   } catch (error) {
+    // Track command failure
+    const duration = Date.now() - startTime;
+    await cacheManager.addCommandToHistory({
+      command: 'create',
+      args: providedName ? [providedName] : [],
+      projectPath: process.cwd(),
+      success: false,
+      duration
+    });
+    
     console.log(chalk.red('\n❌ Error creating project:'));
     console.log(chalk.red(error instanceof Error ? error.message : String(error)));
     process.exit(1);

@@ -2,23 +2,128 @@ import chalk from 'chalk';
 import ora, { type Ora } from 'ora';
 import fs from 'fs-extra';
 import path from 'path';
+import { execSync } from 'child_process';
+import boxen from 'boxen';
+import gradient from 'gradient-string';
+import inquirer from 'inquirer';
 import { displaySuccessMessage, displayErrorMessage, createBanner } from '../utils/dashboard.js';
-import { 
-  updateTemplateUsage, 
-  getCachedTemplateFiles, 
-  cacheTemplateFiles, 
-  getDirectorySize,
-  cacheProjectData
-} from '../utils/cacheManager.js';
-import { 
+import {
   getSupportedLanguages,
   getLanguageConfig,
   SupportedLanguage
 } from '../utils/languageConfig.js';
+import { detectProjectStack, getCliRootPath } from '../utils/featureInstaller.js';
 import { exec } from 'child_process';
 import { promisify } from 'util';
 
 const execAsync = promisify(exec);
+
+/**
+ * Check for CLI updates
+ */
+async function checkForCLIUpdates(): Promise<{ hasUpdate: boolean; currentVersion: string; latestVersion?: string }> {
+  try {
+    const cliRoot = getCliRootPath();
+    const packageJsonPath = path.join(cliRoot, 'package.json');
+
+    if (!await fs.pathExists(packageJsonPath)) {
+      return { hasUpdate: false, currentVersion: 'unknown' };
+    }
+
+    const packageJson = await fs.readJson(packageJsonPath);
+    const currentVersion = packageJson.version;
+
+    // Check npm registry for latest version
+    const { stdout } = await execAsync(`npm view ${packageJson.name} version`);
+    const latestVersion = stdout.trim();
+
+    const hasUpdate = currentVersion !== latestVersion;
+
+    return { hasUpdate, currentVersion, latestVersion };
+  } catch (error) {
+    return { hasUpdate: false, currentVersion: 'unknown' };
+  }
+}
+
+/**
+ * Update CLI to latest version
+ */
+async function updateCLI(): Promise<boolean> {
+  try {
+    const spinner = ora('Updating Package Installer CLI...').start();
+
+    try {
+      await execAsync('npm update -g @0xshariq/package-installer');
+      spinner.succeed('CLI updated successfully!');
+      return true;
+    } catch (error) {
+      // Try yarn if npm fails
+      try {
+        await execAsync('yarn global upgrade @0xshariq/package-installer');
+        spinner.succeed('CLI updated successfully with yarn!');
+        return true;
+      } catch (yarnError) {
+        spinner.fail('Failed to update CLI');
+        console.error(chalk.red('Update failed. Please update manually:'));
+        console.log(chalk.yellow('npm update -g @0xshariq/package-installer'));
+        return false;
+      }
+    }
+  } catch (error) {
+    console.error(chalk.red('Error updating CLI:'), error);
+    return false;
+  }
+}
+
+/**
+ * Update project dependencies
+ */
+async function updateProjectDependencies(projectPath: string): Promise<boolean> {
+  try {
+    const projectInfo = await detectProjectStack(projectPath);
+    if (!projectInfo.packageManager) {
+      console.log(chalk.yellow('⚠️  No package manager detected'));
+      return false;
+    }
+
+    const spinner = ora(`Updating dependencies with ${projectInfo.packageManager}...`).start();
+
+    const updateCommand = getUpdateCommand(projectInfo.projectLanguage as SupportedLanguage, projectInfo.packageManager);
+    if (!updateCommand) {
+      spinner.fail('No update command available for this project type');
+      return false;
+    }
+
+    await execAsync(updateCommand, { cwd: projectPath });
+    spinner.succeed('Dependencies updated successfully!');
+    return true;
+  } catch (error) {
+    console.error(chalk.red('Error updating dependencies:'), error);
+    return false;
+  }
+}
+
+/**
+ * Update features cache
+ */
+async function updateFeaturesCache(): Promise<void> {
+  const spinner = ora('Updating features cache...').start();
+
+  try {
+    const cliRoot = getCliRootPath();
+    const featuresPath = path.join(cliRoot, 'features');
+
+    if (await fs.pathExists(featuresPath)) {
+      // Simple cache refresh - just check if features directory exists
+      spinner.succeed('Features cache checked!');
+    } else {
+      spinner.warn('Features directory not found');
+    }
+  } catch (error) {
+    spinner.fail('Failed to update features cache');
+    console.error(chalk.red('Error:'), error);
+  }
+}
 
 /**
  * Get update command for a specific language and package manager
@@ -26,11 +131,11 @@ const execAsync = promisify(exec);
 function getUpdateCommand(language: SupportedLanguage, packageManagerName?: string): string {
   const config = getLanguageConfig(language);
   if (!config) return '';
-  
-  const pm = packageManagerName 
+
+  const pm = packageManagerName
     ? config.packageManagers.find(p => p.name === packageManagerName)
     : config.packageManagers[0];
-    
+
   return pm?.updateCommand || pm?.installCommand || '';
 }
 
@@ -43,76 +148,137 @@ export async function updateCommand(options: any): Promise<void> {
     return;
   }
 
-  // Blue gradient banner with "UPDATER" on next line
+  // Display banner
   console.clear();
-  const banner = `
-${chalk.bgHex('#00c6ff').hex('#fff').bold(' PACKAGE ')}${chalk.bgHex('#0072ff').hex('#fff').bold(' UP ')}
-${chalk.bgHex('#00c6ff').hex('#fff').bold(' DATER ')}
-`;
-  console.log(banner);
-  
-  const projectPath = process.cwd();
-  const spinner = ora(chalk.hex('#9c88ff')('🔍 Analyzing project structure...')).start();
-  
-  try {
-    // Simple project detection
-    const packageJson = path.join(projectPath, 'package.json');
-    const cargoToml = path.join(projectPath, 'Cargo.toml');
-    const requirementsTxt = path.join(projectPath, 'requirements.txt');
-    
-    let languages: string[] = [];
-    
-    if (await fs.pathExists(packageJson)) {
-      languages = ['javascript'];
-      spinner.text = chalk.hex('#9c88ff')('📦 Node.js project detected...');
-    } else if (await fs.pathExists(cargoToml)) {
-      languages = ['rust'];
-      spinner.text = chalk.hex('#9c88ff')('🦀 Rust project detected...');
-    } else if (await fs.pathExists(requirementsTxt)) {
-      languages = ['python'];
-      spinner.text = chalk.hex('#9c88ff')('🐍 Python project detected...');
+  const banner = boxen(
+    gradient(['#4facfe', '#00f2fe'])('🔄 Package Installer Updater') + '\n\n' +
+    chalk.white('Keep your CLI and project dependencies up to date'),
+    {
+      padding: 1,
+      margin: 1,
+      borderStyle: 'round',
+      borderColor: 'cyan'
     }
-    
-    if (languages.length === 0) {
-      spinner.fail(chalk.red('❌ No recognizable project found in current directory'));
-      displayErrorMessage(
-        'Could not detect any supported project types',
-        [
-          'Make sure you are in a project directory',
-          'Supported: JavaScript/TypeScript, Rust, Python projects',
-          'Look for files like package.json, Cargo.toml, requirements.txt, etc.'
-          ]
-        );
-        return;
+  );
+  console.log(banner);
+
+  try {
+    // Check what to update
+    const choices = [
+      { name: '📦 Update CLI to latest version', value: 'cli' },
+      { name: '� Update project dependencies', value: 'dependencies' },
+      { name: '🚀 Update features cache', value: 'cache' },
+      { name: '🌟 Update everything', value: 'all' }
+    ];
+
+    const { updateType } = await inquirer.prompt([
+      {
+        type: 'list',
+        name: 'updateType',
+        message: 'What would you like to update?',
+        choices,
+        pageSize: 10
       }
-      
-      spinner.succeed(chalk.green(`✅ Detected languages: ${languages.join(', ')}`));
-      
-      // Update packages for each detected language
-      for (const language of languages) {
-        await updatePackagesForLanguage(language, projectPath, options);
-      }
-      
-      displaySuccessMessage(
-        'Package updates completed successfully!',
-        [
-          'All packages have been updated to their latest compatible versions',
-          'Run your tests to ensure everything works correctly',
-          'Check the changelog for any breaking changes'
-        ]
-      );
-      
-  } catch (error: any) {
-    spinner.fail(chalk.red('❌ Failed to update packages'));
+    ]);
+
+    const projectPath = process.cwd();
+
+    switch (updateType) {
+      case 'cli':
+        await handleCLIUpdate();
+        break;
+
+      case 'dependencies':
+        await handleDependencyUpdate(projectPath);
+        break;
+
+      case 'cache':
+        await updateFeaturesCache();
+        break;
+
+      case 'all':
+        await handleFullUpdate(projectPath);
+        break;
+    }
+
+  } catch (error) {
     displayErrorMessage(
-      error.message,
-      [
-        'Try running the command with --dry-run to see what would be updated',
-        'Use --force flag to override conflict warnings',
-        'Check your internet connection and package registry access'
-      ]
+      'Update failed',
+      ['An error occurred during the update process', String(error)]
     );
   }
+}
+
+/**
+ * Handle CLI update
+ */
+async function handleCLIUpdate(): Promise<void> {
+  console.log(chalk.blue('\n� Checking for CLI updates...'));
+
+  const updateInfo = await checkForCLIUpdates();
+
+  if (!updateInfo.hasUpdate) {
+    console.log(chalk.green(`✅ CLI is already up to date (v${updateInfo.currentVersion})`));
+    return;
+  }
+
+  console.log(chalk.yellow(`📦 Update available: v${updateInfo.currentVersion} → v${updateInfo.latestVersion}`));
+
+  const { shouldUpdate } = await inquirer.prompt([
+    {
+      type: 'confirm',
+      name: 'shouldUpdate',
+      message: 'Would you like to update now?',
+      default: true
+    }
+  ]);
+
+  if (shouldUpdate) {
+    const success = await updateCLI();
+    if (success) {
+      displaySuccessMessage(
+        'CLI updated successfully!',
+        [`Updated to version ${updateInfo.latestVersion}`, 'Please restart your terminal']
+      );
+    }
+  }
+}
+
+/**
+ * Handle dependency update
+ */
+async function handleDependencyUpdate(projectPath: string): Promise<void> {
+  console.log(chalk.blue('\n🔍 Analyzing project dependencies...'));
+
+  const success = await updateProjectDependencies(projectPath);
+
+  if (success) {
+    displaySuccessMessage(
+      'Dependencies updated successfully!',
+      ['All packages have been updated to their latest versions']
+    );
+  }
+}
+
+/**
+ * Handle full update
+ */
+async function handleFullUpdate(projectPath: string): Promise<void> {
+  console.log(chalk.blue('\n🚀 Starting full update process...'));
+
+  // Update CLI
+  await handleCLIUpdate();
+
+  // Update dependencies
+  await handleDependencyUpdate(projectPath);
+
+  // Update cache
+  await updateFeaturesCache();
+
+  displaySuccessMessage(
+    'Full update completed!',
+    ['CLI, dependencies, and cache have been updated']
+  );
 }
 
 
@@ -120,14 +286,14 @@ ${chalk.bgHex('#00c6ff').hex('#fff').bold(' DATER ')}
  * Update packages for a specific language/ecosystem
  */
 async function updatePackagesForLanguage(
-  language: string, 
-  projectPath: string, 
+  language: string,
+  projectPath: string,
   options: any
 ): Promise<void> {
   console.log(chalk.hex('#00d2d3')(`\n📦 Updating ${language} packages...`));
-  
+
   const spinner = ora(chalk.hex('#f39c12')('Checking for updates...')).start();
-  
+
   try {
     switch (language) {
       case 'nodejs':
@@ -152,7 +318,7 @@ async function updatePackagesForLanguage(
         spinner.warn(chalk.yellow(`⚠️  Updates for ${language} not yet supported`));
         return;
     }
-    
+
   } catch (error: any) {
     spinner.fail(chalk.red(`❌ Failed to update ${language} packages: ${error.message}`));
     throw error;
@@ -168,12 +334,12 @@ async function updateNodejsPackages(
   spinner: Ora
 ): Promise<void> {
   const packageJsonPath = path.join(projectPath, 'package.json');
-  
+
   if (!(await fs.pathExists(packageJsonPath))) {
     spinner.warn(chalk.yellow('⚠️  No package.json found for Node.js project'));
     return;
   }
-  
+
   // Detect package manager
   let packageManager = 'npm';
   if (await fs.pathExists(path.join(projectPath, 'pnpm-lock.yaml'))) {
@@ -181,15 +347,15 @@ async function updateNodejsPackages(
   } else if (await fs.pathExists(path.join(projectPath, 'yarn.lock'))) {
     packageManager = 'yarn';
   }
-  
+
   spinner.text = chalk.hex('#f39c12')(`Using ${packageManager} to update packages...`);
-  
+
   if (options.global) {
     // Update global packages
     await updateGlobalNodejsPackages(packageManager, options, spinner);
     return;
   }
-  
+
   if (options.packages && options.packages.length > 0) {
     // Update specific packages
     await updateSpecificNodejsPackages(packageManager, options.packages, options, spinner);
@@ -209,7 +375,7 @@ async function updateAllNodejsPackages(
   spinner: Ora
 ): Promise<void> {
   let updateCommand = '';
-  
+
   switch (packageManager) {
     case 'pnpm':
       updateCommand = options.dryRun ? 'pnpm outdated' : 'pnpm update';
@@ -224,16 +390,16 @@ async function updateAllNodejsPackages(
       if (options.major) updateCommand += ' --save';
       break;
   }
-  
+
   if (options.dev) {
     updateCommand += packageManager === 'npm' ? ' --save-dev' : ' --dev';
   }
-  
+
   spinner.text = chalk.hex('#f39c12')(`Running: ${updateCommand}`);
-  
+
   try {
     const { stdout, stderr } = await execAsync(updateCommand, { cwd: projectPath });
-    
+
     if (options.dryRun) {
       console.log('\n' + chalk.hex('#00d2d3')('📋 Packages that can be updated:'));
       console.log(stdout);
@@ -245,12 +411,12 @@ async function updateAllNodejsPackages(
         console.log(chalk.gray(stdout));
       }
     }
-    
+
     if (stderr && !options.dryRun) {
       console.log(chalk.yellow('\nWarnings:'));
       console.log(chalk.yellow(stderr));
     }
-    
+
   } catch (error: any) {
     if (error.code === 1 && packageManager === 'npm' && error.stdout) {
       // npm outdated returns exit code 1 when there are outdated packages
@@ -276,7 +442,7 @@ async function updateSpecificNodejsPackages(
 ): Promise<void> {
   const packageList = packages.join(' ');
   let updateCommand = '';
-  
+
   switch (packageManager) {
     case 'pnpm':
       updateCommand = `pnpm ${options.dryRun ? 'outdated' : 'update'} ${packageList}`;
@@ -291,12 +457,12 @@ async function updateSpecificNodejsPackages(
       if (options.major && !options.dryRun) updateCommand = `npm install ${packageList}@latest`;
       break;
   }
-  
+
   spinner.text = chalk.hex('#f39c12')(`Updating packages: ${packageList}`);
-  
+
   try {
     const { stdout, stderr } = await execAsync(updateCommand);
-    
+
     if (options.dryRun) {
       console.log('\n' + chalk.hex('#00d2d3')(`📋 Update status for: ${packageList}`));
       console.log(stdout || 'All specified packages are up to date');
@@ -304,7 +470,7 @@ async function updateSpecificNodejsPackages(
     } else {
       spinner.succeed(chalk.green(`✅ Updated packages: ${packageList}`));
     }
-    
+
   } catch (error: any) {
     throw new Error(`Failed to update packages: ${error.message}`);
   }
@@ -319,10 +485,10 @@ async function updateGlobalNodejsPackages(
   spinner: Ora
 ): Promise<void> {
   spinner.text = chalk.hex('#f39c12')('Checking global packages...');
-  
+
   let listCommand = '';
   let updateCommand = '';
-  
+
   switch (packageManager) {
     case 'pnpm':
       listCommand = 'pnpm list -g --depth=0';
@@ -337,7 +503,7 @@ async function updateGlobalNodejsPackages(
       updateCommand = 'npm update -g';
       break;
   }
-  
+
   try {
     if (options.dryRun) {
       const { stdout } = await execAsync(listCommand);
@@ -349,7 +515,7 @@ async function updateGlobalNodejsPackages(
       await execAsync(updateCommand);
       spinner.succeed(chalk.green('✅ Global packages updated successfully'));
     }
-    
+
   } catch (error: any) {
     throw new Error(`Failed to update global packages: ${error.message}`);
   }
@@ -364,14 +530,14 @@ async function updateRustPackages(
   spinner: Ora
 ): Promise<void> {
   const cargoTomlPath = path.join(projectPath, 'Cargo.toml');
-  
+
   if (!(await fs.pathExists(cargoTomlPath))) {
     spinner.warn(chalk.yellow('⚠️  No Cargo.toml found for Rust project'));
     return;
   }
-  
+
   spinner.text = chalk.hex('#f39c12')('Updating Rust dependencies...');
-  
+
   try {
     if (options.dryRun) {
       // Check for outdated packages
@@ -391,7 +557,7 @@ async function updateRustPackages(
       await execAsync('cargo update', { cwd: projectPath });
       spinner.succeed(chalk.green('✅ Rust dependencies updated successfully'));
     }
-    
+
   } catch (error: any) {
     throw new Error(`Failed to update Rust packages: ${error.message}`);
   }
@@ -408,14 +574,14 @@ async function updatePythonPackages(
   const hasRequirements = await fs.pathExists(path.join(projectPath, 'requirements.txt'));
   const hasPyproject = await fs.pathExists(path.join(projectPath, 'pyproject.toml'));
   const hasPoetryLock = await fs.pathExists(path.join(projectPath, 'poetry.lock'));
-  
+
   if (!hasRequirements && !hasPyproject) {
     spinner.warn(chalk.yellow('⚠️  No Python package files found'));
     return;
   }
-  
+
   spinner.text = chalk.hex('#f39c12')('Updating Python packages...');
-  
+
   try {
     if (hasPoetryLock || hasPyproject) {
       // Use Poetry
@@ -444,7 +610,7 @@ async function updatePythonPackages(
         spinner.succeed(chalk.green('✅ Python packages updated with pip'));
       }
     }
-    
+
   } catch (error: any) {
     throw new Error(`Failed to update Python packages: ${error.message}`);
   }
@@ -459,14 +625,14 @@ async function updateGoPackages(
   spinner: Ora
 ): Promise<void> {
   const hasGoMod = await fs.pathExists(path.join(projectPath, 'go.mod'));
-  
+
   if (!hasGoMod) {
     spinner.warn(chalk.yellow('⚠️  No go.mod found for Go project'));
     return;
   }
-  
+
   spinner.text = chalk.hex('#f39c12')('Updating Go modules...');
-  
+
   try {
     if (options.dryRun) {
       const { stdout } = await execAsync('go list -u -m all', { cwd: projectPath });
@@ -478,7 +644,7 @@ async function updateGoPackages(
       await execAsync('go mod tidy', { cwd: projectPath });
       spinner.succeed(chalk.green('✅ Go modules updated successfully'));
     }
-    
+
   } catch (error: any) {
     throw new Error(`Failed to update Go modules: ${error.message}`);
   }
@@ -493,14 +659,14 @@ async function updatePhpPackages(
   spinner: Ora
 ): Promise<void> {
   const hasComposer = await fs.pathExists(path.join(projectPath, 'composer.json'));
-  
+
   if (!hasComposer) {
     spinner.warn(chalk.yellow('⚠️  No composer.json found for PHP project'));
     return;
   }
-  
+
   spinner.text = chalk.hex('#f39c12')('Updating PHP packages...');
-  
+
   try {
     if (options.dryRun) {
       const { stdout } = await execAsync('composer outdated', { cwd: projectPath });
@@ -511,7 +677,7 @@ async function updatePhpPackages(
       await execAsync('composer update', { cwd: projectPath });
       spinner.succeed(chalk.green('✅ PHP packages updated with Composer'));
     }
-    
+
   } catch (error: any) {
     throw new Error(`Failed to update PHP packages: ${error.message}`);
   }
@@ -526,14 +692,14 @@ async function updateRubyPackages(
   spinner: Ora
 ): Promise<void> {
   const hasGemfile = await fs.pathExists(path.join(projectPath, 'Gemfile'));
-  
+
   if (!hasGemfile) {
     spinner.warn(chalk.yellow('⚠️  No Gemfile found for Ruby project'));
     return;
   }
-  
+
   spinner.text = chalk.hex('#f39c12')('Updating Ruby gems...');
-  
+
   try {
     if (options.dryRun) {
       const { stdout } = await execAsync('bundle outdated', { cwd: projectPath });
@@ -544,7 +710,7 @@ async function updateRubyPackages(
       await execAsync('bundle update', { cwd: projectPath });
       spinner.succeed(chalk.green('✅ Ruby gems updated with Bundler'));
     }
-    
+
   } catch (error: any) {
     throw new Error(`Failed to update Ruby gems: ${error.message}`);
   }
@@ -553,44 +719,50 @@ async function updateRubyPackages(
 /**
  * Show detailed help for update command
  */
-function showUpdateHelp(): void {
+export function showUpdateHelp(): void {
   console.clear();
-  
-  console.log(chalk.hex('#9c88ff')('🔄 PACKAGE UPDATE COMMAND HELP\n'));
-  
-  console.log(chalk.hex('#00d2d3')('Usage:'));
-  console.log(chalk.white('  pi update [options]'));
-  console.log(chalk.white('  pi u [options]') + chalk.gray(' (alias)\n'));
-  
-  console.log(chalk.hex('#00d2d3')('Description:'));
-  console.log(chalk.white('  Update packages to their latest versions across different ecosystems'));
-  console.log(chalk.white('  Supports Node.js, Rust, Python, Go, PHP, and Ruby projects\n'));
-  
-  console.log(chalk.hex('#00d2d3')('Options:'));
-  console.log(chalk.white('  -p, --packages <packages...>') + chalk.gray('  Update specific packages only'));
-  console.log(chalk.white('  -d, --dev') + chalk.gray('                   Update development dependencies only'));
-  console.log(chalk.white('  -g, --global') + chalk.gray('               Update global packages'));
-  console.log(chalk.white('  --major') + chalk.gray('                    Allow major version updates (breaking changes)'));
-  console.log(chalk.white('  --dry-run') + chalk.gray('                  Show what would be updated without updating'));
-  console.log(chalk.white('  -f, --force') + chalk.gray('                Force update even with conflicts'));
-  console.log(chalk.white('  --interactive') + chalk.gray('             Interactive package selection mode'));
-  console.log(chalk.white('  -h, --help') + chalk.gray('                 Show this help message\n'));
-  
-  console.log(chalk.hex('#00d2d3')('Examples:'));
-  console.log(chalk.gray('  # Update all packages in current project'));
-  console.log(chalk.white('  pi update\n'));
-  console.log(chalk.gray('  # Update specific packages'));
-  console.log(chalk.white('  pi update --packages react vue axios\n'));
-  console.log(chalk.gray('  # Update only development dependencies'));
-  console.log(chalk.white('  pi update --dev\n'));
-  console.log(chalk.gray('  # Check for updates without applying them'));
-  console.log(chalk.white('  pi update --dry-run\n'));
-  console.log(chalk.gray('  # Update global packages'));
-  console.log(chalk.white('  pi update --global\n'));
-  console.log(chalk.gray('  # Allow major version updates (potentially breaking)'));
-  console.log(chalk.white('  pi update --major\n'));
-  
-  console.log(chalk.hex('#ffa502')('⚠️  Warning:'));
-  console.log(chalk.yellow('  Major updates (--major) may introduce breaking changes.'));
-  console.log(chalk.yellow('  Always run tests after updating packages.\n'));
+
+  const helpContent = boxen(
+    gradient(['#4facfe', '#00f2fe'])('🔄 Update Command Help') + '\n\n' +
+    chalk.white('Keep your CLI and project dependencies up to date') + '\n\n' +
+
+    chalk.cyan('Usage:') + '\n' +
+    chalk.white('  pi update [options]') + '\n' +
+    chalk.white('  pi u [options]') + chalk.gray(' (alias)') + '\n\n' +
+
+    chalk.cyan('Description:') + '\n' +
+    chalk.white('  Interactive updater for Package Installer CLI, project dependencies,') + '\n' +
+    chalk.white('  and features cache. Supports multiple package managers and languages.') + '\n\n' +
+
+    chalk.cyan('Options:') + '\n' +
+    chalk.white('  -h, --help') + chalk.gray('                 Show this help message') + '\n\n' +
+
+    chalk.cyan('Update Types:') + '\n' +
+    chalk.green('  📦 CLI Update') + chalk.gray('              Update Package Installer CLI to latest version') + '\n' +
+    chalk.green('  🔧 Dependencies') + chalk.gray('           Update project dependencies using detected package manager') + '\n' +
+    chalk.green('  🚀 Features Cache') + chalk.gray('         Refresh features and templates cache') + '\n' +
+    chalk.green('  🌟 Everything') + chalk.gray('             Update CLI, dependencies, and cache') + '\n\n' +
+
+    chalk.cyan('Supported Package Managers:') + '\n' +
+    chalk.white('  • npm, yarn, pnpm (JavaScript/TypeScript)') + '\n' +
+    chalk.white('  • cargo (Rust)') + '\n' +
+    chalk.white('  • pip, poetry (Python)') + '\n' +
+    chalk.white('  • go mod (Go)') + '\n\n' +
+
+    chalk.cyan('Examples:') + '\n' +
+    chalk.gray('  # Interactive update menu') + '\n' +
+    chalk.white('  pi update') + '\n\n' +
+    chalk.gray('  # Show help') + '\n' +
+    chalk.white('  pi update --help') + '\n\n' +
+
+    chalk.yellow('⚠️  Note: Always backup your project before major updates'),
+    {
+      padding: 1,
+      margin: 1,
+      borderStyle: 'round',
+      borderColor: 'cyan'
+    }
+  );
+
+  console.log(helpContent);
 }

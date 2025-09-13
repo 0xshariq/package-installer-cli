@@ -7,15 +7,7 @@ import gradient from 'gradient-string';
 import fs from 'fs-extra';
 import path from 'path';
 import semver from 'semver';
-import { 
-  updateTemplateUsage, 
-  getCachedTemplateFiles, 
-  cacheTemplateFiles, 
-  getDirectorySize,
-  cacheProjectData,
-  getCachedProject,
-  getCacheStats
-} from '../utils/cacheManager.js';
+import inquirer from 'inquirer';
 import { 
   LANGUAGE_CONFIGS, 
   SupportedLanguage, 
@@ -24,6 +16,8 @@ import {
   getAllConfigFiles,
   detectLanguageFromFiles 
 } from '../utils/languageConfig.js';
+import { detectProjectStack } from '../utils/featureInstaller.js';
+import { displaySuccessMessage, displayErrorMessage } from '../utils/dashboard.js';
 
 const execAsync = promisify(exec);
 
@@ -257,18 +251,10 @@ export async function checkCommand(packageName?: string, options?: { verbose?: b
   try {
     console.log('\n' + chalk.hex('#f39c12')('🔍 Starting package check...'));
     
-    // Check cache for recent analysis first
-    const currentDir = process.cwd();
-    const cachedProject = await getCachedProject(currentDir);
-    
-    if (cachedProject && Date.now() - (cachedProject.timestamp || 0) < 300000) { // 5 minutes cache
-      console.log(chalk.gray('📊 Using cached project analysis...'));
-    }
-    
     if (packageName && packageName !== '--verbose' && packageName !== '-v') {
       await checkSinglePackage(packageName, isVerbose);
     } else {
-      await checkProjectPackages(isVerbose, cachedProject);
+      await checkProjectPackages(isVerbose);
     }
   } catch (error: any) {
     console.error(chalk.hex('#ff4757')(`❌ Failed to check packages: ${error.message}`));
@@ -292,7 +278,7 @@ async function checkSinglePackage(packageName: string, verbose: boolean = false)
   }
 }
 
-async function checkProjectPackages(verbose: boolean = false, cachedProject?: any) {
+async function checkProjectPackages(verbose: boolean = false) {
   const spinner = ora('Analyzing project dependencies...').start();
   
   try {

@@ -28,6 +28,7 @@ import {
   getCachedProject,
   getCacheStats
 } from '../utils/cacheManager.js';
+import { CacheManager } from '../utils/cacheUtils.js';
 import { HistoryManager } from '../utils/historyManager.js';
 import { detectProjectStack } from '../utils/featureInstaller.js';
 import { SupportedLanguage } from '../utils/dependencyInstaller.js';
@@ -53,6 +54,8 @@ export function showAnalyzeHelp(): void {
   console.log(chalk.white('  --system') + chalk.gray('      Show system information only'));
   console.log(chalk.white('  --projects') + chalk.gray('    Show recent projects only'));
   console.log(chalk.white('  --commands') + chalk.gray('    Show available commands only'));
+  console.log(chalk.white('  --history') + chalk.gray('     Show comprehensive history and statistics'));
+  console.log(chalk.white('  --stats') + chalk.gray('       Show usage statistics from history'));
   console.log(chalk.white('  -h, --help') + chalk.gray('     Show this help message\n'));
   
   console.log(chalk.hex('#00d2d3')('Examples:'));
@@ -169,6 +172,11 @@ export async function analyzeCommand(options: any = {}): Promise<void> {
     
     if (options.commands) {
       displayCommandsGrid();
+      return;
+    }
+    
+    if (options.history || options.stats) {
+      await displayHistoryAnalytics(options.stats);
       return;
     }
     
@@ -700,4 +708,149 @@ async function displayCacheInfo(): Promise<void> {
   } catch (error) {
     console.log(chalk.yellow('⚠️  Cache information not available'));
   }
+}
+
+/**
+ * Display comprehensive history analytics
+ */
+async function displayHistoryAnalytics(statsOnly: boolean = false): Promise<void> {
+  const cacheManager = new CacheManager();
+  
+  try {
+    console.log(chalk.hex('#00d2d3')('📈 HISTORY & ANALYTICS DASHBOARD\n'));
+    
+    const history = await cacheManager.getHistory();
+    const featureStats = await cacheManager.getFeatureStats();
+    
+    // Overall statistics
+    const statsBox = boxen(
+      `${chalk.bold.white('Total Projects:')} ${history.projects?.length || 0}\n` +
+      `${chalk.bold.cyan('Features Used:')} ${featureStats.totalUsages}\n` +
+      `${chalk.bold.green('Unique Features:')} ${featureStats.uniqueFeatures}\n` +
+      `${chalk.bold.yellow('Commands Executed:')} ${history.commands?.length || 0}\n` +
+      `${chalk.bold.magenta('Success Rate:')} ${featureStats.successRate.toFixed(1)}%`,
+      {
+        title: '📊 Usage Statistics',
+        padding: 1,
+        margin: 1,
+        borderStyle: 'double',
+        borderColor: 'blue'
+      }
+    );
+    
+    console.log(statsBox);
+    
+    if (!statsOnly) {
+      // Recent projects
+      if (history.projects?.length > 0) {
+        console.log(chalk.hex('#00d2d3')('\n🏗️  RECENT PROJECTS:'));
+        history.projects.slice(0, 8).forEach((project: any, index: number) => {
+          const timeAgo = getTimeAgo(project.createdAt);
+          const framework = project.framework ? chalk.blue(`[${project.framework}]`) : '';
+          console.log(`  ${chalk.white((index + 1).toString().padStart(2))}. ${chalk.white(project.name)} ${framework} ${chalk.gray(`(${timeAgo})`)}`);
+          console.log(`      ${chalk.gray(project.path)}`);
+          if (project.features?.length) {
+            console.log(`      ${chalk.cyan('Features:')} ${project.features.slice(0, 3).join(', ')}${project.features.length > 3 ? '...' : ''}`);
+          }
+        });
+      }
+      
+      // Feature usage breakdown
+      if (Object.keys(featureStats.mostUsedFeatures).length > 0) {
+        console.log(chalk.hex('#00d2d3')('\n🧩 FEATURE USAGE BREAKDOWN:'));
+        const mostUsed = Object.entries(featureStats.mostUsedFeatures)
+          .sort(([,a], [,b]) => (b as number) - (a as number))
+          .slice(0, 10);
+          
+        mostUsed.forEach(([feature, count], index) => {
+          const maxCount = Math.max(...Object.values(featureStats.mostUsedFeatures).map(c => Number(c)));
+          const bar = '█'.repeat(Math.max(1, Math.floor((count as number) / maxCount * 20)));
+          console.log(`  ${chalk.white((index + 1).toString().padStart(2))}. ${chalk.white(feature.padEnd(25))} ${chalk.cyan(bar)} ${chalk.gray(`(${count} times)`)}`);
+        });
+      }
+      
+      // Recent commands
+      if (history.commands?.length > 0) {
+        console.log(chalk.hex('#00d2d3')('\n⚡ RECENT COMMANDS:'));
+        history.commands.slice(0, 10).forEach((cmd: any, index: number) => {
+          const timeAgo = getTimeAgo(cmd.executedAt);
+          const status = cmd.success ? chalk.green('✓') : chalk.red('✗');
+          const duration = cmd.duration ? ` ${chalk.gray(`(${cmd.duration}ms)`)}` : '';
+          const args = cmd.args?.length ? chalk.gray(` ${cmd.args.join(' ')}`) : '';
+          console.log(`  ${chalk.white((index + 1).toString().padStart(2))}. ${status} ${chalk.white(cmd.command)}${args} ${chalk.gray(`${timeAgo}${duration}`)}`);
+        });
+      }
+      
+      // Framework usage statistics
+      if (history.projects?.length > 0) {
+        const frameworks = history.projects
+          .filter((p: any) => p.framework)
+          .reduce((acc: Record<string, number>, p: any) => {
+            acc[p.framework] = (acc[p.framework] || 0) + 1;
+            return acc;
+          }, {});
+          
+        if (Object.keys(frameworks).length > 0) {
+          console.log(chalk.hex('#00d2d3')('\n🔧 FRAMEWORK DISTRIBUTION:'));
+          Object.entries(frameworks)
+            .sort(([,a], [,b]) => (b as number) - (a as number))
+            .forEach(([framework, count], index) => {
+              const percentage = ((count as number) / history.projects.length * 100).toFixed(1);
+              const maxCount = Math.max(...Object.values(frameworks).map(c => Number(c)));
+              const bar = '█'.repeat(Math.max(1, Math.floor((count as number) / maxCount * 20)));
+              console.log(`  ${chalk.white((index + 1).toString().padStart(2))}. ${chalk.white(framework.padEnd(15))} ${chalk.blue(bar)} ${chalk.gray(`${count} projects (${percentage}%)`)}`);
+            });
+        }
+      }
+    }
+    
+    // Performance insights
+    console.log(chalk.hex('#00d2d3')('\n🚀 PERFORMANCE INSIGHTS:'));
+    if (history.commands?.length > 0) {
+      const commandStats = history.commands.reduce((acc: Record<string, {count: number, avgDuration: number, successRate: number}>, cmd: any) => {
+        if (!acc[cmd.command]) {
+          acc[cmd.command] = { count: 0, avgDuration: 0, successRate: 0 };
+        }
+        acc[cmd.command].count++;
+        if (cmd.duration) {
+          acc[cmd.command].avgDuration = (acc[cmd.command].avgDuration * (acc[cmd.command].count - 1) + cmd.duration) / acc[cmd.command].count;
+        }
+        acc[cmd.command].successRate = (acc[cmd.command].successRate * (acc[cmd.command].count - 1) + (cmd.success ? 1 : 0)) / acc[cmd.command].count;
+        return acc;
+      }, {});
+      
+      Object.entries(commandStats)
+        .sort(([,a], [,b]) => (b as any).count - (a as any).count)
+        .slice(0, 5)
+        .forEach(([command, stats]) => {
+          const statData = stats as any;
+          const avgTime = statData.avgDuration > 0 ? `${statData.avgDuration.toFixed(0)}ms` : 'N/A';
+          const successRate = `${(statData.successRate * 100).toFixed(1)}%`;
+          console.log(`  ${chalk.white(command.padEnd(12))} - ${chalk.cyan(statData.count)} uses, ${chalk.yellow(avgTime)} avg, ${chalk.green(successRate)} success`);
+        });
+    }
+    
+  } catch (error) {
+    console.error(chalk.red('❌ Failed to load history analytics:'), error);
+  }
+}
+
+/**
+ * Get human-readable time ago string
+ */
+function getTimeAgo(dateString: string): string {
+  const now = new Date();
+  const date = new Date(dateString);
+  const diffMs = now.getTime() - date.getTime();
+  
+  const diffMinutes = Math.floor(diffMs / (1000 * 60));
+  const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+  
+  if (diffMinutes < 1) return 'just now';
+  if (diffMinutes < 60) return `${diffMinutes}m ago`;
+  if (diffHours < 24) return `${diffHours}h ago`;
+  if (diffDays < 7) return `${diffDays}d ago`;
+  if (diffDays < 30) return `${Math.floor(diffDays / 7)}w ago`;
+  return `${Math.floor(diffDays / 30)}mo ago`;
 }

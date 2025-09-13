@@ -1,8 +1,9 @@
 import chalk from 'chalk';
 import gradient from 'gradient-string';
 import boxen from 'boxen';
+import path from 'path';
 import { cloneRepo as cloneRepoUtil } from '../utils/cloneUtils.js';
-import { HistoryManager } from '../utils/historyManager.js';
+import { CacheManager } from '../utils/cacheUtils.js';
 
 /**
  * Display help for clone command
@@ -50,10 +51,20 @@ export function showCloneHelp(): void {
 }
 
 export async function cloneRepo(userRepo: string, projectName?: string, options: any = {}) {
+  const startTime = Date.now();
+  const cacheManager = new CacheManager();
+  
   // Check for help flag
   if (userRepo === '--help' || userRepo === '-h') {
     showCloneHelp();
     return;
+  }
+
+  // Handle "." as project name - use current directory name
+  let actualProjectName = projectName;
+  if (projectName === '.') {
+    actualProjectName = path.basename(process.cwd());
+    console.log(chalk.cyan(`Using current directory name: ${chalk.bold(actualProjectName)}`));
   }
 
   // Parse additional options from arguments
@@ -66,25 +77,39 @@ export async function cloneRepo(userRepo: string, projectName?: string, options:
   };
 
   try {
-    const result = await cloneRepoUtil(userRepo, projectName, cloneOptions);
+    const result = await cloneRepoUtil(userRepo, actualProjectName, cloneOptions);
     
     // Track the clone operation in history
     if (result) {
-      const historyManager = new HistoryManager();
-      await historyManager.init();
-      await historyManager.recordProject({
-        name: result.projectName || projectName || 'unknown',
-        framework: 'unknown',
+      await cacheManager.addProjectToHistory({
+        name: result.projectName || actualProjectName || 'unknown',
+        path: projectName === '.' ? process.cwd() : path.resolve(process.cwd(), result.projectName),
+        framework: 'cloned',
         language: 'unknown',
-        template: 'cloned',
-        path: process.cwd(),
-        features: []
+        features: [],
+        createdAt: new Date().toISOString()
+      });
+      
+      // Track command completion
+      const duration = Date.now() - startTime;
+      await cacheManager.addCommandToHistory({
+        command: 'clone',
+        args: [userRepo, actualProjectName || ''],
+        projectPath: projectName === '.' ? process.cwd() : path.resolve(process.cwd(), result.projectName),
+        success: true,
+        duration
       });
     }
   } catch (error: any) {
-    // Track failed clone attempts too
-    const historyManager = new HistoryManager();
-    await historyManager.init();
+    // Track failed clone attempts
+    const duration = Date.now() - startTime;
+    await cacheManager.addCommandToHistory({
+      command: 'clone',
+      args: [userRepo, actualProjectName || ''],
+      projectPath: process.cwd(),
+      success: false,
+      duration
+    });
     
     throw error;
   }
