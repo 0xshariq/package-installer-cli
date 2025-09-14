@@ -35,7 +35,7 @@
       "languages": ["python"],
       "templates": [
         "flask-cookiecutter-advance-template",
-        "flask-template-bootstrap-2",
+        "flask-project-template",
         "flask-template-bootstrap",
         "flask-template-with-useful-plugins"
       ]
@@ -44,7 +44,7 @@
       "type": "backend",
       "description": "Statically typed, compiled language designed for simplicity and performance",
       "languages": ["go"],
-      "templates": ["go-lang-boilerplate-template"]
+      "templates": ["golang-boilerplate"]
     },
     "nestjs": {
       "type": "backend",
