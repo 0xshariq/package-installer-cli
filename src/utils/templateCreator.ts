@@ -5,7 +5,7 @@
 
 import fs from 'fs-extra';
 import path from 'path';
-import { execSync, exec } from 'child_process';
+import { exec } from 'child_process';
 import { promisify } from 'util';
 import chalk from 'chalk';
 import ora from 'ora';

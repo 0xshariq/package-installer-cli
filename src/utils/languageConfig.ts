@@ -7,7 +7,7 @@ import { LanguageDetectionResult, PackageManagerDetectionResult } from './types.
 
 export type SupportedLanguage = 
   | 'javascript' | 'typescript' | 'nodejs'
-  | 'rust' | 'python';
+  | 'rust' | 'python' | 'go' | 'php' | 'java' | 'ruby' | 'dotnet';
 
 export type PackageManagerType = 
   | 'npm' | 'pnpm' | 'yarn' | 'bun'
@@ -972,6 +972,413 @@ export const ENHANCED_LANGUAGE_CONFIGS: Record<SupportedLanguage, EnhancedLangua
       architectures: ['x64', 'arm64'],
       containers: true,
       cloud: []
+    }
+  },
+
+  go: {
+    name: 'go',
+    displayName: 'Go',
+    description: 'Fast, reliable, efficient programming language',
+    icon: '🐹',
+    category: 'systems',
+    maturity: 'stable',
+    packageManagers: [
+      {
+        name: 'go',
+        displayName: 'Go Modules',
+        description: 'Official Go dependency management',
+        installCommand: 'go mod download && go mod tidy',
+        updateCommand: 'go get -u ./... && go mod tidy',
+        addCommand: 'go get',
+        removeCommand: 'go mod edit -droprequire',
+        listCommand: 'go list -m all',
+        lockFiles: ['go.sum'],
+        configFiles: ['go.mod'],
+        detectCommand: 'go version',
+        versionCommand: 'go version',
+        priority: 1,
+        features: [
+          { name: 'Module versioning', description: 'Semantic import versioning', supported: true },
+          { name: 'Proxy support', description: 'Module proxy for faster downloads', supported: true }
+        ],
+        performance: {
+          installSpeed: 'fast',
+          diskUsage: 'low',
+          networkEfficiency: 'excellent',
+          caching: 'global'
+        },
+        security: {
+          checksums: true,
+          signatures: true,
+          vulnerabilityScanning: true,
+          lockFileValidation: true
+        }
+      }
+    ],
+    configFiles: [
+      {
+        filename: 'go.mod',
+        description: 'Go module definition',
+        required: true,
+        type: 'dependency',
+        parser: 'custom'
+      },
+      {
+        filename: 'go.sum',
+        description: 'Go module checksums',
+        required: false,
+        type: 'lock'
+      }
+    ],
+    buildFiles: ['bin', 'pkg'],
+    sourceFileExtensions: ['.go'],
+    frameworkDetection: [
+      {
+        framework: 'gin',
+        displayName: 'Gin',
+        patterns: ['main.go'],
+        dependencies: ['github.com/gin-gonic/gin'],
+        popularity: 85,
+        category: 'backend'
+      }
+    ],
+    toolchain: {
+      interpreter: { name: 'Go', command: 'go', optional: false, description: 'Go compiler and runtime' }
+    },
+    ecosystem: {
+      registry: { name: 'Go Packages', url: 'pkg.go.dev' },
+      community: { github: { repos: 500000, stars: 2000000 }, stackoverflow: { questions: 150000, activity: 'high' } },
+      learning: [],
+      trends: { githubStars: 2000000, stackoverflowQuestions: 150000, jobPostings: 80000, trendDirection: 'rising' }
+    },
+    compatibility: {
+      operatingSystems: ['windows', 'macos', 'linux'],
+      architectures: ['x64', 'arm64'],
+      containers: true,
+      cloud: [
+        { name: 'Google Cloud', supported: true, deployment: ['Cloud Run', 'App Engine'] },
+        { name: 'AWS', supported: true, deployment: ['Lambda', 'ECS'] }
+      ]
+    }
+  },
+
+  php: {
+    name: 'php',
+    displayName: 'PHP',
+    description: 'Server-side scripting language for web development',
+    icon: '🐘',
+    category: 'web',
+    maturity: 'stable',
+    packageManagers: [
+      {
+        name: 'composer',
+        displayName: 'Composer',
+        description: 'Dependency Manager for PHP',
+        installCommand: 'composer install',
+        updateCommand: 'composer update',
+        addCommand: 'composer require',
+        removeCommand: 'composer remove',
+        listCommand: 'composer show',
+        lockFiles: ['composer.lock'],
+        configFiles: ['composer.json'],
+        detectCommand: 'composer --version',
+        versionCommand: 'composer --version',
+        priority: 1,
+        features: [
+          { name: 'Autoloading', description: 'PSR-4 autoloading support', supported: true },
+          { name: 'Version constraints', description: 'Semantic versioning', supported: true }
+        ],
+        performance: {
+          installSpeed: 'medium',
+          diskUsage: 'medium',
+          networkEfficiency: 'good',
+          caching: 'global'
+        },
+        security: {
+          checksums: true,
+          signatures: false,
+          vulnerabilityScanning: true,
+          lockFileValidation: true
+        }
+      }
+    ],
+    configFiles: [
+      {
+        filename: 'composer.json',
+        description: 'PHP dependency configuration',
+        required: true,
+        type: 'dependency',
+        parser: 'json'
+      }
+    ],
+    buildFiles: ['vendor'],
+    sourceFileExtensions: ['.php'],
+    frameworkDetection: [
+      {
+        framework: 'laravel',
+        displayName: 'Laravel',
+        patterns: ['artisan'],
+        dependencies: ['laravel/framework'],
+        popularity: 90,
+        category: 'backend'
+      }
+    ],
+    toolchain: {
+      interpreter: { name: 'PHP', command: 'php', optional: false, description: 'PHP interpreter' }
+    },
+    ecosystem: {
+      registry: { name: 'Packagist', url: 'packagist.org' },
+      community: { github: { repos: 300000, stars: 1000000 }, stackoverflow: { questions: 300000, activity: 'high' } },
+      learning: [],
+      trends: { githubStars: 1000000, stackoverflowQuestions: 300000, jobPostings: 120000, trendDirection: 'stable' }
+    },
+    compatibility: {
+      operatingSystems: ['windows', 'macos', 'linux'],
+      architectures: ['x64', 'arm64'],
+      containers: true,
+      cloud: [
+        { name: 'AWS', supported: true, deployment: ['Lambda', 'EC2'] }
+      ]
+    }
+  },
+
+  java: {
+    name: 'java',
+    displayName: 'Java',
+    description: 'Enterprise-grade, platform-independent programming language',
+    icon: '☕',
+    category: 'enterprise',
+    maturity: 'stable',
+    packageManagers: [
+      {
+        name: 'maven',
+        displayName: 'Maven',
+        description: 'Build automation and dependency management',
+        installCommand: 'mvn install',
+        updateCommand: 'mvn versions:use-latest-versions',
+        addCommand: 'mvn dependency:get',
+        listCommand: 'mvn dependency:list',
+        lockFiles: [],
+        configFiles: ['pom.xml'],
+        detectCommand: 'mvn --version',
+        versionCommand: 'mvn --version',
+        priority: 1,
+        features: [
+          { name: 'Central repository', description: 'Maven Central repository', supported: true },
+          { name: 'Build lifecycle', description: 'Standardized build process', supported: true }
+        ],
+        performance: {
+          installSpeed: 'medium',
+          diskUsage: 'high',
+          networkEfficiency: 'good',
+          caching: 'local'
+        },
+        security: {
+          checksums: true,
+          signatures: true,
+          vulnerabilityScanning: true,
+          lockFileValidation: false
+        }
+      }
+    ],
+    configFiles: [
+      {
+        filename: 'pom.xml',
+        description: 'Maven project configuration',
+        required: true,
+        type: 'dependency',
+        parser: 'xml'
+      }
+    ],
+    buildFiles: ['target', '.m2'],
+    sourceFileExtensions: ['.java'],
+    frameworkDetection: [
+      {
+        framework: 'spring',
+        displayName: 'Spring Boot',
+        patterns: ['src/main/java/**/*Application.java'],
+        dependencies: ['org.springframework.boot:spring-boot-starter'],
+        popularity: 95,
+        category: 'backend'
+      }
+    ],
+    toolchain: {
+      interpreter: { name: 'Java', command: 'java', optional: false, description: 'Java runtime' }
+    },
+    ecosystem: {
+      registry: { name: 'Maven Central', url: 'mvnrepository.com' },
+      community: { github: { repos: 800000, stars: 3000000 }, stackoverflow: { questions: 1500000, activity: 'high' } },
+      learning: [],
+      trends: { githubStars: 3000000, stackoverflowQuestions: 1500000, jobPostings: 200000, trendDirection: 'stable' }
+    },
+    compatibility: {
+      operatingSystems: ['windows', 'macos', 'linux'],
+      architectures: ['x64', 'arm64'],
+      containers: true,
+      cloud: [
+        { name: 'AWS', supported: true },
+        { name: 'Google Cloud', supported: true }
+      ]
+    }
+  },
+
+  ruby: {
+    name: 'ruby',
+    displayName: 'Ruby',
+    description: 'Dynamic, programmer-friendly programming language',
+    icon: '💎',
+    category: 'web',
+    maturity: 'stable',
+    packageManagers: [
+      {
+        name: 'bundler',
+        displayName: 'Bundler',
+        description: 'Ruby dependency management',
+        installCommand: 'bundle install',
+        updateCommand: 'bundle update',
+        addCommand: 'bundle add',
+        removeCommand: 'bundle remove',
+        listCommand: 'bundle list',
+        lockFiles: ['Gemfile.lock'],
+        configFiles: ['Gemfile'],
+        detectCommand: 'bundle --version',
+        versionCommand: 'bundle --version',
+        priority: 1,
+        features: [
+          { name: 'Version locking', description: 'Precise version management', supported: true },
+          { name: 'Platform support', description: 'Cross-platform gem support', supported: true }
+        ],
+        performance: {
+          installSpeed: 'medium',
+          diskUsage: 'medium',
+          networkEfficiency: 'good',
+          caching: 'local'
+        },
+        security: {
+          checksums: true,
+          signatures: false,
+          vulnerabilityScanning: true,
+          lockFileValidation: true
+        }
+      }
+    ],
+    configFiles: [
+      {
+        filename: 'Gemfile',
+        description: 'Ruby dependency specification',
+        required: true,
+        type: 'dependency'
+      }
+    ],
+    buildFiles: ['vendor/bundle'],
+    sourceFileExtensions: ['.rb'],
+    frameworkDetection: [
+      {
+        framework: 'rails',
+        displayName: 'Ruby on Rails',
+        patterns: ['config/application.rb'],
+        dependencies: ['rails'],
+        popularity: 85,
+        category: 'backend'
+      }
+    ],
+    toolchain: {
+      interpreter: { name: 'Ruby', command: 'ruby', optional: false, description: 'Ruby interpreter' }
+    },
+    ecosystem: {
+      registry: { name: 'RubyGems', url: 'rubygems.org' },
+      community: { github: { repos: 200000, stars: 500000 }, stackoverflow: { questions: 200000, activity: 'medium' } },
+      learning: [],
+      trends: { githubStars: 500000, stackoverflowQuestions: 200000, jobPostings: 50000, trendDirection: 'stable' }
+    },
+    compatibility: {
+      operatingSystems: ['windows', 'macos', 'linux'],
+      architectures: ['x64', 'arm64'],
+      containers: true,
+      cloud: [
+        { name: 'Heroku', supported: true }
+      ]
+    }
+  },
+
+  dotnet: {
+    name: 'dotnet',
+    displayName: '.NET',
+    description: 'Cross-platform framework for modern applications',
+    icon: '🟣',
+    category: 'enterprise',
+    maturity: 'stable',
+    packageManagers: [
+      {
+        name: 'dotnet',
+        displayName: 'NuGet',
+        description: '.NET package manager',
+        installCommand: 'dotnet restore',
+        updateCommand: 'dotnet outdated --upgrade',
+        addCommand: 'dotnet add package',
+        removeCommand: 'dotnet remove package',
+        listCommand: 'dotnet list package',
+        lockFiles: ['packages.lock.json'],
+        configFiles: ['*.csproj', '*.fsproj', '*.vbproj'],
+        detectCommand: 'dotnet --version',
+        versionCommand: 'dotnet --version',
+        priority: 1,
+        features: [
+          { name: 'Package references', description: 'Modern package management', supported: true },
+          { name: 'Central package management', description: 'Centralized version control', supported: true }
+        ],
+        performance: {
+          installSpeed: 'fast',
+          diskUsage: 'medium',
+          networkEfficiency: 'excellent',
+          caching: 'global'
+        },
+        security: {
+          checksums: true,
+          signatures: true,
+          vulnerabilityScanning: true,
+          lockFileValidation: true
+        }
+      }
+    ],
+    configFiles: [
+      {
+        filename: '*.csproj',
+        description: 'C# project file',
+        required: true,
+        type: 'dependency',
+        parser: 'xml'
+      }
+    ],
+    buildFiles: ['bin', 'obj'],
+    sourceFileExtensions: ['.cs', '.fs', '.vb'],
+    frameworkDetection: [
+      {
+        framework: 'aspnet',
+        displayName: 'ASP.NET Core',
+        patterns: ['Program.cs', 'Startup.cs'],
+        dependencies: ['Microsoft.AspNetCore'],
+        popularity: 85,
+        category: 'backend'
+      }
+    ],
+    toolchain: {
+      interpreter: { name: '.NET', command: 'dotnet', optional: false, description: '.NET CLI' }
+    },
+    ecosystem: {
+      registry: { name: 'NuGet', url: 'nuget.org' },
+      community: { github: { repos: 600000, stars: 2500000 }, stackoverflow: { questions: 800000, activity: 'high' } },
+      learning: [],
+      trends: { githubStars: 2500000, stackoverflowQuestions: 800000, jobPostings: 150000, trendDirection: 'rising' }
+    },
+    compatibility: {
+      operatingSystems: ['windows', 'macos', 'linux'],
+      architectures: ['x64', 'arm64'],
+      containers: true,
+      cloud: [
+        { name: 'Azure', supported: true },
+        { name: 'AWS', supported: true }
+      ]
     }
   }
   

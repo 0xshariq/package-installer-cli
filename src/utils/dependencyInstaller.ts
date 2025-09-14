@@ -384,7 +384,9 @@ function extractInstalledPackages(output: string, language: SupportedLanguage): 
   try {
     switch (language) {
       case 'javascript':
-        // Parse npm/yarn/pnpm output
+      case 'typescript':
+      case 'nodejs':
+        // Parse npm/yarn/pnpm/bun output
         const jsMatches = output.match(/(?:added|installed)\s+(.+?)(?:\s|$)/gi);
         if (jsMatches) {
           jsMatches.forEach(match => {
@@ -413,6 +415,61 @@ function extractInstalledPackages(output: string, language: SupportedLanguage): 
         }
         break;
         
+      case 'go':
+        // Parse go mod output
+        const goMatches = output.match(/go: downloading (.+?) (.+)/gi);
+        if (goMatches) {
+          goMatches.forEach(match => {
+            const pkg = match.replace(/go: downloading\s+/, '').split(' ')[0];
+            if (pkg) packages.push(pkg);
+          });
+        }
+        break;
+        
+      case 'php':
+        // Parse composer output
+        const phpMatches = output.match(/Installing (.+?) \(/gi);
+        if (phpMatches) {
+          phpMatches.forEach(match => {
+            const pkg = match.replace(/Installing\s+/, '').replace(/\s+\(.*/, '');
+            if (pkg) packages.push(pkg);
+          });
+        }
+        break;
+        
+      case 'java':
+        // Parse maven output
+        const javaMatches = output.match(/Downloaded from .+?: (.+?) \(/gi);
+        if (javaMatches) {
+          javaMatches.forEach(match => {
+            const pkg = match.match(/: (.+?) \(/)?.[1];
+            if (pkg) packages.push(pkg);
+          });
+        }
+        break;
+        
+      case 'ruby':
+        // Parse bundler output
+        const rubyMatches = output.match(/Installing (.+?) \(/gi);
+        if (rubyMatches) {
+          rubyMatches.forEach(match => {
+            const pkg = match.replace(/Installing\s+/, '').replace(/\s+\(.*/, '');
+            if (pkg) packages.push(pkg);
+          });
+        }
+        break;
+        
+      case 'dotnet':
+        // Parse dotnet output
+        const dotnetMatches = output.match(/PackageReference for package '(.+?)'/gi);
+        if (dotnetMatches) {
+          dotnetMatches.forEach(match => {
+            const pkg = match.match(/'(.+?)'/)?.[1];
+            if (pkg) packages.push(pkg);
+          });
+        }
+        break;
+        
       default:
         // Generic extraction
         packages.push('dependencies');
@@ -431,11 +488,14 @@ function getInstallInstructions(packageManager: string): string {
   const instructions: Record<string, string> = {
     'pnpm': 'npm install -g pnpm',
     'yarn': 'npm install -g yarn',
+    'bun': 'curl -fsSL https://bun.sh/install | bash',
     'poetry': 'curl -sSL https://install.python-poetry.org | python3 -',
     'cargo': 'curl --proto "=https" --tlsv1.2 -sSf https://sh.rustup.rs | sh',
     'composer': 'Visit https://getcomposer.org/download/',
     'go': 'Visit https://golang.org/dl/',
-    'bundle': 'gem install bundler'
+    'maven': 'Visit https://maven.apache.org/install.html',
+    'bundler': 'gem install bundler',
+    'dotnet': 'Visit https://dotnet.microsoft.com/download'
   };
   
   return instructions[packageManager] || `Install ${packageManager} from official documentation`;
@@ -465,6 +525,8 @@ export async function installPackages(
   
   switch (language) {
     case 'javascript':
+    case 'typescript':
+    case 'nodejs':
       const flags = [
         isDev ? (packageManager.name === 'npm' ? '--save-dev' : packageManager.name === 'yarn' ? '--dev' : '--save-dev') : '',
         exact ? '--save-exact' : '',
@@ -485,6 +547,28 @@ export async function installPackages(
       } else {
         command = `pip install ${packages.join(' ')}`;
       }
+      break;
+      
+    case 'go':
+      command = `go get ${packages.join(' ')}`;
+      break;
+      
+    case 'php':
+      const composerFlags = isDev ? '--dev' : '';
+      command = `composer require ${composerFlags} ${packages.join(' ')}`;
+      break;
+      
+    case 'java':
+      // For Maven, we'd typically need to edit pom.xml, but for simplicity:
+      command = `mvn dependency:get -Dartifact=${packages[0]}`;
+      break;
+      
+    case 'ruby':
+      command = `bundle add ${packages.join(' ')}`;
+      break;
+      
+    case 'dotnet':
+      command = `dotnet add package ${packages.join(' ')}`;
       break;
       
     default:
