@@ -82,8 +82,10 @@
     "react-native": {
       "type": "mobile",
       "description": "Framework for building native apps using React",
-      "languages": "",
-      "templates": []
+      "languages": ["javascript", "typescript"],
+      "templates": [
+        "template"
+      ]
     },
     "reactjs": {
       "type": "frontend",

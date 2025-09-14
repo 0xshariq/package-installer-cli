@@ -7,18 +7,14 @@ import gradient from 'gradient-string';
 import fs from 'fs-extra';
 import path from 'path';
 import semver from 'semver';
-import inquirer from 'inquirer';
 import https from 'https';
 import { 
-  LANGUAGE_CONFIGS, 
   SupportedLanguage, 
   getSupportedLanguages,
   getLanguageConfig,
   getAllConfigFiles,
   detectLanguageFromFiles 
 } from '../utils/languageConfig.js';
-import { detectProjectStack } from '../utils/featureInstaller.js';
-import { displaySuccessMessage, displayErrorMessage } from '../utils/dashboard.js';
 
 const execAsync = promisify(exec);
 
