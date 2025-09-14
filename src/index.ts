@@ -42,8 +42,8 @@ const VERSION = packageJson.version;
 // Initialize CLI program
 const program = new Command();
 
-// Create beautiful gradient for CLI name
-const gradientTitle = gradient(['#667eea', '#764ba2', '#f093fb']);
+// Create beautiful blue gradient for CLI name
+const gradientTitle = gradient(['#0072ff', '#00c6ff', '#0072ff']);
 const piGradient = gradient(['#00c6ff', '#0072ff']);
 
 // Configure main program with enhanced styling

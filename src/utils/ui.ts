@@ -19,13 +19,19 @@ import { ProjectOptions, FeatureConfig, InstallationProgress, ProgressCallback }
 export function printBanner(version: string, frameworkCount: number, templateCount: number = 0): void {
   console.clear();
 
-  // Enhanced gradients for better visual appeal
-  const titleGradient = gradient(['#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4']);
-  const subtitleGradient = gradient(['#ffa726', '#ff7043', '#ec407a']);
-  const taglineGradient = gradient(['#667eea', '#764ba2']);
+  // Blue gradient themes for consistent branding
+  const titleGradient = gradient(['#0072ff', '#00c6ff', '#0072ff']);
+  const subtitleGradient = gradient(['#667eea', '#764ba2', '#667eea']);
+  const taglineGradient = gradient(['#00c6ff', '#0072ff']);
 
-  // Modern ASCII art for "Package Installer"
-  const titleArt = figlet.textSync('Package Installer', {
+  // Create ASCII art for "PACKAGE" and "INSTALLER" separately
+  const packageArt = figlet.textSync('PACKAGE', {
+    font: 'ANSI Shadow',
+    horizontalLayout: 'fitted',
+    verticalLayout: 'default'
+  });
+
+  const installerArt = figlet.textSync('INSTALLER', {
     font: 'ANSI Shadow',
     horizontalLayout: 'fitted',
     verticalLayout: 'default'
@@ -36,21 +42,22 @@ export function printBanner(version: string, frameworkCount: number, templateCou
   const tagline = '✨ Fast • Smart • Feature-Rich • Production-Ready';
   const description = '💡 Create stunning web applications with integrated features in seconds';
 
-  // Create the banner content with better spacing
+  // Create the banner content with better spacing - package and installer on separate lines
   const bannerContent = 
-    titleGradient(titleArt) + '\n\n' +
+    titleGradient(packageArt) + '\n' +
+    titleGradient(installerArt) + '\n\n' +
     subtitleGradient(subtitle) + '\n' +
     taglineGradient(tagline) + '\n' +
     chalk.hex('#95afc0')(description);
 
-  // Enhanced box with rounded corners and better styling
+  // Enhanced box with rounded corners and blue theme styling
   console.log('\n' + boxen(
     bannerContent,
     {
       padding: { top: 1, bottom: 1, left: 4, right: 4 },
       margin: { top: 1, bottom: 1, left: 2, right: 2 },
       borderStyle: 'double',
-      borderColor: 'cyanBright',
+      borderColor: 'blueBright',
       backgroundColor: 'black',
       align: 'center'
     }
@@ -70,7 +77,7 @@ export function printBanner(version: string, frameworkCount: number, templateCou
       padding: { top: 0, bottom: 0, left: 3, right: 3 },
       margin: { top: 0, bottom: 1, left: 0, right: 0 },
       borderStyle: 'round',
-      borderColor: 'magentaBright',
+      borderColor: 'blue',
       backgroundColor: 'black',
       align: 'center'
     }
@@ -230,7 +237,7 @@ export function showSuccessMessage(
   }
 
   // Main success message with enhanced styling
-  const successTitle = gradient(['#43e97b', '#38f9d7'])(`🎉 Project "${chalk.bold(projectName)}" Created Successfully!`);
+  const successTitle = gradient(['#0072ff', '#00c6ff'])(`🎉 Project "${chalk.bold(projectName)}" Created Successfully!`);
   
   let successContent = successTitle + '\n\n' +
     `${chalk.bold('📁 Location:')} ${chalk.cyan(targetPath)}\n` +
@@ -324,7 +331,7 @@ export function showSuccessMessage(
 export function showErrorMessage(title: string, message: string, details?: string, suggestions?: string[]): void {
   console.log();
   
-  let errorContent = gradient(['#ff6b6b', '#ee5a24'])(`❌ ${title}`) + '\n\n' +
+  let errorContent = gradient(['#667eea', '#764ba2'])(`❌ ${title}`) + '\n\n' +
     chalk.red(message);
 
   if (details) {

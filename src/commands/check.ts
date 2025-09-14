@@ -8,6 +8,7 @@ import fs from 'fs-extra';
 import path from 'path';
 import semver from 'semver';
 import inquirer from 'inquirer';
+import https from 'https';
 import { 
   LANGUAGE_CONFIGS, 
   SupportedLanguage, 
@@ -34,6 +35,35 @@ interface PackageInfo {
   needsUpdate: boolean;
   packageManager: string;
   projectType: string;
+  downloadCount?: number;
+  maintainers?: string[];
+  license?: string;
+  lastPublished?: string;
+  securityVulnerabilities?: number;
+  bundleSize?: string;
+}
+
+interface RegistryResponse {
+  name: string;
+  'dist-tags': {
+    latest: string;
+    [key: string]: string;
+  };
+  description?: string;
+  homepage?: string;
+  repository?: {
+    type: string;
+    url: string;
+  };
+  license?: string;
+  maintainers?: Array<{
+    name: string;
+    email: string;
+  }>;
+  time?: {
+    [version: string]: string;
+  };
+  deprecated?: string;
 }
 
 interface ProjectType {
@@ -44,18 +74,47 @@ interface ProjectType {
   getInstallCommand: (packages: string[]) => string;
   getUpdateCommand: () => string;
   registryUrl?: string;
+  packageInfoUrl?: (packageName: string) => string;
 }
 
 
-// Generate PROJECT_TYPES from shared language configuration
+// Generate PROJECT_TYPES from shared language configuration with enhanced registry support
 const PROJECT_TYPES: ProjectType[] = getSupportedLanguages().map(lang => {
   const config = getLanguageConfig(lang)!;
   const primaryPackageManager = config.packageManagers[0];
+  
+  // Define registry URLs and package info URLs for different languages
+  let registryUrl: string | undefined;
+  let packageInfoUrl: ((packageName: string) => string) | undefined;
+  
+  switch (lang) {
+    case 'nodejs':
+    case 'javascript':
+    case 'typescript':
+      registryUrl = 'https://registry.npmjs.org';
+      packageInfoUrl = (packageName: string) => `https://registry.npmjs.org/${packageName}`;
+      break;
+    case 'rust':
+      registryUrl = 'https://crates.io';
+      packageInfoUrl = (packageName: string) => `https://crates.io/api/v1/crates/${packageName}`;
+      break;
+    case 'python':
+      registryUrl = 'https://pypi.org';
+      packageInfoUrl = (packageName: string) => `https://pypi.org/pypi/${packageName}/json`;
+      break;
+    default:
+      // For unsupported languages, we'll try npm registry as fallback
+      registryUrl = 'https://registry.npmjs.org';
+      packageInfoUrl = (packageName: string) => `https://registry.npmjs.org/${packageName}`;
+      break;
+  }
   
   return {
     name: config.displayName,
     files: config.configFiles.filter(cf => cf.required || cf.type === 'dependency').map(cf => cf.filename),
     packageManager: config.packageManagers.map(pm => pm.name).join('/'),
+    registryUrl,
+    packageInfoUrl,
     getDependencies: (content: any, filename: string) => {
       const deps: Record<string, string> = {};
       
@@ -170,8 +229,7 @@ const PROJECT_TYPES: ProjectType[] = getSupportedLanguages().map(lang => {
       const addCmd = primaryPackageManager.addCommand || primaryPackageManager.installCommand;
       return `${addCmd} ${packages.join(' ')}`;
     },
-    getUpdateCommand: () => primaryPackageManager.updateCommand || primaryPackageManager.installCommand,
-    registryUrl: getRegistryUrl(lang)
+    getUpdateCommand: () => primaryPackageManager.updateCommand || primaryPackageManager.installCommand
   };
 });
 
@@ -188,6 +246,232 @@ function getRegistryUrl(lang: SupportedLanguage | string): string {
     case 'swift': return 'https://packagecatalog.com';
     case 'dart': return 'https://pub.dev/api/packages';
     default: return '';
+  }
+}
+
+/**
+ * Enhanced function to fetch package information from various registries
+ */
+async function fetchPackageFromRegistry(packageName: string, projectType: ProjectType): Promise<Partial<PackageInfo>> {
+  if (!projectType.packageInfoUrl) {
+    throw new Error(`Registry not supported for ${projectType.name}`);
+  }
+
+  const url = projectType.packageInfoUrl(packageName);
+  
+  return new Promise((resolve, reject) => {
+    const request = https.get(url, (response) => {
+      let data = '';
+      
+      response.on('data', (chunk) => {
+        data += chunk;
+      });
+      
+      response.on('end', () => {
+        try {
+          const parsed = JSON.parse(data);
+          
+          // Handle different registry response formats
+          switch (projectType.name) {
+            case 'Node.js':
+              resolve(parseNpmRegistryResponse(parsed, packageName));
+              break;
+            case 'Rust':
+              resolve(parseCratesIoResponse(parsed, packageName));
+              break;
+            case 'Python':
+              resolve(parsePyPiResponse(parsed, packageName));
+              break;
+            default:
+              resolve(parseGenericResponse(parsed, packageName));
+              break;
+          }
+        } catch (error) {
+          reject(new Error(`Failed to parse registry response: ${error}`));
+        }
+      });
+    });
+    
+    request.on('error', (error) => {
+      reject(new Error(`Failed to fetch package info: ${error.message}`));
+    });
+    
+    request.setTimeout(10000, () => {
+      request.destroy();
+      reject(new Error('Request timeout'));
+    });
+  });
+}
+
+/**
+ * Parse npm registry response
+ */
+function parseNpmRegistryResponse(data: RegistryResponse, packageName: string): Partial<PackageInfo> {
+  const latestVersion = data['dist-tags']?.latest || 'unknown';
+  const timeData = data.time || {};
+  const lastPublished = timeData[latestVersion] || timeData.modified || 'unknown';
+  
+  return {
+    name: packageName,
+    latestVersion,
+    description: data.description,
+    homepage: data.homepage,
+    repository: data.repository?.url,
+    license: data.license,
+    lastPublished,
+    isDeprecated: !!data.deprecated,
+    deprecatedMessage: data.deprecated,
+    maintainers: data.maintainers?.map(m => m.name) || []
+  };
+}
+
+/**
+ * Parse crates.io registry response
+ */
+function parseCratesIoResponse(data: any, packageName: string): Partial<PackageInfo> {
+  const crate = data.crate || {};
+  const versions = data.versions || [];
+  const latestVersion = versions.find((v: any) => !v.yanked)?.num || 'unknown';
+  
+  return {
+    name: packageName,
+    latestVersion,
+    description: crate.description,
+    homepage: crate.homepage,
+    repository: crate.repository,
+    license: crate.license,
+    lastPublished: crate.updated_at,
+    downloadCount: crate.downloads,
+    isDeprecated: false
+  };
+}
+
+/**
+ * Parse PyPI registry response
+ */
+function parsePyPiResponse(data: any, packageName: string): Partial<PackageInfo> {
+  const info = data.info || {};
+  const latestVersion = info.version || 'unknown';
+  
+  return {
+    name: packageName,
+    latestVersion,
+    description: info.summary || info.description,
+    homepage: info.home_page,
+    repository: info.project_urls?.Repository || info.project_urls?.Source,
+    license: info.license,
+    lastPublished: data.releases?.[latestVersion]?.[0]?.upload_time || 'unknown',
+    isDeprecated: false,
+    maintainers: info.maintainer ? [info.maintainer] : []
+  };
+}
+
+/**
+ * Parse generic registry response
+ */
+function parseGenericResponse(data: any, packageName: string): Partial<PackageInfo> {
+  return {
+    name: packageName,
+    latestVersion: data.version || data.latest || 'unknown',
+    description: data.description || data.summary,
+    isDeprecated: false
+  };
+}
+
+/**
+ * Get latest version using package manager commands
+ */
+async function getLatestVersion(packageName: string, projectType: ProjectType): Promise<string> {
+  try {
+    switch (projectType.name) {
+      case 'Node.js':
+        const { stdout } = await execAsync(`npm view ${packageName} version`);
+        return stdout.trim();
+      case 'Rust':
+        // For Rust, we'll parse from cargo search output
+        const { stdout: cargoOutput } = await execAsync(`cargo search ${packageName} --limit 1`);
+        const match = cargoOutput.match(/= "(.*?)"/);
+        return match ? match[1] : 'unknown';
+      case 'Python':
+        try {
+          const { stdout: pipOutput } = await execAsync(`pip show ${packageName}`);
+          const versionMatch = pipOutput.match(/Version: (.*)/);
+          return versionMatch ? versionMatch[1] : 'unknown';
+        } catch {
+          // Fallback to pip index
+          const { stdout: indexOutput } = await execAsync(`pip index versions ${packageName}`);
+          const versions = indexOutput.match(/Available versions: (.*)/);
+          return versions ? versions[1].split(',')[0].trim() : 'unknown';
+        }
+      default:
+        return 'unknown';
+    }
+  } catch (error) {
+    return 'unknown';
+  }
+}
+
+/**
+ * Enhanced package info fetcher with registry integration
+ */
+async function getEnhancedPackageInfo(
+  name: string, 
+  currentVersion: string | undefined, 
+  projectType: ProjectType
+): Promise<PackageInfo> {
+  const spinner = ora(`Fetching ${name} from ${projectType.name} registry...`).start();
+  
+  try {
+    // First try to get info from registry
+    let registryInfo: Partial<PackageInfo> = {};
+    
+    try {
+      registryInfo = await fetchPackageFromRegistry(name, projectType);
+      spinner.text = `Analyzing ${name} package details...`;
+    } catch (error) {
+      spinner.warn(`Registry fetch failed for ${name}, using fallback method`);
+      // Fallback to existing method
+    }
+    
+    // Get latest version using package manager
+    const latestVersion = registryInfo.latestVersion || await getLatestVersion(name, projectType);
+    const cleanCurrentVersion = currentVersion ? semver.clean(currentVersion) || currentVersion : 'unknown';
+    const cleanLatestVersion = semver.clean(latestVersion) || latestVersion;
+    
+    let needsUpdate = false;
+    if (cleanCurrentVersion !== 'unknown' && cleanLatestVersion !== 'unknown') {
+      try {
+        needsUpdate = semver.lt(cleanCurrentVersion, cleanLatestVersion);
+      } catch {
+        needsUpdate = cleanCurrentVersion !== cleanLatestVersion;
+      }
+    }
+    
+    spinner.succeed(`Retrieved info for ${name}`);
+    
+    return {
+      name,
+      currentVersion: cleanCurrentVersion,
+      latestVersion: cleanLatestVersion,
+      needsUpdate,
+      projectType: projectType.name,
+      packageManager: projectType.packageManager,
+      description: registryInfo.description || 'No description available',
+      homepage: registryInfo.homepage,
+      repository: registryInfo.repository,
+      license: registryInfo.license,
+      lastPublished: registryInfo.lastPublished,
+      maintainers: registryInfo.maintainers,
+      downloadCount: registryInfo.downloadCount,
+      isDeprecated: registryInfo.isDeprecated || false,
+      deprecatedMessage: registryInfo.deprecatedMessage,
+      securityVulnerabilities: 0, // To be implemented with security API
+      bundleSize: undefined // To be implemented with bundlephobia API
+    };
+    
+  } catch (error) {
+    spinner.fail(`Failed to get package info for ${name}`);
+    throw error;
   }
 }
 
@@ -268,7 +552,7 @@ async function checkSinglePackage(packageName: string, verbose: boolean = false)
   try {
     // Try to detect what kind of package this might be
     const projectType = await detectProjectType();
-    const packageInfo = await getPackageInfo(packageName, undefined, projectType);
+    const packageInfo = await getEnhancedPackageInfo(packageName, undefined, projectType);
     spinner.succeed(chalk.hex('#10ac84')(`✅ Package information retrieved for ${packageName}`));
     
     displayPackageInfo([packageInfo], projectType || undefined, verbose);
@@ -311,7 +595,7 @@ async function checkProjectPackages(verbose: boolean = false) {
     
     for (const [name, version] of Object.entries(dependencies)) {
       try {
-        const info = await getPackageInfo(name, version, projectType);
+        const info = await getEnhancedPackageInfo(name, version, projectType);
         packageInfos.push(info);
       } catch (error) {
         console.warn(`⚠️  Could not check ${name}`);
