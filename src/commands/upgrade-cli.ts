@@ -10,7 +10,6 @@ import inquirer from 'inquirer';
 import { exec } from 'child_process';
 import { promisify } from 'util';
 import semver from 'semver';
-import { CacheManager } from '../utils/cacheUtils.js';
 
 const execAsync = promisify(exec);
 
@@ -22,7 +21,7 @@ export function showUpgradeHelp(): void {
   const headerGradient = gradient(['#4facfe', '#00f2fe']);
   
   console.log('\n' + boxen(
-    headerGradient('🚀 Upgrade CLI Command Help') + '\n\n' +
+    headerGradient('🚀 Package Installer CLI - Upgrade Command Help') + '\n\n' +
     chalk.white('Update Package Installer CLI to the latest version with intelligent upgrade management.') + '\n' +
     chalk.white('Includes breaking change detection and version compatibility checks!') + '\n\n' +
     chalk.cyan('Usage:') + '\n' +
@@ -37,7 +36,6 @@ export function showUpgradeHelp(): void {
     chalk.hex('#95afc0')('  • Interactive confirmation for major version upgrades') + '\n' +
     chalk.hex('#95afc0')('  • Automatic @latest tag installation for maximum compatibility') + '\n' +
     chalk.hex('#95afc0')('  • Package size and release date information') + '\n' +
-    chalk.hex('#95afc0')('  • Command history tracking and performance metrics') + '\n' +
     chalk.hex('#95afc0')('  • Comprehensive upgrade verification and rollback guidance'),
     {
       padding: 1,
@@ -49,184 +47,123 @@ export function showUpgradeHelp(): void {
 }
 
 /**
- * Get the current version from package.json
+ * Get current CLI version
  */
 async function getCurrentVersion(): Promise<string> {
   try {
-    const { stdout } = await execAsync('npm list -g @0xshariq/package-installer --depth=0 --json');
-    const data = JSON.parse(stdout);
-    return data.dependencies?.['@0xshariq/package-installer']?.version || 'unknown';
-  } catch {
-    try {
-      const { stdout } = await execAsync('pi --version');
-      return stdout.trim();
-    } catch {
-      return 'unknown';
-    }
+    const { stdout } = await execAsync('pi --version');
+    return stdout.trim();
+  } catch (error) {
+    return 'unknown';
   }
 }
 
 /**
- * Get the latest version from npm registry
+ * Get latest version from npm registry
  */
 async function getLatestVersion(): Promise<string> {
   try {
-    const { stdout } = await execAsync('npm show @0xshariq/package-installer version');
+    const { stdout } = await execAsync('npm view @0xshariq/package-installer version');
     return stdout.trim();
   } catch (error) {
-    throw new Error(`Failed to fetch latest version: ${error}`);
+    throw new Error('Failed to fetch latest version from npm registry');
   }
 }
 
 /**
- * Get package information including changelog
+ * Detect package manager
+ */
+async function detectPackageManager(): Promise<string> {
+  try {
+    await execAsync('pnpm --version');
+    return 'pnpm';
+  } catch {}
+
+  try {
+    await execAsync('yarn --version');
+    return 'yarn';
+  } catch {}
+
+  return 'npm';
+}
+
+/**
+ * Get package information
  */
 async function getPackageInfo(): Promise<any> {
   try {
-    const { stdout } = await execAsync('npm show @0xshariq/package-installer --json');
+    const { stdout } = await execAsync('npm view @0xshariq/package-installer --json');
     return JSON.parse(stdout);
   } catch (error) {
-    throw new Error(`Failed to fetch package information: ${error}`);
+    return {};
   }
-}
-
-/**
- * Check for breaking changes between versions
- */
-function hasBreakingChanges(currentVersion: string, latestVersion: string): boolean {
-  if (!semver.valid(currentVersion) || !semver.valid(latestVersion)) {
-    return true; // Assume breaking changes if versions can't be parsed
-  }
-  
-  return semver.major(latestVersion) > semver.major(currentVersion);
-}
-
-/**
- * Get version change type
- */
-function getVersionChangeType(currentVersion: string, latestVersion: string): string {
-  if (!semver.valid(currentVersion) || !semver.valid(latestVersion)) {
-    return 'unknown';
-  }
-  
-  if (semver.major(latestVersion) > semver.major(currentVersion)) {
-    return 'major';
-  } else if (semver.minor(latestVersion) > semver.minor(currentVersion)) {
-    return 'minor';
-  } else if (semver.patch(latestVersion) > semver.patch(currentVersion)) {
-    return 'patch';
-  }
-  
-  return 'same';
-}
-
-/**
- * Show breaking changes warning
- */
-async function showBreakingChangesWarning(currentVersion: string, latestVersion: string): Promise<boolean> {
-  const changeType = getVersionChangeType(currentVersion, latestVersion);
-  
-  if (changeType === 'major') {
-    console.log('\n' + boxen(
-      chalk.red.bold('⚠️  BREAKING CHANGES DETECTED') + '\n\n' +
-      chalk.white(`Upgrading from v${currentVersion} to v${latestVersion}`) + '\n' +
-      chalk.white('This is a major version update that may include breaking changes.') + '\n\n' +
-      chalk.yellow('Potential impacts:') + '\n' +
-      chalk.gray('  • Command interface changes') + '\n' +
-      chalk.gray('  • Configuration file format updates') + '\n' +
-      chalk.gray('  • Template structure modifications') + '\n' +
-      chalk.gray('  • Deprecated features removal') + '\n\n' +
-      chalk.cyan('💡 Recommendation:') + '\n' +
-      chalk.white('  • Review the changelog before upgrading') + '\n' +
-      chalk.white('  • Backup your projects and configurations') + '\n' +
-      chalk.white('  • Test in a non-production environment first'),
-      {
-        padding: 1,
-        borderStyle: 'double',
-        borderColor: 'red',
-        backgroundColor: '#2a0000'
-      }
-    ));
-    
-    const { confirmUpgrade } = await inquirer.prompt([
-      {
-        type: 'confirm',
-        name: 'confirmUpgrade',
-        message: 'Do you want to proceed with this potentially breaking upgrade?',
-        default: false
-      }
-    ]);
-    
-    return confirmUpgrade;
-  }
-  
-  return true; // No breaking changes, proceed
 }
 
 /**
  * Show upgrade summary
  */
 function showUpgradeSummary(currentVersion: string, latestVersion: string, packageInfo: any): void {
-  const changeType = getVersionChangeType(currentVersion, latestVersion);
-  const changeEmoji: Record<string, string> = {
-    major: '🚨',
-    minor: '✨',
-    patch: '🐛',
-    unknown: '❓'
-  };
-  
-  const changeColor: Record<string, any> = {
-    major: chalk.red,
-    minor: chalk.blue,
-    patch: chalk.green,
-    unknown: chalk.yellow
-  };
-  
   console.log('\n' + boxen(
-    chalk.hex('#00d2d3')('📊 Upgrade Summary') + '\n\n' +
-    chalk.white(`Current Version: ${chalk.hex('#ffa502')(currentVersion)}`) + '\n' +
-    chalk.white(`Latest Version:  ${chalk.hex('#10ac84')(latestVersion)}`) + '\n' +
-    chalk.white(`Change Type:     ${changeColor[changeType](`${changeEmoji[changeType]} ${changeType.toUpperCase()}`)}`) + '\n' +
-    chalk.white(`Last Updated:    ${packageInfo.time?.[latestVersion] ? new Date(packageInfo.time[latestVersion]).toLocaleDateString() : 'Unknown'}`) + '\n' +
-    chalk.white(`Size:            ${packageInfo.dist?.unpackedSize ? `${Math.round(packageInfo.dist.unpackedSize / 1024)} KB` : 'Unknown'}`),
+    chalk.hex('#10ac84')('📦 Upgrade Summary') + '\n\n' +
+    chalk.white('Current Version: ') + chalk.hex('#ffa502')(currentVersion === 'unknown' ? 'Not detected' : `v${currentVersion}`) + '\n' +
+    chalk.white('Latest Version:  ') + chalk.hex('#10ac84')(`v${latestVersion}`) + '\n' +
+    chalk.white('Package Size:    ') + chalk.hex('#95afc0')((packageInfo.dist?.unpackedSize ? `${(packageInfo.dist.unpackedSize / 1024).toFixed(0)} KB` : 'Unknown')) + '\n' +
+    chalk.white('Last Updated:    ') + chalk.hex('#95afc0')((packageInfo.time?.[latestVersion] ? new Date(packageInfo.time[latestVersion]).toLocaleDateString() : 'Unknown')),
     {
       padding: 1,
-      borderStyle: 'round',
-      borderColor: '#00d2d3',
-      backgroundColor: '#0a1a1a'
+      borderStyle: 'single',
+      borderColor: '#10ac84'
     }
   ));
 }
 
 /**
- * Detect which package manager was used for installation
+ * Show breaking changes warning for major version upgrades
  */
-async function detectPackageManager(): Promise<string> {
-  const managers = [
-    { name: 'pnpm', command: 'pnpm list -g @0xshariq/package-installer' },
-    { name: 'yarn', command: 'yarn global list --depth=0' },
-    { name: 'npm', command: 'npm list -g @0xshariq/package-installer' }
-  ];
-  
-  for (const manager of managers) {
-    try {
-      await execAsync(manager.command);
-      return manager.name;
-    } catch {
-      continue;
-    }
+async function showBreakingChangesWarning(currentVersion: string, latestVersion: string): Promise<boolean> {
+  if (currentVersion === 'unknown') return true;
+
+  const currentMajor = semver.major(currentVersion);
+  const latestMajor = semver.major(latestVersion);
+
+  if (latestMajor > currentMajor) {
+    console.log('\n' + boxen(
+      chalk.hex('#ff6b6b')('⚠️  MAJOR VERSION UPGRADE DETECTED') + '\n\n' +
+      chalk.white(`This upgrade involves a major version change (v${currentMajor}.x → v${latestMajor}.x)`) + '\n' +
+      chalk.white('which may include breaking changes that could affect your workflows.') + '\n\n' +
+      chalk.hex('#ffa502')('Potential Breaking Changes:') + '\n' +
+      chalk.hex('#95afc0')('  • Command line interface modifications') + '\n' +
+      chalk.hex('#95afc0')('  • Template structure changes') + '\n' +
+      chalk.hex('#95afc0')('  • Configuration file format updates') + '\n' +
+      chalk.hex('#95afc0')('  • Feature removals or significant changes') + '\n\n' +
+      chalk.cyan('💡 Recommendation:') + '\n' +
+      chalk.hex('#95afc0')('  Review the changelog before proceeding with the upgrade.'),
+      {
+        padding: 1,
+        borderStyle: 'double',
+        borderColor: '#ff6b6b'
+      }
+    ));
+
+    const { shouldProceed } = await inquirer.prompt([
+      {
+        type: 'confirm',
+        name: 'shouldProceed',
+        message: 'Do you want to proceed with this major version upgrade?',
+        default: false
+      }
+    ]);
+
+    return shouldProceed;
   }
-  
-  return 'npm'; // fallback to npm
+
+  return true;
 }
 
 /**
  * Main upgrade CLI function
  */
 export async function upgradeCliCommand(): Promise<void> {
-  const startTime = Date.now();
-  const cacheManager = new CacheManager();
-  
   // Check for help flag
   if (process.argv.includes('--help') || process.argv.includes('-h')) {
     showUpgradeHelp();
@@ -253,17 +190,6 @@ export async function upgradeCliCommand(): Promise<void> {
     
     if (currentVersion === latestVersion) {
       console.log('\n' + chalk.hex('#10ac84')('🎉 You are already using the latest version!'));
-      
-      // Track command completion
-      const duration = Date.now() - startTime;
-      await cacheManager.addCommandToHistory({
-        command: 'upgrade-cli',
-        args: [],
-        projectPath: process.cwd(),
-        success: true,
-        duration
-      });
-      
       return;
     }
     
@@ -277,17 +203,6 @@ export async function upgradeCliCommand(): Promise<void> {
       
       if (!shouldProceed) {
         console.log('\n' + chalk.yellow('⏹️  Upgrade cancelled by user'));
-        
-        // Track command cancellation
-        const duration = Date.now() - startTime;
-        await cacheManager.addCommandToHistory({
-          command: 'upgrade-cli',
-          args: ['cancelled'],
-          projectPath: process.cwd(),
-          success: false,
-          duration
-        });
-        
         return;
       }
     }
@@ -330,8 +245,8 @@ export async function upgradeCliCommand(): Promise<void> {
       chalk.white('All new features and improvements are now available!') + '\n\n' +
       chalk.hex('#00d2d3')('💡 What\'s new?') + '\n' +
       chalk.hex('#95afc0')('  • Enhanced template system with better error handling') + '\n' +
-      chalk.hex('#95afc0')('  • Improved caching and performance optimizations') + '\n' +
-      chalk.hex('#95afc0')('  • New history tracking and analytics features') + '\n' +
+      chalk.hex('#95afc0')('  • Improved performance optimizations') + '\n' +
+      chalk.hex('#95afc0')('  • New analytics and tracking features') + '\n' +
       chalk.hex('#95afc0')('  • Better version management and upgrade warnings') + '\n\n' +
       chalk.cyan('📖 View full changelog:') + '\n' +
       chalk.blue('  https://github.com/0xshariq/package-installer-cli/releases'),
@@ -343,16 +258,6 @@ export async function upgradeCliCommand(): Promise<void> {
       }
     ));
     
-    // Track successful upgrade
-    const duration = Date.now() - startTime;
-    await cacheManager.addCommandToHistory({
-      command: 'upgrade-cli',
-      args: [currentVersion, latestVersion],
-      projectPath: process.cwd(),
-      success: true,
-      duration
-    });
-    
   } catch (error: any) {
     spinner.fail(chalk.red('❌ Upgrade failed'));
     console.log(chalk.red(`\n❌ Error: ${error.message}`));
@@ -362,15 +267,5 @@ export async function upgradeCliCommand(): Promise<void> {
     console.log(chalk.hex('#95afc0')('   yarn global add @0xshariq/package-installer@latest'));
     console.log(chalk.hex('#95afc0')('   # or'));
     console.log(chalk.hex('#95afc0')('   pnpm add -g @0xshariq/package-installer@latest'));
-    
-    // Track failed upgrade
-    const duration = Date.now() - startTime;
-    await cacheManager.addCommandToHistory({
-      command: 'upgrade-cli',
-      args: [],
-      projectPath: process.cwd(),
-      success: false,
-      duration
-    });
   }
 }
