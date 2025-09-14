@@ -552,7 +552,9 @@ async function checkSinglePackage(packageName: string, verbose: boolean = false)
   try {
     // Try to detect what kind of package this might be
     const projectType = await detectProjectType();
-    const packageInfo = await getEnhancedPackageInfo(packageName, undefined, projectType);
+    // Fallback to npm if no project type detected
+    const defaultProjectType = projectType || PROJECT_TYPES.find(pt => pt.name.toLowerCase().includes('npm') || pt.name.toLowerCase().includes('javascript')) || PROJECT_TYPES[0];
+    const packageInfo = await getEnhancedPackageInfo(packageName, undefined, defaultProjectType);
     spinner.succeed(chalk.hex('#10ac84')(`✅ Package information retrieved for ${packageName}`));
     
     displayPackageInfo([packageInfo], projectType || undefined, verbose);
