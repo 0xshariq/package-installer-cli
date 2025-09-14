@@ -6,7 +6,7 @@ import chalk from 'chalk';
 import ora from 'ora';
 import fs from 'fs-extra';
 import path from 'path';
-import { createBanner, displaySuccessMessage } from '../utils/dashboard.js';
+import { displaySuccessMessage } from '../utils/dashboard.js';
 
 /**
  * Display help for clean command

@@ -11,9 +11,7 @@ import https from 'https';
 import { 
   SupportedLanguage, 
   getSupportedLanguages,
-  getLanguageConfig,
-  getAllConfigFiles,
-  detectLanguageFromFiles 
+  getLanguageConfig
 } from '../utils/languageConfig.js';
 
 const execAsync = promisify(exec);

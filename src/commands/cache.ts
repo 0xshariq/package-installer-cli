@@ -3,7 +3,6 @@
  */
 
 import chalk from 'chalk';
-import figlet from 'figlet';
 import gradientString from 'gradient-string';
 import fs from 'fs-extra';
 import path from 'path';

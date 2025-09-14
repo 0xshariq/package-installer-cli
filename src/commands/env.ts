@@ -10,7 +10,7 @@ import path from 'path';
 import boxen from 'boxen';
 import gradient from 'gradient-string';
 import inquirer from 'inquirer';
-import { createBanner, displaySuccessMessage, displayErrorMessage } from '../utils/dashboard.js';
+import { displaySuccessMessage, displayErrorMessage } from '../utils/dashboard.js';
 import { detectProjectStack } from '../utils/featureInstaller.js';
 
 // Types
