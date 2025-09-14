@@ -71,7 +71,13 @@
       "type": "frontend",
       "description": "Progressive JavaScript framework for building modern web applications",
       "languages": ["javascript", "typescript"],
-      "templates": []
+      "ui": ["shadcn"],
+      "options": ["tailwind"],
+      "templates": [
+        "shadcn-tailwind-template",
+        "no-shadcn-no-tailwind-template",
+        "no-shadcn-tailwind-template"
+      ]
     },
     "react-native": {
       "type": "mobile",
