@@ -1,7 +1,6 @@
 # Source files - only include built JS files
 src/
 *.ts
-!dist/**/*.d.ts
 
 # Development files
 tsconfig.json
@@ -18,7 +17,6 @@ tsconfig.json
 
 # Environment files
 .env*
-!.env.example
 
 # Test files
 *.test.js
@@ -80,15 +78,3 @@ Thumbs.db
 # Package manager lock files
 package-lock.json
 yarn.lock
-
-# Keep essential files for CLI functionality
-!package.json
-!README.md
-!LICENSE
-!dist/
-!templates/
-!features/
-!template.json
-
-# Keep pnpm-lock.yaml for reproducible builds
-!pnpm-lock.yaml

@@ -142,8 +142,3 @@ docs/build/
 *.zip
 *.tar.gz
 *.rar
-
-# Keep important files for CLI functionality
-!templates/
-!features/
-!template.json
