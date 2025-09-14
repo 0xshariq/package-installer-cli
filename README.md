@@ -6,20 +6,26 @@
 
 A **cross-platform, interactive CLI** to scaffold modern web application templates with support for multiple frameworks, languages, and development tools. Create production-ready projects in seconds!
 
-## 🚀 Features
+## 🚀 Quick Features
 
 - **🎨 Multiple Frameworks**: React, Next.js, Express, Angular, Vue, Rust
 - **🔤 Language Support**: TypeScript & JavaScript variants
 - **🎭 UI Libraries**: Tailwind CSS, Material-UI, shadcn/ui
-- **📦 Smart Bundlers**: Vite, built-in framework bundlers
-- **Auto-Installation**: Automatic dependency installation
-- **🎯 Interactive Prompts**: Guided project setup experience
-- **⚡ Lightning Fast**: Optimized template generation
-- **🌈 Beautiful CLI**: Gorgeous terminal interface
+- **📦 Smart Package Management**: Auto-detects npm, yarn, pnpm
+- **⚡ Lightning Fast**: Optimized template generation with intelligent caching
+- **🌈 Beautiful CLI**: Gorgeous terminal interface with real-time analytics
+- **🔍 Project Analysis**: Advanced dependency analysis and project insights
+
+## ✨ New Features
+
+- **📊 Enhanced Analytics Dashboard**: Real-time usage analytics with detailed insights
+- **🎯 Smart Dependency Updates**: Project-specific dependency management for JS, Python, Rust, Go, Ruby, PHP
+- **🚀 Intelligent CLI Upgrades**: Separate upgrade system with breaking change detection
+- **💾 .package-installer-cli Folder**: All cache and history stored in dedicated folder
+- **📈 Usage Tracking**: Comprehensive command and feature usage tracking
+- **⚡ Performance Insights**: Productivity scoring and usage patterns
 
 ## 📥 Installation
-
-### Global Installation (Recommended)
 
 ```bash
 # Using npm
@@ -32,155 +38,86 @@ yarn global add @0xshariq/package-installer
 pnpm add -g @0xshariq/package-installer
 ```
 
-### One-Time Usage
-
-```bash
-# Using npx
-npx @0xshariq/package-installer create my-app
-```
-
 ## 🎯 Quick Start
 
 ```bash
 # Create new project interactively
 pi create
 
-# Create with specific name
-pi create my-awesome-app
-
-# Analyze current project
+# Analyze project with enhanced dashboard
 pi analyze
 
-# Update project dependencies
+# Update project dependencies only
 pi update
+
+# Upgrade CLI to latest version
+pi upgrade-cli
 ```
 
-## 📋 Commands Overview
+## 📚 Documentation
 
-| Command | Description | Status |
-|---------|-------------|--------|
-| `pi create` | Create new project from templates | ✅ Available |
-| `pi analyze` | Analyze project structure and dependencies | ✅ Available |
-| `pi update` | Update project dependencies to latest versions | ✅ Available |
-| `pi add` | Add features to existing projects | ✅ Available |
-| `pi check` | Check project health and dependencies | ✅ Available |
-| `pi clone` | Clone and setup repositories | ✅ Available |
-| `pi doctor` | Diagnose and fix project issues | ✅ Available |
-| `pi env` | Analyze development environment | ✅ Available |
-| `pi clean` | Clean development artifacts | ✅ Available |
-| `pi cache` | Manage CLI cache system | ✅ Available |
-| `pi upgrade-cli` | Upgrade CLI to latest version | ✅ Available |
-| `pi deploy` | Deploy projects to platforms | 🚧 Coming Soon |
-| `pi --help` | Show help information | ✅ Available |
-| `pi --version` | Display CLI version | ✅ Available |
+| Document | Description |
+|----------|-------------|
+| [📋 Commands](docs/commands.md) | Complete command reference with examples |
+| [⚡ Features](docs/features.md) | Detailed feature documentation and usage |
+| [🎨 Templates](docs/templates.md) | Available templates and customization options |
+| [🚀 Deployment](docs/deploy.md) | Deployment options and platform integration |
 
-For detailed command documentation, see [docs/commands.md](docs/commands.md).
+## 🛠️ Command Overview
 
-## ⚡ Intelligent Caching System
+| Command | Description | Usage |
+|---------|-------------|-------|
+| `pi create` | Create new project from templates | `pi create [name]` |
+| `pi analyze` | Enhanced project analytics dashboard | `pi analyze [--detailed]` |
+| `pi update` | Update project dependencies | `pi update [--latest]` |
+| `pi upgrade-cli` | Upgrade CLI to latest version | `pi upgrade-cli` |
+| `pi add` | Add features to existing projects | `pi add [feature]` |
+| `pi doctor` | Diagnose and fix project issues | `pi doctor` |
+| `pi clean` | Clean development artifacts | `pi clean [--all]` |
 
-Package Installer CLI includes a comprehensive caching system for lightning-fast performance:
+*For complete command documentation, see [docs/commands.md](docs/commands.md)*
 
-### 🗄️ Cache Features
-- **Project Analysis Caching** - Stores project metadata and analysis results
-- **Template Usage Tracking** - Recommends popular templates based on usage
-- **Package Version Caching** - Caches npm package version checks
-- **Template File Caching** - Caches frequently used templates for instant creation
-- **System Environment Caching** - Stores development tool information
+## 🏗️ Supported Project Types
 
-### 📊 Cache Management
-```bash
-# View cache statistics and info
-pi cache
+| Language/Framework | Templates | Package Managers |
+|-------------------|-----------|------------------|
+| **JavaScript/TypeScript** | React, Next.js, Express, Angular, Vue | npm, yarn, pnpm |
+| **Python** | Django, Flask, FastAPI | pip, poetry |
+| **Rust** | Basic, Advanced, Web | cargo |
+| **Go** | CLI, Web, API | go mod |
+| **Ruby** | Rails, Sinatra | bundler |
+| **PHP** | Laravel, Symfony | composer |
 
-# Clear specific cache types
-pi cache clear projects    # Clear project analysis cache
-pi cache clear packages    # Clear package version cache
-pi cache clear templates   # Clear template file cache
-pi cache clear all         # Clear all caches
+*For detailed template information, see [docs/templates.md](docs/templates.md)*
 
-# View detailed cache stats
-pi cache stats
+## 🎯 System Requirements
 
-# Show cache configuration
-pi cache info
-```
-
-### 🎯 Performance Benefits
-- **5-10x faster** project creation with cached templates
-- **2-3x faster** project analysis with cached data
-- **Instant template recommendations** based on usage patterns
-- **Reduced API calls** for package version checks
-- **Smart cache invalidation** ensures data freshness
-
-## 🎨 Supported Templates
-
-### Frontend Frameworks
-- **React (Vite)** - TypeScript/JavaScript with modern tooling
-- **Next.js** - App Router, Tailwind CSS, shadcn/ui, src directory options
-- **Angular** - Material-UI, Tailwind CSS, modern CLI setup
-- **Vue.js** - Composition API, Vite, modern tooling
-
-### Backend Frameworks
-- **Express** - TypeScript/JavaScript RESTful APIs with middleware
-
-### System Programming
-- **Rust** - Basic & Advanced project templates
-
-## 🛠️ Template Features
-
-- **UI & Styling**: Tailwind CSS, Material-UI, shadcn/ui
-- **Project Structure**: Source directory or root level organization
-- **Development Tools**: ESLint, Prettier, TypeScript support
-- **Build Tools**: Vite, framework-specific bundlers
-
-## 🏗️ Project Structure
-
-After creating a project, you'll get a modern, well-organized structure:
-
-```
-my-awesome-app/
-├── src/                    # Source code
-│   ├── components/         # Reusable components
-│   ├── pages/              # Route components
-│   └── utils/              # Utility functions
-├── public/                 # Static assets
-├── .env.example            # Environment variables template
-├── package.json            # Dependencies and scripts
-├── README.md               # Project documentation
-└── tailwind.config.js      # Tailwind CSS config (if selected)
-```
-
-## 🔄 Auto-Installation Features
-
-Package Installer CLI automatically:
-
-- **Installs dependencies** using your preferred package manager (npm/yarn/pnpm)
-- **Sets up Git repository** with initial commit
-- **Configures development scripts** and build processes
-- **Creates well-structured project layout**
+- **Node.js**: 18.0.0 or higher
+- **Operating Systems**: Windows, macOS, Linux
+- **Package Managers**: npm, yarn, or pnpm
+- **Git**: Required for project initialization
 
 ## 🐛 Troubleshooting
 
-### Common Issues
+### Quick Fixes
 
-**Installation Issues:**
 ```bash
-# Clear npm cache and reinstall
+# Clear cache and reinstall
 npm cache clean --force
 npm install -g @0xshariq/package-installer
-```
 
-**Command Not Found:**
-```bash
-# Alternative: use npx
+# Use npx if global installation fails
 npx @0xshariq/package-installer create my-app
+
+# Check CLI status
+pi doctor
 ```
 
 ## 🤝 Contributing
 
 We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
 
-##  License
+## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
