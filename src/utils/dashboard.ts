@@ -1,6 +1,6 @@
 /**
  * Advanced Dashboard Utility
- * Creates beautiful terminal interfaces with advanced styling
+ * Creates beautiful terminal interfaces with advanced styling for Package Installer CLI
  */
 
 import chalk from 'chalk';
@@ -11,6 +11,7 @@ import boxen from 'boxen';
 import fs from 'fs-extra';
 import path from 'path';
 import { detectLanguageFromFiles } from './languageConfig.js';
+import { HistoryManager } from './historyManager.js';
 
 export interface DashboardStats {
   totalProjects: number;
@@ -18,7 +19,10 @@ export interface DashboardStats {
   frameworkBreakdown: Record<string, number>;
   recentProjects: string[];
   featuresUsed: string[];
-  cacheHits: number;
+  totalCommands: number;
+  commandBreakdown: Record<string, number>;
+  usageStreak: number;
+  lastUsed: string;
 }
 
 export interface ProjectInfo {
@@ -36,8 +40,8 @@ export interface ProjectInfo {
 export function createBanner(title: string = 'Package Installer CLI'): void {
   console.clear();
   
-  // Create figlet text
-  const figletText = figlet.textSync(title.length > 15 ? 'PKG CLI' : title, {
+  // Create figlet text with proper title
+  const figletText = figlet.textSync(title.length > 15 ? 'Package Installer' : title, {
     font: 'ANSI Shadow',
     horizontalLayout: 'fitted',
     width: 80
@@ -57,8 +61,8 @@ export function createBanner(title: string = 'Package Installer CLI'): void {
   
   console.log(banner);
   
-  // Add tagline
-  const tagline = chalk.hex('#00d2d3')('� Advanced Project Analytics Dashboard');
+  // Add tagline with updated branding
+  const tagline = chalk.hex('#00d2d3')('🚀 Advanced Project Analytics Dashboard');
   const version = chalk.hex('#95afc0')('v3.0.0');
   const author = chalk.hex('#ffa502')('by @0xshariq');
   
@@ -97,26 +101,69 @@ export function displayProjectStats(stats: DashboardStats): void {
     [
       chalk.white('📝 Languages Used'),
       chalk.blue(Object.keys(stats.languageBreakdown).length.toString()),
-      chalk.gray(Object.keys(stats.languageBreakdown).join(', '))
+      chalk.gray(Object.keys(stats.languageBreakdown).join(', ') || 'No data')
     ],
     [
       chalk.white('🎯 Frameworks Used'),
       chalk.cyan(Object.keys(stats.frameworkBreakdown).length.toString()),
-      chalk.gray(Object.keys(stats.frameworkBreakdown).join(', '))
+      chalk.gray(Object.keys(stats.frameworkBreakdown).join(', ') || 'No data')
     ],
     [
-      chalk.white('⚡ Cache Hits'),
-      chalk.yellow(stats.cacheHits.toString()),
-      chalk.gray('Cached preferences used')
+      chalk.white('⚡ Total Commands'),
+      chalk.yellow(stats.totalCommands.toString()),
+      chalk.gray('CLI commands executed')
     ],
     [
-      chalk.white('� Features Added'),
-      chalk.magenta(stats.featuresUsed.length.toString()),
-      chalk.gray(stats.featuresUsed.slice(0, 3).join(', '))
+      chalk.white('🔥 Usage Streak'),
+      chalk.magenta(stats.usageStreak.toString() + ' days'),
+      chalk.gray('Consecutive days of usage')
+    ],
+    [
+      chalk.white('📅 Last Used'),
+      chalk.greenBright(stats.lastUsed || 'Never'),
+      chalk.gray('Most recent CLI activity')
     ]
   );
   
   console.log(statsTable.toString());
+  
+  // Display command breakdown if available
+  if (Object.keys(stats.commandBreakdown).length > 0) {
+    console.log('\n' + gradientString('green', 'blue')('🎮 COMMAND USAGE BREAKDOWN\n'));
+    
+    const commandTable = new Table({
+      head: [
+        chalk.hex('#10ac84')('Command'),
+        chalk.hex('#00d2d3')('Count'),
+        chalk.hex('#ffa502')('Percentage'),
+        chalk.hex('#ff6b6b')('Usage Bar')
+      ],
+      style: {
+        head: [],
+        border: ['green']
+      }
+    });
+    
+    const totalCommands = Object.values(stats.commandBreakdown).reduce((sum, count) => sum + count, 0);
+    
+    Object.entries(stats.commandBreakdown)
+      .sort(([,a], [,b]) => b - a)
+      .slice(0, 8)
+      .forEach(([command, count]) => {
+        const percentage = ((count / totalCommands) * 100).toFixed(1);
+        const barLength = Math.round((count / totalCommands) * 20);
+        const bar = '█'.repeat(barLength) + '░'.repeat(20 - barLength);
+        
+        commandTable.push([
+          chalk.white(command),
+          chalk.cyan(count.toString()),
+          chalk.green(percentage + '%'),
+          chalk.hex('#74b9ff')(bar)
+        ]);
+      });
+    
+    console.log(commandTable.toString());
+  }
   
   // Language breakdown pie chart (text-based)
   if (Object.keys(stats.languageBreakdown).length > 0) {
@@ -784,60 +831,139 @@ export async function gatherProjectStats(workspacePath: string = process.cwd()):
     languageBreakdown: {},
     frameworkBreakdown: {},
     recentProjects: [],
-    featuresUsed: ['Tailwind CSS', 'TypeScript', 'Vite', 'shadcn/ui', 'Material-UI'],
-    cacheHits: 0
+    featuresUsed: [],
+    totalCommands: 0,
+    commandBreakdown: {},
+    usageStreak: 0,
+    lastUsed: 'Never'
   };
   
   try {
-    // Check for cache file
-    const cacheFile = path.join(process.env.HOME || '', '.pi-cache.json');
-    if (await fs.pathExists(cacheFile)) {
-      const cache = await fs.readJson(cacheFile);
-      stats.cacheHits = cache.usageCount || 0;
+    // Load real data from history.json in .package-installer-cli folder
+    const historyManager = new HistoryManager();
+    await historyManager.init();
+    const data = historyManager.getHistory();
+    
+    if (data) {
+      // Get project statistics
+      const projects = data.projects || [];
+      stats.totalProjects = projects.length;
       
-      if (cache.recentProjects) {
-        stats.recentProjects = cache.recentProjects.slice(0, 5);
-        stats.totalProjects = cache.recentProjects.length;
-      }
+      // Extract recent project names (last 5)
+      stats.recentProjects = projects
+        .slice(-5)
+        .map((p: any) => p.name || 'Unnamed Project')
+        .reverse();
       
-      if (cache.featuresUsed) {
-        stats.featuresUsed = cache.featuresUsed;
+      // Calculate language breakdown from projects
+      projects.forEach((project: any) => {
+        if (project.language) {
+          stats.languageBreakdown[project.language] = (stats.languageBreakdown[project.language] || 0) + 1;
+        }
+      });
+      
+      // Calculate framework breakdown from projects
+      projects.forEach((project: any) => {
+        if (project.framework) {
+          stats.frameworkBreakdown[project.framework] = (stats.frameworkBreakdown[project.framework] || 0) + 1;
+        }
+      });
+      
+      // Get feature statistics
+      const features = data.features || [];
+      stats.featuresUsed = features
+        .slice(-10)
+        .map((f: any) => f.name || 'Unknown Feature')
+        .filter((name: string) => name !== 'Unknown Feature');
+      
+      // Get command statistics using historyManager methods
+      const commandStats = historyManager.getCommandStats();
+      commandStats.forEach(stat => {
+        stats.commandBreakdown[stat.command] = stat.count;
+      });
+      stats.totalCommands = Object.values(stats.commandBreakdown).reduce((sum: number, count: number) => sum + count, 0);
+      
+      // Calculate usage streak and last used
+      const allEvents = [...projects, ...features];
+      if (allEvents.length > 0) {
+        const dates = allEvents
+          .map((event: any) => new Date(event.createdAt || event.addedAt || event.timestamp))
+          .filter((date: Date) => !isNaN(date.getTime()))
+          .sort((a, b) => b.getTime() - a.getTime());
+        
+        if (dates.length > 0) {
+          stats.lastUsed = formatRelativeTime(dates[0]);
+          stats.usageStreak = calculateUsageStreak(dates);
+        }
       }
     }
     
-    // Detect current project languages and frameworks if in a project directory
+    // If in a project directory, detect current project info
     try {
       const languages = await detectProjectLanguage(workspacePath);
       languages.forEach((lang: string) => {
         stats.languageBreakdown[lang] = (stats.languageBreakdown[lang] || 0) + 1;
       });
       
-      // Detect framework based on project files
       const framework = await detectProjectFramework(workspacePath);
       if (framework) {
         stats.frameworkBreakdown[framework] = (stats.frameworkBreakdown[framework] || 0) + 1;
       }
     } catch (error) {
-      // Ignore if not in a valid project
-    }
-    
-    // Add some mock data for demonstration
-    if (stats.totalProjects === 0) {
-      stats.totalProjects = 12;
-      stats.languageBreakdown = { 'TypeScript': 8, 'JavaScript': 3, 'Rust': 1 };
-      stats.frameworkBreakdown = { 'Next.js': 5, 'React': 3, 'Express': 2, 'Rust': 1, 'Angular': 1 };
-      stats.cacheHits = 45;
+      // Ignore if not in a valid project directory
     }
     
   } catch (error) {
-    // Return default stats if there's an error
-    stats.totalProjects = 8;
-    stats.languageBreakdown = { 'TypeScript': 5, 'JavaScript': 2, 'Rust': 1 };
-    stats.frameworkBreakdown = { 'Next.js': 3, 'React': 2, 'Express': 2, 'Rust': 1 };
-    stats.cacheHits = 25;
+    console.warn('Warning: Could not load analytics data:', (error as Error).message || error);
+    // Return stats with all zeros - no dummy data
   }
   
   return stats;
+}
+
+/**
+ * Helper functions for analytics
+ */
+function formatRelativeTime(date: Date): string {
+  const now = new Date();
+  const diffMs = now.getTime() - date.getTime();
+  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+  const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+  const diffMinutes = Math.floor(diffMs / (1000 * 60));
+  
+  if (diffMinutes < 60) return `${diffMinutes} minutes ago`;
+  if (diffHours < 24) return `${diffHours} hours ago`;
+  if (diffDays === 1) return 'Yesterday';
+  if (diffDays < 7) return `${diffDays} days ago`;
+  if (diffDays < 30) return `${Math.floor(diffDays / 7)} weeks ago`;
+  if (diffDays < 365) return `${Math.floor(diffDays / 30)} months ago`;
+  
+  return `${Math.floor(diffDays / 365)} years ago`;
+}
+
+function calculateUsageStreak(dates: Date[]): number {
+  if (dates.length === 0) return 0;
+  
+  let streak = 1;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  
+  for (let i = 0; i < dates.length - 1; i++) {
+    const current = new Date(dates[i]);
+    const next = new Date(dates[i + 1]);
+    current.setHours(0, 0, 0, 0);
+    next.setHours(0, 0, 0, 0);
+    
+    const diffDays = Math.floor((current.getTime() - next.getTime()) / (1000 * 60 * 60 * 24));
+    
+    if (diffDays === 1) {
+      streak++;
+    } else if (diffDays > 1) {
+      break;
+    }
+  }
+  
+  return streak;
 }
 
 /**

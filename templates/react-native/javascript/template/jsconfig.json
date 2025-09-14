@@ -1,0 +1,5 @@
+{
+  "extends": "@react-native/metro-config",
+  "include": ["**/*.js", "**/*.jsx"],
+  "exclude": ["**/node_modules", "**/Pods"]
+}

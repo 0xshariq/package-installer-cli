@@ -12,7 +12,7 @@ import {
   getLanguageConfig,
   SupportedLanguage
 } from '../utils/languageConfig.js';
-import { detectProjectStack, getCliRootPath } from '../utils/featureInstaller.js';
+import { detectProjectStack } from '../utils/featureInstaller.js';
 import { exec } from 'child_process';
 import { promisify } from 'util';
 
