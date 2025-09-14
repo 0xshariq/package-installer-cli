@@ -13,6 +13,15 @@ import inquirer from 'inquirer';
 import { createBanner, displaySuccessMessage, displayErrorMessage } from '../utils/dashboard.js';
 import { detectProjectStack } from '../utils/featureInstaller.js';
 
+// Types
+interface Tool {
+  name: string;
+  command: string;
+  flag: string;
+  installed: boolean;
+  version: string;
+}
+
 /**
  * Check if a command exists
  */
@@ -59,7 +68,7 @@ function getSystemInfo(): any {
 /**
  * Check development tools
  */
-function checkDevelopmentTools(): any {
+function checkDevelopmentTools(): Tool[] {
   const tools = [
     { name: 'Node.js', command: 'node', flag: '--version' },
     { name: 'npm', command: 'npm', flag: '--version' },
@@ -223,7 +232,6 @@ async function validateEnvFile(projectPath: string): Promise<void> {
     console.error(chalk.red('❌ Failed to validate .env file:'), error);
   }
 }
-import { detectProjectStack } from '../utils/featureInstaller.js';
 
 /**
  * Display help for environment command
@@ -398,7 +406,7 @@ async function performEnvironmentCheck(): Promise<void> {
   console.log(chalk.blue('\n🔍 Checking environment variables...\n'));
   const envVars = checkEnvironmentVariables();
   Object.entries(envVars).forEach(([key, value]) => {
-    const displayValue = value.length > 50 ? value.substring(0, 50) + '...' : value;
+    const displayValue = (value as string).length > 50 ? (value as string).substring(0, 50) + '...' : value;
     console.log(chalk.white(`  ${key}: `) + chalk.gray(displayValue));
   });
 }
@@ -612,55 +620,6 @@ async function checkLanguages(): Promise<any> {
 }
 
 /**
- * Check development tool availability
- */
-async function checkDevelopmentTools(): Promise<any> {
-  const tools = [
-    'git', 'docker', 'docker-compose', 'kubectl', 
-    'terraform', 'aws', 'gcloud', 'az',
-    'code', 'vim', 'nano'
-  ];
-  
-  const results: any = {};
-  
-  for (const tool of tools) {
-    try {
-      const version = execSync(`${tool} --version`, { 
-        encoding: 'utf8', 
-        timeout: 5000,
-        stdio: ['ignore', 'pipe', 'pipe']
-      }).trim();
-      
-      results[tool] = {
-        available: true,
-        version: version.split('\n')[0]
-      };
-    } catch (error) {
-      // Try alternative version commands
-      try {
-        const version = execSync(`${tool} version`, { 
-          encoding: 'utf8', 
-          timeout: 5000,
-          stdio: ['ignore', 'pipe', 'pipe']
-        }).trim();
-        
-        results[tool] = {
-          available: true,
-          version: version.split('\n')[0]
-        };
-      } catch (error2) {
-        results[tool] = {
-          available: false,
-          error: 'Not installed'
-        };
-      }
-    }
-  }
-  
-  return results;
-}
-
-/**
  * Check Git configuration
  */
 async function checkGit(): Promise<any> {
@@ -794,26 +753,6 @@ function displayFullEnvInfo(envInfo: any, options: any): void {
     console.log(`${chalk.white('User Name:')} ${envInfo.git.userName}`);
     console.log(`${chalk.white('User Email:')} ${envInfo.git.userEmail}`);
   }
-}
-
-/**
- * Export environment information to file
- */
-async function exportEnvironmentInfo(envInfo: any): Promise<void> {
-  const exportData = {
-    timestamp: new Date().toISOString(),
-    environment: envInfo
-  };
-  
-  const filename = `environment-info-${new Date().toISOString().split('T')[0]}.json`;
-  const filepath = path.join(process.cwd(), filename);
-  
-  await fs.writeJson(filepath, exportData, { spaces: 2 });
-  
-  displaySuccessMessage(
-    'Environment information exported!',
-    [`Saved to: ${filename}`]
-  );
 }
 
 /**

@@ -285,30 +285,6 @@ async function checkProjectPackages(verbose: boolean = false) {
     let projectType = await detectProjectType();
     let dependencies: Record<string, string> = {};
     
-    // Use cached project info if available
-    if (cachedProject && cachedProject.framework) {
-      spinner.text = 'Using cached project analysis...';
-      
-      // Map framework to project type
-      const frameworkToType: Record<string, string> = {
-        'nextjs': 'Node.js',
-        'reactjs': 'Node.js', 
-        'vuejs': 'Node.js',
-        'expressjs': 'Node.js',
-        'nestjs': 'Node.js'
-      };
-      
-      const mappedType = frameworkToType[cachedProject.framework] || 'Node.js';
-      projectType = PROJECT_TYPES.find(pt => pt.name === mappedType) || projectType;
-      
-      // Use cached dependencies if available
-      if (cachedProject.dependencies && Array.isArray(cachedProject.dependencies)) {
-        cachedProject.dependencies.forEach((dep: string) => {
-          dependencies[dep] = 'cached';
-        });
-      }
-    }
-    
     if (!projectType) {
       spinner.warn('No supported project files found in current directory');
       console.log(chalk.yellow('💡 Supported project types:'));
@@ -332,10 +308,6 @@ async function checkProjectPackages(verbose: boolean = false) {
     spinner.text = `Checking ${Object.keys(dependencies).length} ${projectType.name} packages...`;
     
     const packageInfos: PackageInfo[] = [];
-    
-    // Check if we have cached package info
-    const cacheStats = getCacheStats();
-    const cacheKey = `packages_${path.basename(process.cwd())}_${Date.now()}`;
     
     for (const [name, version] of Object.entries(dependencies)) {
       try {
