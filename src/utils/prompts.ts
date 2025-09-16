@@ -7,6 +7,7 @@ import inquirer from 'inquirer';
 import chalk from 'chalk';
 import fs from 'fs-extra';
 import path from 'path';
+import { fileURLToPath } from 'url';
 
 export interface FrameworkOptions {
   tailwind?: boolean;
@@ -15,11 +16,20 @@ export interface FrameworkOptions {
   bundler?: string;
 }
 
+// Get CLI installation directory
+function getCLIDirectory() {
+  const __filename = fileURLToPath(import.meta.url);
+  const __dirname = path.dirname(__filename);
+  // Go up from src/utils to root directory
+  return path.resolve(__dirname, '..', '..');
+}
+
 // Helper functions to read template.json
 function getTemplateConfig() {
-  const templatePath = path.join(process.cwd(), 'template.json');
+  const cliDir = getCLIDirectory();
+  const templatePath = path.join(cliDir, 'template.json');
   if (!fs.existsSync(templatePath)) {
-    throw new Error('template.json not found');
+    throw new Error(`template.json not found at: ${templatePath}`);
   }
   return JSON.parse(fs.readFileSync(templatePath, 'utf-8'));
 }
@@ -182,35 +192,30 @@ export async function promptFrameworkOptions(framework: string): Promise<Framewo
 
   const options: FrameworkOptions = {};
 
-  // 1. UI Library selection (if available)
+  // 1. UI Library selection (if available) - ALWAYS ASK if UI options exist
   if (config.ui && config.ui.length > 0) {
-    if (config.ui.length === 1) {
-      options.ui = config.ui[0];
-      console.log(chalk.cyan(`💎 Using ${chalk.bold(config.ui[0])} as UI library`));
-    } else {
-      const { ui } = await inquirer.prompt([
-        {
-          type: 'list',
-          name: 'ui',
-          message: `${chalk.blue('❯')} Choose a UI library:`,
-          choices: [
-            { 
-              name: `${chalk.gray('◯')} None - Build your own UI`, 
-              value: 'none' 
-            },
-            ...config.ui.map((uiLib: string) => ({
-              name: `${chalk.green('●')} ${capitalize(uiLib)}`,
-              value: uiLib
-            }))
-          ],
-          pageSize: 8
-        }
-      ]);
-      options.ui = ui === 'none' ? undefined : ui;
-    }
+    const { ui } = await inquirer.prompt([
+      {
+        type: 'list',
+        name: 'ui',
+        message: `${chalk.blue('❯')} Choose a UI library:`,
+        choices: [
+          { 
+            name: `${chalk.gray('◯')} None - Build your own UI`, 
+            value: 'none' 
+          },
+          ...config.ui.map((uiLib: string) => ({
+            name: `${chalk.green('●')} ${capitalize(uiLib)}`,
+            value: uiLib
+          }))
+        ],
+        pageSize: 8
+      }
+    ]);
+    options.ui = ui === 'none' ? undefined : ui;
   }
 
-  // 2. Tailwind CSS (if available in options)
+  // 2. Tailwind CSS (if available in options) - ALWAYS ASK if tailwind option exists
   if (config.options?.includes('tailwind')) {
     const { tailwind } = await inquirer.prompt([
       {
@@ -223,7 +228,7 @@ export async function promptFrameworkOptions(framework: string): Promise<Framewo
     options.tailwind = tailwind;
   }
 
-  // 3. Src directory (only for Next.js)
+  // 3. Src directory (only for Next.js) - ALWAYS ASK if src option exists for nextjs
   if (framework === 'nextjs' && config.options?.includes('src')) {
     const { src } = await inquirer.prompt([
       {
@@ -236,7 +241,7 @@ export async function promptFrameworkOptions(framework: string): Promise<Framewo
     options.src = src;
   }
 
-  // 4. Bundler selection (only for React-based frameworks)
+  // 4. Bundler selection (only for React-based frameworks) - ALWAYS ASK if bundlers exist
   if (config.bundlers && config.bundlers.length > 0) {
     const { bundler } = await inquirer.prompt([
       {
@@ -399,6 +404,13 @@ export function hasBundlerOptions(framework: string): boolean {
 
 export function hasTemplateSelection(framework: string): boolean {
   const config = getFrameworkConfig(framework);
+  return !!(config?.templates && config.templates.length > 0);
+}
+
+export function shouldShowTemplates(framework: string): boolean {
+  const config = getFrameworkConfig(framework);
+  // Show templates if framework has predefined templates but no options/ui/bundlers
+  // OR if framework has both templates and options (let user choose specific template)
   return !!(config?.templates && config.templates.length > 0);
 }
 
