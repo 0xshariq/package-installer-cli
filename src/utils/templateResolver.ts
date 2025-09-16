@@ -5,6 +5,7 @@
 
 import path from 'path';
 import fs from 'fs-extra';
+import { fileURLToPath } from 'url';
 import { FrameworkOptions } from './prompts.js';
 
 export interface ProjectInfo {
@@ -14,11 +15,20 @@ export interface ProjectInfo {
   options?: FrameworkOptions;
 }
 
+// Get CLI installation directory
+function getCLIDirectory() {
+  const __filename = fileURLToPath(import.meta.url);
+  const __dirname = path.dirname(__filename);
+  // Go up from src/utils to root directory
+  return path.resolve(__dirname, '..', '..');
+}
+
 // Helper functions to read template.json
 function getTemplateConfig() {
-  const templatePath = path.join(process.cwd(), 'template.json');
+  const cliDir = getCLIDirectory();
+  const templatePath = path.join(cliDir, 'template.json');
   if (!fs.existsSync(templatePath)) {
-    throw new Error('template.json not found');
+    throw new Error(`template.json not found at: ${templatePath}`);
   }
   return JSON.parse(fs.readFileSync(templatePath, 'utf-8'));
 }
@@ -29,45 +39,61 @@ function getFrameworkConfig(framework: string) {
 }
 
 /**
- * Generate template name based on framework options
+ * Generate template name based on framework options - use exact template names from template.json
  */
 export function generateTemplateName(framework: string, options: FrameworkOptions): string {
   const config = getFrameworkConfig(framework);
   
-  // If framework doesn't have options, return empty (will use provided template name)
-  if (!config?.options) {
+  // If framework doesn't have options or templates, return empty
+  if (!config?.options && !config?.templates) {
     return '';
   }
 
-  // Build template name based on selected options
-  const parts: string[] = [];
-  
-  // Handle UI library
-  if (options.ui && options.ui !== 'none') {
-    parts.push(options.ui);
-  } else {
-    parts.push('no-' + (config.ui?.[0] || 'ui'));
-  }
-  
-  // Handle tailwind option
-  if (config.options.includes('tailwind')) {
-    if (options.tailwind) {
-      parts.push('tailwind');
-    } else {
-      parts.push('no-tailwind');
+  // If framework has predefined templates, select the matching one
+  if (config.templates && config.templates.length > 0) {
+    // Build template name based on selected options
+    const parts: string[] = [];
+    
+    // Handle src option (only for nextjs)
+    if (framework === 'nextjs' && config.options?.includes('src')) {
+      if (options.src) {
+        parts.push('src');
+      } else {
+        parts.push('no-src');
+      }
     }
-  }
-  
-  // Handle src option
-  if (config.options.includes('src')) {
-    if (options.src) {
-      parts.push('src');
-    } else {
-      parts.push('no-src');
+    
+    // Handle UI library
+    if (config.ui && config.ui.length > 0) {
+      if (options.ui && options.ui !== 'none') {
+        parts.push(options.ui);
+      } else {
+        parts.push('no-' + config.ui[0]);
+      }
     }
+    
+    // Handle tailwind option
+    if (config.options?.includes('tailwind')) {
+      if (options.tailwind) {
+        parts.push('tailwind');
+      } else {
+        parts.push('no-tailwind');
+      }
+    }
+    
+    const generatedName = parts.join('-') + '-template';
+    
+    // Find exact match in templates array
+    const exactMatch = config.templates.find((template: string) => template === generatedName);
+    if (exactMatch) {
+      return exactMatch;
+    }
+    
+    // If no exact match, return the first template as fallback
+    return config.templates[0];
   }
-  
-  return parts.join('-') + '-template';
+
+  return '';
 }
 
 /**
@@ -75,24 +101,48 @@ export function generateTemplateName(framework: string, options: FrameworkOption
  */
 export function resolveTemplatePath(projectInfo: ProjectInfo): string {
   const { framework, language, templateName } = projectInfo;
-  const templatesRoot = path.join(process.cwd(), 'templates');
+  const cliDir = getCLIDirectory();
+  const templatesRoot = path.join(cliDir, 'templates');
   
   // Handle combination templates (like reactjs+expressjs+shadcn)
   if (framework.includes('+')) {
     const frameworkDir = framework.replace(/\+/g, '-');
-    return path.join(templatesRoot, frameworkDir);
+    const combinationPath = path.join(templatesRoot, frameworkDir);
+    if (fs.existsSync(combinationPath)) {
+      // Check for language subdirectory
+      if (language) {
+        const langPath = path.join(combinationPath, language);
+        if (fs.existsSync(langPath)) {
+          // Check for specific template
+          if (templateName) {
+            const templatePath = path.join(langPath, templateName);
+            if (fs.existsSync(templatePath)) {
+              return templatePath;
+            }
+          }
+          return langPath;
+        }
+      }
+      return combinationPath;
+    }
   }
   
-  // For frameworks with specific template names (like angularjs)
+  // For frameworks with specific template names
   if (templateName) {
     // Check if language subdirectory exists and is required
     const languageSubdirPath = path.join(templatesRoot, framework, language || 'typescript');
     if (fs.existsSync(languageSubdirPath)) {
-      return path.join(languageSubdirPath, templateName);
+      const templatePath = path.join(languageSubdirPath, templateName);
+      if (fs.existsSync(templatePath)) {
+        return templatePath;
+      }
     }
     
     // Otherwise, use direct framework directory with template name
-    return path.join(templatesRoot, framework, templateName);
+    const directTemplatePath = path.join(templatesRoot, framework, templateName);
+    if (fs.existsSync(directTemplatePath)) {
+      return directTemplatePath;
+    }
   }
   
   // For frameworks with options but no specific template name, use language subdirectory if available
@@ -118,7 +168,8 @@ export function templateExists(templatePath: string): boolean {
  * Get all available templates for a framework
  */
 export function getFrameworkTemplates(framework: string): string[] {
-  const frameworkPath = path.join(process.cwd(), 'templates', framework);
+  const cliDir = getCLIDirectory();
+  const frameworkPath = path.join(cliDir, 'templates', framework);
   
   if (!fs.existsSync(frameworkPath)) {
     return [];
