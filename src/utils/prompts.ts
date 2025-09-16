@@ -413,9 +413,3 @@ export function shouldShowTemplates(framework: string): boolean {
   // OR if framework has both templates and options (let user choose specific template)
   return !!(config?.templates && config.templates.length > 0);
 }
-
-export function shouldShowTemplates(framework: string): boolean {
-  const config = getFrameworkConfig(framework);
-  // Show templates only if framework has templates but no options or UI
-  return !!(config?.templates && config.templates.length > 0 && !config.options && !config.ui);
-}

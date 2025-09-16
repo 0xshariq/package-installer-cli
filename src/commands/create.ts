@@ -3,13 +3,10 @@
  */
 
 import chalk from 'chalk';
-import inquirer from 'inquirer';
 import path from 'path';
-import fs from 'fs-extra';
 import gradient from 'gradient-string';
 import boxen from 'boxen';
-import { 
-  promptProjectName, 
+import {
   promptFrameworkSelection, 
   promptLanguageSelection, 
   promptTemplateSelection,
@@ -100,10 +97,11 @@ export async function createProject(providedName?: string, options?: any): Promi
     console.log('\n' + chalk.hex('#10ac84')('🚀 Welcome to Package Installer CLI!'));
     console.log(chalk.hex('#95afc0')('Let\'s create something amazing together...'));
 
-    // Step 1: Get project name (if not provided)
+    // Step 1: Get project name (if not provided, default to "my-app")
     let projectName = providedName;
     if (!projectName) {
-      projectName = await promptProjectName();
+      projectName = "my-app";
+      console.log(chalk.cyan(`\n✅ Using default project name: ${chalk.bold(projectName)}`));
     }
     
     // Handle "." as project name - use current directory name
@@ -254,7 +252,7 @@ export async function createProject(providedName?: string, options?: any): Promi
     if (selectedFeatures.length > 0) {
       console.log(`   ${chalk.gray('Features:')} ${chalk.magenta(selectedFeatures.join(', '))}`);
     }
-    console.log(`\n${chalk.hex('#95afc0')('Navigate to your project:')} ${chalk.bold(`cd ${projectName}`)}`);
+    console.log(`\n${chalk.hex('#95afc0')('Navigate to your project:')} ${chalk.bold(providedName === '.' ? 'Already in project directory!' : `cd ${projectName}`)}`);
     
   } catch (error) {
     // Track command failure
