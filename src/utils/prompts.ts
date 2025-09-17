@@ -409,7 +409,10 @@ export function hasTemplateSelection(framework: string): boolean {
 
 export function shouldShowTemplates(framework: string): boolean {
   const config = getFrameworkConfig(framework);
-  // Show templates if framework has predefined templates but no options/ui/bundlers
-  // OR if framework has both templates and options (let user choose specific template)
-  return !!(config?.templates && config.templates.length > 0);
+  // Show templates ONLY for frameworks that have templates but NO options/ui/bundlers
+  // Frameworks WITH options should generate template names based on user choices
+  const hasOptions = !!(config?.options || config?.ui || config?.bundlers);
+  const hasTemplates = !!(config?.templates && config.templates.length > 0);
+  
+  return hasTemplates && !hasOptions;
 }

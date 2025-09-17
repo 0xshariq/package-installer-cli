@@ -38,24 +38,28 @@ function getFrameworkConfig(framework: string) {
   return config.frameworks[framework];
 }
 
+// Export for use in other modules
+export { getFrameworkConfig };
+
 /**
  * Generate template name based on framework options - use exact template names from template.json
+ * Only generates for frameworks that HAVE options
  */
 export function generateTemplateName(framework: string, options: FrameworkOptions): string {
   const config = getFrameworkConfig(framework);
   
-  // If framework doesn't have options or templates, return empty
-  if (!config?.options && !config?.templates) {
+  // Only generate template names for frameworks that have options
+  if (!config?.options && !config?.ui && !config?.bundlers) {
     return '';
   }
 
-  // If framework has predefined templates, select the matching one
+  // If framework has predefined templates, select the matching one based on options
   if (config.templates && config.templates.length > 0) {
     // Build template name based on selected options
     const parts: string[] = [];
     
-    // Handle src option (only for nextjs)
-    if (framework === 'nextjs' && config.options?.includes('src')) {
+    // Handle src option (only for nextjs and reactjs)
+    if ((framework === 'nextjs' || framework === 'reactjs') && config.options?.includes('src')) {
       if (options.src) {
         parts.push('src');
       } else {
