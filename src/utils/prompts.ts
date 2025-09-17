@@ -11,9 +11,9 @@ import { fileURLToPath } from 'url';
 
 export interface FrameworkOptions {
   tailwind?: boolean;
-  src?: boolean;
+  src?: boolean;   // only for nextjs
   ui?: string;
-  bundler?: string;
+  bundler?: string;   // only for reactjs
 }
 
 // Get CLI installation directory
@@ -64,16 +64,18 @@ export async function promptProjectName(): Promise<string> {
       type: 'input',
       name: 'projectName',
       message: `${chalk.blue('❯')} Enter your project name:`,
+      default: 'my-app',
       validate: (input: string) => {
+        // Allow empty input (will use default)
         if (!input.trim()) {
-          return chalk.red('Project name is required');
+          return true;
         }
         if (!/^[a-zA-Z0-9-_\.]+$/.test(input)) {
           return chalk.red('Project name can only contain letters, numbers, hyphens, underscores, and dots');
         }
         return true;
       },
-      transformer: (input: string) => chalk.cyan(input)
+      transformer: (input: string) => chalk.cyan(input || 'my-app')
     }
   ]);
 
@@ -318,7 +320,8 @@ export async function promptFeatureSelection(): Promise<string[]> {
   }
 
   // Get available feature categories from features.json
-  const featuresPath = path.join(process.cwd(), 'features', 'features.json');
+  const cliDir = getCLIDirectory();
+  const featuresPath = path.join(cliDir, 'features', 'features.json');
   if (!fs.existsSync(featuresPath)) {
     console.log(chalk.yellow('⚠️  Features configuration not found'));
     return [];
@@ -348,7 +351,8 @@ export async function promptFeatureSelection(): Promise<string[]> {
  * Specific feature provider selection
  */
 export async function promptFeatureProvider(category: string, framework: string): Promise<string | null> {
-  const featuresPath = path.join(process.cwd(), 'features', 'features.json');
+  const cliDir = getCLIDirectory();
+  const featuresPath = path.join(cliDir, 'features', 'features.json');
   const featuresConfig = JSON.parse(fs.readFileSync(featuresPath, 'utf-8'));
   
   if (!featuresConfig[category]) {

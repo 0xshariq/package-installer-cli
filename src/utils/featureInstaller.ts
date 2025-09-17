@@ -52,8 +52,13 @@ let SUPPORTED_FEATURES: { [featureName: string]: FeatureConfig } = {};
  */
 async function loadFeatures(): Promise<void> {
   try {
+    // Get CLI installation directory
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = path.dirname(__filename);
+    const cliDir = path.resolve(__dirname, '..', '..');
+    
     // Load directly from file system (simplified approach)
-    const featuresPath = path.join(__dirname, '../../features/features.json');
+    const featuresPath = path.join(cliDir, 'features', 'features.json');
     if (await fs.pathExists(featuresPath)) {
       const featuresData = await fs.readJson(featuresPath);
       SUPPORTED_FEATURES = featuresData.features;
@@ -587,31 +592,10 @@ async function copyTemplateFile(sourceFilePath: string, targetFilePath: string):
  * Get the CLI installation root directory
  */
 export function getCliRootPath(): string {
-  let cliRoot: string;
-  
-  if (__dirname.includes('/dist/')) {
-    cliRoot = path.join(__dirname, '../..');
-  } else {
-    cliRoot = path.join(__dirname, '../..');
-  }
-  
-  if (__dirname.includes('node_modules')) {
-    const nodeModulesIndex = __dirname.lastIndexOf('node_modules');
-    if (nodeModulesIndex !== -1) {
-      const afterNodeModules = __dirname.substring(nodeModulesIndex + 'node_modules'.length);
-      const packageParts = afterNodeModules.split(path.sep).filter(Boolean);
-      
-      if (packageParts.length >= 2) {
-        if (packageParts[0].startsWith('@')) {
-          cliRoot = path.join(__dirname.substring(0, nodeModulesIndex + 'node_modules'.length), packageParts[0], packageParts[1]);
-        } else {
-          cliRoot = path.join(__dirname.substring(0, nodeModulesIndex + 'node_modules'.length), packageParts[0]);
-        }
-      }
-    }
-  }
-  
-  return cliRoot;
+  const __filename = fileURLToPath(import.meta.url);
+  const __dirname = path.dirname(__filename);
+  // Go up from src/utils to root directory
+  return path.resolve(__dirname, '..', '..');
 }
 
 /**
