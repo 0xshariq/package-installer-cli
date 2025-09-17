@@ -102,15 +102,11 @@ export async function createProject(providedName?: string, options?: any): Promi
     // Step 1: Get project name (prompt if not provided)
     let projectName = providedName ? providedName.trim() : '';
     if (!projectName) {
-      const inputName = await promptProjectName();
-      if (!inputName || inputName.trim() === '') {
-        projectName = 'my-app';
-        console.log(chalk.cyan(`\n✅ No name provided. Using default project name: ${chalk.bold(projectName)}`));
-      } else if (inputName.trim() === '.') {
+      projectName = await promptProjectName();
+      if (projectName === '.') {
         projectName = path.basename(process.cwd());
         console.log(chalk.cyan(`\n✅ Using current directory name: ${chalk.bold(projectName)}`));
       } else {
-        projectName = inputName.trim();
         console.log(chalk.cyan(`\n✅ Using project name: ${chalk.bold(projectName)}`));
       }
     } else if (projectName === '.') {

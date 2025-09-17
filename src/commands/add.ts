@@ -64,25 +64,12 @@ function capitalize(str: string): string {
  */
 function getFeaturesConfig(): Record<string, any> {
   try {
-    // Get the CLI root path first
+    // Get the CLI root path
     const cliRoot = getCliRootPath();
     const featuresPath = path.join(cliRoot, 'features', 'features.json');
     
     if (fs.existsSync(featuresPath)) {
       return JSON.parse(fs.readFileSync(featuresPath, 'utf-8'));
-    }
-
-    // Fallback to trying different paths for local vs global installation
-    const possiblePaths = [
-      path.join(process.cwd(), 'features', 'features.json'),
-      path.join(__dirname, '..', '..', 'features', 'features.json'),
-      path.join(__dirname, '..', '..', '..', 'features', 'features.json'),
-    ];
-
-    for (const fallbackPath of possiblePaths) {
-      if (fs.existsSync(fallbackPath)) {
-        return JSON.parse(fs.readFileSync(fallbackPath, 'utf-8'));
-      }
     }
 
     console.warn(chalk.yellow('⚠️  features.json not found, using fallback'));
@@ -485,7 +472,8 @@ export async function addCommand(
     }
 
     // Validate that framework features exist in features directory
-    const frameworkFeaturesPath = path.join(process.cwd(), 'features');
+    const cliRoot = getCliRootPath();
+    const frameworkFeaturesPath = path.join(cliRoot, 'features');
     if (!await fs.pathExists(frameworkFeaturesPath)) {
       console.log(chalk.red('❌ Features directory not found'));
       console.log(chalk.yellow('💡 Make sure you\'re running this from the Package Installer CLI root directory'));
