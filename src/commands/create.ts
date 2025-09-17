@@ -7,6 +7,7 @@ import path from 'path';
 import gradient from 'gradient-string';
 import boxen from 'boxen';
 import {
+  promptProjectName,
   promptFrameworkSelection, 
   promptLanguageSelection, 
   promptTemplateSelection,
@@ -98,9 +99,9 @@ export async function createProject(providedName?: string, options?: any): Promi
     console.log(chalk.hex('#95afc0')('Let\'s create something amazing together...'));
 
     // Step 1: Get project name (if not provided, default to "my-app")
-    let projectName = providedName;
+    let projectName = providedName ? providedName.trim() : 'my-app';
     if (!projectName) {
-      projectName = "my-app";
+      projectName = await promptProjectName();
       console.log(chalk.cyan(`\n✅ Using default project name: ${chalk.bold(projectName)}`));
     }
     
