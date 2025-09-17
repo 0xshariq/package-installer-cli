@@ -98,15 +98,21 @@ export async function createProject(providedName?: string, options?: any): Promi
     console.log('\n' + chalk.hex('#10ac84')('🚀 Welcome to Package Installer CLI!'));
     console.log(chalk.hex('#95afc0')('Let\'s create something amazing together...'));
 
-    // Step 1: Get project name (if not provided, default to "my-app")
-    let projectName = providedName ? providedName.trim() : 'my-app';
+    // Step 1: Get project name (prompt if not provided)
+    let projectName = providedName ? providedName.trim() : '';
     if (!projectName) {
-      projectName = await promptProjectName();
-      console.log(chalk.cyan(`\n✅ Using default project name: ${chalk.bold(projectName)}`));
-    }
-    
-    // Handle "." as project name - use current directory name
-    if (projectName === '.') {
+      const inputName = await promptProjectName();
+      if (!inputName || inputName.trim() === '') {
+        projectName = 'my-app';
+        console.log(chalk.cyan(`\n✅ No name provided. Using default project name: ${chalk.bold(projectName)}`));
+      } else if (inputName.trim() === '.') {
+        projectName = path.basename(process.cwd());
+        console.log(chalk.cyan(`\n✅ Using current directory name: ${chalk.bold(projectName)}`));
+      } else {
+        projectName = inputName.trim();
+        console.log(chalk.cyan(`\n✅ Using project name: ${chalk.bold(projectName)}`));
+      }
+    } else if (projectName === '.') {
       projectName = path.basename(process.cwd());
       console.log(chalk.cyan(`\n✅ Using current directory name: ${chalk.bold(projectName)}`));
     }
