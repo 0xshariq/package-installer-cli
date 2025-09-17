@@ -25,7 +25,8 @@ import {
   resolveTemplatePath, 
   generateTemplateName,
   templateExists,
-  ProjectInfo
+  ProjectInfo,
+  getFrameworkConfig
 } from '../utils/templateResolver.js';
 import { createProjectFromTemplate, installDependenciesForCreate } from '../utils/templateCreator.js';
 import { 
@@ -130,13 +131,22 @@ export async function createProject(providedName?: string, options?: any): Promi
       options = await promptFrameworkOptions(selectedFramework);
     }
     
-    // Step 5: Template selection (only if framework has no options/UI but has templates)
+    // Step 5: Template selection and generation
     let templateName = '';
     if (shouldShowTemplates(selectedFramework)) {
+      // For frameworks WITHOUT options - show template selection list
       templateName = await promptTemplateSelection(selectedFramework);
-    } else if (hasFrameworkOptions(selectedFramework) && !templateName) {
-      // Generate template name from options if not selected from predefined list
+    } else if (hasFrameworkOptions(selectedFramework) || hasUIOptions(selectedFramework) || hasBundlerOptions(selectedFramework)) {
+      // For frameworks WITH options - generate template name from user choices
       templateName = generateTemplateName(selectedFramework, options);
+      if (!templateName) {
+        console.log(chalk.yellow(`⚠️  Could not generate template name for ${selectedFramework}`));
+        // Fallback to first available template
+        const config = getFrameworkConfig(selectedFramework);
+        if (config?.templates && config.templates.length > 0) {
+          templateName = config.templates[0];
+        }
+      }
     }
 
     // Step 6: Confirmation before creating project
