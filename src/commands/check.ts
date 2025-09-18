@@ -612,17 +612,44 @@ async function checkProjectPackages(verbose: boolean = false) {
 }
 
 async function detectProjectType(): Promise<ProjectType | null> {
+  const searchPaths = [
+    process.cwd(),
+    path.join(process.cwd(), '..'),
+    path.join(process.cwd(), '../..'),
+  ];
+  
+  // First, check current directory for config files
   for (const projectType of PROJECT_TYPES) {
     for (const file of projectType.files) {
+      // Check in current directory first
       if (await fs.pathExists(path.join(process.cwd(), file))) {
         return projectType;
       }
+      
+      // Then check subdirectories for config files
+      try {
+        const currentDirContents = await fs.readdir(process.cwd());
+        for (const item of currentDirContents) {
+          const itemPath = path.join(process.cwd(), item);
+          const stats = await fs.stat(itemPath);
+          if (stats.isDirectory()) {
+            const configPath = path.join(itemPath, file);
+            if (await fs.pathExists(configPath)) {
+              return projectType;
+            }
+          }
+        }
+      } catch (error) {
+        // Ignore directory read errors
+      }
     }
   }
+  
   return PROJECT_TYPES[0]; // Default to Node.js for single package checks
 }
 
 async function getDependenciesForProject(projectType: ProjectType): Promise<Record<string, string>> {
+  // First check current directory
   for (const file of projectType.files) {
     const filePath = path.join(process.cwd(), file);
     if (await fs.pathExists(filePath)) {
@@ -645,6 +672,41 @@ async function getDependenciesForProject(projectType: ProjectType): Promise<Reco
       }
     }
   }
+  
+  // Then check subdirectories
+  try {
+    const currentDirContents = await fs.readdir(process.cwd());
+    for (const item of currentDirContents) {
+      const itemPath = path.join(process.cwd(), item);
+      const stats = await fs.stat(itemPath);
+      if (stats.isDirectory()) {
+        for (const file of projectType.files) {
+          const configPath = path.join(itemPath, file);
+          if (await fs.pathExists(configPath)) {
+            try {
+              let content: any;
+              
+              if (file.endsWith('.json')) {
+                content = await fs.readJson(configPath);
+              } else if (file.endsWith('.toml')) {
+                const tomlContent = await fs.readFile(configPath, 'utf-8');
+                content = parseSimpleToml(tomlContent);
+              } else {
+                content = await fs.readFile(configPath, 'utf-8');
+              }
+              
+              return projectType.getDependencies(content, file);
+            } catch (error) {
+              console.warn(`⚠️  Could not parse ${configPath}`);
+            }
+          }
+        }
+      }
+    }
+  } catch (error) {
+    // Ignore directory read errors
+  }
+  
   return {};
 }
 
