@@ -100,9 +100,55 @@ export async function createProjectFromTemplate(options: CreateProjectOptions): 
 }
 
 /**
- * Copy template files with intelligent filtering
+ * Copy template files with intelligent filtering and flattening
  */
 async function copyTemplateFiles(templatePath: string, projectPath: string): Promise<void> {
+    // Check if template has a single subdirectory that should be flattened
+    const templateContents = await fs.readdir(templatePath);
+    const nonSystemFiles = templateContents.filter(item => 
+        !item.startsWith('.') && 
+        item !== 'node_modules' && 
+        item !== 'dist' && 
+        item !== 'build'
+    );
+    
+    // If template has only one directory, copy its contents instead of the directory itself
+    if (nonSystemFiles.length === 1) {
+        const singleItem = nonSystemFiles[0];
+        const singleItemPath = path.join(templatePath, singleItem);
+        const stats = await fs.stat(singleItemPath);
+        
+        if (stats.isDirectory()) {
+            // Copy contents of the single directory
+            await fs.copy(singleItemPath, projectPath, {
+                filter: (src, dest) => {
+                    const relativePath = path.relative(singleItemPath, src);
+                    
+                    // Skip common directories that shouldn't be copied
+                    if (relativePath.includes('node_modules') || 
+                        relativePath.includes('.git') || 
+                        relativePath.includes('dist') || 
+                        relativePath.includes('build') ||
+                        relativePath.includes('.next')) {
+                        return false;
+                    }
+                    
+                    // Skip system files
+                    const fileName = path.basename(src);
+                    if (fileName === '.DS_Store' || 
+                        fileName === 'Thumbs.db' ||
+                        fileName === '.gitkeep') {
+                        return false;
+                    }
+                    
+                    return true;
+                }
+            });
+            return;
+        }
+    }
+    
+    // Default behavior: copy entire template directory
     await fs.copy(templatePath, projectPath, {
         filter: (src, dest) => {
             const relativePath = path.relative(templatePath, src);

@@ -75,7 +75,12 @@ export async function promptProjectName(): Promise<string> {
         }
         return true;
       },
-      transformer: (input: string) => chalk.cyan(input || 'my-app')
+      transformer: (input: string) => {
+        if (!input.trim()) {
+          return chalk.gray('my-app');
+        }
+        return chalk.cyan(input);
+      }
     }
   ]);
 
