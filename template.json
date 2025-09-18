@@ -104,7 +104,6 @@
       "type": "fullstack",
       "description": "Complete full-stack solution with React frontend, Express backend, and Shadcn UI",
       "languages": ["javascript", "typescript"],
-      "ui": ["shadcn"],
       "templates": [
         "react-basic-express-shadcn-template",
         "react-advance-express-shadcn-template"
@@ -114,7 +113,6 @@
       "type": "fullstack",
       "description": "Enterprise-grade full-stack solution with React frontend, NestJS backend, and Shadcn UI",
       "languages": ["typescript"],
-      "ui": ["shadcn"],
       "templates": ["react-nest-shadcn-template"]
     },
     "remixjs": {
