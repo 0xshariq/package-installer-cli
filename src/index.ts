@@ -22,8 +22,9 @@ import { environmentCommand, showEnvironmentHelp } from './commands/env.js';
 import { doctorCommand, showDoctorHelp } from './commands/doctor.js';
 
 // Import utilities
-import { printBanner, logError, showBanner } from './utils/ui.js';
+import { logError } from './utils/ui.js';
 import { initializeCache } from './utils/cacheManager.js';
+import { displayBanner, displayCommandBanner } from './utils/banner.js';
 
 // Get current file directory for ESM
 const __filename = fileURLToPath(import.meta.url);
@@ -88,7 +89,7 @@ program
   })      
   .action(async (projectName: string | undefined) => {
     try {
-      showBanner();
+      displayCommandBanner('create', 'Create a new project from templates');
       await createProject(projectName);
     } catch (error) {
       handleCommandError('create project', error as Error);
@@ -221,7 +222,7 @@ program
   })
   .action(async (options) => {
     try {
-      showBanner();
+      displayCommandBanner('clean', 'Clean development artifacts and caches');
       await cleanCommand(options);
     } catch (error) {
       handleCommandError('clean', error as Error);
@@ -361,7 +362,7 @@ program.on('--help', () => {
 
 // ENHANCED DEFAULT BEHAVIOR - Beautiful banner and help when no command provided
 if (process.argv.length === 2) {
-  showBanner();
+  displayBanner();
   console.log('\n' + boxen(
     chalk.white('Welcome to Package Installer CLI! 👋') + '\n\n' +
     chalk.hex('#00d2d3')('🚀 Ready to build something amazing?') + '\n\n' +
