@@ -920,7 +920,7 @@ pi upgrade-cli
 pi upgrade-cli --check
 
 # Breaking Change Analysis:
-# ⚠️  Breaking Changes Detected in v3.0.0:
+# ⚠️  Breaking Changes Detected in v3.2.0:
 # ├── 🔧 Configuration format changed
 # ├── 📂 Cache directory structure updated
 # ├── 🚫 Deprecated commands removed
@@ -943,7 +943,7 @@ pi upgrade-cli --info
 # ├── Current: 2.1.0
 # ├── Latest Stable: 2.1.0
 # ├── Latest Beta: 2.2.0-beta.1
-# ├── Next Major: 3.0.0-alpha.1
+# ├── Next Major: 3.2.0-alpha.1
 # └── Release Schedule: Monthly
 ```
 
