@@ -74,7 +74,6 @@
     "cli-spinners": "^3.2.0",
     "cli-table3": "^0.6.5",
     "commander": "^11.1.0",
-    "degit": "^2.8.4",
     "figlet": "^1.8.2",
     "fs-extra": "^11.3.1",
     "gradient-string": "^3.0.0",
