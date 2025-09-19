@@ -1,6 +1,6 @@
 /**
- * UI and display utilities for Package Installer CLI v3.0.0
- * Enhanced with modern styling, progress indicators, and better user experience
+ * UI and display utilities for Package Installer CLI v3.2.0
+ * Enhanced user interface components and styling utilities
  */
 
 import chalk from 'chalk';
@@ -11,7 +11,7 @@ import cliSpinners from 'cli-spinners';
 import ora from 'ora';
 import path from 'path';
 import * as fs from 'fs';
-import { ProjectOptions, FeatureConfig, InstallationProgress, ProgressCallback } from './types.js';
+import { ProjectOptions } from './types.js';
 
 /**
  * Enhanced banner display with dynamic statistics

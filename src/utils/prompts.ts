@@ -1,5 +1,5 @@
 /**
- * User interaction prompts for Package Installer CLI v3.0.0
+ * User interaction prompts for Package Installer CLI v3.2.0
  * Handles framework selection and template configuration based on template.json
  */
 

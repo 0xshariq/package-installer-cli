@@ -1,5 +1,5 @@
 /**
- * Enhanced utility functions for Package Installer CLI v3.0.0
+ * Enhanced utility functions for Package Installer CLI v3.2.0
  * Comprehensive utilities for project management, validation, and operations
  */
 
@@ -9,9 +9,28 @@ import * as fs from 'fs';
 import * as crypto from 'crypto';
 import { promisify } from 'util';
 import { exec } from 'child_process';
-import { ProjectOptions, FeatureConfig, TemplateMetadata, ValidationResult } from './types.js';
+import { FeatureConfig, TemplateMetadata, ValidationResult } from './types.js';
+import { fileURLToPath } from 'url';
 
 const execAsync = promisify(exec);
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+/**
+ * Get the current version from package.json
+ */
+export function getPackageVersion(): string {
+  try {
+    const packageJsonPath = path.resolve(__dirname, '../../package.json');
+    const packageJsonContent = fs.readFileSync(packageJsonPath, 'utf-8');
+    const packageJson = JSON.parse(packageJsonContent);
+    return packageJson.version || '3.2.0';
+  } catch (error) {
+    console.warn('Warning: Could not read version from package.json, using fallback version');
+    return '3.2.0';
+  }
+}
+
 
 /**
  * Enhanced string utilities

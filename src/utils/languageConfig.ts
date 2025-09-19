@@ -1,5 +1,5 @@
 /**
- * Enhanced Language Configuration for Package Installer CLI v3.0.0
+ * Enhanced Language Configuration for Package Installer CLI v3.2.0
  * Comprehensive language support with modern tooling and advanced features
  */
 
@@ -1387,7 +1387,7 @@ export const ENHANCED_LANGUAGE_CONFIGS: Record<SupportedLanguage, EnhancedLangua
 };
 
 /**
- * Enhanced utility functions for v3.0.0
+ * Enhanced utility functions for v3.2.0
  */
 export function getSupportedLanguages(): SupportedLanguage[] {
   return Object.keys(ENHANCED_LANGUAGE_CONFIGS) as SupportedLanguage[];

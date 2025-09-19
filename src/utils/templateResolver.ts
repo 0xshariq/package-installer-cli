@@ -1,5 +1,5 @@
 /**
- * Template path resolution utilities for Package Installer CLI v3.0.0
+ * Template path resolution utilities for Package Installer CLI v3.2.0
  * Handles template name generation and path resolution based on template.json
  */
 

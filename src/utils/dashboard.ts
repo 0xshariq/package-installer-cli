@@ -63,7 +63,7 @@ export function createBanner(title: string = 'Package Installer CLI'): void {
   
   // Add tagline with updated branding
   const tagline = chalk.hex('#00d2d3')('🚀 Advanced Project Analytics Dashboard');
-  const version = chalk.hex('#95afc0')('v3.0.0');
+  const version = chalk.hex('#95afc0')('v3.2.0');
   const author = chalk.hex('#ffa502')('by @0xshariq');
   
   const centered = `${tagline} ${version} ${author}`;

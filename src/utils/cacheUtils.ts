@@ -1,5 +1,5 @@
 /**
- * Enhanced Cache Utility for Package Installer CLI v3.0.0
+ * Enhanced Cache Utility for Package Installer CLI v3.2.0
  * Advanced caching system with compression, encryption, and smart invalidation
  */
 
@@ -10,7 +10,7 @@ import chalk from 'chalk';
 import zlib from 'zlib';
 import crypto from 'crypto';
 import { promisify } from 'util';
-import { ProjectOptions, FeatureConfig, TemplateMetadata, CacheEntry, CacheStrategy } from './types.js';
+import {  FeatureConfig, TemplateMetadata, CacheStrategy } from './types.js';
 
 const compress = promisify(zlib.gzip);
 const decompress = promisify(zlib.gunzip);
