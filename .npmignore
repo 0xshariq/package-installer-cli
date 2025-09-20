@@ -34,3 +34,8 @@ pnpm-debug.log*
 # Package manager lock files
 package-lock.json
 yarn.lock
+
+# Docker Config Files
+Dockerfile*
+docker-compose*.yml
+.dockerignore
