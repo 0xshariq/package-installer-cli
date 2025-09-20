@@ -38,6 +38,65 @@ yarn global add @0xshariq/package-installer
 pnpm add -g @0xshariq/package-installer
 ```
 
+## 🐳 Docker Installation
+
+[![Docker Hub](https://img.shields.io/docker/v/0xshariq/package-installer-cli?label=Docker%20Hub)](https://hub.docker.com/r/0xshariq/package-installer-cli)
+[![Docker Image Size](https://img.shields.io/docker/image-size/0xshariq/package-installer-cli/latest)](https://hub.docker.com/r/0xshariq/package-installer-cli)
+
+Run Package Installer CLI in a containerized environment with Docker:
+
+### Quick Usage with Docker
+
+```bash
+# Pull the latest image
+docker pull 0xshariq/package-installer-cli:latest
+
+# Run interactively with current directory mounted
+docker run -it --rm \
+  -v "$(pwd)":/home/pi/projects \
+  -v ~/.gitconfig:/home/pi/.gitconfig:ro \
+  -v ~/.ssh:/home/pi/.ssh:ro \
+  0xshariq/package-installer-cli:latest
+
+# Create a new project
+docker run -it --rm \
+  -v "$(pwd)":/home/pi/projects \
+  0xshariq/package-installer-cli:latest create my-app
+
+# Analyze existing project
+docker run -it --rm \
+  -v "$(pwd)":/home/pi/projects \
+  0xshariq/package-installer-cli:latest analyze
+```
+
+### Docker Compose Setup
+
+```bash
+# Clone the repository
+git clone https://github.com/0xshariq/package-installer-cli.git
+cd package-installer-cli
+
+# Run with docker-compose
+docker-compose run --rm package-installer
+
+# Development mode with hot reload
+docker-compose --profile dev run --rm package-installer-dev
+```
+
+### Docker Image Variants
+
+| Tag | Description | Use Case |
+|-----|-------------|----------|
+| `latest` | Latest stable release | Production usage |
+| `dev` | Development version | Testing new features |
+| `v3.2.0` | Specific version | Version pinning |
+
+### Volume Mounts
+
+- **Projects**: Mount your project directory to `/home/pi/projects`
+- **Git Config**: Mount `~/.gitconfig` for Git authentication
+- **SSH Keys**: Mount `~/.ssh` for Git repository access
+
 ## 🎯 Quick Start
 
 ```bash
