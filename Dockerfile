@@ -5,6 +5,7 @@ FROM node:22-alpine
 LABEL maintainer="Sharique Chaudhary"
 LABEL description="A cross-platform, interactive CLI to scaffold modern web app templates"
 LABEL version="3.2.0"
+LABEL image="0xshariq/package-installer-cli"
 
 # Install system dependencies required for the CLI
 RUN apk add --no-cache \
