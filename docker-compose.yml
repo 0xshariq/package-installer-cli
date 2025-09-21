@@ -5,7 +5,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: 0xshariq/package-installer:latest
+    image: 0xshariq/package-installer-cli:latest
     container_name: package-installer-cli
     volumes:
       # Mount local directory for project development
@@ -26,7 +26,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.dev
-    image: 0xshariq/package-installer:dev
+    image: 0xshariq/package-installer-cli:dev
     container_name: package-installer-cli-dev
     volumes:
       - .:/app
