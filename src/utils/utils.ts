@@ -11,6 +11,7 @@ import { promisify } from 'util';
 import { exec } from 'child_process';
 import { FeatureConfig, TemplateMetadata, ValidationResult } from './types.js';
 import { fileURLToPath } from 'url';
+import { getPackageJsonPath } from './pathResolver.js';
 
 const execAsync = promisify(exec);
 const __filename = fileURLToPath(import.meta.url);
@@ -21,7 +22,7 @@ const __dirname = path.dirname(__filename);
  */
 export function getPackageVersion(): string {
   try {
-    const packageJsonPath = path.resolve(__dirname, '../../package.json');
+    const packageJsonPath = getPackageJsonPath();
     const packageJsonContent = fs.readFileSync(packageJsonPath, 'utf-8');
     const packageJson = JSON.parse(packageJsonContent);
     return packageJson.version || '3.2.0';

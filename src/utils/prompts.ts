@@ -8,6 +8,7 @@ import chalk from 'chalk';
 import fs from 'fs-extra';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { getCliRootPath, getFeaturesJsonPath } from './pathResolver.js';
 
 export interface FrameworkOptions {
   tailwind?: boolean;
@@ -16,17 +17,9 @@ export interface FrameworkOptions {
   bundler?: string;   // only for reactjs
 }
 
-// Get CLI installation directory
-function getCLIDirectory() {
-  const __filename = fileURLToPath(import.meta.url);
-  const __dirname = path.dirname(__filename);
-  // Go up from src/utils to root directory
-  return path.resolve(__dirname, '..', '..');
-}
-
 // Helper functions to read template.json
 function getTemplateConfig() {
-  const cliDir = getCLIDirectory();
+  const cliDir = getCliRootPath();
   const templatePath = path.join(cliDir, 'template.json');
   if (!fs.existsSync(templatePath)) {
     throw new Error(`template.json not found at: ${templatePath}`);
@@ -325,8 +318,7 @@ export async function promptFeatureSelection(): Promise<string[]> {
   }
 
   // Get available feature categories from features.json
-  const cliDir = getCLIDirectory();
-  const featuresPath = path.join(cliDir, 'features', 'features.json');
+  const featuresPath = getFeaturesJsonPath();
   if (!fs.existsSync(featuresPath)) {
     console.log(chalk.yellow('⚠️  Features configuration not found'));
     return [];
@@ -356,8 +348,7 @@ export async function promptFeatureSelection(): Promise<string[]> {
  * Specific feature provider selection
  */
 export async function promptFeatureProvider(category: string, framework: string): Promise<string | null> {
-  const cliDir = getCLIDirectory();
-  const featuresPath = path.join(cliDir, 'features', 'features.json');
+  const featuresPath = getFeaturesJsonPath();
   const featuresConfig = JSON.parse(fs.readFileSync(featuresPath, 'utf-8'));
   
   if (!featuresConfig[category]) {

@@ -14,6 +14,7 @@ import {
   cacheProjectData,
   getCachedProject
 } from './cacheManager.js';
+import { getCliRootPath, getFeaturesJsonPath } from './pathResolver.js';
 
 // Get the directory of this file for proper path resolution
 const __filename = fileURLToPath(import.meta.url);
@@ -48,16 +49,14 @@ let SUPPORTED_FEATURES: { [featureName: string]: FeatureConfig } = {};
  */
 async function loadFeatures(): Promise<void> {
   try {
-    // Get CLI installation directory
-    const __filename = fileURLToPath(import.meta.url);
-    const __dirname = path.dirname(__filename);
-    const cliDir = path.resolve(__dirname, '..', '..');
+    // Get CLI installation directory using the centralized path resolver
+    const featuresPath = getFeaturesJsonPath();
     
-    // Load directly from file system (simplified approach)
-    const featuresPath = path.join(cliDir, 'features', 'features.json');
     if (await fs.pathExists(featuresPath)) {
       const featuresData = await fs.readJson(featuresPath);
-      SUPPORTED_FEATURES = featuresData.features;
+      SUPPORTED_FEATURES = featuresData.features || featuresData;
+    } else {
+      console.warn(chalk.yellow(`⚠️  Features file not found at: ${featuresPath}`));
     }
   } catch (error) {
     console.warn(chalk.yellow('⚠️  Could not load features.json, using fallback configuration'));
@@ -69,6 +68,9 @@ await loadFeatures();
 
 // Export for use in other modules
 export { SUPPORTED_FEATURES };
+
+// Re-export path utilities for backward compatibility
+export { getCliRootPath } from './pathResolver.js';
 
 /**
  * Detect the current project's framework and language with improved logic
@@ -582,16 +584,6 @@ async function copyTemplateFile(sourceFilePath: string, targetFilePath: string):
     // For non-code files, just copy directly
     await fs.copy(sourceFilePath, targetFilePath);
   }
-}
-
-/**
- * Get the CLI installation root directory
- */
-export function getCliRootPath(): string {
-  const __filename = fileURLToPath(import.meta.url);
-  const __dirname = path.dirname(__filename);
-  // Go up from src/utils to root directory
-  return path.resolve(__dirname, '..', '..');
 }
 
 /**
