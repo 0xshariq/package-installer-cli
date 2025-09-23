@@ -5,52 +5,10 @@ import boxen from 'boxen';
 import path from 'path';
 import fs from 'fs-extra';
 import { fileURLToPath } from 'url';
-import { addFeature, detectProjectStack, SUPPORTED_FEATURES, FeatureConfig, getCliRootPath } from '../utils/featureInstaller.js';
+import { addFeature, detectProjectStack, SUPPORTED_FEATURES, FeatureConfig } from '../utils/featureInstaller.js';
 import { historyManager } from '../utils/historyManager.js';
 import { getCachedProject, cacheProjectData } from '../utils/cacheManager.js';
-
-/**
- * Resolve CLI installation paths for both local and global installations
- */
-function resolveCLIPath(): string {
-  // Get the current file's directory
-  const currentFile = fileURLToPath(import.meta.url);
-  const currentDir = path.dirname(currentFile);
-  
-  // Try to find package root by looking for package.json
-  let packageRoot = currentDir;
-  while (packageRoot !== path.dirname(packageRoot)) {
-    const packageJsonPath = path.join(packageRoot, 'package.json');
-    if (fs.existsSync(packageJsonPath)) {
-      try {
-        const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
-        if (packageJson.name === '@0xshariq/package-installer') {
-          return packageRoot;
-        }
-      } catch (error) {
-        // Continue searching
-      }
-    }
-    packageRoot = path.dirname(packageRoot);
-  }
-  
-  // Fallback: use current working directory if we're in development
-  if (fs.existsSync(path.join(process.cwd(), 'features'))) {
-    return process.cwd();
-  }
-  
-  // Final fallback: try node_modules resolution
-  try {
-    const nodeModulesPath = path.join(currentDir, '../../../');
-    if (fs.existsSync(path.join(nodeModulesPath, 'features'))) {
-      return nodeModulesPath;
-    }
-  } catch (error) {
-    // Ignore
-  }
-  
-  return process.cwd();
-}
+import { getFeaturesJsonPath, getFeaturesPath } from '../utils/pathResolver.js';
 
 /**
  * Helper function to capitalize strings
@@ -64,15 +22,14 @@ function capitalize(str: string): string {
  */
 function getFeaturesConfig(): Record<string, any> {
   try {
-    // Get the CLI root path
-    const cliRoot = getCliRootPath();
-    const featuresPath = path.join(cliRoot, 'features', 'features.json');
+    // Use the centralized path resolver
+    const featuresPath = getFeaturesJsonPath();
     
     if (fs.existsSync(featuresPath)) {
       return JSON.parse(fs.readFileSync(featuresPath, 'utf-8'));
     }
 
-    console.warn(chalk.yellow('⚠️  features.json not found, using fallback'));
+    console.warn(chalk.yellow(`⚠️  features.json not found at: ${featuresPath}`));
     return { features: {} };
   } catch (error) {
     console.warn(chalk.yellow('⚠️  Error reading features.json, using fallback'));
@@ -472,8 +429,7 @@ export async function addCommand(
     }
 
     // Validate that framework features exist in features directory
-    const cliRoot = getCliRootPath();
-    const frameworkFeaturesPath = path.join(cliRoot, 'features');
+    const frameworkFeaturesPath = getFeaturesPath();
     if (!await fs.pathExists(frameworkFeaturesPath)) {
       console.log(chalk.red('❌ Features directory not found'));
       console.log(chalk.yellow('💡 Make sure you\'re running this from the Package Installer CLI root directory'));
@@ -481,7 +437,7 @@ export async function addCommand(
     }
 
     // Load features configuration
-    const featuresConfigPath = path.join(frameworkFeaturesPath, 'features.json');
+    const featuresConfigPath = getFeaturesJsonPath();
     if (!await fs.pathExists(featuresConfigPath)) {
       console.log(chalk.red('❌ Features configuration not found'));
       return;
