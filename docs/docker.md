@@ -1,23 +1,37 @@
-# 🐳 Docker Documentation
+# 🐳 Docker Setup for Package Installer CLI
 
-## Overview
+This document provides comprehensive instructions for building, running, and deploying the Package Installer CLI using Docker.
 
-The Package Installer CLI is available as a Docker image for containerized environments. This provides a consistent runtime environment across different platforms and eliminates the need for local Node.js installation.
+## 📋 Prerequisites
 
-## Quick Start
+- Docker Desktop or Docker Engine installed
+- Docker Hub account (for pushing images)
+- Git (for cloning the repository)
 
-### Pull and Run
+## 🚀 Quick Start
+
+### Pull from Docker Hub
 
 ```bash
-# Pull the latest image
+# Pull the latest version
 docker pull 0xshariq/package-installer-cli:latest
 
-# Run with your current directory mounted
+# Run the CLI
+docker run -it --rm 0xshariq/package-installer-cli:latest --help
+```
+
+### Run with Project Volume
+
+```bash
+# Create a new project in current directory
 docker run -it --rm \
-  -v "$(pwd)":/home/pi/projects \
-  -v ~/.gitconfig:/home/pi/.gitconfig:ro \
-  -v ~/.ssh:/home/pi/.ssh:ro \
-  0xshariq/package-installer-cli:latest
+  -v $(pwd):/home/pi/projects \
+  0xshariq/package-installer-cli:latest create
+
+# Add features to existing project
+docker run -it --rm \
+  -v $(pwd):/home/pi/projects \
+  0xshariq/package-installer-cli:latest add auth
 ```
 
 ## Image Details

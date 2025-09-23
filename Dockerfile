@@ -1,5 +1,5 @@
 # Use the latest Node.js LTS version with Alpine for smaller image size
-FROM node:22-alpine
+FROM node:20-alpine
 
 # Set metadata labels
 LABEL maintainer="Sharique Chaudhary"
