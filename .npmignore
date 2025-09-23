@@ -39,3 +39,6 @@ yarn.lock
 Dockerfile*
 docker-compose*.yml
 .dockerignore
+
+
+*.sh
