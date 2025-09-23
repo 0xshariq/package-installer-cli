@@ -25,16 +25,23 @@ import { doctorCommand, showDoctorHelp } from './commands/doctor.js';
 import { logError } from './utils/ui.js';
 import { initializeCache } from './utils/cacheManager.js';
 import { displayBanner, displayCommandBanner } from './utils/banner.js';
+import { getPackageJsonPath } from './utils/pathResolver.js';
 
 // Get current file directory for ESM
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-// Load package.json to get version
-let packageJsonPath = join(__dirname, '../package.json');
-// Check if we're running from dist folder
-if (__dirname.includes('/dist/')) {
-  packageJsonPath = join(__dirname, '../../package.json');
+// Load package.json to get version using improved path resolution
+let packageJsonPath: string;
+try {
+  packageJsonPath = getPackageJsonPath();
+} catch (error) {
+  // Fallback to the old method if getPackageJsonPath fails
+  packageJsonPath = join(__dirname, '../package.json');
+  // Check if we're running from dist folder
+  if (__dirname.includes('/dist/')) {
+    packageJsonPath = join(__dirname, '../../package.json');
+  }
 }
 
 const packageJson = JSON.parse(readFileSync(packageJsonPath, 'utf8'));
