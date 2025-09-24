@@ -28,15 +28,17 @@ A **cross-platform, interactive CLI** to scaffold modern web application templat
 ## 📥 Installation
 
 ```bash
-# Using npm
+# Using npm (recommended)
 npm install -g @0xshariq/package-installer
 
 # Using yarn
 yarn global add @0xshariq/package-installer
 
-# Using pnpm (recommended)
+# Using pnpm
 pnpm add -g @0xshariq/package-installer
 ```
+
+> **📋 Complete Installation Guide**: For all installation methods including Python, Rust, Ruby, Go, Homebrew, and Docker, see [installation.md](docs/installation.md)
 
 ## 🐳 Docker Installation
 
@@ -117,7 +119,8 @@ pi upgrade-cli
 
 | Document | Description |
 |----------|-------------|
-| [📋 Commands](docs/commands.md) | Complete command reference with examples |
+| [� Installation](INSTALLATION.md) | Complete installation guide for all package managers |
+| [�📋 Commands](docs/commands.md) | Complete command reference with examples |
 | [⚡ Features](docs/features.md) | Detailed feature documentation and usage |
 | [🎨 Templates](docs/templates.md) | Available templates and customization options |
 | [🚀 Deployment](docs/deploy.md) | Deployment options and platform integration |
@@ -182,9 +185,23 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🔗 Links
 
-- **NPM Package**: [@0xshariq/package-installer](https://www.npmjs.com/package/@0xshariq/package-installer)
-- **GitHub Repository**: [package-installer-cli](https://github.com/0xshariq/package-installer-cli)
+### Official Packages
+- **NPM**: [@0xshariq/package-installer](https://www.npmjs.com/package/@0xshariq/package-installer)
+- **PyPI**: [package-installer-cli](https://pypi.org/project/package-installer-cli/)
+- **Crates.io**: [package-installer-cli](https://crates.io/crates/package-installer-cli)
+- **RubyGems**: [package-installer-cli](https://rubygems.org/gems/package-installer-cli)
+- **Docker Hub**: [0xshariq/package-installer-cli](https://hub.docker.com/r/0xshariq/package-installer-cli)
+
+### Source Repositories
+- **Main (Node.js)**: [package-installer-cli](https://github.com/0xshariq/package-installer-cli)
+- **Python**: [py_package_installer_cli](https://github.com/0xshariq/py_package_installer_cli)
+- **Rust**: [rust_package_installer_cli](https://github.com/0xshariq/rust_package_installer_cli)
+- **Ruby**: [ruby_package_installer_cli](https://github.com/0xshariq/ruby_package_installer_cli)
+- **Go**: [go_package_installer_cli](https://github.com/0xshariq/go_package_installer_cli)
+
+### Support & Community
 - **Issues & Feedback**: [GitHub Issues](https://github.com/0xshariq/package-installer-cli/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/0xshariq/package-installer-cli/discussions)
 
 ---
 
