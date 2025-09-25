@@ -7,17 +7,12 @@ import { LanguageDetectionResult, PackageManagerDetectionResult } from './types.
 
 export type SupportedLanguage = 
   | 'javascript' | 'typescript' | 'nodejs'
-  | 'rust' | 'python' | 'go' | 'php' | 'java' | 'ruby' | 'dotnet';
+  | 'rust' | 'python' | 'go' | 'ruby';
 
 export type PackageManagerType = 
   | 'npm' | 'pnpm' | 'yarn' | 'bun'
   | 'cargo' | 'pip' | 'poetry' | 'conda' | 'pipenv'
-  | 'go' | 'maven' | 'gradle' | 'sbt'
-  | 'bundler' | 'gem' | 'composer'
-  | 'dotnet' | 'nuget' | 'swift' | 'pub' | 'flutter'
-  | 'conan' | 'vcpkg' | 'cmake' | 'make'
-  | 'stack' | 'cabal' | 'opam' | 'leiningen'
-  | 'luarocks' | 'nimble' | 'shards' | 'vpkg';
+  | 'go' | 'bundler' | 'gem' | 'composer'|'make';
 
 export interface EnhancedLanguageConfig {
   name: SupportedLanguage;
@@ -189,39 +184,6 @@ export const ENHANCED_LANGUAGE_CONFIGS: Record<SupportedLanguage, EnhancedLangua
     maturity: 'stable',
     packageManagers: [
       {
-        name: 'bun',
-        displayName: 'Bun',
-        description: 'Fast all-in-one JavaScript runtime & toolkit',
-        installCommand: 'bun install',
-        updateCommand: 'bun update',
-        addCommand: 'bun add',
-        removeCommand: 'bun remove',
-        listCommand: 'bun pm ls',
-        lockFiles: ['bun.lockb'],
-        configFiles: ['bunfig.toml'],
-        detectCommand: 'bun --version',
-        versionCommand: 'bun --version',
-        priority: 1,
-        features: [
-          { name: 'Native bundling', description: 'Built-in bundler and transpiler', supported: true },
-          { name: 'TypeScript support', description: 'Native TypeScript execution', supported: true },
-          { name: 'JSX support', description: 'Native JSX transpilation', supported: true },
-          { name: 'Hot reloading', description: 'Development server with hot reload', supported: true }
-        ],
-        performance: {
-          installSpeed: 'fast',
-          diskUsage: 'low',
-          networkEfficiency: 'excellent',
-          caching: 'global'
-        },
-        security: {
-          checksums: true,
-          signatures: true,
-          vulnerabilityScanning: true,
-          lockFileValidation: true
-        }
-      },
-      {
         name: 'pnpm',
         displayName: 'pnpm',
         description: 'Fast, disk space efficient package manager',
@@ -235,7 +197,7 @@ export const ENHANCED_LANGUAGE_CONFIGS: Record<SupportedLanguage, EnhancedLangua
         configFiles: ['pnpm-workspace.yaml', '.pnpmrc'],
         detectCommand: 'pnpm --version',
         versionCommand: 'pnpm --version',
-        priority: 2,
+        priority: 1,
         globalFlag: '-g',
         features: [
           { name: 'Workspace support', description: 'Monorepo and workspace management', supported: true },
@@ -252,6 +214,41 @@ export const ENHANCED_LANGUAGE_CONFIGS: Record<SupportedLanguage, EnhancedLangua
           checksums: true,
           signatures: false,
           auditCommand: 'pnpm audit',
+          vulnerabilityScanning: true,
+          lockFileValidation: true
+        }
+      },
+      {
+        name: 'npm',
+        displayName: 'npm',
+        description: 'Node.js package manager',
+        installCommand: 'npm install',
+        updateCommand: 'npm update',
+        addCommand: 'npm install',
+        removeCommand: 'npm uninstall',
+        listCommand: 'npm list',
+        searchCommand: 'npm search',
+        lockFiles: ['package-lock.json'],
+        configFiles: ['.npmrc'],
+        detectCommand: 'npm --version',
+        versionCommand: 'npm --version',
+        priority: 2,
+        globalFlag: '-g',
+        features: [
+          { name: 'Package scripts', description: 'Custom script execution', supported: true },
+          { name: 'Version management', description: 'Semantic versioning support', supported: true },
+          { name: 'Workspaces', description: 'Monorepo support', supported: true }
+        ],
+        performance: {
+          installSpeed: 'medium',
+          diskUsage: 'high',
+          networkEfficiency: 'good',
+          caching: 'local'
+        },
+        security: {
+          checksums: true,
+          signatures: false,
+          auditCommand: 'npm audit',
           vulnerabilityScanning: true,
           lockFileValidation: true
         }
@@ -291,36 +288,34 @@ export const ENHANCED_LANGUAGE_CONFIGS: Record<SupportedLanguage, EnhancedLangua
         }
       },
       {
-        name: 'npm',
-        displayName: 'npm',
-        description: 'Node.js package manager',
-        installCommand: 'npm install',
-        updateCommand: 'npm update',
-        addCommand: 'npm install',
-        removeCommand: 'npm uninstall',
-        listCommand: 'npm list',
-        searchCommand: 'npm search',
-        lockFiles: ['package-lock.json'],
-        configFiles: ['.npmrc'],
-        detectCommand: 'npm --version',
-        versionCommand: 'npm --version',
+        name: 'bun',
+        displayName: 'Bun',
+        description: 'Fast all-in-one JavaScript runtime & toolkit',
+        installCommand: 'bun install',
+        updateCommand: 'bun update',
+        addCommand: 'bun add',
+        removeCommand: 'bun remove',
+        listCommand: 'bun pm ls',
+        lockFiles: ['bun.lockb'],
+        configFiles: ['bunfig.toml'],
+        detectCommand: 'bun --version',
+        versionCommand: 'bun --version',
         priority: 4,
-        globalFlag: '-g',
         features: [
-          { name: 'Package scripts', description: 'Custom script execution', supported: true },
-          { name: 'Version management', description: 'Semantic versioning support', supported: true },
-          { name: 'Workspaces', description: 'Monorepo support', supported: true }
+          { name: 'Native bundling', description: 'Built-in bundler and transpiler', supported: true },
+          { name: 'TypeScript support', description: 'Native TypeScript execution', supported: true },
+          { name: 'JSX support', description: 'Native JSX transpilation', supported: true },
+          { name: 'Hot reloading', description: 'Development server with hot reload', supported: true }
         ],
         performance: {
-          installSpeed: 'medium',
-          diskUsage: 'high',
-          networkEfficiency: 'good',
-          caching: 'local'
+          installSpeed: 'fast',
+          diskUsage: 'low',
+          networkEfficiency: 'excellent',
+          caching: 'global'
         },
         security: {
           checksums: true,
-          signatures: false,
-          auditCommand: 'npm audit',
+          signatures: true,
           vulnerabilityScanning: true,
           lockFileValidation: true
         }
@@ -481,7 +476,111 @@ export const ENHANCED_LANGUAGE_CONFIGS: Record<SupportedLanguage, EnhancedLangua
     category: 'web',
     maturity: 'stable',
     packageManagers: [
-      // Inherits from JavaScript but with TypeScript-specific tooling
+      // Inherits from JavaScript with same priority order: pnpm > npm > yarn > bun
+      {
+        name: 'pnpm',
+        displayName: 'pnpm',
+        description: 'Fast, disk space efficient package manager',
+        installCommand: 'pnpm install',
+        updateCommand: 'pnpm update',
+        addCommand: 'pnpm add',
+        removeCommand: 'pnpm remove',
+        listCommand: 'pnpm list',
+        searchCommand: 'pnpm search',
+        lockFiles: ['pnpm-lock.yaml'],
+        configFiles: ['pnpm-workspace.yaml', '.pnpmrc'],
+        detectCommand: 'pnpm --version',
+        versionCommand: 'pnpm --version',
+        priority: 1,
+        globalFlag: '-g',
+        features: [
+          { name: 'TypeScript support', description: 'Excellent TypeScript integration', supported: true },
+          { name: 'Workspace support', description: 'Monorepo and workspace management', supported: true },
+          { name: 'Content-addressed storage', description: 'Efficient disk space usage', supported: true }
+        ],
+        performance: {
+          installSpeed: 'fast',
+          diskUsage: 'low',
+          networkEfficiency: 'excellent',
+          caching: 'global'
+        },
+        security: {
+          checksums: true,
+          signatures: false,
+          auditCommand: 'pnpm audit',
+          vulnerabilityScanning: true,
+          lockFileValidation: true
+        }
+      },
+      {
+        name: 'npm',
+        displayName: 'npm',
+        description: 'Node.js package manager with TypeScript support',
+        installCommand: 'npm install',
+        updateCommand: 'npm update',
+        addCommand: 'npm install',
+        removeCommand: 'npm uninstall',
+        listCommand: 'npm list',
+        searchCommand: 'npm search',
+        lockFiles: ['package-lock.json'],
+        configFiles: ['.npmrc'],
+        detectCommand: 'npm --version',
+        versionCommand: 'npm --version',
+        priority: 2,
+        globalFlag: '-g',
+        features: [
+          { name: 'TypeScript support', description: 'Official TypeScript support', supported: true },
+          { name: 'Package scripts', description: 'Custom script execution', supported: true },
+          { name: 'Version management', description: 'Semantic versioning support', supported: true }
+        ],
+        performance: {
+          installSpeed: 'medium',
+          diskUsage: 'high',
+          networkEfficiency: 'good',
+          caching: 'local'
+        },
+        security: {
+          checksums: true,
+          signatures: false,
+          auditCommand: 'npm audit',
+          vulnerabilityScanning: true,
+          lockFileValidation: true
+        }
+      },
+      {
+        name: 'yarn',
+        displayName: 'Yarn',
+        description: 'Reliable, secure, fast package manager with TypeScript support',
+        installCommand: 'yarn install',
+        updateCommand: 'yarn upgrade',
+        addCommand: 'yarn add',
+        removeCommand: 'yarn remove',
+        listCommand: 'yarn list',
+        lockFiles: ['yarn.lock'],
+        configFiles: ['.yarnrc.yml', '.yarnrc'],
+        detectCommand: 'yarn --version',
+        versionCommand: 'yarn --version',
+        priority: 3,
+        globalFlag: 'global',
+        features: [
+          { name: 'TypeScript support', description: 'Excellent TypeScript integration', supported: true },
+          { name: 'Zero-installs', description: 'Offline installation support', supported: true },
+          { name: 'Plug\'n\'Play', description: 'Fast module resolution', supported: true }
+        ],
+        performance: {
+          installSpeed: 'fast',
+          diskUsage: 'medium',
+          networkEfficiency: 'good',
+          caching: 'global'
+        },
+        security: {
+          checksums: true,
+          signatures: false,
+          auditCommand: 'yarn npm audit',
+          vulnerabilityScanning: true,
+          lockFileValidation: true
+        }
+      },
       {
         name: 'bun',
         displayName: 'Bun',
@@ -489,14 +588,17 @@ export const ENHANCED_LANGUAGE_CONFIGS: Record<SupportedLanguage, EnhancedLangua
         installCommand: 'bun install',
         updateCommand: 'bun update',
         addCommand: 'bun add',
+        removeCommand: 'bun remove',
+        listCommand: 'bun pm ls',
         lockFiles: ['bun.lockb'],
         configFiles: ['bunfig.toml'],
         detectCommand: 'bun --version',
         versionCommand: 'bun --version',
-        priority: 1,
+        priority: 4,
         features: [
           { name: 'Native TypeScript', description: 'No transpilation needed', supported: true },
-          { name: 'Type checking', description: 'Built-in type checking', supported: true }
+          { name: 'Type checking', description: 'Built-in type checking', supported: true },
+          { name: 'Hot reloading', description: 'Development server with hot reload', supported: true }
         ],
         performance: {
           installSpeed: 'fast',
@@ -1062,166 +1164,6 @@ export const ENHANCED_LANGUAGE_CONFIGS: Record<SupportedLanguage, EnhancedLangua
     }
   },
 
-  php: {
-    name: 'php',
-    displayName: 'PHP',
-    description: 'Server-side scripting language for web development',
-    icon: '🐘',
-    category: 'web',
-    maturity: 'stable',
-    packageManagers: [
-      {
-        name: 'composer',
-        displayName: 'Composer',
-        description: 'Dependency Manager for PHP',
-        installCommand: 'composer install',
-        updateCommand: 'composer update',
-        addCommand: 'composer require',
-        removeCommand: 'composer remove',
-        listCommand: 'composer show',
-        lockFiles: ['composer.lock'],
-        configFiles: ['composer.json'],
-        detectCommand: 'composer --version',
-        versionCommand: 'composer --version',
-        priority: 1,
-        features: [
-          { name: 'Autoloading', description: 'PSR-4 autoloading support', supported: true },
-          { name: 'Version constraints', description: 'Semantic versioning', supported: true }
-        ],
-        performance: {
-          installSpeed: 'medium',
-          diskUsage: 'medium',
-          networkEfficiency: 'good',
-          caching: 'global'
-        },
-        security: {
-          checksums: true,
-          signatures: false,
-          vulnerabilityScanning: true,
-          lockFileValidation: true
-        }
-      }
-    ],
-    configFiles: [
-      {
-        filename: 'composer.json',
-        description: 'PHP dependency configuration',
-        required: true,
-        type: 'dependency',
-        parser: 'json'
-      }
-    ],
-    buildFiles: ['vendor'],
-    sourceFileExtensions: ['.php'],
-    frameworkDetection: [
-      {
-        framework: 'laravel',
-        displayName: 'Laravel',
-        patterns: ['artisan'],
-        dependencies: ['laravel/framework'],
-        popularity: 90,
-        category: 'backend'
-      }
-    ],
-    toolchain: {
-      interpreter: { name: 'PHP', command: 'php', optional: false, description: 'PHP interpreter' }
-    },
-    ecosystem: {
-      registry: { name: 'Packagist', url: 'packagist.org' },
-      community: { github: { repos: 300000, stars: 1000000 }, stackoverflow: { questions: 300000, activity: 'high' } },
-      learning: [],
-      trends: { githubStars: 1000000, stackoverflowQuestions: 300000, jobPostings: 120000, trendDirection: 'stable' }
-    },
-    compatibility: {
-      operatingSystems: ['windows', 'macos', 'linux'],
-      architectures: ['x64', 'arm64'],
-      containers: true,
-      cloud: [
-        { name: 'AWS', supported: true, deployment: ['Lambda', 'EC2'] }
-      ]
-    }
-  },
-
-  java: {
-    name: 'java',
-    displayName: 'Java',
-    description: 'Enterprise-grade, platform-independent programming language',
-    icon: '☕',
-    category: 'enterprise',
-    maturity: 'stable',
-    packageManagers: [
-      {
-        name: 'maven',
-        displayName: 'Maven',
-        description: 'Build automation and dependency management',
-        installCommand: 'mvn install',
-        updateCommand: 'mvn versions:use-latest-versions',
-        addCommand: 'mvn dependency:get',
-        listCommand: 'mvn dependency:list',
-        lockFiles: [],
-        configFiles: ['pom.xml'],
-        detectCommand: 'mvn --version',
-        versionCommand: 'mvn --version',
-        priority: 1,
-        features: [
-          { name: 'Central repository', description: 'Maven Central repository', supported: true },
-          { name: 'Build lifecycle', description: 'Standardized build process', supported: true }
-        ],
-        performance: {
-          installSpeed: 'medium',
-          diskUsage: 'high',
-          networkEfficiency: 'good',
-          caching: 'local'
-        },
-        security: {
-          checksums: true,
-          signatures: true,
-          vulnerabilityScanning: true,
-          lockFileValidation: false
-        }
-      }
-    ],
-    configFiles: [
-      {
-        filename: 'pom.xml',
-        description: 'Maven project configuration',
-        required: true,
-        type: 'dependency',
-        parser: 'xml'
-      }
-    ],
-    buildFiles: ['target', '.m2'],
-    sourceFileExtensions: ['.java'],
-    frameworkDetection: [
-      {
-        framework: 'spring',
-        displayName: 'Spring Boot',
-        patterns: ['src/main/java/**/*Application.java'],
-        dependencies: ['org.springframework.boot:spring-boot-starter'],
-        popularity: 95,
-        category: 'backend'
-      }
-    ],
-    toolchain: {
-      interpreter: { name: 'Java', command: 'java', optional: false, description: 'Java runtime' }
-    },
-    ecosystem: {
-      registry: { name: 'Maven Central', url: 'mvnrepository.com' },
-      community: { github: { repos: 800000, stars: 3000000 }, stackoverflow: { questions: 1500000, activity: 'high' } },
-      learning: [],
-      trends: { githubStars: 3000000, stackoverflowQuestions: 1500000, jobPostings: 200000, trendDirection: 'stable' }
-    },
-    compatibility: {
-      operatingSystems: ['windows', 'macos', 'linux'],
-      architectures: ['x64', 'arm64'],
-      containers: true,
-      cloud: [
-        { name: 'AWS', supported: true },
-        { name: 'Google Cloud', supported: true }
-      ]
-    }
-  },
-
   ruby: {
     name: 'ruby',
     displayName: 'Ruby',
@@ -1297,87 +1239,6 @@ export const ENHANCED_LANGUAGE_CONFIGS: Record<SupportedLanguage, EnhancedLangua
       containers: true,
       cloud: [
         { name: 'Heroku', supported: true }
-      ]
-    }
-  },
-
-  dotnet: {
-    name: 'dotnet',
-    displayName: '.NET',
-    description: 'Cross-platform framework for modern applications',
-    icon: '🟣',
-    category: 'enterprise',
-    maturity: 'stable',
-    packageManagers: [
-      {
-        name: 'dotnet',
-        displayName: 'NuGet',
-        description: '.NET package manager',
-        installCommand: 'dotnet restore',
-        updateCommand: 'dotnet outdated --upgrade',
-        addCommand: 'dotnet add package',
-        removeCommand: 'dotnet remove package',
-        listCommand: 'dotnet list package',
-        lockFiles: ['packages.lock.json'],
-        configFiles: ['*.csproj', '*.fsproj', '*.vbproj'],
-        detectCommand: 'dotnet --version',
-        versionCommand: 'dotnet --version',
-        priority: 1,
-        features: [
-          { name: 'Package references', description: 'Modern package management', supported: true },
-          { name: 'Central package management', description: 'Centralized version control', supported: true }
-        ],
-        performance: {
-          installSpeed: 'fast',
-          diskUsage: 'medium',
-          networkEfficiency: 'excellent',
-          caching: 'global'
-        },
-        security: {
-          checksums: true,
-          signatures: true,
-          vulnerabilityScanning: true,
-          lockFileValidation: true
-        }
-      }
-    ],
-    configFiles: [
-      {
-        filename: '*.csproj',
-        description: 'C# project file',
-        required: true,
-        type: 'dependency',
-        parser: 'xml'
-      }
-    ],
-    buildFiles: ['bin', 'obj'],
-    sourceFileExtensions: ['.cs', '.fs', '.vb'],
-    frameworkDetection: [
-      {
-        framework: 'aspnet',
-        displayName: 'ASP.NET Core',
-        patterns: ['Program.cs', 'Startup.cs'],
-        dependencies: ['Microsoft.AspNetCore'],
-        popularity: 85,
-        category: 'backend'
-      }
-    ],
-    toolchain: {
-      interpreter: { name: '.NET', command: 'dotnet', optional: false, description: '.NET CLI' }
-    },
-    ecosystem: {
-      registry: { name: 'NuGet', url: 'nuget.org' },
-      community: { github: { repos: 600000, stars: 2500000 }, stackoverflow: { questions: 800000, activity: 'high' } },
-      learning: [],
-      trends: { githubStars: 2500000, stackoverflowQuestions: 800000, jobPostings: 150000, trendDirection: 'rising' }
-    },
-    compatibility: {
-      operatingSystems: ['windows', 'macos', 'linux'],
-      architectures: ['x64', 'arm64'],
-      containers: true,
-      cloud: [
-        { name: 'Azure', supported: true },
-        { name: 'AWS', supported: true }
       ]
     }
   }
