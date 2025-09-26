@@ -494,65 +494,104 @@ async function handleFileCreation(sourceFilePath: string, targetFilePath: string
 }
 
 /**
- * Handle file overwrite (replace existing content)
+ * Handle file overwrite (replace existing content or create if doesn't exist)
  */
 async function handleFileOverwrite(sourceFilePath: string, targetFilePath: string, cachedContent?: string | null): Promise<void> {
-  if (cachedContent) {
-    await fs.outputFile(targetFilePath, cachedContent);
-  } else {
-    await copyTemplateFile(sourceFilePath, targetFilePath);
+  // Ensure target directory exists
+  await fs.ensureDir(path.dirname(targetFilePath));
+  
+  const fileExists = await fs.pathExists(targetFilePath);
+  
+  try {
+    if (cachedContent) {
+      await fs.outputFile(targetFilePath, cachedContent);
+    } else {
+      await copyTemplateFile(sourceFilePath, targetFilePath);
+    }
+    
+    if (fileExists) {
+      console.log(chalk.green(`✅ Updated: ${path.relative(process.cwd(), targetFilePath)}`));
+    } else {
+      console.log(chalk.green(`✅ Created: ${path.relative(process.cwd(), targetFilePath)}`));
+    }
+  } catch (error) {
+    console.error(chalk.red(`❌ Failed to overwrite/create ${path.relative(process.cwd(), targetFilePath)}: ${error}`));
+    throw error;
   }
-  console.log(chalk.green(`✅ Updated: ${path.relative(process.cwd(), targetFilePath)}`));
 }
 
 /**
- * Handle file append (add content to end of file)
+ * Handle file append (add content to end of file, create if doesn't exist)
  */
 async function handleFileAppend(sourceFilePath: string, targetFilePath: string, cachedContent?: string | null): Promise<void> {
-  let existingContent = '';
-  if (await fs.pathExists(targetFilePath)) {
-    existingContent = await fs.readFile(targetFilePath, 'utf-8');
-  }
-  
-  let templateContent: string;
-  if (cachedContent) {
-    templateContent = cachedContent;
-  } else {
-    templateContent = await fs.readFile(sourceFilePath, 'utf-8');
-  }
-  
-  const separator = existingContent && !existingContent.endsWith('\n') ? '\n\n' : '\n';
-  const newContent = existingContent + separator + templateContent;
-  
   // Ensure target directory exists
   await fs.ensureDir(path.dirname(targetFilePath));
-  await fs.outputFile(targetFilePath, newContent);
-  console.log(chalk.green(`✅ Appended to: ${path.relative(process.cwd(), targetFilePath)}`));
+  
+  const fileExists = await fs.pathExists(targetFilePath);
+  let existingContent = '';
+  
+  try {
+    if (fileExists) {
+      existingContent = await fs.readFile(targetFilePath, 'utf8');
+    }
+    
+    let contentToAppend = '';
+    if (cachedContent) {
+      contentToAppend = cachedContent;
+    } else {
+      contentToAppend = await fs.readFile(sourceFilePath, 'utf8');
+    }
+    
+    const newContent = existingContent + contentToAppend;
+    await fs.outputFile(targetFilePath, newContent);
+    
+    if (fileExists) {
+      console.log(chalk.green(`✅ Appended to: ${path.relative(process.cwd(), targetFilePath)}`));
+    } else {
+      console.log(chalk.green(`✅ Created with content: ${path.relative(process.cwd(), targetFilePath)}`));
+    }
+  } catch (error) {
+    console.error(chalk.red(`❌ Failed to append/create ${path.relative(process.cwd(), targetFilePath)}: ${error}`));
+    throw error;
+  }
 }
 
 /**
- * Handle file prepend (add content to beginning of file)
+ * Handle file prepend (add content to beginning of file, create if doesn't exist)
  */
 async function handleFilePrepend(sourceFilePath: string, targetFilePath: string, cachedContent?: string | null): Promise<void> {
-  let existingContent = '';
-  if (await fs.pathExists(targetFilePath)) {
-    existingContent = await fs.readFile(targetFilePath, 'utf-8');
-  }
-  
-  let templateContent: string;
-  if (cachedContent) {
-    templateContent = cachedContent;
-  } else {
-    templateContent = await fs.readFile(sourceFilePath, 'utf-8');
-  }
-  
-  const separator = templateContent.endsWith('\n') ? '' : '\n';
-  const newContent = templateContent + separator + existingContent;
-  
   // Ensure target directory exists
   await fs.ensureDir(path.dirname(targetFilePath));
-  await fs.outputFile(targetFilePath, newContent);
-  console.log(chalk.green(`✅ Prepended to: ${path.relative(process.cwd(), targetFilePath)}`));
+  
+  const fileExists = await fs.pathExists(targetFilePath);
+  let existingContent = '';
+  
+  try {
+    if (fileExists) {
+      existingContent = await fs.readFile(targetFilePath, 'utf-8');
+    }
+    
+    let templateContent: string;
+    if (cachedContent) {
+      templateContent = cachedContent;
+    } else {
+      templateContent = await fs.readFile(sourceFilePath, 'utf-8');
+    }
+    
+    const separator = templateContent.endsWith('\n') ? '' : '\n';
+    const newContent = templateContent + separator + existingContent;
+    
+    await fs.outputFile(targetFilePath, newContent);
+    
+    if (fileExists) {
+      console.log(chalk.green(`✅ Prepended to: ${path.relative(process.cwd(), targetFilePath)}`));
+    } else {
+      console.log(chalk.green(`✅ Created with content: ${path.relative(process.cwd(), targetFilePath)}`));
+    }
+  } catch (error) {
+    console.error(chalk.red(`❌ Failed to prepend/create ${path.relative(process.cwd(), targetFilePath)}: ${error}`));
+    throw error;
+  }
 }
 
 /**
@@ -560,29 +599,37 @@ async function handleFilePrepend(sourceFilePath: string, targetFilePath: string,
  */
 async function copyTemplateFile(sourceFilePath: string, targetFilePath: string): Promise<void> {
   if (!await fs.pathExists(sourceFilePath)) {
+    const relativePath = path.relative(process.cwd(), sourceFilePath);
+    console.error(chalk.red(`❌ Template file not found: ${relativePath}`));
+    console.error(chalk.yellow(`💡 This might be due to running a globally installed CLI. Consider using 'npx' or installing locally.`));
     throw new Error(`Template file not found: ${sourceFilePath}`);
   }
   
-  // Ensure target directory exists
-  await fs.ensureDir(path.dirname(targetFilePath));
-  
-  // For Next.js projects, we might need to adjust import paths in template files
-  if (path.extname(sourceFilePath).match(/\.(js|jsx|ts|tsx)$/)) {
-    const templateContent = await fs.readFile(sourceFilePath, 'utf-8');
+  try {
+    // Ensure target directory exists
+    await fs.ensureDir(path.dirname(targetFilePath));
     
-    // Process content for Next.js src folder structure
-    let processedContent = templateContent;
+    // For Next.js projects, we might need to adjust import paths in template files
+    if (path.extname(sourceFilePath).match(/\.(js|jsx|ts|tsx)$/)) {
+      const templateContent = await fs.readFile(sourceFilePath, 'utf-8');
+      
+      // Process content for Next.js src folder structure
+      let processedContent = templateContent;
     
-    // Adjust import paths if needed (this is basic - you might want to make it more sophisticated)
-    if (targetFilePath.includes('/src/')) {
-      processedContent = processedContent.replace(/from ['"]@\//g, 'from "@/');
-      processedContent = processedContent.replace(/from ['"]\.\.\//g, 'from "../');
+      // Adjust import paths if needed (this is basic - you might want to make it more sophisticated)
+      if (targetFilePath.includes('/src/')) {
+        processedContent = processedContent.replace(/from ['"]@\//g, 'from "@/');
+        processedContent = processedContent.replace(/from ['"]\.\.\//g, 'from "../');
+      }
+      
+      await fs.writeFile(targetFilePath, processedContent);
+    } else {
+      // For non-code files, just copy directly
+      await fs.copy(sourceFilePath, targetFilePath);
     }
-    
-    await fs.writeFile(targetFilePath, processedContent);
-  } else {
-    // For non-code files, just copy directly
-    await fs.copy(sourceFilePath, targetFilePath);
+  } catch (error) {
+    console.error(chalk.red(`❌ Failed to copy template file: ${error}`));
+    throw error;
   }
 }
 
