@@ -3,7 +3,7 @@
     "ai": {
       "description": "AI integration code for enhanced user experiences",
       "supportedFrameworks": ["nextjs", "expressjs", "nestjs", "remixjs"],
-      "supportedLanguages": ["javascript"],
+      "supportedLanguages": ["javascript", "typescript"],
       "supportedAIs": ["gemini", "grok", "open-ai", "open-router", "claude"],
       "files": {
         "claude": {
@@ -556,7 +556,7 @@
     "analytics": {
       "description": "Analytics integration for enhanced functionality",
       "supportedFrameworks": ["nextjs", "expressjs", "nestjs", "remixjs"],
-      "supportedLanguages": ["javascript"],
+      "supportedLanguages": ["javascript", "typescript"],
       "supportedAnalytics": ["plausible", "posthog"],
       "files": {
         "plausible": {},
@@ -577,7 +577,7 @@
         "go",
         "ruby-on-rails"
       ],
-      "supportedLanguages": ["javascript"],
+      "supportedLanguages": ["javascript", "typescript"],
       "supportedAuths": ["auth0", "clerk", "next-auth"],
       "files": {
         "auth0": {
@@ -919,7 +919,7 @@
     "aws": {
       "description": "AWS integration and deployment features",
       "supportedFrameworks": ["nextjs", "expressjs", "nestjs", "remixjs"],
-      "supportedLanguages": ["javascript"],
+      "supportedLanguages": ["javascript", "typescript"],
       "supportedAwsServices": [
         "api-gateway",
         "app-sync",
@@ -6218,7 +6218,13 @@
         "prisma",
         "typeorm"
       ],
-      "supportedLanguages": ["javascript", "go", "python", "ruby"],
+      "supportedLanguages": [
+        "javascript",
+        "go",
+        "python",
+        "ruby",
+        "typescript"
+      ],
       "supportedDatabases": ["mongodb", "supabase", "neondb"],
       "supportedORMs": {
         "mongodb": {
@@ -6296,7 +6302,6 @@
               "nestjs": {},
               "nextjs": {},
               "remixjs": {}
-
             }
           },
           "djangoORM": {
@@ -6505,7 +6510,14 @@
         "vuejs",
         "reactjs"
       ],
-      "supportedLanguages": ["javascript", "go", "python", "ruby", "rust"],
+      "supportedLanguages": [
+        "javascript",
+        "go",
+        "python",
+        "ruby",
+        "rust",
+        "typescript"
+      ],
       "files": {
         "angularjs": {
           ".dockerignore": {
@@ -6618,7 +6630,13 @@
     "gitignore": {
       "description": "GitIgnore files for various frameworks and languages",
       "supportedFrameworks": ["nextjs", "angularjs", "nestjs"],
-      "supportedLanguages": ["javascript", "go", "python", "rust"],
+      "supportedLanguages": [
+        "javascript",
+        "go",
+        "python",
+        "rust",
+        "typescript"
+      ],
       "files": {
         "angularjs": {
           ".gitignore": {
@@ -6662,7 +6680,7 @@
     "monitoring": {
       "description": "Monitoring integration for enhanced functionality",
       "supportedFrameworks": ["nextjs", "expressjs", "nestjs", "remixjs"],
-      "supportedLanguages": ["javascript"],
+      "supportedLanguages": ["javascript", "typescript"],
       "supportedMonitoring": ["sentry", "datadog", "opentelemetry"],
       "files": {
         "sentry": {},
@@ -6679,7 +6697,7 @@
         "remixjs",
         "vuejs"
       ],
-      "supportedLanguages": ["javascript"],
+      "supportedLanguages": ["javascript", "typescript"],
       "supportedPayments": ["stripe", "razorpay", "paypal"],
       "files": {
         "paypal": {
@@ -7032,7 +7050,7 @@
     "storage": {
       "description": "Storage Integration for files, images, and videos",
       "supportedFrameworks": ["nextjs", "expressjs", "nestjs", "remixjs"],
-      "supportedLanguages": ["javascript"],
+      "supportedLanguages": ["javascript", "typescript"],
       "supportedStorages": ["imagekit.io", "cloudinary", "google-cloud"],
       "files": {
         "imagekit.io": {
@@ -7409,7 +7427,7 @@
     "testing": {
       "description": "Testing integration for enhanced functionality",
       "supportedFrameworks": ["nextjs", "expressjs", "nestjs", "remixjs"],
-      "supportedLanguages": ["javascript"],
+      "supportedLanguages": ["javascript", "typescript"],
       "supportedTesting": ["jest", "cypress", "mocha", "playwright"],
       "files": {
         "jest": {},
@@ -7428,7 +7446,7 @@
         "django",
         "nuxtjs"
       ],
-      "supportedLanguages": ["javascript", "python"],
+      "supportedLanguages": ["javascript", "python", "typescript"],
       "supportedUiLibraries": ["daisy"],
       "files": {
         "daisy": {
