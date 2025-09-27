@@ -76,43 +76,29 @@ export { getCliRootPath } from './pathResolver.js';
  * Detect the current project's framework and language with improved logic
  */
 /**
- * Detect if a project uses src folder structure (Next.js, React, etc.)
+ * Detect if a Next.js project uses src folder structure (Next.js only)
  */
-async function detectSrcFolderStructure(projectPath: string, framework: string): Promise<boolean> {
+async function detectNextjsSrcStructure(projectPath: string): Promise<boolean> {
   try {
-    // Check if src folder exists and contains typical project folders
+    // Check if src folder exists and contains typical Next.js folders
     const srcPath = path.join(projectPath, 'src');
     if (!await fs.pathExists(srcPath)) {
       return false;
     }
     
-    // Check for framework-specific directories in src
-    if (framework === 'nextjs') {
-      // Check for app directory in src (Next.js App Router)
-      const srcAppPath = path.join(srcPath, 'app');
-      if (await fs.pathExists(srcAppPath)) {
-        return true;
-      }
-      
-      // Check for pages directory in src (Next.js Pages Router)
-      const srcPagesPath = path.join(srcPath, 'pages');
-      if (await fs.pathExists(srcPagesPath)) {
-        return true;
-      }
-    } else if (framework === 'reactjs') {
-      // Check for typical React src structure
-      const srcIndexPath = path.join(srcPath, 'index.js');
-      const srcIndexTsPath = path.join(srcPath, 'index.ts');
-      const srcMainPath = path.join(srcPath, 'main.js');
-      const srcMainTsPath = path.join(srcPath, 'main.ts');
-      
-      if (await fs.pathExists(srcIndexPath) || await fs.pathExists(srcIndexTsPath) ||
-          await fs.pathExists(srcMainPath) || await fs.pathExists(srcMainTsPath)) {
-        return true;
-      }
+    // Check for Next.js App Router (app directory in src)
+    const srcAppPath = path.join(srcPath, 'app');
+    if (await fs.pathExists(srcAppPath)) {
+      return true;
     }
     
-    // Check for components directory in src (common across frameworks)
+    // Check for Next.js Pages Router (pages directory in src) 
+    const srcPagesPath = path.join(srcPath, 'pages');
+    if (await fs.pathExists(srcPagesPath)) {
+      return true;
+    }
+    
+    // Check for components directory in src (common pattern)
     const srcComponentsPath = path.join(srcPath, 'components');
     if (await fs.pathExists(srcComponentsPath)) {
       return true;
@@ -125,63 +111,39 @@ async function detectSrcFolderStructure(projectPath: string, framework: string):
 }
 
 /**
- * Adjust file path for frameworks that support src folder structure (Next.js, React, etc.)
+ * Adjust file path for Next.js src folder structure (Next.js only)
+ * Dynamically places files in src/ folder based on their path structure
  */
-function adjustSrcFolderFilePath(filePath: string, hasSrcFolder: boolean, projectPath: string, framework: string): string {
-  // Files that should be placed in src folder when src structure is used
-  const srcFolderFiles = [
-    'app/',
-    'pages/',
-    'components/',
-    'lib/',
-    'utils/',
-    'hooks/',
-    'context/',
-    'types/',
-    'styles/' // Only component-specific styles, not global ones
-  ];
-  
-  // Files that should always be in root regardless of src folder (framework-specific)
-  let rootOnlyFiles = [
-    '.env',
-    '.env.local',
-    '.env.example',
-    'package.json'
-  ];
-  
-  // Add framework-specific root files
-  if (framework === 'nextjs') {
-    rootOnlyFiles.push(
-      'middleware.ts',
-      'middleware.js',
-      'next.config.js',
-      'next.config.mjs',
-      'tailwind.config.js',
-      'tailwind.config.ts',
-      'postcss.config.js'
-    );
-  } else if (framework === 'reactjs') {
-    rootOnlyFiles.push(
-      'vite.config.js',
-      'vite.config.ts',
-      'tailwind.config.js',
-      'tailwind.config.ts',
-      'postcss.config.js'
-    );
+function adjustNextjsSrcFilePath(filePath: string, hasSrcFolder: boolean, projectPath: string): string {
+  // If project doesn't use src folder, return original path
+  if (!hasSrcFolder) {
+    return path.join(projectPath, filePath);
   }
+
+  // Files that should ALWAYS be in root regardless of src folder
+  const rootOnlyFiles = [
+    '.env',
+    '.env.local', 
+    '.env.example',
+    'package.json',
+    'next.config.js',
+    'next.config.mjs',
+    'tailwind.config.js',
+    'tailwind.config.ts',
+    'postcss.config.js',
+    'middleware.ts',
+    'middleware.js'
+  ];
+
+  const fileName = path.basename(filePath);
   
   // Check if this file should always be in root
-  const fileName = path.basename(filePath);
-  if (rootOnlyFiles.includes(fileName) || filePath.includes('public/')) {
-    return filePath;
+  if (rootOnlyFiles.includes(fileName) || filePath.startsWith('public/')) {
+    return path.join(projectPath, filePath);
   }
-  
-  // If project has src folder and this file should be in src
-  if (hasSrcFolder && srcFolderFiles.some(prefix => filePath.startsWith(prefix))) {
-    return path.join('src', filePath);
-  }
-  
-  return filePath;
+
+  // For all other files, place them in src/ folder if src structure is used
+  return path.join(projectPath, 'src', filePath);
 }
 
 export async function detectProjectStack(projectPath: string): Promise<{
@@ -199,9 +161,9 @@ export async function detectProjectStack(projectPath: string): Promise<{
       const packageManager = await detectPackageManager(projectPath);
       let hasSrcFolder = await fs.pathExists(path.join(projectPath, 'src'));
       
-      // For frameworks that support src structure, do a more thorough detection
-      if (['nextjs', 'reactjs'].includes(cachedProject.framework)) {
-        hasSrcFolder = await detectSrcFolderStructure(projectPath, cachedProject.framework);
+      // For Next.js projects, do a more thorough src folder detection
+      if (cachedProject.framework === 'nextjs') {
+        hasSrcFolder = await detectNextjsSrcStructure(projectPath);
       }
       
       return {
@@ -246,7 +208,7 @@ export async function detectProjectStack(projectPath: string): Promise<{
       if (dependencies['next']) {
         framework = 'nextjs';
         // For Next.js projects, do a more thorough src folder detection
-        hasSrcFolder = await detectSrcFolderStructure(projectPath, framework);
+        hasSrcFolder = await detectNextjsSrcStructure(projectPath);
       } else if (dependencies['react']) {
         framework = 'reactjs';
       } else if (dependencies['express']) {
@@ -262,7 +224,7 @@ export async function detectProjectStack(projectPath: string): Promise<{
       }
       
       // For other frameworks, simple src folder check
-      if (framework && !['nextjs', 'reactjs'].includes(framework) && !hasSrcFolder) {
+      if (framework !== 'nextjs' && !hasSrcFolder) {
         hasSrcFolder = await fs.pathExists(path.join(projectPath, 'src'));
       }
       
@@ -443,9 +405,9 @@ async function processFeatureFile(
   // Handle file path adjustment based on project structure
   let targetFilePath = path.join(projectPath, filePath);
   
-  // For frameworks that support src folder structure, adjust file paths accordingly
-  if (['nextjs', 'reactjs'].includes(projectInfo.framework) && projectInfo.hasSrcFolder) {
-    targetFilePath = adjustSrcFolderFilePath(filePath, projectInfo.hasSrcFolder || false, projectPath, projectInfo.framework);
+  // For Next.js projects with src folder structure, adjust file paths accordingly
+  if (projectInfo.framework === 'nextjs' && projectInfo.hasSrcFolder) {
+    targetFilePath = adjustNextjsSrcFilePath(filePath, projectInfo.hasSrcFolder, projectPath);
   }
   
   // Ensure all parent directories exist before processing
