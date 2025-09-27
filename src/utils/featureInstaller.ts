@@ -76,29 +76,43 @@ export { getCliRootPath } from './pathResolver.js';
  * Detect the current project's framework and language with improved logic
  */
 /**
- * Detect if a Next.js project uses src folder structure
+ * Detect if a project uses src folder structure (Next.js, React, etc.)
  */
-async function detectNextjsSrcStructure(projectPath: string): Promise<boolean> {
+async function detectSrcFolderStructure(projectPath: string, framework: string): Promise<boolean> {
   try {
-    // Check if src folder exists and contains typical Next.js folders
+    // Check if src folder exists and contains typical project folders
     const srcPath = path.join(projectPath, 'src');
     if (!await fs.pathExists(srcPath)) {
       return false;
     }
     
-    // Check for app directory in src (App Router)
-    const srcAppPath = path.join(srcPath, 'app');
-    if (await fs.pathExists(srcAppPath)) {
-      return true;
+    // Check for framework-specific directories in src
+    if (framework === 'nextjs') {
+      // Check for app directory in src (Next.js App Router)
+      const srcAppPath = path.join(srcPath, 'app');
+      if (await fs.pathExists(srcAppPath)) {
+        return true;
+      }
+      
+      // Check for pages directory in src (Next.js Pages Router)
+      const srcPagesPath = path.join(srcPath, 'pages');
+      if (await fs.pathExists(srcPagesPath)) {
+        return true;
+      }
+    } else if (framework === 'reactjs') {
+      // Check for typical React src structure
+      const srcIndexPath = path.join(srcPath, 'index.js');
+      const srcIndexTsPath = path.join(srcPath, 'index.ts');
+      const srcMainPath = path.join(srcPath, 'main.js');
+      const srcMainTsPath = path.join(srcPath, 'main.ts');
+      
+      if (await fs.pathExists(srcIndexPath) || await fs.pathExists(srcIndexTsPath) ||
+          await fs.pathExists(srcMainPath) || await fs.pathExists(srcMainTsPath)) {
+        return true;
+      }
     }
     
-    // Check for pages directory in src (Pages Router)
-    const srcPagesPath = path.join(srcPath, 'pages');
-    if (await fs.pathExists(srcPagesPath)) {
-      return true;
-    }
-    
-    // Check for components directory in src
+    // Check for components directory in src (common across frameworks)
     const srcComponentsPath = path.join(srcPath, 'components');
     if (await fs.pathExists(srcComponentsPath)) {
       return true;
@@ -111,9 +125,9 @@ async function detectNextjsSrcStructure(projectPath: string): Promise<boolean> {
 }
 
 /**
- * Adjust file path for Next.js src folder structure
+ * Adjust file path for frameworks that support src folder structure (Next.js, React, etc.)
  */
-function adjustNextjsFilePath(filePath: string, hasSrcFolder: boolean, projectPath: string): string {
+function adjustSrcFolderFilePath(filePath: string, hasSrcFolder: boolean, projectPath: string, framework: string): string {
   // Files that should be placed in src folder when src structure is used
   const srcFolderFiles = [
     'app/',
@@ -127,20 +141,34 @@ function adjustNextjsFilePath(filePath: string, hasSrcFolder: boolean, projectPa
     'styles/' // Only component-specific styles, not global ones
   ];
   
-  // Files that should always be in root regardless of src folder
-  const rootOnlyFiles = [
-    'middleware.ts',
-    'middleware.js',
-    'next.config.js',
-    'next.config.mjs',
+  // Files that should always be in root regardless of src folder (framework-specific)
+  let rootOnlyFiles = [
     '.env',
     '.env.local',
     '.env.example',
-    'package.json',
-    'tailwind.config.js',
-    'tailwind.config.ts',
-    'postcss.config.js'
+    'package.json'
   ];
+  
+  // Add framework-specific root files
+  if (framework === 'nextjs') {
+    rootOnlyFiles.push(
+      'middleware.ts',
+      'middleware.js',
+      'next.config.js',
+      'next.config.mjs',
+      'tailwind.config.js',
+      'tailwind.config.ts',
+      'postcss.config.js'
+    );
+  } else if (framework === 'reactjs') {
+    rootOnlyFiles.push(
+      'vite.config.js',
+      'vite.config.ts',
+      'tailwind.config.js',
+      'tailwind.config.ts',
+      'postcss.config.js'
+    );
+  }
   
   // Check if this file should always be in root
   const fileName = path.basename(filePath);
@@ -171,9 +199,9 @@ export async function detectProjectStack(projectPath: string): Promise<{
       const packageManager = await detectPackageManager(projectPath);
       let hasSrcFolder = await fs.pathExists(path.join(projectPath, 'src'));
       
-      // For Next.js projects, do a more thorough src folder detection
-      if (cachedProject.framework === 'nextjs') {
-        hasSrcFolder = await detectNextjsSrcStructure(projectPath);
+      // For frameworks that support src structure, do a more thorough detection
+      if (['nextjs', 'reactjs'].includes(cachedProject.framework)) {
+        hasSrcFolder = await detectSrcFolderStructure(projectPath, cachedProject.framework);
       }
       
       return {
@@ -218,7 +246,7 @@ export async function detectProjectStack(projectPath: string): Promise<{
       if (dependencies['next']) {
         framework = 'nextjs';
         // For Next.js projects, do a more thorough src folder detection
-        hasSrcFolder = await detectNextjsSrcStructure(projectPath);
+        hasSrcFolder = await detectSrcFolderStructure(projectPath, framework);
       } else if (dependencies['react']) {
         framework = 'reactjs';
       } else if (dependencies['express']) {
@@ -233,8 +261,8 @@ export async function detectProjectStack(projectPath: string): Promise<{
         framework = 'remixjs';
       }
       
-      // For non-Next.js projects, simple src folder check
-      if (framework !== 'nextjs' && !hasSrcFolder) {
+      // For other frameworks, simple src folder check
+      if (framework && !['nextjs', 'reactjs'].includes(framework) && !hasSrcFolder) {
         hasSrcFolder = await fs.pathExists(path.join(projectPath, 'src'));
       }
       
@@ -415,9 +443,9 @@ async function processFeatureFile(
   // Handle file path adjustment based on project structure
   let targetFilePath = path.join(projectPath, filePath);
   
-  // For Next.js projects, adjust file paths based on src folder structure
-  if (projectInfo.framework === 'nextjs') {
-    targetFilePath = adjustNextjsFilePath(filePath, projectInfo.hasSrcFolder || false, projectPath);
+  // For frameworks that support src folder structure, adjust file paths accordingly
+  if (['nextjs', 'reactjs'].includes(projectInfo.framework) && projectInfo.hasSrcFolder) {
+    targetFilePath = adjustSrcFolderFilePath(filePath, projectInfo.hasSrcFolder || false, projectPath, projectInfo.framework);
   }
   
   // Ensure all parent directories exist before processing
@@ -506,7 +534,14 @@ async function handleFileOverwrite(sourceFilePath: string, targetFilePath: strin
     if (cachedContent) {
       await fs.outputFile(targetFilePath, cachedContent);
     } else {
-      await copyTemplateFile(sourceFilePath, targetFilePath);
+      // Check if source template exists
+      if (await fs.pathExists(sourceFilePath)) {
+        await copyTemplateFile(sourceFilePath, targetFilePath);
+      } else {
+        console.log(chalk.yellow(`⚠️  Template file not found, skipping: ${path.relative(process.cwd(), sourceFilePath)}`));
+        console.log(chalk.gray(`   This might be due to running a globally installed CLI. Consider using 'npx' or installing locally.`));
+        return;
+      }
     }
     
     if (fileExists) {
@@ -539,7 +574,14 @@ async function handleFileAppend(sourceFilePath: string, targetFilePath: string, 
     if (cachedContent) {
       contentToAppend = cachedContent;
     } else {
-      contentToAppend = await fs.readFile(sourceFilePath, 'utf8');
+      // Check if source template exists
+      if (await fs.pathExists(sourceFilePath)) {
+        contentToAppend = await fs.readFile(sourceFilePath, 'utf8');
+      } else {
+        console.log(chalk.yellow(`⚠️  Template file not found, skipping append: ${path.relative(process.cwd(), sourceFilePath)}`));
+        console.log(chalk.gray(`   This might be due to running a globally installed CLI. Consider using 'npx' or installing locally.`));
+        return;
+      }
     }
     
     const newContent = existingContent + contentToAppend;
@@ -575,7 +617,14 @@ async function handleFilePrepend(sourceFilePath: string, targetFilePath: string,
     if (cachedContent) {
       templateContent = cachedContent;
     } else {
-      templateContent = await fs.readFile(sourceFilePath, 'utf-8');
+      // Check if source template exists
+      if (await fs.pathExists(sourceFilePath)) {
+        templateContent = await fs.readFile(sourceFilePath, 'utf-8');
+      } else {
+        console.log(chalk.yellow(`⚠️  Template file not found, skipping prepend: ${path.relative(process.cwd(), sourceFilePath)}`));
+        console.log(chalk.gray(`   This might be due to running a globally installed CLI. Consider using 'npx' or installing locally.`));
+        return;
+      }
     }
     
     const separator = templateContent.endsWith('\n') ? '' : '\n';
@@ -595,7 +644,7 @@ async function handleFilePrepend(sourceFilePath: string, targetFilePath: string,
 }
 
 /**
- * Copy template file to target location with Next.js content processing
+ * Copy template file to target location with framework-agnostic content processing
  */
 async function copyTemplateFile(sourceFilePath: string, targetFilePath: string): Promise<void> {
   if (!await fs.pathExists(sourceFilePath)) {
@@ -609,14 +658,14 @@ async function copyTemplateFile(sourceFilePath: string, targetFilePath: string):
     // Ensure target directory exists
     await fs.ensureDir(path.dirname(targetFilePath));
     
-    // For Next.js projects, we might need to adjust import paths in template files
+    // For code files, we might need to adjust import paths based on project structure
     if (path.extname(sourceFilePath).match(/\.(js|jsx|ts|tsx)$/)) {
       const templateContent = await fs.readFile(sourceFilePath, 'utf-8');
       
-      // Process content for Next.js src folder structure
+      // Process content based on project structure (framework-agnostic)
       let processedContent = templateContent;
     
-      // Adjust import paths if needed (this is basic - you might want to make it more sophisticated)
+      // Adjust import paths for src-based project structures
       if (targetFilePath.includes('/src/')) {
         processedContent = processedContent.replace(/from ['"]@\//g, 'from "@/');
         processedContent = processedContent.replace(/from ['"]\.\.\//g, 'from "../');
