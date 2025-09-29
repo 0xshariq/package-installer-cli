@@ -30,6 +30,7 @@ export interface FeatureFile {
 export interface FeatureConfig {
   supportedFrameworks: string[];
   supportedLanguages: string[];
+  description?: string;
   files: {
     [provider: string]: {
       [framework: string]: {
@@ -45,7 +46,7 @@ export interface FeatureConfig {
 let SUPPORTED_FEATURES: { [featureName: string]: FeatureConfig } = {};
 
 /**
- * Load features from cache or file system
+ * Load features from cache or file system with new jsonPath structure
  */
 async function loadFeatures(): Promise<void> {
   try {
@@ -54,7 +55,58 @@ async function loadFeatures(): Promise<void> {
     
     if (await fs.pathExists(featuresPath)) {
       const featuresData = await fs.readJson(featuresPath);
-      SUPPORTED_FEATURES = featuresData.features || featuresData;
+      const featuresConfig = featuresData.features || featuresData;
+      
+      // Process each feature and load its individual JSON file
+      for (const [featureName, config] of Object.entries(featuresConfig)) {
+        const featureConfig = config as any;
+        
+        if (featureConfig.jsonPath) {
+          try {
+            // Load the individual feature JSON file
+            const individualFeaturePath = path.resolve(path.dirname(featuresPath), featureConfig.jsonPath);
+            
+            if (await fs.pathExists(individualFeaturePath)) {
+              const individualFeatureData = await fs.readJson(individualFeaturePath);
+              
+              // Merge the base config with the individual feature data
+              SUPPORTED_FEATURES[featureName] = {
+                supportedFrameworks: featureConfig.supportedFrameworks || [],
+                supportedLanguages: featureConfig.supportedLanguages || [],
+                files: individualFeatureData.files || individualFeatureData,
+                description: featureConfig.description,
+                ...individualFeatureData
+              };
+            } else {
+              console.warn(chalk.yellow(`⚠️  Individual feature file not found: ${individualFeaturePath}`));
+              // Fallback to base config
+              SUPPORTED_FEATURES[featureName] = {
+                supportedFrameworks: featureConfig.supportedFrameworks || [],
+                supportedLanguages: featureConfig.supportedLanguages || [],
+                files: {},
+                description: featureConfig.description
+              };
+            }
+          } catch (error) {
+            console.warn(chalk.yellow(`⚠️  Could not load individual feature file for ${featureName}`));
+            // Fallback to base config
+            SUPPORTED_FEATURES[featureName] = {
+              supportedFrameworks: featureConfig.supportedFrameworks || [],
+              supportedLanguages: featureConfig.supportedLanguages || [],
+              files: {},
+              description: featureConfig.description
+            };
+          }
+        } else {
+          // Legacy format - direct files in config
+          SUPPORTED_FEATURES[featureName] = {
+            supportedFrameworks: featureConfig.supportedFrameworks || [],
+            supportedLanguages: featureConfig.supportedLanguages || [],
+            files: featureConfig.files || {},
+            description: featureConfig.description
+          };
+        }
+      }
     } else {
       console.warn(chalk.yellow(`⚠️  Features file not found at: ${featuresPath}`));
     }
