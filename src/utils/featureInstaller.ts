@@ -70,12 +70,12 @@ async function loadFeatures(): Promise<void> {
               const individualFeatureData = await fs.readJson(individualFeaturePath);
               
               // Merge the base config with the individual feature data
+              // The individual JSON files directly contain the provider structure
               SUPPORTED_FEATURES[featureName] = {
                 supportedFrameworks: featureConfig.supportedFrameworks || [],
                 supportedLanguages: featureConfig.supportedLanguages || [],
-                files: individualFeatureData.files || individualFeatureData,
-                description: featureConfig.description,
-                ...individualFeatureData
+                files: individualFeatureData, // Direct provider structure
+                description: featureConfig.description
               };
             } else {
               console.warn(chalk.yellow(`⚠️  Individual feature file not found: ${individualFeaturePath}`));
