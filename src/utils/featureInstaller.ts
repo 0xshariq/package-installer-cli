@@ -469,10 +469,13 @@ export async function addFeature(
     
     spinner.text = chalk.hex('#9c88ff')(`Detected ${projectInfo.framework} project (${projectInfo.projectLanguage})`);
     
-    // For features with providers (like auth), prompt for provider selection
+    // Check if this feature has a simple structure (framework-based) or complex (provider-based)
     let selectedProvider = provider;
-    if (!selectedProvider && featureConfig.files) {
-      const availableProviders = Object.keys(featureConfig.files);
+    const availableProviders = Object.keys(featureConfig.files);
+    const hasSimpleStructure = availableProviders.includes(projectInfo.framework);
+    
+    if (!hasSimpleStructure && !selectedProvider && featureConfig.files) {
+      // Complex structure with providers
       if (availableProviders.length > 1) {
         spinner.stop();
         const inquirer = await import('inquirer');
@@ -489,6 +492,9 @@ export async function addFeature(
       } else {
         selectedProvider = availableProviders[0];
       }
+    } else if (hasSimpleStructure) {
+      // Simple structure - use framework as the "provider"
+      selectedProvider = projectInfo.framework;
     }
     
     // Get files for the specific provider, framework, and language
@@ -528,6 +534,9 @@ export async function addFeature(
 
 /**
  * Get feature files for a specific provider, framework, and language
+ * Handles both structures:
+ * 1. provider -> framework -> language -> files (auth, ai, etc.)
+ * 2. framework -> files (docker, gitignore, etc.)
  */
 function getFeatureFiles(
   featureConfig: FeatureConfig,
@@ -535,6 +544,29 @@ function getFeatureFiles(
   framework: string,
   language: string
 ): { [filePath: string]: FeatureFile } {
+  // Check if this is a simple framework-based structure (no providers)
+  if (featureConfig.files[framework] && !featureConfig.files[provider]) {
+    // Simple structure: framework -> files
+    const frameworkConfig = featureConfig.files[framework] as any;
+    if (frameworkConfig && typeof frameworkConfig === 'object') {
+      // Check if it has action properties (direct files) or language subdirectories
+      const firstKey = Object.keys(frameworkConfig)[0];
+      if (firstKey && frameworkConfig[firstKey]?.action) {
+        // Direct files with actions
+        return frameworkConfig as { [filePath: string]: FeatureFile };
+      } else if (frameworkConfig[language]) {
+        // Has language subdirectories
+        return frameworkConfig[language] as { [filePath: string]: FeatureFile };
+      } else if (frameworkConfig['typescript'] && language === 'javascript') {
+        // Fallback to typescript
+        console.log(chalk.yellow(`⚠️  JavaScript templates not available, using TypeScript templates`));
+        return frameworkConfig['typescript'] as { [filePath: string]: FeatureFile };
+      }
+    }
+    return (frameworkConfig as { [filePath: string]: FeatureFile }) || {};
+  }
+  
+  // Complex structure: provider -> framework -> language -> files
   const providerConfig = featureConfig.files[provider];
   if (!providerConfig) return {};
   
