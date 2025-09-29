@@ -442,19 +442,6 @@ Clone and setup repositories with intelligent configuration detection.
 pi clone [repository-url] [directory] [options]
 ```
 
-**Interactive Repository Discovery:**
-```bash
-# Browse popular repositories
-pi clone
-
-# Repository categories:
-# 🚀 Trending Projects
-# 📚 Learning Resources
-# 🛠️ Development Tools
-# 🎨 UI Components
-# 📱 Mobile Apps
-```
-
 **Direct Repository Cloning:**
 ```bash
 # Clone from GitHub
