@@ -37,7 +37,7 @@ import {
   cacheProjectData
 } from '../utils/cacheManager.js';
 import { CacheManager } from '../utils/cacheUtils.js';
-import { addFeatureToProject } from './add.js';
+
 
 /**
  * Display help for create command
@@ -218,17 +218,24 @@ export async function createProject(providedName?: string, options?: any): Promi
     if (selectedFeatures.length > 0) {
       console.log(chalk.hex('#00d2d3')('\n🚀 Adding Features...\n'));
       
+      // Import the add command dynamically to avoid circular imports
+      const { addCommand } = await import('./add.js');
+      
       for (const category of selectedFeatures) {
-        const provider = await promptFeatureProvider(category, selectedFramework);
-        if (provider) {
-          console.log(chalk.cyan(`🔧 Adding ${provider} for ${category}...`));
+        try {
+          console.log(chalk.cyan(`🔧 Adding ${category} feature...`));
           
-          const success = await addFeatureToProject(projectPath, category, provider, selectedFramework);
-          if (success) {
-            console.log(chalk.green(`✅ Successfully added ${provider} for ${category}`));
-          } else {
-            console.log(chalk.yellow(`⚠️  Failed to add ${provider} for ${category}, skipping...`));
-          }
+          // Use the add command directly with the detected framework
+          await addCommand(category, undefined, {
+            framework: selectedFramework,
+            projectPath: projectPath,
+            list: false,
+            verbose: false
+          });
+          
+          console.log(chalk.green(`✅ Successfully added ${category} feature`));
+        } catch (error) {
+          console.log(chalk.yellow(`⚠️  Failed to add ${category} feature, skipping...`));
         }
       }
     }

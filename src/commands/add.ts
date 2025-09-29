@@ -18,15 +18,50 @@ function capitalize(str: string): string {
 }
 
 /**
- * Get features.json configuration
+ * Get features.json configuration with new jsonPath structure
  */
-function getFeaturesConfig(): Record<string, any> {
+async function getFeaturesConfig(): Promise<Record<string, any>> {
   try {
     // Use the centralized path resolver
     const featuresPath = getFeaturesJsonPath();
     
     if (fs.existsSync(featuresPath)) {
-      return JSON.parse(fs.readFileSync(featuresPath, 'utf-8'));
+      const baseConfig = JSON.parse(fs.readFileSync(featuresPath, 'utf-8'));
+      const processedConfig: Record<string, any> = {};
+      
+      // Process each feature to load individual JSON files
+      for (const [featureName, config] of Object.entries(baseConfig.features || baseConfig)) {
+        const featureConfig = config as any;
+        
+        if (featureConfig.jsonPath) {
+          try {
+            // Load the individual feature JSON file
+            const individualFeaturePath = path.resolve(path.dirname(featuresPath), featureConfig.jsonPath);
+            
+            if (fs.existsSync(individualFeaturePath)) {
+              const individualFeatureData = JSON.parse(fs.readFileSync(individualFeaturePath, 'utf-8'));
+              
+              // Merge the base config with the individual feature data
+              processedConfig[featureName] = {
+                ...featureConfig,
+                files: individualFeatureData.files || individualFeatureData,
+                ...individualFeatureData
+              };
+            } else {
+              console.warn(chalk.yellow(`⚠️  Individual feature file not found: ${individualFeaturePath}`));
+              processedConfig[featureName] = featureConfig;
+            }
+          } catch (error) {
+            console.warn(chalk.yellow(`⚠️  Could not load individual feature file for ${featureName}`));
+            processedConfig[featureName] = featureConfig;
+          }
+        } else {
+          // Legacy format
+          processedConfig[featureName] = featureConfig;
+        }
+      }
+      
+      return { features: processedConfig };
     }
 
     console.warn(chalk.yellow(`⚠️  features.json not found at: ${featuresPath}`));
@@ -40,30 +75,30 @@ function getFeaturesConfig(): Record<string, any> {
 /**
  * Get available feature categories
  */
-function getAvailableFeatures(): string[] {
-  const config = getFeaturesConfig();
-  return Object.keys(config);
+async function getAvailableFeatures(): Promise<string[]> {
+  const config = await getFeaturesConfig();
+  return Object.keys(config.features || {});
 }
 
 /**
  * Get sub-features for a category
  */
-function getSubFeatures(category: string): string[] {
-  const config = getFeaturesConfig();
-  const categoryConfig = config[category];
+async function getSubFeatures(category: string): Promise<string[]> {
+  const config = await getFeaturesConfig();
+  const categoryConfig = config.features?.[category];
   
   if (!categoryConfig || typeof categoryConfig !== 'object') {
     return [];
   }
   
-  return Object.keys(categoryConfig);
+  return Object.keys(categoryConfig.files || {});
 }
 
 /**
  * List available features from features.json with descriptions
  */
-function listAvailableFeatures(): void {
-  const featuresConfig = getFeaturesConfig();
+async function listAvailableFeatures(): Promise<void> {
+  const featuresConfig = await getFeaturesConfig();
   
   if (!featuresConfig.features || Object.keys(featuresConfig.features).length === 0) {
     console.log(chalk.yellow('⚠️  No features found in configuration'));
@@ -71,7 +106,7 @@ function listAvailableFeatures(): void {
   }
 
   const featuresData = Object.entries(featuresConfig.features).map(([key, config]: [string, any]) => {
-    const providers = Object.keys(config).filter(k => k !== 'description' && k !== 'supportedFrameworks');
+    const providers = config.files ? Object.keys(config.files) : [];
     const description = config.description || 'No description available';
     const frameworks = config.supportedFrameworks ? config.supportedFrameworks.join(', ') : 'All frameworks';
     
@@ -273,9 +308,9 @@ function showEnhancedSetupInstructions(feature: string, provider: string): void 
 /**
  * Show help for add command
  */
-export function showAddHelp(): void {
+export async function showAddHelp(): Promise<void> {
   const piGradient = gradient(['#00c6ff', '#0072ff']);
-  const featuresConfig = getFeaturesConfig();
+  const featuresConfig = await getFeaturesConfig();
   const availableFeatures = Object.keys(featuresConfig.features || {});
   
   console.log('\n' + boxen(
@@ -351,13 +386,13 @@ export async function addCommand(
   try {
     // Handle help flag
     if (options.help || feature === '--help' || feature === '-h') {
-      showAddHelp();
+      await showAddHelp();
       return;
     }
 
     // Handle list flag
     if (options.list || feature === '--list' || feature === '-l') {
-      listAvailableFeatures();
+      await listAvailableFeatures();
       return;
     }
 
@@ -443,8 +478,8 @@ export async function addCommand(
       return;
     }
 
-    const featuresConfig = JSON.parse(await fs.readFile(featuresConfigPath, 'utf-8'));
-    const availableFeatures = Object.keys(featuresConfig.features);
+    const featuresConfig = await getFeaturesConfig();
+    const availableFeatures = Object.keys(featuresConfig.features || {});
 
     // Handle different command syntax cases
     if (!feature) {
@@ -599,7 +634,7 @@ export async function addCommand(
     }
 
     // Get available sub-features/providers
-    const subFeatures = getSubFeatures(selectedFeature!);
+    const subFeatures = await getSubFeatures(selectedFeature!);
 
     // If no provider specified and multiple providers available, show selection
     if (!selectedProvider && subFeatures.length > 1) {
