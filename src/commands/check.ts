@@ -96,6 +96,14 @@ const PROJECT_TYPES: ProjectType[] = getSupportedLanguages().map(lang => {
       registryUrl = 'https://pypi.org';
       packageInfoUrl = (packageName: string) => `https://pypi.org/pypi/${packageName}/json`;
       break;
+    case 'ruby':
+      registryUrl = 'https://rubygems.org';
+      packageInfoUrl = (packageName: string) => `https://rubygems.org/api/v1/gems/${packageName}.json`;  
+      break;
+    case 'go':
+      registryUrl = 'https://proxy.golang.org'; 
+      packageInfoUrl = (packageName: string) => `https://proxy.golang.org/${packageName}/@v/list`;  
+      break;
     default:
       // For unsupported languages, we'll try npm registry as fallback
       registryUrl = 'https://registry.npmjs.org';
@@ -561,7 +569,43 @@ async function checkProjectPackages(verbose: boolean = false) {
   const spinner = ora('Analyzing project dependencies...').start();
 
   try {
-    let projectType = await detectProjectType();
+    // Detect ALL project types instead of just one
+    const allProjectTypes = await detectAllProjectTypes();
+    
+    if (allProjectTypes.length === 0) {
+      spinner.fail(chalk.hex('#ff4757')('❌ No supported project configuration files found'));
+      console.log(chalk.hex('#95afc0')('💡 Supported files: package.json, Cargo.toml, requirements.txt, composer.json, go.mod, pubspec.yaml, Gemfile, mix.exs'));
+      return;
+    }
+
+    spinner.succeed(chalk.hex('#10ac84')(`✅ Detected ${allProjectTypes.length} project type(s): ${allProjectTypes.map(pt => pt.name).join(', ')}`));
+
+    // Process each project type separately
+    for (let i = 0; i < allProjectTypes.length; i++) {
+      const projectType = allProjectTypes[i];
+      const isMultiProject = allProjectTypes.length > 1;
+      
+      if (isMultiProject) {
+        console.log('\n' + chalk.hex('#667eea')('═'.repeat(80)));
+        console.log(chalk.hex('#667eea')(`📋 Analyzing ${projectType.name} Dependencies (${i + 1}/${allProjectTypes.length})`));
+        console.log(chalk.hex('#667eea')('═'.repeat(80)));
+      }
+      
+      await analyzeSingleProjectType(projectType, verbose, isMultiProject);
+    }
+    
+    return; // Exit early since we've processed all project types
+  } catch (error: any) {
+    spinner.fail(chalk.hex('#ff4757')(`❌ Failed to analyze projects: ${error.message}`));
+    throw error;
+  }
+}
+
+// New function to analyze a single project type
+async function analyzeSingleProjectType(projectType: ProjectType, verbose: boolean, isMultiProject: boolean = false) {
+  const spinner = ora(`Analyzing ${projectType.name} dependencies...`).start();
+  
+  try {
     let dependencies: Record<string, string> = {};
 
     if (!projectType) {
@@ -574,10 +618,8 @@ async function checkProjectPackages(verbose: boolean = false) {
       return;
     }
 
-    // Get fresh dependencies if not cached or cache is incomplete
-    if (Object.keys(dependencies).length === 0) {
-      dependencies = await getDependenciesForProject(projectType);
-    }
+    // Get fresh dependencies
+    dependencies = await getDependenciesForProject(projectType);
 
     if (Object.keys(dependencies).length === 0) {
       spinner.warn(`No dependencies found in ${projectType.name} project`);
@@ -592,90 +634,82 @@ async function checkProjectPackages(verbose: boolean = false) {
       try {
         const info = await getEnhancedPackageInfo(name, version, projectType);
         packageInfos.push(info);
+        spinner.text = `✔ Retrieved info for ${name}`;
       } catch (error) {
         console.warn(`⚠️  Could not check ${name}`);
       }
     }
 
-    spinner.succeed(`Checked ${packageInfos.length} ${projectType.name} packages`);
+    spinner.succeed(`✔ Checked ${packageInfos.length} ${projectType.name} packages`);
 
     // Cache the package check results
     await cachePackageCheckResults(packageInfos, projectType);
 
-    displayPackageInfo(packageInfos, projectType, verbose);
+    displayPackageInfo(packageInfos, projectType, verbose, isMultiProject);
 
   } catch (error: any) {
-    spinner.fail('Failed to analyze project dependencies');
+    spinner.fail(`Failed to analyze ${projectType.name} dependencies`);
     throw error;
   }
 }
 
-async function detectProjectType(): Promise<ProjectType | null> {
-  console.log(chalk.gray('🔍 Detecting project type...'));
+// New function to detect ALL project types in a directory
+async function detectAllProjectTypes(): Promise<ProjectType[]> {
+  console.log(chalk.gray('🔍 Detecting all project types...'));
+  const foundTypes: ProjectType[] = [];
+  const foundFiles: string[] = [];
 
   // Priority order for detection - check most common files first
-  const priorityFiles = ['package.json', 'Cargo.toml', 'requirements.txt', 'composer.json', 'go.mod'];
+  const priorityFiles = ['package.json', 'Cargo.toml', 'requirements.txt', 'composer.json', 'go.mod', 'pubspec.yaml', 'Gemfile', 'mix.exs'];
 
-  // First pass: check priority files in current directory
+  // Check all priority files in current directory
   for (const priorityFile of priorityFiles) {
     const filePath = path.join(process.cwd(), priorityFile);
-    console.log(chalk.gray(`   Checking priority file: ${filePath}`));
+    console.log(chalk.gray(`   Checking: ${filePath}`));
 
     if (await fs.pathExists(filePath)) {
       console.log(chalk.green(`   ✅ Found: ${priorityFile}`));
+      foundFiles.push(priorityFile);
 
       // Find the project type that matches this file
       const matchingType = PROJECT_TYPES.find(type =>
         type.files.includes(priorityFile)
       );
 
-      if (matchingType) {
+      if (matchingType && !foundTypes.find(t => t.name === matchingType.name)) {
         console.log(chalk.green(`   📦 Detected: ${matchingType.name}`));
-        return matchingType;
+        foundTypes.push(matchingType);
       }
     }
   }
 
-  // Second pass: check all other files
+  // Check for additional files in each detected project type
   for (const projectType of PROJECT_TYPES) {
-    console.log(chalk.gray(`   Checking ${projectType.name}: ${projectType.files.join(', ')}`));
+    if (foundTypes.find(t => t.name === projectType.name)) continue; // Already found
+    
     for (const file of projectType.files) {
       if (priorityFiles.includes(file)) continue; // Already checked
-
-      // Check in current directory first
+      
       const filePath = path.join(process.cwd(), file);
       if (await fs.pathExists(filePath)) {
-        console.log(chalk.green(`   ✅ Found: ${file}`));
-        return projectType;
-      }
-    }
-  }
-
-  // Third pass: check subdirectories
-  try {
-    const currentDirContents = await fs.readdir(process.cwd());
-    for (const item of currentDirContents) {
-      const itemPath = path.join(process.cwd(), item);
-      const stats = await fs.stat(itemPath);
-      if (stats.isDirectory()) {
-        for (const priorityFile of priorityFiles) {
-          const configPath = path.join(itemPath, priorityFile);
-          if (await fs.pathExists(configPath)) {
-            console.log(chalk.green(`   ✅ Found in subdirectory: ${item}/${priorityFile}`));
-            const matchingType = PROJECT_TYPES.find(type =>
-              type.files.includes(priorityFile)
-            );
-            if (matchingType) return matchingType;
-          }
+        console.log(chalk.green(`   ✅ Found additional: ${file}`));
+        foundFiles.push(file);
+        
+        if (!foundTypes.find(t => t.name === projectType.name)) {
+          console.log(chalk.green(`   📦 Detected: ${projectType.name}`));
+          foundTypes.push(projectType);
         }
       }
     }
-  } catch (error) {
-    console.log(chalk.yellow('   Warning: Could not read directory contents'));
   }
 
-  console.log(chalk.yellow('   No project type detected'));
-  return null;
+  return foundTypes;
+}
+
+async function detectProjectType(): Promise<ProjectType | null> {
+  // This function now uses detectAllProjectTypes and returns the first one for backward compatibility
+  const allTypes = await detectAllProjectTypes();
+  return allTypes.length > 0 ? allTypes[0] : null;
 }
 
 async function getDependenciesForProject(projectType: ProjectType): Promise<Record<string, string>> {
@@ -945,71 +979,70 @@ async function getPackageInfo(
   }
 }
 
-function displayPackageInfo(packages: PackageInfo[], projectType?: ProjectType, verbose: boolean = false) {
+function displayPackageInfo(packages: PackageInfo[], projectType?: ProjectType, verbose: boolean = false, isMultiProject: boolean = false) {
   if (packages.length === 0) {
     console.log(chalk.yellow('📦 No packages to display'));
     return;
   }
 
-  console.log('\n' + chalk.hex('#00d2d3')('📊 Package Analysis Results'));
-  console.log(chalk.gray('─'.repeat(60)));
-
   const outdatedPackages = packages.filter(pkg => pkg.needsUpdate);
   const deprecatedPackages = packages.filter(pkg => pkg.isDeprecated);
   const upToDatePackages = packages.filter(pkg => !pkg.needsUpdate && !pkg.isDeprecated);
 
-  // Enhanced Summary with statistics
-  console.log(`\n${chalk.hex('#10ac84')('✅ Total packages checked:')} ${chalk.bold(packages.length.toString())}`);
-  console.log(`${chalk.hex('#10ac84')('✅ Up to date:')} ${chalk.bold(upToDatePackages.length.toString())}`);
-
-  if (outdatedPackages.length > 0) {
-    console.log(`${chalk.hex('#f39c12')('⚠️  Packages needing updates:')} ${chalk.bold(outdatedPackages.length.toString())}`);
-  }
-  if (deprecatedPackages.length > 0) {
-    console.log(`${chalk.hex('#ff4757')('🚨 Deprecated packages:')} ${chalk.bold(deprecatedPackages.length.toString())}`);
-  }
-
-  // Show severity breakdown
+  // Compact summary header
+  console.log('\n' + chalk.hex('#00d2d3')('📊 Package Analysis Results'));
+  console.log(chalk.gray('─'.repeat(80)));
+  
+  const summary = [
+    `${chalk.hex('#10ac84')('✅')} ${upToDatePackages.length} up-to-date`,
+    outdatedPackages.length > 0 ? `${chalk.hex('#f39c12')('⚠️')} ${outdatedPackages.length} need updates` : null,
+    deprecatedPackages.length > 0 ? `${chalk.hex('#ff4757')('🚨')} ${deprecatedPackages.length} deprecated` : null
+  ].filter(Boolean).join('  •  ');
+  
+  console.log(`${chalk.bold(`Total: ${packages.length}`)}  •  ${summary}`);
+  
   if (projectType) {
-    console.log(`\n${chalk.hex('#00d2d3')('📋 Project Type:')} ${chalk.bold(projectType.name)} (${chalk.cyan(projectType.packageManager)})`);
+    console.log(`${chalk.hex('#00d2d3')('📋')} ${projectType.name} (${chalk.cyan(projectType.packageManager)})`);
   }
 
-  // Determine how many packages to show based on verbose flag
-  const packagesToShow = verbose ? packages : packages.slice(0, 8);
+  // Determine how many packages to show
+  const packagesToShow = verbose ? packages : packages.slice(0, 12);
+  
+  // Group packages by status for better organization
+  const groupedPackages = [
+    ...deprecatedPackages.slice(0, verbose ? deprecatedPackages.length : 3),
+    ...outdatedPackages.slice(0, verbose ? outdatedPackages.length : 8),
+    ...upToDatePackages.slice(0, verbose ? upToDatePackages.length : 6)
+  ].slice(0, verbose ? packages.length : 12);
 
-  if (verbose && packages.length > 8) {
-    console.log(`\n${chalk.hex('#f39c12')('📋 Showing all')} ${chalk.bold(packages.length.toString())} ${chalk.hex('#f39c12')('packages (verbose mode)')}`);
-  } else if (!verbose && packages.length > 8) {
-    console.log(`\n${chalk.hex('#f39c12')('📋 Showing first')} ${chalk.bold('8')} ${chalk.hex('#f39c12')('packages (use --verbose to see all)')}`);
-  }
-
-  packagesToShow.forEach((pkg, index) => {
-    const statusIcon = pkg.isDeprecated ? '🚨' : pkg.needsUpdate ? '⚠️' : '✅';
-    const statusColor = pkg.isDeprecated ? '#ff4757' : pkg.needsUpdate ? '#f39c12' : '#10ac84';
-    const statusText = pkg.isDeprecated ? 'DEPRECATED' : pkg.needsUpdate ? 'UPDATE AVAILABLE' : 'UP TO DATE';
-
-    const versionComparison = pkg.currentVersion !== 'unknown' && pkg.latestVersion !== 'unknown'
-      ? ` ${chalk.gray('→')} ${chalk.hex('#10ac84')(pkg.latestVersion)}`
-      : '';
-
-    console.log('\n' + boxen(
-      `${statusIcon} ${chalk.bold(pkg.name)} ${chalk.hex(statusColor)(`[${statusText}]`)}\n` +
-      `${chalk.gray('Current:')} ${chalk.yellow(pkg.currentVersion)}${versionComparison}\n` +
-      `${chalk.gray('Type:')} ${chalk.blue(pkg.projectType)} ${chalk.gray('via')} ${chalk.cyan(pkg.packageManager)}\n` +
-      (pkg.description ? `${chalk.gray('Description:')} ${pkg.description.slice(0, 70)}${pkg.description.length > 70 ? '...' : ''}\n` : '') +
-      (pkg.homepage ? `${chalk.gray('Homepage:')} ${chalk.blue(pkg.homepage)}\n` : '') +
-      (pkg.isDeprecated ? `${chalk.hex('#ff4757')('⚠️ DEPRECATED:')} ${pkg.deprecatedMessage || 'This package is no longer maintained'}\n` : '') +
-      (pkg.alternatives && pkg.alternatives.length > 0 ? `${chalk.gray('Alternatives:')} ${pkg.alternatives.join(', ')}\n` : ''),
-      {
-        padding: 1,
-        margin: 0,
-        borderStyle: 'round',
-        borderColor: statusColor,
-        title: `Package ${index + 1}/${packagesToShow.length}`,
-        titleAlignment: 'left'
+  if (groupedPackages.length > 0) {
+    console.log('\n');
+    // Compact table format
+    groupedPackages.forEach((pkg, index) => {
+      const statusIcon = pkg.isDeprecated ? '🚨' : pkg.needsUpdate ? '⚠️' : '✅';
+      const statusColor = pkg.isDeprecated ? '#ff4757' : pkg.needsUpdate ? '#f39c12' : '#10ac84';
+      
+      // Format version comparison compactly
+      const versionText = pkg.needsUpdate && pkg.latestVersion !== 'unknown' 
+        ? `${chalk.dim(pkg.currentVersion)} → ${chalk.hex(statusColor)(pkg.latestVersion)}`
+        : chalk.dim(pkg.currentVersion);
+      
+      // Truncate name and description for compact view
+      const name = pkg.name.length > 25 ? pkg.name.slice(0, 22) + '...' : pkg.name;
+      const desc = pkg.description 
+        ? (pkg.description.length > 50 ? pkg.description.slice(0, 47) + '...' : pkg.description)
+        : chalk.dim('No description');
+      
+      console.log(
+        `${statusIcon} ${chalk.bold(name.padEnd(25))} ${versionText.padEnd(20)} ${chalk.gray(desc)}`
+      );
+      
+      // Show deprecation warning inline
+      if (pkg.isDeprecated && pkg.deprecatedMessage) {
+        console.log(`   ${chalk.hex('#ff4757')('⚠️')} ${chalk.dim(pkg.deprecatedMessage.slice(0, 80))}`);
       }
-    ));
-  });
+    });
+  }
 
   // Show remaining packages info when not in verbose mode
   if (!verbose && packages.length > 8) {
