@@ -187,6 +187,10 @@ docker-compose run --rm package-installer
 
 ---
 
+## Chocolatey Installation
+Coming Soon...
+---
+
 ## 📋 Installation Verification
 
 After installation, verify the CLI is working correctly:

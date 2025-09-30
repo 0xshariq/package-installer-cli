@@ -4,26 +4,18 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Node.js](https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen.svg)](https://nodejs.org/)
 
-A **cross-platform, interactive CLI** to scaffold modern web application templates with support for multiple frameworks, languages, and development tools. Create production-ready projects in seconds!
+A **powerful, cross-platform CLI** for modern development workflows. Create projects, manage dependencies, analyze codebases, and streamline your development process with intelligent automation.
 
-## 🚀 Quick Features
+## 🚀 Core Features
 
-- **🎨 Multiple Frameworks**: React, Next.js, Express, Angular, Vue, Rust
-- **🔤 Language Support**: TypeScript & JavaScript variants
-- **🎭 UI Libraries**: Tailwind CSS, Material-UI, shadcn/ui
-- **📦 Smart Package Management**: Auto-detects npm, yarn, pnpm
-- **⚡ Lightning Fast**: Optimized template generation with intelligent caching
-- **🌈 Beautiful CLI**: Gorgeous terminal interface with real-time analytics
-- **🔍 Project Analysis**: Advanced dependency analysis and project insights
-
-## ✨ New Features
-
-- **📊 Enhanced Analytics Dashboard**: Real-time usage analytics with detailed insights
-- **🎯 Smart Dependency Updates**: Project-specific dependency management for JS, Python, Rust, Go, Ruby, PHP
-- **🚀 Intelligent CLI Upgrades**: Separate upgrade system with breaking change detection
-- **💾 .package-installer-cli Folder**: All cache and history stored in dedicated folder
-- **📈 Usage Tracking**: Comprehensive command and feature usage tracking
-- **⚡ Performance Insights**: Productivity scoring and usage patterns
+- **🎨 Project Creation**: React, Next.js, Express, Angular, Vue, Rust templates
+- **� Code Analysis**: Comprehensive project analytics and insights
+- **📦 Dependency Management**: Smart updates across multiple package managers
+- **🩺 Health Diagnostics**: Automated issue detection and fixes
+- **🌍 Environment Analysis**: Development environment optimization
+- **�️ Intelligent Caching**: Performance optimization with smart caching
+- **� Usage Analytics**: Real-time insights and productivity metrics
+- **⚡ Cross-Platform**: Windows, macOS, Linux support
 
 ## 📥 Installation
 
@@ -103,16 +95,19 @@ docker-compose --profile dev run --rm package-installer-dev
 
 ```bash
 # Create new project interactively
-pi create
+pi create my-app
 
-# Analyze project with enhanced dashboard
+# Analyze existing project
 pi analyze
 
-# Update project dependencies only
+# Check project health
+pi doctor
+
+# Update dependencies
 pi update
 
-# Upgrade CLI to latest version
-pi upgrade-cli
+# Clean development artifacts
+pi clean
 ```
 
 ## 📚 Documentation
@@ -127,30 +122,34 @@ pi upgrade-cli
 
 ## 🛠️ Command Overview
 
-| Command | Description | Usage |
-|---------|-------------|-------|
-| `pi create` | Create new project from templates | `pi create [name]` |
-| `pi analyze` | Enhanced project analytics dashboard | `pi analyze [--detailed]` |
-| `pi update` | Update project dependencies | `pi update [--latest]` |
-| `pi upgrade-cli` | Upgrade CLI to latest version | `pi upgrade-cli` |
-| `pi add` | Add features to existing projects | `pi add [feature]` |
-| `pi doctor` | Diagnose and fix project issues | `pi doctor` |
-| `pi clean` | Clean development artifacts | `pi clean [--all]` |
+| Command | Description | Key Options |
+|---------|-------------|-------------|
+| `pi create` | Create new projects from templates | Interactive framework selection |
+| `pi analyze` | Project analytics and insights | `--detailed`, `--export` |
+| `pi update` | Update project dependencies | `--latest` for breaking changes |
+| `pi doctor` | Diagnose and fix issues | `--fix`, `--node`, `--deps`, `--tools` |
+| `pi env` | Environment analysis | `--check`, `--generate`, `--validate` |
+| `pi clone` | Clone and setup repositories | `--offline`, `--shallow`, `--branch` |
+| `pi add` | Add features to projects | `--list` to see all features |
+| `pi clean` | Clean development artifacts | `--all`, `--dry-run` |
+| `pi cache` | Manage CLI cache | `clear`, `stats`, `optimize` |
+| `pi check` | Check package versions | `--verbose` for details |
+| `pi upgrade-cli` | Upgrade CLI version | Breaking change detection |
 
-*For complete command documentation, see [docs/commands.md](docs/commands.md)*
+*For complete documentation, see [docs/commands.md](docs/commands.md)*
 
-## 🏗️ Supported Project Types
+## 🏗️ Supported Technologies
 
-| Language/Framework | Templates | Package Managers |
-|-------------------|-----------|------------------|
-| **JavaScript/TypeScript** | React, Next.js, Express, Angular, Vue | npm, yarn, pnpm |
-| **Python** | Django, Flask, FastAPI | pip, poetry |
-| **Rust** | Basic, Advanced, Web | cargo |
-| **Go** | CLI, Web, API | go mod |
-| **Ruby** | Rails, Sinatra | bundler |
-| **PHP** | Laravel, Symfony | composer |
+| Language/Framework | Project Creation | Dependency Updates | Package Managers |
+|-------------------|-----------------|-------------------|------------------|
+| **JavaScript/TypeScript** | React, Next.js, Express, Angular, Vue | ✅ | npm, yarn, pnpm |
+| **Python** | Django, Flask | ✅ | pip, poetry |
+| **Rust** | Basic, Web, CLI | ✅ | cargo |
+| **Go** | Web, API | ✅ | go mod |
+| **Ruby** | Rails, basic | ✅ | bundler |
+| **PHP** | Laravel, basic | ✅ | composer |
 
-*For detailed template information, see [docs/templates.md](docs/templates.md)*
+*For detailed information, see [docs/templates.md](docs/templates.md)*
 
 ## 🎯 System Requirements
 

@@ -19,6 +19,7 @@ pnpm install -g @0xshariq/package-installer
 yarn global add @0xshariq/package-installer
 ```
 
+> **📋 Complete Installation Guide**: For all installation methods including Python, Rust, Ruby, Go, Homebrew, and Docker, see [installation.md](docs/installation.md)
 After installation, you can use the `pi` command globally in any terminal.
 
 ### First Steps
@@ -50,20 +51,20 @@ Available for all commands:
 
 ## 📋 Commands Overview
 
-| Command | Purpose | Real-time Data | Status |
-|---------|---------|----------------|--------|
-| [`create`](#create-command) | Create new projects from templates | ✅ Live template selection | ✅ Available |
-| [`analyze`](#analyze-command) | Project analytics dashboard | ✅ Real usage data | ✅ Available |
-| [`update`](#update-command) | Update project dependencies | ✅ Live version checks | ✅ Available |
-| [`add`](#add-command) | Add features to existing projects | ✅ Feature detection | ✅ Available |
-| [`check`](#check-command) | Project health diagnostics | ✅ Real-time checks | ✅ Available |
-| [`clone`](#clone-command) | Clone and setup repositories | ✅ Git integration | ✅ Available |
-| [`doctor`](#doctor-command) | Diagnose and fix issues | ✅ System analysis | ✅ Available |
-| [`env`](#env-command) | Environment analysis | ✅ Live environment | ✅ Available |
-| [`clean`](#clean-command) | Clean project artifacts | ✅ Real file scanning | ✅ Available |
-| [`cache`](#cache-command) | Manage CLI cache and data | ✅ Real cache stats | ✅ Available |
-| [`upgrade-cli`](#upgrade-cli-command) | Upgrade CLI version | ✅ Version checking | ✅ Available |
-| [`deploy`](#deploy-command) | Deploy to cloud platforms | 🚧 In Development | 🚧 Coming Soon |
+| Command | Purpose | Key Features | Status |
+|---------|---------|-------------|--------|
+| [`create`](#create-command) | Create new projects from templates | Interactive selection, modern tooling | ✅ Available |
+| [`analyze`](#analyze-command) | Project analytics dashboard | Usage stats, performance insights | ✅ Available |
+| [`update`](#update-command) | Update project dependencies | Multi-language support, safety checks | ✅ Available |
+| [`add`](#add-command) | Add features to existing projects | Framework detection, smart config | ✅ Available |
+| [`check`](#check-command) | Check package versions | Security scanning, detailed reports | ✅ Available |
+| [`clone`](#clone-command) | Clone and setup repositories | Multiple platforms, auto setup | ✅ Available |
+| [`doctor`](#doctor-command) | Diagnose and fix issues | Auto-fix, comprehensive checks | ✅ Available |
+| [`env`](#env-command) | Environment analysis | Tool detection, optimization tips | ✅ Available |
+| [`clean`](#clean-command) | Clean project artifacts | Selective cleanup, preview mode | ✅ Available |
+| [`cache`](#cache-command) | Manage CLI cache and data | Performance optimization | ✅ Available |
+| [`upgrade-cli`](#upgrade-cli-command) | Upgrade CLI version | Breaking change detection | ✅ Available |
+| [`deploy`](#deploy-command) | Deploy to cloud platforms | Multiple platforms | 🚧 Coming Soon |
 
 
 ## 🛠️ Core Commands
@@ -309,12 +310,12 @@ pi add
 
 **Direct Feature Addition:**
 ```bash
-# Add specific features
-pi add auth            # Authentication setup
+# Add specific features (interactive selection)
+pi add auth            # Authentication providers
 pi add docker          # Docker configuration
-pi add tailwind        # Tailwind CSS integration
-pi add testing         # Testing framework setup
-pi add database        # Database integration
+pi add ui              # UI libraries (Tailwind, Material-UI, etc.)
+pi add testing         # Testing frameworks
+pi add database        # Database integrations
 ```
 
 **Feature Categories:**
@@ -479,10 +480,12 @@ pi clone git@github.com:user/repo.git
 **Available Options:**
 | Option | Description | Example |
 |--------|-------------|---------|
-| `--no-install` | Skip dependency installation | `--no-install` |
+| `--offline` | Use cached templates if available | `--offline` |
+| `--no-deps` | Skip dependency installation | `--no-deps` |
+| `--no-git` | Skip git initialization | `--no-git` |
+| `--shallow` | Create shallow clone (faster) | `--shallow` |
 | `--branch` | Clone specific branch | `--branch=develop` |
-| `--depth` | Shallow clone depth | `--depth=1` |
-| `--setup` | Run automated setup | `--setup` |
+| `--template` | Treat as template repository | `--template` |
 
 **Post-Clone Actions:**
 1. **Dependency Installation** - Automatic npm/yarn/pnpm install
@@ -562,10 +565,11 @@ pi doctor
 **Available Options:**
 | Option | Description | Example |
 |--------|-------------|---------|
-| `--fix` | Automatically fix issues | `--fix` |
-| `--system` | System-only diagnostics | `--system` |
-| `--project` | Project-only diagnostics | `--project` |
-| `--verbose` | Detailed diagnostic output | `--verbose` |
+| `--fix` | Automatically fix detected issues | `--fix` |
+| `--node` | Check Node.js and npm setup only | `--node` |
+| `--deps` | Check project dependencies only | `--deps` |
+| `--tools` | Check development tools only | `--tools` |
+| `--verbose` | Show detailed diagnostic information | `--verbose` |
 
 **Auto-Fix Capabilities:**
 - ✅ **Dependency Updates** - Update outdated packages
@@ -652,10 +656,11 @@ pi env --check-updates
 **Available Options:**
 | Option | Description | Example |
 |--------|-------------|---------|
-| `--optimize` | Show optimization suggestions | `--optimize` |
-| `--check-updates` | Check for tool updates | `--check-updates` |
-| `--export` | Export environment info | `--export=env.json` |
-| `--benchmark` | Run performance benchmarks | `--benchmark` |
+| `--check` | Check development tools and versions | `--check` |
+| `--generate` | Generate .env template for project | `--generate` |
+| `--validate` | Validate existing .env file | `--validate` |
+| `--export` | Export environment info to file | `--export` |
+| `--system` | Show system information only | `--system` |
 
 ---
 
@@ -1198,26 +1203,23 @@ pi doctor --export=debug.json
 - 💬 [Discussions](https://github.com/0xshariq/package-installer-cli/discussions)
 - 🚀 [Feature Requests](https://github.com/0xshariq/package-installer-cli/issues/new?template=feature_request.md)
 
-## 📈 Performance Metrics
+## 📈 Performance Benefits
 
-### Speed Improvements with Caching
+### Caching Improvements
 
-| Operation | Without Cache | With Cache | Improvement |
-|-----------|---------------|------------|-------------|
-| Project Creation | 45-60 seconds | 8-12 seconds | **5x faster** |
-| Project Analysis | 10-15 seconds | 3-5 seconds | **3x faster** |
-| Template Loading | 5-8 seconds | 1-2 seconds | **4x faster** |
-| Package Updates | 30-45 seconds | 15-20 seconds | **2x faster** |
-| Environment Check | 8-12 seconds | 2-3 seconds | **4x faster** |
+| Operation | Improvement | Notes |
+|-----------|-------------|-------|
+| Project Creation | 2-3x faster | Template caching |
+| Project Analysis | 2x faster | Metadata caching |
+| Package Updates | 1.5x faster | Version caching |
+| Environment Check | 3x faster | System info caching |
 
 ### Resource Usage
 
-| Resource | Typical Usage | Peak Usage | Optimization |
-|----------|---------------|------------|--------------|
-| Memory | 50-100MB | 200MB | Streaming processing |
-| Disk Space | 100-200MB | 500MB | Automatic cleanup |
-| Network | Minimal | High during updates | Smart caching |
-| CPU | Low | Medium during builds | Parallel processing |
+- **Memory**: 50-150MB typical usage
+- **Disk Space**: 100-300MB (includes cache)
+- **Network**: Minimal after initial setup
+- **Performance**: Optimized for development workflows
 
 ---
 
