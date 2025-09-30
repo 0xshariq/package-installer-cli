@@ -9,6 +9,7 @@ import os from 'os';
 import gradientString from 'gradient-string';
 import boxen from 'boxen';
 import { createStandardHelp, CommandHelpConfig } from '../utils/helpFormatter.js';
+import { displayCommandBanner } from '../utils/banner.js';
 import { 
   createBanner, 
   displaySystemInfo,
@@ -31,8 +32,7 @@ export function showAnalyzeHelp(): void {
     options: [
       { flag: '--export', description: 'Export analytics data to JSON file' },
       { flag: '--reset', description: 'Reset analytics history' },
-      { flag: '--detailed', description: 'Show detailed analytics breakdown' },
-      { flag: '-h, --help', description: 'Show this help message' }
+      { flag: '--detailed', description: 'Show detailed analytics breakdown' }
     ],
     examples: [
       { command: 'analyze', description: 'Show complete analytics dashboard' },
@@ -74,7 +74,7 @@ export async function analyzeCommand(options: any = {}): Promise<void> {
     return;
   }
 
-  createBanner('Package Installer CLI Analytics');
+  displayCommandBanner('Analytics', 'Comprehensive project analytics and usage insights');
 
   const historyManager = new HistoryManager();
   

@@ -8,6 +8,7 @@ import path from 'path';
 import semver from 'semver';
 import https from 'https';
 import { createStandardHelp, CommandHelpConfig } from '../utils/helpFormatter.js';
+import { displayCommandBanner } from '../utils/banner.js';
 import {
   SupportedLanguage,
   getSupportedLanguages,
@@ -472,7 +473,6 @@ export function showCheckHelp(): void {
       'check [options]'
     ],
     options: [
-      { flag: '-h, --help', description: 'Display help for this command' },
       { flag: '-v, --verbose', description: 'Show detailed information for all packages' }
     ],
     examples: [
@@ -524,6 +524,8 @@ export async function checkCommand(packageName?: string, options?: { verbose?: b
   }
 
   try {
+    // Display command banner
+    displayCommandBanner('Check', 'Check package versions and updates for your project dependencies');
     console.log('\n' + chalk.hex('#f39c12')('🔍 Starting package check...'));
 
     if (packageName && packageName !== '--verbose' && packageName !== '-v') {

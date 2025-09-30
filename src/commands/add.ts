@@ -9,6 +9,7 @@ import { addFeature, detectProjectStack, SUPPORTED_FEATURES } from '../utils/fea
 import { historyManager } from '../utils/historyManager.js';
 import { cacheProjectData } from '../utils/cacheManager.js';
 import { getFeaturesJsonPath, getFeaturesPath } from '../utils/pathResolver.js';
+import { displayCommandBanner } from '../utils/banner.js';
 
 /**
  * Helper function to capitalize strings
@@ -20,7 +21,15 @@ function capitalize(str: string): string {
 /**
  * Get features.json configuration with new jsonPath structure
  */
+// Cache for features config to avoid repeated file reads
+let featuresConfigCache: Record<string, any> | null = null;
+
 async function getFeaturesConfig(): Promise<Record<string, any>> {
+  // Return cached config if available
+  if (featuresConfigCache) {
+    return featuresConfigCache;
+  }
+
   try {
     // Use the centralized path resolver
     const featuresPath = getFeaturesJsonPath();
@@ -48,11 +57,11 @@ async function getFeaturesConfig(): Promise<Record<string, any>> {
                 ...individualFeatureData
               };
             } else {
-              console.warn(chalk.yellow(`⚠️  Individual feature file not found: ${individualFeaturePath}`));
+              // Silently skip missing files to avoid console spam
               processedConfig[featureName] = featureConfig;
             }
           } catch (error) {
-            console.warn(chalk.yellow(`⚠️  Could not load individual feature file for ${featureName}`));
+            // Silently handle errors to avoid console spam
             processedConfig[featureName] = featureConfig;
           }
         } else {
@@ -61,13 +70,16 @@ async function getFeaturesConfig(): Promise<Record<string, any>> {
         }
       }
       
-      return { features: processedConfig };
+      // Cache the processed config
+      featuresConfigCache = { features: processedConfig };
+      return featuresConfigCache;
     }
 
-    console.warn(chalk.yellow(`⚠️  features.json not found at: ${featuresPath}`));
-    return { features: {} };
+    // Return empty config without warning to avoid console spam
+    featuresConfigCache = { features: {} };
+    return featuresConfigCache;
   } catch (error) {
-    console.warn(chalk.yellow('⚠️  Error reading features.json, using fallback'));
+    // Return fallback config without warning
     return { features: {} };
   }
 }
@@ -322,8 +334,7 @@ export async function showAddHelp(): Promise<void> {
     ],
     options: [
       { flag: '-l, --list', description: 'List all available features' },
-      { flag: '-v, --verbose', description: 'Show detailed output' },
-      { flag: '-h, --help', description: 'Show this help message' }
+      { flag: '-v, --verbose', description: 'Show detailed output' }
     ],
     examples: [
       { command: 'add', description: 'Interactive feature selection' },
@@ -381,25 +392,20 @@ export async function addCommand(
   options: { list?: boolean; verbose?: boolean; framework?: string; projectPath?: string; help?: boolean } = {}
 ): Promise<void> {
   try {
-    // Handle help flag
-    if (options.help || feature === '--help' || feature === '-h') {
-      await showAddHelp();
-      return;
-    }
-
     // Handle list flag
     if (options.list || feature === '--list' || feature === '-l') {
       await listAvailableFeatures();
       return;
     }
 
+    // Display command banner
+    displayCommandBanner('Add', 'Add new features to your project with integrated templates and configurations');
+
     // Initialize history manager
     await historyManager.init();
 
     // Show disclaimer
     showFeatureDisclaimer();
-
-    console.log(chalk.hex('#9c88ff')('\n🔮 Adding features to your project...'));
 
     // Use provided project path or current directory
     const projectPath = options.projectPath || process.cwd();

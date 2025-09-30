@@ -17,7 +17,6 @@ export function showDeployHelp(): void {
     description: 'Deploy your projects to various cloud platforms seamlessly.\nThis feature is currently under development!',
     usage: ['pi deploy'],
     options: [
-      { flag: '-h, --help', description: 'Display help for this command' }
     ],
     examples: [
       { command: 'pi deploy', description: 'Deploy current project' },

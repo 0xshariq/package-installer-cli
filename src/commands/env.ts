@@ -251,8 +251,7 @@ export function showEnvironmentHelp(): void {
       { flag: '--generate', description: 'Generate .env template for project' },
       { flag: '--validate', description: 'Validate existing .env file' },
       { flag: '--export', description: 'Export environment info to file' },
-      { flag: '--system', description: 'Show system information only' },
-      { flag: '-h, --help', description: 'Show this help message' }
+      { flag: '--system', description: 'Show system information only' }
     ],
     examples: [
       { command: 'env', description: 'Interactive environment analysis' },

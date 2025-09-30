@@ -17,7 +17,6 @@ export function showCloneHelp(): void {
       'clone [options]'
     ],
     options: [
-      { flag: '-h, --help', description: 'Display help for this command' },
       { flag: '--offline', description: 'Use cached templates if available' },
       { flag: '--no-deps', description: 'Skip dependency installation' },
       { flag: '--no-git', description: 'Skip git initialization' },

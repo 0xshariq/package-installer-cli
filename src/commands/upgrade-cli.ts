@@ -24,7 +24,6 @@ export function showUpgradeHelp(): void {
     description: 'Update Package Installer CLI to the latest version with intelligent upgrade management.\nIncludes breaking change detection and version compatibility checks!',
     usage: ['pi upgrade-cli'],
     options: [
-      { flag: '-h, --help', description: 'Display help for this command' }
     ],
     examples: [
       { command: 'pi upgrade-cli', description: 'Smart upgrade with breaking change detection' },
