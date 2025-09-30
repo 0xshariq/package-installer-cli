@@ -82,7 +82,10 @@ export function createStandardHelp(config: CommandHelpConfig): void {
   if (config.examples && config.examples.length > 0) {
     helpContent += chalk.cyan('Examples:') + '\n';
     config.examples.forEach(example => {
-      helpContent += chalk.gray(`  ${piGradient('pi')} ${example.command.padEnd(25)} # ${example.description}`) + '\n';
+      // Check if command already starts with 'pi', if not add it
+      const command = example.command.startsWith('pi ') ? example.command : `pi ${example.command}`;
+      const formattedCommand = command.replace(/^pi /, `${piGradient('pi')} `);
+      helpContent += chalk.gray(`  ${formattedCommand.padEnd(35)} # ${example.description}`) + '\n';
     });
     helpContent += '\n';
   }
