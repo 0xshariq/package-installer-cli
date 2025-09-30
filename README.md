@@ -83,7 +83,7 @@ docker-compose --profile dev run --rm package-installer-dev
 |-----|-------------|----------|
 | `latest` | Latest stable release | Production usage |
 | `dev` | Development version | Testing new features |
-| `v3.2.0` | Specific version | Version pinning |
+| `v3.7.0` | Specific version | Version pinning |
 
 ### Volume Mounts
 
@@ -114,7 +114,8 @@ pi clean
 
 | Document | Description |
 |----------|-------------|
-| [� Installation](INSTALLATION.md) | Complete installation guide for all package managers |
+| [� Installation](docs/installation.md) | Complete installation guide for all package managers |
+| [🐳 Docker](docs/docker.md) | Docker Usage and installation |
 | [�📋 Commands](docs/commands.md) | Complete command reference with examples |
 | [⚡ Features](docs/features.md) | Detailed feature documentation and usage |
 | [🎨 Templates](docs/templates.md) | Available templates and customization options |
