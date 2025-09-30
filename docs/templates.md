@@ -10,11 +10,11 @@ Package Installer CLI offers a wide variety of pre-configured templates for mode
 
 | Category | Templates | Languages | Status |
 |----------|-----------|-----------|--------|
-| **Frontend** | React, Next.js, Angular, Vue.js | TypeScript, JavaScript | ✅ Available |
+| **Frontend** | React, Angular, Vue.js | TypeScript, JavaScript | ✅ Available |
 | **Backend** | Express.js, NestJS | TypeScript, JavaScript | ✅ Available |
-| **Fullstack** | React+Express, React+NestJS | TypeScript, JavaScript | ✅ Available |
+| **Fullstack** | React+Express, React+NestJS , Next.js| TypeScript, JavaScript | ✅ Available |
 | **System** | Rust Basic, Rust Advanced | Rust | ✅ Available |
-| **Mobile** | React Native | TypeScript, JavaScript | 🚧 Coming Soon |
+| **Mobile** | React Native | TypeScript, JavaScript |  ✅ Available |
 | **Desktop** | Electron, Tauri | TypeScript, JavaScript, Rust | 🚧 Coming Soon |
 
 ## 🚀 Frontend Templates
