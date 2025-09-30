@@ -6,6 +6,7 @@ import chalk from 'chalk';
 import path from 'path';
 import gradient from 'gradient-string';
 import boxen from 'boxen';
+import { createStandardHelp, CommandHelpConfig } from '../utils/helpFormatter.js';
 import {
   promptProjectName,
   promptFrameworkSelection, 
@@ -43,43 +44,60 @@ import { CacheManager } from '../utils/cacheUtils.js';
  * Display help for create command
  */
 export function showCreateHelp(): void {
-  const piGradient = gradient(['#00c6ff', '#0072ff']);
-  const headerGradient = gradient(['#4facfe', '#00f2fe']);
+  const helpConfig: CommandHelpConfig = {
+    commandName: 'Create',
+    emoji: '🚀',
+    description: 'Create a new project from our curated collection of modern templates.\nChoose from React, Next.js, Express, Nest.js, Rust, and more!',
+    usage: [
+      'create [project-name] [options]',
+      'create [options]'
+    ],
+    options: [
+      { flag: '-h, --help', description: 'Display help for this command' },
+      { flag: '--show-cache', description: 'Show cached preferences' },
+      { flag: '--clear-cache', description: 'Clear cached preferences' }
+    ],
+    examples: [
+      { command: 'create my-awesome-app', description: 'Create with specific name' },
+      { command: 'create', description: 'Interactive mode - will prompt for name' },
+      { command: 'create --show-cache', description: 'Show cached preferences' },
+      { command: 'create --clear-cache', description: 'Clear cached preferences' }
+    ],
+    additionalSections: [
+      {
+        title: 'Smart Caching',
+        items: [
+          'Remembers your preferences from previous sessions',
+          'Suggests framework-specific project names',
+          'Shows project count and usage statistics'
+        ]
+      },
+      {
+        title: 'Available Templates',
+        items: [
+          'React (Vite) - JavaScript/TypeScript variants',
+          'Next.js - App Router with multiple configurations',
+          'Express - RESTful APIs with authentication',
+          'Nest.js - Enterprise-grade Node.js framework',
+          'Angular - Modern Angular applications',
+          'Vue.js - Progressive Vue.js applications',
+          'Rust - Systems programming templates',
+          'Django - Python web framework',
+          'Flask - Lightweight Python web apps',
+          'Go - Fast and efficient web services',
+          'React-Native - Mobile apps for iOS and Android',
+          'Combination Templates - reactjs+express+shadcn,reactjs=nestjs+shadcn' 
+        ]
+      }
+    ],
+    tips: [
+      'Use interactive mode for guided project creation',
+      'Templates include best practices and modern tooling',
+      'All templates support both JavaScript and TypeScript'
+    ]
+  };
   
-  console.log('\n' + boxen(
-    headerGradient('🚀 Create Command Help') + '\n\n' +
-    chalk.white('Create a new project from our curated collection of modern templates.') + '\n' +
-    chalk.white('Choose from React, Next.js, Express, Nest.js, Rust, and more!') + '\n\n' +
-    chalk.cyan('Usage:') + '\n' +
-    chalk.white(`  ${piGradient('pi')} ${chalk.hex('#10ac84')('create')} [project-name]`) + '\n\n' +
-    chalk.cyan('Options:') + '\n' +
-    chalk.gray('  -h, --help    Display help for this command') + '\n\n' +
-    chalk.cyan('Examples:') + '\n' +
-    chalk.gray(`  ${piGradient('pi')} ${chalk.hex('#10ac84')('create')} my-awesome-app    # Create with specific name`) + '\n' +
-    chalk.gray(`  ${piGradient('pi')} ${chalk.hex('#10ac84')('create')}                   # Interactive mode - will prompt for name`) + '\n' +
-    chalk.gray(`  ${piGradient('pi')} ${chalk.hex('#10ac84')('create')} ${chalk.hex('#ff6b6b')('--show-cache')}       # Show cached preferences`) + '\n' +
-    chalk.gray(`  ${piGradient('pi')} ${chalk.hex('#10ac84')('create')} ${chalk.hex('#ff6b6b')('--clear-cache')}      # Clear cached preferences`) + '\n' +
-    chalk.gray(`  ${piGradient('pi')} ${chalk.hex('#10ac84')('create')} ${chalk.hex('#ff6b6b')('--help')}            # Show this help message`) + '\n\n' +
-    chalk.hex('#00d2d3')('💡 Smart Caching:') + '\n' +
-    chalk.hex('#95afc0')('  • Remembers your preferences from previous sessions') + '\n' +
-    chalk.hex('#95afc0')('  • Suggests framework-specific project names') + '\n' +
-    chalk.hex('#95afc0')('  • Shows project count and usage statistics') + '\n\n' +
-    chalk.hex('#00d2d3')('💡 Available Templates:') + '\n' +
-    chalk.hex('#95afc0')('  • React (Vite) - JavaScript/TypeScript variants') + '\n' +
-    chalk.hex('#95afc0')('  • Next.js - App Router with multiple configurations') + '\n' +
-    chalk.hex('#95afc0')('  • Express - RESTful APIs with authentication') + '\n' +
-    chalk.hex('#95afc0')('  • Nest.js - Enterprise-grade Node.js framework') + '\n' +
-    chalk.hex('#95afc0')('  • Angular - Modern Angular applications') + '\n' +
-    chalk.hex('#95afc0')('  • Vue.js - Progressive Vue.js applications') + '\n' +
-    chalk.hex('#95afc0')('  • Rust - Systems programming templates') + '\n' +
-    chalk.hex('#95afc0')('  • Django - Python web framework'),
-    {
-      padding: 1,
-      borderStyle: 'round',
-      borderColor: 'cyan',
-      backgroundColor: '#0a0a0a'
-    }
-  ));
+  createStandardHelp(helpConfig);
 }
 
 /**
@@ -189,25 +207,20 @@ export async function createProject(providedName?: string, options?: any): Promi
       await updateTemplateUsage(
         templateName || selectedFramework, 
         selectedFramework, 
-        selectedLanguage, 
-        []  // Features will be updated after adding them
+        selectedLanguage
       );
       
       const templateFiles = await getCachedTemplateFiles(templateName || selectedFramework);
       await cacheTemplateFiles(
         templateName || selectedFramework,
         templatePath,
-        templateFiles || {},
-        await getDirectorySize(projectPath)
+        templateFiles || {}
       );
       
       await cacheProjectData(
         projectPath,
         projectName,
-        selectedLanguage,
-        selectedFramework,
-        [], // Features will be added next
-        await getDirectorySize(projectPath)
+        selectedLanguage
       );
     } catch (error) {
       console.warn(chalk.yellow('⚠️  Could not cache project data'));

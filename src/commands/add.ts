@@ -4,10 +4,10 @@ import gradient from 'gradient-string';
 import boxen from 'boxen';
 import path from 'path';
 import fs from 'fs-extra';
-import { fileURLToPath } from 'url';
-import { addFeature, detectProjectStack, SUPPORTED_FEATURES, FeatureConfig } from '../utils/featureInstaller.js';
+import { createStandardHelp, CommandHelpConfig } from '../utils/helpFormatter.js';
+import { addFeature, detectProjectStack, SUPPORTED_FEATURES } from '../utils/featureInstaller.js';
 import { historyManager } from '../utils/historyManager.js';
-import { getCachedProject, cacheProjectData } from '../utils/cacheManager.js';
+import { cacheProjectData } from '../utils/cacheManager.js';
 import { getFeaturesJsonPath, getFeaturesPath } from '../utils/pathResolver.js';
 
 /**
@@ -75,7 +75,7 @@ async function getFeaturesConfig(): Promise<Record<string, any>> {
 /**
  * Get available feature categories
  */
-async function getAvailableFeatures(): Promise<string[]> {
+export async function getAvailableFeatures(): Promise<string[]> {
   const config = await getFeaturesConfig();
   return Object.keys(config.features || {});
 }
@@ -309,64 +309,61 @@ function showEnhancedSetupInstructions(feature: string, provider: string): void 
  * Show help for add command
  */
 export async function showAddHelp(): Promise<void> {
-  const piGradient = gradient(['#00c6ff', '#0072ff']);
   const featuresConfig = await getFeaturesConfig();
   const availableFeatures = Object.keys(featuresConfig.features || {});
   
-  console.log('\n' + boxen(
-    piGradient.multiline([
-      '📦 Package Installer CLI - Add Features',
-      '',
-      'USAGE:',
-      '  pi add                         # Interactive feature selection',
-      '  pi add <feature>               # Add feature with provider selection',
-      '  pi add <feature> <provider>    # Add specific feature provider',
-      '  pi add --list                  # List all available features',
-      '  pi add --help                  # Show this help message',
-      '',
-      'EXAMPLES:',
-      '  pi add                         # Show all features in dropdown',
-      '  pi add auth                    # Show auth providers dropdown',
-      '  pi add auth clerk              # Add Clerk authentication',
-      '  pi add aws                     # Show AWS services dropdown',  
-      '  pi add aws ec2                 # Add AWS EC2 integration',
-      '  pi add ai openai               # Add OpenAI integration',
-      '  pi add database postgres       # Add PostgreSQL integration',
-      '  pi add payment stripe          # Add Stripe payment integration',
-      '',
-      'OPTIONS:',
-      '  -l, --list                     List all available features',
-      '  -v, --verbose                  Show detailed output',
-      '  -h, --help                     Show this help message',
-      '',
-      `AVAILABLE FEATURES (${availableFeatures.length}):`,
-      availableFeatures.length > 0 
-        ? availableFeatures.map(feature => `  • ${feature}`).join('\n')
-        : '  No features configured',
-      '',
-      'SUPPORTED FRAMEWORKS:',
-      '  • Next.js                      App Router & Pages Router',
-      '  • React                        Create React App & Vite',
-      '  • Express.js                   Node.js backend framework',
-      '  • NestJS                       TypeScript backend framework',
-      '  • Vue.js                       Vue 3 with Composition API',
-      '  • Angular                      Angular 15+',
-      '  • Remix                        Full-stack React framework',
-      '  • And more coming soon...',
-      '',
-      'NOTES:',
-      '  • Features are automatically configured for your framework',
-      '  • Environment variables are added to .env files',
-      '  • TypeScript and JavaScript are both supported',
-      '  • Use "pi add --list" to see detailed feature information'
-    ].join('\n')),
-    {
-      padding: 1,
-      margin: 1,
-      borderStyle: 'round',
-      borderColor: 'blue'
-    }
-  ));
+  const helpConfig: CommandHelpConfig = {
+    commandName: 'Add',
+    emoji: '➕',
+    description: 'Add new features to your project with automatic framework integration.\nSupports authentication, databases, AI, payments, AWS services, and more.',
+    usage: [
+      'add [options]',
+      'add <feature> [provider] [options]'
+    ],
+    options: [
+      { flag: '-l, --list', description: 'List all available features' },
+      { flag: '-v, --verbose', description: 'Show detailed output' },
+      { flag: '-h, --help', description: 'Show this help message' }
+    ],
+    examples: [
+      { command: 'add', description: 'Interactive feature selection' },
+      { command: 'add auth', description: 'Show auth providers dropdown' },
+      { command: 'add auth clerk', description: 'Add Clerk authentication' },
+      { command: 'add aws ec2', description: 'Add AWS EC2 integration' },
+      { command: 'add ai openai', description: 'Add OpenAI integration' },
+      { command: 'add database postgres', description: 'Add PostgreSQL integration' },
+      { command: 'add payment stripe', description: 'Add Stripe payment integration' },
+      { command: 'add --list', description: 'List all available features' }
+    ],
+    additionalSections: [
+      {
+        title: `Available Features (${availableFeatures.length})`,
+        items: availableFeatures.length > 0 
+          ? availableFeatures
+          : ['No features configured']
+      },
+      {
+        title: 'Supported Frameworks',
+        items: [
+          'Next.js - App Router & Pages Router',
+          'React - Create React App & Vite',
+          'Express.js - Node.js backend framework',
+          'NestJS - TypeScript backend framework',
+          'Vue.js - Vue 3 with Composition API',
+          'Angular - Angular 15+',
+          'Remix - Full-stack React framework'
+        ]
+      }
+    ],
+    tips: [
+      'Features are automatically configured for your framework',
+      'Environment variables are added to .env files',
+      'TypeScript and JavaScript are both supported',
+      'Use "pi add --list" to see detailed feature information'
+    ]
+  };
+  
+  createStandardHelp(helpConfig);
 }
 
 /**
@@ -418,7 +415,8 @@ export async function addCommand(
       };
     } else {
       // Standalone add command - detect framework from project files
-      projectInfo = await getCachedProject(projectPath);
+      // Get cached project info or detect it (simplified)
+      projectInfo = null; // Simplified - always detect fresh
       
       if (!projectInfo) {
         console.log(chalk.yellow('🔍 Analyzing project structure...'));
@@ -435,10 +433,7 @@ export async function addCommand(
             await cacheProjectData(
               projectPath,
               projectName,
-              projectInfo.projectLanguage || 'unknown',
-              projectInfo.framework,
-              [],
-              0
+              projectInfo.projectLanguage || 'unknown'
             );
           } catch (error) {
             console.warn(chalk.yellow('⚠️  Could not cache project info'));

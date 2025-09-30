@@ -3,11 +3,11 @@ import { promisify } from 'util';
 import chalk from 'chalk';
 import ora from 'ora';
 import boxen from 'boxen';
-import gradient from 'gradient-string';
 import fs from 'fs-extra';
 import path from 'path';
 import semver from 'semver';
 import https from 'https';
+import { createStandardHelp, CommandHelpConfig } from '../utils/helpFormatter.js';
 import {
   SupportedLanguage,
   getSupportedLanguages,
@@ -463,37 +463,44 @@ async function getEnhancedPackageInfo(
  * Display help for check command
  */
 export function showCheckHelp(): void {
-  const piGradient = gradient(['#00c6ff', '#0072ff']);
-  const headerGradient = gradient(['#4facfe', '#00f2fe']);
-
-  console.log('\n' + boxen(
-    headerGradient('🔍 Check Command Help') + '\n\n' +
-    chalk.white('Check package versions in your project and get suggestions for updates.') + '\n' +
-    chalk.white('Helps you keep your dependencies up-to-date and secure.') + '\n\n' +
-    chalk.cyan('Usage:') + '\n' +
-    chalk.white(`  ${piGradient('pi')} ${chalk.hex('#f39c12')('check')} [package-name] [options]`) + '\n\n' +
-    chalk.cyan('Options:') + '\n' +
-    chalk.gray('  -h, --help      Display help for this command') + '\n' +
-    chalk.gray('  -v, --verbose   Show detailed information for all packages') + '\n\n' +
-    chalk.cyan('Examples:') + '\n' +
-    chalk.gray(`  ${piGradient('pi')} ${chalk.hex('#f39c12')('check')}                    # Check all packages in current project`) + '\n' +
-    chalk.gray(`  ${piGradient('pi')} ${chalk.hex('#f39c12')('check')} ${chalk.hex('#feca57')('--verbose')}          # Check all packages with detailed info`) + '\n' +
-    chalk.gray(`  ${piGradient('pi')} ${chalk.hex('#f39c12')('check')} react              # Check specific package version`) + '\n' +
-    chalk.gray(`  ${piGradient('pi')} ${chalk.hex('#f39c12')('check')} @types/node        # Check scoped packages`) + '\n' +
-    chalk.gray(`  ${piGradient('pi')} ${chalk.hex('#f39c12')('check')} ${chalk.hex('#ff6b6b')('--help')}             # Show this help message`) + '\n\n' +
-    chalk.hex('#00d2d3')('💡 Supported Package Managers:') + '\n' +
-    chalk.hex('#95afc0')('  • npm, pnpm, yarn (Node.js)') + '\n' +
-    chalk.hex('#95afc0')('  • pip, pipenv, poetry (Python)') + '\n' +
-    chalk.hex('#95afc0')('  • cargo (Rust)') + '\n' +
-    chalk.hex('#95afc0')('  • go modules (Go)') + '\n' +
-    chalk.hex('#95afc0')('  • composer (PHP)'),
-    {
-      padding: 1,
-      borderStyle: 'round',
-      borderColor: 'cyan',
-      backgroundColor: '#0a0a0a'
-    }
-  ));
+  const helpConfig: CommandHelpConfig = {
+    commandName: 'Check',
+    emoji: '🔍',
+    description: 'Check package versions in your project and get suggestions for updates.\nHelps you keep your dependencies up-to-date and secure.',
+    usage: [
+      'check [package-name] [options]',
+      'check [options]'
+    ],
+    options: [
+      { flag: '-h, --help', description: 'Display help for this command' },
+      { flag: '-v, --verbose', description: 'Show detailed information for all packages' }
+    ],
+    examples: [
+      { command: 'check', description: 'Check all packages in current project' },
+      { command: 'check --verbose', description: 'Check all packages with detailed info' },
+      { command: 'check react', description: 'Check specific package version' },
+      { command: 'check @types/node', description: 'Check scoped packages' },
+      { command: 'check --help', description: 'Show this help message' }
+    ],
+    additionalSections: [
+      {
+        title: 'Supported Package Managers',
+        items: [
+          'npm, pnpm, yarn (Node.js)',
+          'pip, pipenv, poetry (Python)',
+          'cargo (Rust)',
+          'go modules (Go)',
+          'composer (PHP)'
+        ]
+      }
+    ],
+    tips: [
+      'Use --verbose for detailed package information including security vulnerabilities',
+      'Check specific packages by name for targeted updates'
+    ]
+  };
+  
+  createStandardHelp(helpConfig);
 }
 
 export async function checkCommand(packageName?: string, options?: { verbose?: boolean; help?: boolean; '--help'?: boolean; '-h'?: boolean }) {
