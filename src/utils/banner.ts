@@ -80,7 +80,7 @@ export function displayCommandBanner(commandName: string, description: string): 
   console.log('\n' + boxen(
     commandGradient(`🚀 ${commandName.toUpperCase()} COMMAND`) + '\n\n' +
     chalk.white(description) + '\n\n' +
-    chalk.hex('#00d2d3')('💡 Package Installer CLI v3.2.0') + ' • ' +
+    chalk.hex('#00d2d3')(`💡 Package Installer CLI v${getPackageVersion()}`) + ' • ' +
     chalk.hex('#95afc0')('Fast • Smart • Feature-Rich'),
     {
       padding: 1,

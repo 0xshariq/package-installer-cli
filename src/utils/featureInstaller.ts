@@ -11,10 +11,10 @@ import ora from 'ora';
 import { SupportedLanguage, installPackages } from './dependencyInstaller.js';
 import { detectLanguageFromFiles } from './languageConfig.js';
 import { 
-  cacheProjectData,
-  getCachedProject
+  cacheProjectData
 } from './cacheManager.js';
 import { getCliRootPath, getFeaturesJsonPath } from './pathResolver.js';
+import { getAvailableFeatures } from '../commands/add.js';
 
 // Get the directory of this file for proper path resolution
 const __filename = fileURLToPath(import.meta.url);
@@ -56,6 +56,10 @@ async function loadFeatures(): Promise<void> {
     if (await fs.pathExists(featuresPath)) {
       const featuresData = await fs.readJson(featuresPath);
       const featuresConfig = featuresData.features || featuresData;
+      
+      // Get available features using the centralized function
+      const availableFeatures = await getAvailableFeatures();
+      console.log(chalk.gray(`📦 Loading ${availableFeatures.length} available features...`));
       
       // Process each feature and load its individual JSON file
       for (const [featureName, config] of Object.entries(featuresConfig)) {
@@ -315,25 +319,7 @@ export async function detectProjectStack(projectPath: string): Promise<{
   hasSrcFolder?: boolean;
 }> {
   try {
-    // Check cache first
-    const cachedProject = await getCachedProject(projectPath);
-    if (cachedProject) {
-      const packageManager = await detectPackageManager(projectPath);
-      let hasSrcFolder = await fs.pathExists(path.join(projectPath, 'src'));
-      
-      // For Next.js projects, do a more thorough src folder detection
-      if (cachedProject.framework === 'nextjs') {
-        hasSrcFolder = await detectNextjsSrcStructure(projectPath);
-      }
-      
-      return {
-        framework: cachedProject.framework,
-        language: cachedProject.language as SupportedLanguage,
-        projectLanguage: cachedProject.language as 'javascript' | 'typescript',
-        packageManager,
-        hasSrcFolder
-      };
-    }
+    // Skip cache lookup for simplicity - always detect fresh
     
     // Detect language first
     const files = await fs.readdir(projectPath);
@@ -392,10 +378,7 @@ export async function detectProjectStack(projectPath: string): Promise<{
       await cacheProjectData(
         projectPath,
         packageJson.name || path.basename(projectPath),
-        typeof projectLanguage === 'string' ? projectLanguage : 'unknown',
-        framework,
-        Object.keys(dependencies),
-        0
+        typeof projectLanguage === 'string' ? projectLanguage : 'unknown'
       );
     }
     
