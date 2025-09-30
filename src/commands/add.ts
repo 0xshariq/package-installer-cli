@@ -5,7 +5,7 @@ import boxen from 'boxen';
 import path from 'path';
 import fs from 'fs-extra';
 import { createStandardHelp, CommandHelpConfig } from '../utils/helpFormatter.js';
-import { addFeature, detectProjectStack, SUPPORTED_FEATURES } from '../utils/featureInstaller.js';
+import { addFeature, detectProjectStack, SUPPORTED_FEATURES, ensureFeaturesLoaded } from '../utils/featureInstaller.js';
 import { historyManager } from '../utils/historyManager.js';
 import { cacheProjectData } from '../utils/cacheManager.js';
 import { getFeaturesJsonPath, getFeaturesPath } from '../utils/pathResolver.js';
@@ -110,6 +110,7 @@ async function getSubFeatures(category: string): Promise<string[]> {
  * List available features from features.json with descriptions
  */
 async function listAvailableFeatures(): Promise<void> {
+  await ensureFeaturesLoaded();
   const featuresConfig = await getFeaturesConfig();
   
   if (!featuresConfig.features || Object.keys(featuresConfig.features).length === 0) {
@@ -321,6 +322,7 @@ function showEnhancedSetupInstructions(feature: string, provider: string): void 
  * Show help for add command
  */
 export async function showAddHelp(): Promise<void> {
+  await ensureFeaturesLoaded();
   const featuresConfig = await getFeaturesConfig();
   const availableFeatures = Object.keys(featuresConfig.features || {});
   
@@ -392,6 +394,9 @@ export async function addCommand(
   options: { list?: boolean; verbose?: boolean; framework?: string; projectPath?: string; help?: boolean } = {}
 ): Promise<void> {
   try {
+    // Ensure features are loaded first
+    await ensureFeaturesLoaded();
+
     // Handle list flag
     if (options.list || feature === '--list' || feature === '-l') {
       await listAvailableFeatures();

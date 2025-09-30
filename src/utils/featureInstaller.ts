@@ -10,7 +10,7 @@ import chalk from 'chalk';
 import ora from 'ora';
 import { SupportedLanguage, installPackages } from './dependencyInstaller.js';
 import { detectLanguageFromFiles } from './languageConfig.js';
-import { 
+import {
   cacheProjectData
 } from './cacheManager.js';
 import { getCliRootPath, getFeaturesJsonPath } from './pathResolver.js';
@@ -52,26 +52,26 @@ async function loadFeatures(): Promise<void> {
   try {
     // Get CLI installation directory using the centralized path resolver
     const featuresPath = getFeaturesJsonPath();
-    
+
     if (await fs.pathExists(featuresPath)) {
       const featuresData = await fs.readJson(featuresPath);
       const featuresConfig = featuresData.features || featuresData;
-      
+
       // Get available features using the centralized function
       const availableFeatures = await getAvailableFeatures();
-      
+
       // Process each feature and load its individual JSON file
       for (const [featureName, config] of Object.entries(featuresConfig)) {
         const featureConfig = config as any;
-        
+
         if (featureConfig.jsonPath) {
           try {
             // Load the individual feature JSON file
             const individualFeaturePath = path.resolve(path.dirname(featuresPath), featureConfig.jsonPath);
-            
+
             if (await fs.pathExists(individualFeaturePath)) {
               const individualFeatureData = await fs.readJson(individualFeaturePath);
-              
+
               // Merge the base config with the individual feature data
               // The individual JSON files directly contain the provider structure
               SUPPORTED_FEATURES[featureName] = {
@@ -147,19 +147,19 @@ async function detectNextjsSrcStructure(projectPath: string): Promise<boolean> {
     if (!await fs.pathExists(srcPath)) {
       return false;
     }
-    
+
     // Check for Next.js App Router (app directory in src)
     const srcAppPath = path.join(srcPath, 'app');
     if (await fs.pathExists(srcAppPath)) {
       return true;
     }
-    
+
     // Check for Next.js Pages Router (pages directory in src) 
     const srcPagesPath = path.join(srcPath, 'pages');
     if (await fs.pathExists(srcPagesPath)) {
       return true;
     }
-    
+
     // Check for components, lib, utils directories in src (common Next.js patterns)
     const commonDirs = ['components', 'lib', 'utils', 'styles', 'hooks'];
     for (const dir of commonDirs) {
@@ -168,14 +168,14 @@ async function detectNextjsSrcStructure(projectPath: string): Promise<boolean> {
         return true;
       }
     }
-    
+
     // Check for any TypeScript/JavaScript files in src root
     const srcFiles = await fs.readdir(srcPath);
-    const codeFiles = srcFiles.filter(file => 
-      file.endsWith('.ts') || file.endsWith('.tsx') || 
+    const codeFiles = srcFiles.filter(file =>
+      file.endsWith('.ts') || file.endsWith('.tsx') ||
       file.endsWith('.js') || file.endsWith('.jsx')
     );
-    
+
     return codeFiles.length > 0;
   } catch (error) {
     return false;
@@ -235,15 +235,15 @@ function adjustNextjsSrcFilePath(filePath: string, hasSrcFolder: boolean, projec
  * Dynamically places files based on detected project structure
  */
 function adjustFrameworkFilePath(
-  filePath: string, 
+  filePath: string,
   framework: string,
-  hasSrcFolder: boolean, 
+  hasSrcFolder: boolean,
   projectPath: string
 ): string {
   // Files that should ALWAYS be in root regardless of src folder
   const rootOnlyFiles = [
     '.env',
-    '.env.local', 
+    '.env.local',
     '.env.example',
     '.env.development',
     '.env.production',
@@ -274,7 +274,7 @@ function adjustFrameworkFilePath(
 
   const fileName = path.basename(filePath);
   const fileDir = path.dirname(filePath);
-  
+
   // Check if this file should always be in root
   if (rootOnlyFiles.includes(fileName) || filePath.startsWith('public/')) {
     return path.join(projectPath, filePath);
@@ -327,36 +327,36 @@ export async function detectProjectStack(projectPath: string): Promise<{
 }> {
   try {
     // Skip cache lookup for simplicity - always detect fresh
-    
+
     // Detect language first
     const files = await fs.readdir(projectPath);
     const detectedLanguages = detectLanguageFromFiles(files);
     const primaryLanguage = detectedLanguages[0];
-    
+
     let framework: string | undefined;
     let isComboTemplate = false;
     let packageManager = 'npm';
     let projectLanguage: 'javascript' | 'typescript' = 'javascript';
     let hasSrcFolder = false;
-    
+
     const packageJsonPath = path.join(projectPath, 'package.json');
     if (await fs.pathExists(packageJsonPath)) {
       const packageJson = await fs.readJson(packageJsonPath);
       const dependencies = { ...packageJson.dependencies, ...packageJson.devDependencies };
-      
+
       // Detect TypeScript
       if (await fs.pathExists(path.join(projectPath, 'tsconfig.json'))) {
         projectLanguage = 'typescript';
       } else if (dependencies['typescript']) {
         projectLanguage = 'typescript';
       }
-      
+
       // Check for src folder structure
       hasSrcFolder = await fs.pathExists(path.join(projectPath, 'src'));
-      
+
       // Detect package manager
       packageManager = await detectPackageManager(projectPath);
-      
+
       // Detect framework
       if (dependencies['next']) {
         framework = 'nextjs';
@@ -375,12 +375,12 @@ export async function detectProjectStack(projectPath: string): Promise<{
       } else if (dependencies['@remix-run/react']) {
         framework = 'remixjs';
       }
-      
+
       // For other frameworks, simple src folder check
       if (framework !== 'nextjs' && !hasSrcFolder) {
         hasSrcFolder = await fs.pathExists(path.join(projectPath, 'src'));
       }
-      
+
       // Cache the detected information
       await cacheProjectData(
         projectPath,
@@ -388,10 +388,10 @@ export async function detectProjectStack(projectPath: string): Promise<{
         typeof projectLanguage === 'string' ? projectLanguage : 'unknown'
       );
     }
-    
+
     return {
       framework,
-  language: typeof primaryLanguage === 'string' ? (primaryLanguage as SupportedLanguage) : ((primaryLanguage && typeof primaryLanguage.language === 'string') ? (primaryLanguage.language as SupportedLanguage) : undefined),
+      language: typeof primaryLanguage === 'string' ? (primaryLanguage as SupportedLanguage) : ((primaryLanguage && typeof primaryLanguage.language === 'string') ? (primaryLanguage.language as SupportedLanguage) : undefined),
       projectLanguage,
       isComboTemplate,
       packageManager,
@@ -426,44 +426,44 @@ export async function addFeature(
   projectPath: string = process.cwd()
 ): Promise<void> {
   const spinner = ora(chalk.hex('#9c88ff')(`Adding ${featureName} feature...`)).start();
-  
+
   try {
     // Ensure features are loaded
-    await loadFeatures();
-    
+    await ensureFeaturesLoaded();
+
     // Validate project path exists
     if (!await fs.pathExists(projectPath)) {
       throw new Error(`Project path does not exist: ${projectPath}`);
     }
-    
+
     // Get project information
     const projectInfo = await detectProjectStack(projectPath);
-    
+
     if (!projectInfo.framework) {
       spinner.warn(chalk.yellow('Could not detect project framework automatically'));
       console.log(chalk.hex('#95afc0')('📋 Supported frameworks: nextjs, expressjs, nestjs, reactjs, vuejs, angularjs, remixjs'));
       throw new Error('Could not detect project framework. Please ensure you\'re in a valid project directory.');
     }
-    
+
     // Get feature configuration
     const featureConfig = SUPPORTED_FEATURES[featureName];
     if (!featureConfig) {
       const availableFeatures = Object.keys(SUPPORTED_FEATURES);
       throw new Error(`Feature '${featureName}' not found. Available features: ${availableFeatures.join(', ')}`);
     }
-    
+
     // Check if feature supports this framework
     if (!featureConfig.supportedFrameworks.includes(projectInfo.framework)) {
       throw new Error(`Feature '${featureName}' is not supported for ${projectInfo.framework} projects. Supported frameworks: ${featureConfig.supportedFrameworks.join(', ')}`);
     }
-    
+
     spinner.text = chalk.hex('#9c88ff')(`Detected ${projectInfo.framework} project (${projectInfo.projectLanguage})`);
-    
+
     // Check if this feature has a simple structure (framework-based) or complex (provider-based)
     let selectedProvider = provider;
     const availableProviders = Object.keys(featureConfig.files);
     const hasSimpleStructure = availableProviders.includes(projectInfo.framework);
-    
+
     if (!hasSimpleStructure && !selectedProvider && featureConfig.files) {
       // Complex structure with providers
       if (availableProviders.length > 1) {
@@ -486,36 +486,36 @@ export async function addFeature(
       // Simple structure - use framework as the "provider"
       selectedProvider = projectInfo.framework;
     }
-    
+
     // Get files for the specific provider, framework, and language
     const files = getFeatureFiles(featureConfig, selectedProvider!, projectInfo.framework, projectInfo.projectLanguage!);
-    
+
     if (Object.keys(files).length === 0) {
       throw new Error(`No files configured for ${featureName} with ${selectedProvider} provider for ${projectInfo.framework} (${projectInfo.projectLanguage})`);
     }
-    
+
     spinner.text = `Processing ${Object.keys(files).length} files...`;
-    
+
     // Process each file based on its action
     for (const [filePath, fileConfig] of Object.entries(files)) {
       await processFeatureFile(filePath, fileConfig, featureName, selectedProvider!, projectInfo, projectPath);
     }
-    
+
     spinner.succeed(chalk.green(`✅ ${featureName} feature added successfully!`));
-    
+
     // Update cache with feature usage
     console.log(chalk.gray(`📊 Feature ${featureName} used for ${projectInfo.framework || 'unknown'} project`));
-    
+
     // Show setup instructions
     showSetupInstructions(featureName, selectedProvider!);
-    
+
     // Show additional helpful messages
     console.log(`\n${chalk.hex('#f39c12')('📋 Next Steps:')}`);
     console.log(chalk.hex('#95afc0')('• Review the created/updated files to ensure they match your project needs'));
     console.log(chalk.hex('#95afc0')('• Update environment variables in .env files with your actual values'));
     console.log(chalk.hex('#95afc0')('• Test the feature integration by running your project'));
     console.log(chalk.hex('#95afc0')('• Check the documentation for any additional configuration steps'));
-    
+
   } catch (error: any) {
     spinner.fail(chalk.red(`❌ Failed to add ${featureName} feature: ${error.message}`));
     throw error;
@@ -555,14 +555,14 @@ function getFeatureFiles(
     }
     return (frameworkConfig as { [filePath: string]: FeatureFile }) || {};
   }
-  
+
   // Complex structure: provider -> framework -> language -> files
   const providerConfig = featureConfig.files[provider];
   if (!providerConfig) return {};
-  
+
   const frameworkConfig = providerConfig[framework];
   if (!frameworkConfig) return {};
-  
+
   const languageConfig = frameworkConfig[language];
   if (!languageConfig) {
     // Fallback to typescript if javascript not available
@@ -573,7 +573,7 @@ function getFeatureFiles(
     }
     return {};
   }
-  
+
   return languageConfig;
 }
 
@@ -589,32 +589,32 @@ async function resolveTemplateFilePath(
   filePath: string
 ): Promise<string | null> {
   const cliRoot = getCliRootPath();
-  
+
   // Primary path strategies in order of preference
   const pathStrategies = [
     // 1. Full path with all parameters
     path.join(cliRoot, 'features', featureName, provider, framework, language, filePath),
-    
+
     // 2. Without language subfolder (framework-only)
     path.join(cliRoot, 'features', featureName, provider, framework, filePath),
-    
+
     // 3. Generic provider path (no framework/language)
     path.join(cliRoot, 'features', featureName, provider, filePath),
-    
+
     // 4. Feature root path (no provider/framework/language)
     path.join(cliRoot, 'features', featureName, filePath),
-    
+
     // 5. Try with typescript if javascript doesn't exist
     ...(language === 'javascript' ? [
       path.join(cliRoot, 'features', featureName, provider, framework, 'typescript', filePath)
     ] : []),
-    
+
     // 6. Try with javascript if typescript doesn't exist  
     ...(language === 'typescript' ? [
       path.join(cliRoot, 'features', featureName, provider, framework, 'javascript', filePath)
     ] : [])
   ];
-  
+
   // Try each strategy until we find an existing file
   for (const templatePath of pathStrategies) {
     try {
@@ -626,7 +626,7 @@ async function resolveTemplateFilePath(
       continue;
     }
   }
-  
+
   return null;
 }
 /**
@@ -641,7 +641,7 @@ async function processFeatureFile(
   projectPath: string
 ): Promise<void> {
   const { action } = fileConfig;
-  
+
   // Resolve template file path with dynamic fallback strategies
   const sourceFilePath = await resolveTemplateFilePath(
     featureName,
@@ -650,46 +650,46 @@ async function processFeatureFile(
     projectInfo.projectLanguage,
     filePath
   );
-  
+
   if (!sourceFilePath) {
     console.warn(chalk.yellow(`⚠️  Template file not found for: ${filePath}`));
     console.log(chalk.gray(`   Searched in feature: ${featureName}, provider: ${provider}, framework: ${projectInfo.framework}, language: ${projectInfo.projectLanguage}`));
     console.log(chalk.gray(`   This might be due to running a globally installed CLI. Consider using 'npx' or installing locally.`));
     return;
   }
-  
+
   // Handle file path adjustment based on project structure - framework agnostic
   let targetFilePath = adjustFrameworkFilePath(
-    filePath, 
+    filePath,
     projectInfo.framework || 'unknown',
-    projectInfo.hasSrcFolder || false, 
+    projectInfo.hasSrcFolder || false,
     projectPath
   );
-  
+
   // Ensure all parent directories exist before processing
   await fs.ensureDir(path.dirname(targetFilePath));
-  
+
   switch (action) {
     case 'install':
       await handlePackageInstallation(sourceFilePath, projectPath, projectInfo.packageManager || 'npm', projectInfo.language);
       break;
-      
+
     case 'create':
       await handleFileCreation(sourceFilePath, targetFilePath);
       break;
-      
+
     case 'overwrite':
       await handleFileOverwrite(sourceFilePath, targetFilePath);
       break;
-      
+
     case 'append':
       await handleFileAppend(sourceFilePath, targetFilePath);
       break;
-      
+
     case 'prepend':
       await handleFilePrepend(sourceFilePath, targetFilePath);
       break;
-      
+
     default:
       console.warn(chalk.yellow(`⚠️  Unknown action '${action}' for file: ${filePath}`));
   }
@@ -709,17 +709,17 @@ async function handlePackageInstallation(
       const packageData = await fs.readJson(sourceFilePath);
       const dependencies = packageData.dependencies || {};
       const devDependencies = packageData.devDependencies || {};
-      
+
       const allDeps = Object.keys(dependencies);
       const allDevDeps = Object.keys(devDependencies);
-      
+
       if (allDeps.length > 0 || allDevDeps.length > 0) {
         console.log(chalk.blue(`📦 Installing packages with ${packageManager}:`));
         // Install regular dependencies
         if (allDeps.length > 0) {
           console.log(chalk.cyan(`   Dependencies: ${allDeps.join(', ')}`));
           try {
-            await installPackages(projectPath, language || 'javascript', allDeps, { 
+            await installPackages(projectPath, language || 'javascript', allDeps, {
               isDev: false,
               timeout: 180000 // 3 minutes timeout
             });
@@ -733,7 +733,7 @@ async function handlePackageInstallation(
         if (allDevDeps.length > 0) {
           console.log(chalk.cyan(`   Dev Dependencies: ${allDevDeps.join(', ')}`));
           try {
-            await installPackages(projectPath, language || 'javascript', allDevDeps, { 
+            await installPackages(projectPath, language || 'javascript', allDevDeps, {
               isDev: true,
               timeout: 180000 // 3 minutes timeout
             });
@@ -764,7 +764,7 @@ async function handleFileCreation(sourceFilePath: string, targetFilePath: string
     console.log(chalk.yellow(`⚠️  File already exists, skipping: ${path.relative(process.cwd(), targetFilePath)}`));
     return;
   }
-  
+
   try {
     if (await fs.pathExists(sourceFilePath)) {
       await copyTemplateFile(sourceFilePath, targetFilePath);
@@ -785,9 +785,9 @@ async function handleFileCreation(sourceFilePath: string, targetFilePath: string
 async function handleFileOverwrite(sourceFilePath: string, targetFilePath: string): Promise<void> {
   // Ensure target directory exists
   await fs.ensureDir(path.dirname(targetFilePath));
-  
+
   const fileExists = await fs.pathExists(targetFilePath);
-  
+
   try {
     // Check if source template exists
     if (await fs.pathExists(sourceFilePath)) {
@@ -813,15 +813,15 @@ async function handleFileOverwrite(sourceFilePath: string, targetFilePath: strin
 async function handleFileAppend(sourceFilePath: string, targetFilePath: string): Promise<void> {
   // Ensure target directory exists
   await fs.ensureDir(path.dirname(targetFilePath));
-  
+
   const fileExists = await fs.pathExists(targetFilePath);
   let existingContent = '';
-  
+
   try {
     if (fileExists) {
       existingContent = await fs.readFile(targetFilePath, 'utf8');
     }
-    
+
     let contentToAppend = '';
     // Check if source template exists
     if (await fs.pathExists(sourceFilePath)) {
@@ -831,13 +831,13 @@ async function handleFileAppend(sourceFilePath: string, targetFilePath: string):
       console.log(chalk.gray(`   This might be due to running a globally installed CLI. Consider using 'npx' or installing locally.`));
       return;
     }
-    
+
     // Only append if the content isn't already present (avoid duplicates)
     if (!existingContent.includes(contentToAppend.trim())) {
       const separator = existingContent.endsWith('\n') || !existingContent ? '' : '\n';
       const newContent = existingContent + separator + contentToAppend;
       await fs.outputFile(targetFilePath, newContent);
-      
+
       if (fileExists) {
         console.log(chalk.green(`✅ Appended to: ${path.relative(process.cwd(), targetFilePath)}`));
       } else {
@@ -846,7 +846,7 @@ async function handleFileAppend(sourceFilePath: string, targetFilePath: string):
     } else {
       console.log(chalk.yellow(`⚠️  Content already exists in file, skipping append: ${path.relative(process.cwd(), targetFilePath)}`));
     }
-    
+
   } catch (error: any) {
     console.error(chalk.red(`❌ Failed to append/create ${path.relative(process.cwd(), targetFilePath)}: ${error.message}`));
     throw error;
@@ -859,15 +859,15 @@ async function handleFileAppend(sourceFilePath: string, targetFilePath: string):
 async function handleFilePrepend(sourceFilePath: string, targetFilePath: string): Promise<void> {
   // Ensure target directory exists
   await fs.ensureDir(path.dirname(targetFilePath));
-  
+
   const fileExists = await fs.pathExists(targetFilePath);
   let existingContent = '';
-  
+
   try {
     if (fileExists) {
       existingContent = await fs.readFile(targetFilePath, 'utf-8');
     }
-    
+
     let templateContent: string;
     // Check if source template exists
     if (await fs.pathExists(sourceFilePath)) {
@@ -877,14 +877,14 @@ async function handleFilePrepend(sourceFilePath: string, targetFilePath: string)
       console.log(chalk.gray(`   This might be due to running a globally installed CLI. Consider using 'npx' or installing locally.`));
       return;
     }
-    
+
     // Only prepend if the content isn't already present (avoid duplicates)
     if (!existingContent.includes(templateContent.trim())) {
       const separator = templateContent.endsWith('\n') ? '' : '\n';
       const newContent = templateContent + separator + existingContent;
-      
+
       await fs.outputFile(targetFilePath, newContent);
-      
+
       if (fileExists) {
         console.log(chalk.green(`✅ Prepended to: ${path.relative(process.cwd(), targetFilePath)}`));
       } else {
@@ -893,7 +893,7 @@ async function handleFilePrepend(sourceFilePath: string, targetFilePath: string)
     } else {
       console.log(chalk.yellow(`⚠️  Content already exists in file, skipping prepend: ${path.relative(process.cwd(), targetFilePath)}`));
     }
-    
+
   } catch (error: any) {
     console.error(chalk.red(`❌ Failed to prepend/create ${path.relative(process.cwd(), targetFilePath)}: ${error.message}`));
     throw error;
@@ -910,24 +910,24 @@ async function copyTemplateFile(sourceFilePath: string, targetFilePath: string):
     console.error(chalk.yellow(`💡 This might be due to running a globally installed CLI. Consider using 'npx' or installing locally.`));
     throw new Error(`Template file not found: ${sourceFilePath}`);
   }
-  
+
   try {
     // Ensure target directory exists
     await fs.ensureDir(path.dirname(targetFilePath));
-    
+
     // For code files, we might need to adjust import paths based on project structure
     if (path.extname(sourceFilePath).match(/\.(js|jsx|ts|tsx)$/)) {
       const templateContent = await fs.readFile(sourceFilePath, 'utf-8');
-      
+
       // Process content based on project structure (framework-agnostic)
       let processedContent = templateContent;
-    
+
       // Adjust import paths for src-based project structures
       if (targetFilePath.includes('/src/')) {
         processedContent = processedContent.replace(/from ['"]@\//g, 'from "@/');
         processedContent = processedContent.replace(/from ['"]\.\.\//g, 'from "../');
       }
-      
+
       await fs.writeFile(targetFilePath, processedContent);
     } else {
       // For non-code files, just copy directly
@@ -944,7 +944,7 @@ async function copyTemplateFile(sourceFilePath: string, targetFilePath: string):
  */
 function showSetupInstructions(featureName: string, provider: string): void {
   console.log(`\n${chalk.hex('#00d2d3')('📋 Setup Instructions:')}`);
-  
+
   switch (featureName) {
     case 'auth':
       if (provider === 'clerk') {
@@ -961,19 +961,19 @@ function showSetupInstructions(featureName: string, provider: string): void {
         console.log(chalk.hex('#95afc0')('3. Add provider client IDs/secrets'));
       }
       break;
-      
+
     case 'database':
       console.log(chalk.hex('#95afc0')('1. Set up your database connection'));
       console.log(chalk.hex('#95afc0')('2. Update connection string in .env'));
       console.log(chalk.hex('#95afc0')('3. Run migrations if needed'));
       break;
-      
+
     case 'docker':
       console.log(chalk.hex('#95afc0')('1. Install Docker on your system'));
       console.log(chalk.hex('#95afc0')('2. Run: docker-compose up -d'));
       console.log(chalk.hex('#95afc0')('3. Your app will be available at the configured port'));
       break;
-      
+
     default:
       console.log(chalk.hex('#95afc0')(`Check the documentation for ${featureName} configuration`));
   }
