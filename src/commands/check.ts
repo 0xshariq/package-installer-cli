@@ -2,7 +2,6 @@ import { exec } from 'child_process';
 import { promisify } from 'util';
 import chalk from 'chalk';
 import ora from 'ora';
-import boxen from 'boxen';
 import fs from 'fs-extra';
 import path from 'path';
 import semver from 'semver';
@@ -494,11 +493,11 @@ export function showCheckHelp(): void {
       {
         title: 'Supported Package Managers',
         items: [
-          'npm, pnpm, yarn (Node.js)',
+          'npm, pnpm, yarn (JavaScript/TypeScript)',
           'pip, pipenv, poetry (Python)',
           'cargo (Rust)',
           'go modules (Go)',
-          'composer (PHP)'
+          'gem, bundler (Ruby)'
         ]
       }
     ],
@@ -574,7 +573,7 @@ async function checkProjectPackages(verbose: boolean = false) {
     
     if (allProjectTypes.length === 0) {
       spinner.fail(chalk.hex('#ff4757')('❌ No supported project configuration files found'));
-      console.log(chalk.hex('#95afc0')('💡 Supported files: package.json, Cargo.toml, requirements.txt, composer.json, go.mod, pubspec.yaml, Gemfile, mix.exs'));
+      console.log(chalk.hex('#95afc0')('💡 Supported files: package.json, tsconfig.json, Cargo.toml, requirements.txt, pyproject.toml, go.mod, Gemfile'));
       return;
     }
 
@@ -642,8 +641,12 @@ async function analyzeSingleProjectType(projectType: ProjectType, verbose: boole
 
     spinner.succeed(`✔ Checked ${packageInfos.length} ${projectType.name} packages`);
 
-    // Cache the package check results
-    await cachePackageCheckResults(packageInfos, projectType);
+    // Cache the package check results (optional)
+    try {
+      await cachePackageCheckResults?.(packageInfos, projectType);
+    } catch (error) {
+      // Caching is optional, continue without it
+    }
 
     displayPackageInfo(packageInfos, projectType, verbose, isMultiProject);
 
@@ -659,8 +662,8 @@ async function detectAllProjectTypes(): Promise<ProjectType[]> {
   const foundTypes: ProjectType[] = [];
   const foundFiles: string[] = [];
 
-  // Priority order for detection - check most common files first
-  const priorityFiles = ['package.json', 'Cargo.toml', 'requirements.txt', 'composer.json', 'go.mod', 'pubspec.yaml', 'Gemfile', 'mix.exs'];
+  // Priority order for detection - check most common files first (supported languages only)
+  const priorityFiles = ['package.json', 'tsconfig.json', 'Cargo.toml', 'requirements.txt', 'pyproject.toml', 'go.mod', 'Gemfile'];
 
   // Check all priority files in current directory
   for (const priorityFile of priorityFiles) {
@@ -860,8 +863,8 @@ async function getPackageInfo(
     // Clean up version string (remove ^ ~ and similar prefixes)
     const cleanCurrentVersion = currentVersion?.replace(/[\^~>=<]/, '') || 'unknown';
 
-    // Enhanced NPM registry support
-    if (type.name === 'Node.js') {
+    // Enhanced NPM registry support  
+    if (type.name === 'JavaScript' || type.name === 'TypeScript') {
       const response = await fetch(`https://registry.npmjs.org/${packageName}`);
 
       if (!response.ok) {
@@ -1044,56 +1047,54 @@ function displayPackageInfo(packages: PackageInfo[], projectType?: ProjectType, 
     });
   }
 
-  // Show remaining packages info when not in verbose mode
-  if (!verbose && packages.length > 8) {
-    const remaining = packages.length - 8;
-    const remainingOutdated = packages.slice(8).filter(pkg => pkg.needsUpdate).length;
-    const remainingDeprecated = packages.slice(8).filter(pkg => pkg.isDeprecated).length;
-    const remainingUpToDate = packages.slice(8).filter(pkg => !pkg.needsUpdate && !pkg.isDeprecated).length;
+  // Show remaining packages summary when not in verbose mode
+  if (!verbose && packages.length > 12) {
+    const remaining = packages.length - groupedPackages.length;
+    const remainingOutdated = packages.filter(pkg => pkg.needsUpdate && !groupedPackages.includes(pkg)).length;
+    const remainingUpToDate = packages.filter(pkg => !pkg.needsUpdate && !pkg.isDeprecated && !groupedPackages.includes(pkg)).length;
 
-    console.log('\n' + chalk.hex('#f39c12')(`📦 Remaining ${remaining} packages:`));
-    console.log(chalk.gray('─'.repeat(30)));
-
-    if (remainingUpToDate > 0) {
-      console.log(`   ${chalk.hex('#10ac84')('✅')} ${remainingUpToDate} up to date`);
+    console.log('\n' + chalk.gray('─'.repeat(80)));
+    const hiddenSummary = [
+      remainingUpToDate > 0 ? `${chalk.hex('#10ac84')('✅')} ${remainingUpToDate} more up-to-date` : null,
+      remainingOutdated > 0 ? `${chalk.hex('#f39c12')('⚠️')} ${remainingOutdated} more need updates` : null
+    ].filter(Boolean).join('  •  ');
+    
+    if (hiddenSummary) {
+      console.log(`${chalk.dim(`+${remaining} hidden:`)} ${hiddenSummary}`);
     }
+    
+    // Show sample of remaining package names
     if (remainingOutdated > 0) {
-      console.log(`   ${chalk.hex('#f39c12')('⚠️')} ${remainingOutdated} need updates`);
-      // Show names of remaining outdated packages
-      const outdatedNames = packages.slice(8).filter(pkg => pkg.needsUpdate).slice(0, 5).map(pkg => pkg.name);
-      console.log(`      ${chalk.gray('Packages:')} ${outdatedNames.join(', ')}${outdatedNames.length < remainingOutdated ? '...' : ''}`);
-    }
-    if (remainingDeprecated > 0) {
-      console.log(`   ${chalk.hex('#ff4757')('🚨')} ${remainingDeprecated} deprecated`);
-      // Show names of remaining deprecated packages
-      const deprecatedNames = packages.slice(8).filter(pkg => pkg.isDeprecated).slice(0, 3).map(pkg => pkg.name);
-      console.log(`      ${chalk.gray('Packages:')} ${deprecatedNames.join(', ')}${deprecatedNames.length < remainingDeprecated ? '...' : ''}`);
+      const sampleNames = packages.filter(pkg => pkg.needsUpdate && !groupedPackages.includes(pkg))
+        .slice(0, 4).map(pkg => pkg.name).join(', ');
+      console.log(`${chalk.dim('Outdated:')} ${sampleNames}${remainingOutdated > 4 ? '...' : ''}`);
     }
 
-    console.log(`\n   ${chalk.cyan('💡 Tip:')} Use ${chalk.bold('--verbose')} to see detailed info for all ${packages.length} packages`);
+    console.log(`\n${chalk.cyan('💡')} Use ${chalk.bold('--verbose')} to see all ${packages.length} packages`);
   }
 
-  // Enhanced recommendations section
-  console.log('\n' + chalk.hex('#00d2d3')('💡 Recommendations:'));
-  console.log(chalk.gray('─'.repeat(30)));
+  // Compact recommendations section
+  if (outdatedPackages.length > 0 || deprecatedPackages.length > 0) {
+    console.log('\n' + chalk.hex('#667eea')('💡 Quick Actions:'));
+    console.log(chalk.gray('─'.repeat(40)));
 
-  if (deprecatedPackages.length > 0) {
-    console.log(`${chalk.hex('#ff4757')('🚨 URGENT:')} Replace ${deprecatedPackages.length} deprecated package(s) immediately`);
-    deprecatedPackages.slice(0, 3).forEach(pkg => {
-      console.log(`   • ${chalk.red(pkg.name)} ${chalk.gray(pkg.deprecatedMessage ? '- ' + pkg.deprecatedMessage.slice(0, 50) + '...' : '')}`);
-    });
+    if (deprecatedPackages.length > 0) {
+      console.log(`${chalk.hex('#ff4757')('🚨')} ${deprecatedPackages.length} deprecated - replace immediately`);
+      deprecatedPackages.slice(0, 3).forEach(pkg => {
+        console.log(`   • ${chalk.red(pkg.name)} ${chalk.gray(pkg.deprecatedMessage ? '- ' + pkg.deprecatedMessage.slice(0, 50) + '...' : '')}`);
+      });
+    }
+
+    if (outdatedPackages.length > 0 && projectType) {
+      console.log(`${chalk.hex('#f39c12')('⚠️')} ${outdatedPackages.length} need updates - Run: ${chalk.cyan(projectType.getUpdateCommand())}`);
+    }
+
+    if (packages.length > 50) {
+      console.log(`${chalk.hex('#95afc0')('📦')} Large dependency count (${packages.length}) - consider optimization`);
+    }
   }
 
-  if (outdatedPackages.length > 0 && projectType) {
-    console.log(`${chalk.hex('#f39c12')('⚠️  UPDATE:')} ${outdatedPackages.length} package(s) need updating`);
-    console.log(`   Run: ${chalk.cyan(projectType.getUpdateCommand())}`);
-  }
-
-  if (packages.length > 50) {
-    console.log(`${chalk.hex('#95afc0')('📦 INFO:')} Large dependency count (${packages.length}) - consider reviewing for optimization`);
-  }
-
-  console.log(chalk.gray(`\n   Last checked: ${new Date().toLocaleString()}`));
+  console.log(chalk.gray(`\nLast checked: ${new Date().toLocaleString()}`));
 }
 
 /**
