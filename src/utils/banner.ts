@@ -12,8 +12,8 @@ import { getPackageVersion } from './utils.js';
  * Generate the main CLI banner with gradient colors
  */
 export function generateBanner(): string {
-  const packageGradient = gradient(['#00c6ff', '#4facfe', '#6c5ce7']);
-  const installerGradient = gradient(['#fd79a8', '#e84393', '#fd79a8']);
+  const packageGradient = gradient(['#0072ff', '#00c6ff', '#4facfe']);
+  const installerGradient = gradient(['#00c6ff', '#0072ff', '#667eea']);
   
   return boxen(
     packageGradient('           ██████╗  █████╗  ██████╗██╗  ██╗ █████╗  ██████╗ ███████╗') + '\n' +

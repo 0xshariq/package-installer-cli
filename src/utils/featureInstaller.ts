@@ -59,7 +59,6 @@ async function loadFeatures(): Promise<void> {
       
       // Get available features using the centralized function
       const availableFeatures = await getAvailableFeatures();
-      console.log(chalk.gray(`📦 Loading ${availableFeatures.length} available features...`));
       
       // Process each feature and load its individual JSON file
       for (const [featureName, config] of Object.entries(featuresConfig)) {
@@ -119,11 +118,19 @@ async function loadFeatures(): Promise<void> {
   }
 }
 
-// Initialize features on module load
-await loadFeatures();
+// Lazy loading flag
+let featuresLoaded = false;
+
+// Lazy load features when needed
+async function ensureFeaturesLoaded() {
+  if (!featuresLoaded) {
+    await loadFeatures();
+    featuresLoaded = true;
+  }
+}
 
 // Export for use in other modules
-export { SUPPORTED_FEATURES };
+export { SUPPORTED_FEATURES, ensureFeaturesLoaded };
 
 // Re-export path utilities for backward compatibility
 export { getCliRootPath } from './pathResolver.js';
