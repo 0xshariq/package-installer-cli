@@ -1065,23 +1065,24 @@ When sending feedback emails, you can choose:
 |--------|-------------|---------|
 | `--help` | Show comprehensive help | `pi email --help` |
 | `--list` | List all available categories | `pi email --list` |
-| `--status` | Check Email MCP Server status | `pi email --status` |
-| `--test` | Send test email | `pi email --test` |
-| `--setup` | Show configuration guide | `pi email --setup` |
-| `--install` | Show installation instructions | `pi email --install` |
-| `--commands` | Show all email commands | `pi email --commands` |
-| `--dev` | Development troubleshooting | `pi email --dev` |
-| `--quick` | Quick feedback mode | `pi email bug --quick` |
+| `--status` | Check Email MCP Server status and configuration | `pi email --status` |
+| `--test` | Send test email to verify functionality | `pi email --test` |
+| `--setup` | Interactive email configuration setup | `pi email --setup` |
+| `--install` | Show Email MCP Server installation guide | `pi email --install` |
+| `--commands` | Show all Email MCP Server commands | `pi email --commands` |
+| `--dev` | Development troubleshooting and local setup | `pi email --dev` |
+| `--quick` | Quick feedback mode (minimal prompts) | `pi email bug --quick` |
 
 **System Status Information:**
 ```bash
 pi email --status
 
 # Email System Status:
-# ✅ Email MCP Server: Available (v1.6.0)
-# ℹ️ Type: global
+# ✅ Email MCP Server: Ready (v1.6.0)
+# ℹ️ Type: npx
+# ℹ️ Path: npx @0xshariq/email-mcp-server
 # ℹ️ Configuration: ✅ Configured
-# ℹ️ Target Email: your_email@gmail.com
+# ℹ️ Target Email: khanshariq92213@gmail.com
 # ℹ️ Package: @0xshariq/email-mcp-server
 #
 # Available Commands:
@@ -1112,13 +1113,61 @@ pi email --dev
 ```
 
 **Email Features:**
-- ✅ **Professional Templates** - Category-specific email formatting
-- ✅ **System Information** - Auto-includes OS, Node.js, CLI version
-- ✅ **Contact Management** - Optional user contact for follow-up
+- ✅ **Professional HTML Templates** - Beautiful category-specific email formatting with CSS
+- ✅ **Interactive Configuration** - Step-by-step email setup with provider selection
+- ✅ **Multiple Email Providers** - Gmail, Outlook, Yahoo, and custom SMTP support
+- ✅ **Sender Selection** - Choose between configured email or custom credentials
+- ✅ **System Information** - Auto-includes OS, Node.js, CLI version details
+- ✅ **Contact Management** - Optional user contact information for follow-up
 - ✅ **Multi-Installation Support** - Works with global, npx, or local setup
-- ✅ **Configuration Detection** - Smart setup status checking
-- ✅ **Fallback Options** - Alternative contact methods if email fails
-- ✅ **Development Support** - Special modes for local development
+- ✅ **Configuration Detection** - Smart setup status checking and validation
+- ✅ **Secure Storage** - Encrypted credential storage in .env files
+- ✅ **Fallback Options** - Alternative contact methods if email setup fails
+- ✅ **Development Support** - Special modes for local development and testing
+
+**Email Configuration Workflow:**
+
+```bash
+# Step 1: Check current status
+pi email --status
+# → Shows if Email MCP Server is installed and configured
+
+# Step 2: Install Email MCP Server (if needed)
+npm install -g @0xshariq/email-mcp-server
+
+# Step 3: Configure your email credentials
+pi email --setup
+# → Interactive setup process:
+#   1. Select Provider: Gmail / Outlook / Yahoo / Custom
+#   2. Enter Email: your-email@example.com
+#   3. Enter Password: (app password for Gmail)
+#   4. Auto SMTP Configuration
+#   5. Secure .env File Creation
+
+# Step 4: Test the configuration
+pi email --test
+# → Sends formatted test email to verify everything works
+
+# Step 5: Send feedback
+pi email bug
+# → Choose sender email source:
+#   • Use configured email (from .env)
+#   • Enter custom email credentials
+```
+
+**Email Flow Process:**
+```
+1. User runs: pi email bug
+2. System checks Email MCP Server availability
+3. If not configured → automatic setup prompt
+4. User selects email sender option:
+   ├── Use configured email (.env file)
+   └── Use custom email (temporary credentials)
+5. Category-specific form collection
+6. Professional HTML email generation
+7. Email sent via Email MCP Server
+8. Success confirmation with beautiful formatting
+```
 
 **Contact Information:**
 - **Primary**: khanshariq92213@gmail.com
@@ -1127,21 +1176,33 @@ pi email --dev
 
 **Quick Examples:**
 ```bash
+# Initial email setup (first-time use)
+pi email --setup
+# → Interactive configuration with provider selection
+
 # Report a critical bug
 pi email bug
-# → Opens detailed bug report form with system info
+# → Detailed bug report form with system info and sender selection
 
 # Quick feature suggestion
 pi email feature --quick
 # → Minimal prompts for fast feedback
 
-# Check if email is working
-pi email --test
-# → Sends test email to verify setup
+# Check email system status
+pi email --status
+# → Shows Email MCP Server status and configuration
 
-# Get help with setup
+# Test email functionality
+pi email --test
+# → Sends formatted test email to verify setup
+
+# Get complete installation guide
+pi email --install
+# → Step-by-step Email MCP Server installation
+
+# Troubleshoot configuration issues
 pi email --dev
-# → Complete troubleshooting guide
+# → Complete troubleshooting and development guide
 ```
 
 ---
