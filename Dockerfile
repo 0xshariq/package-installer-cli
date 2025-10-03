@@ -5,7 +5,7 @@ FROM node:20-alpine AS builder
 # Set metadata labels
 LABEL maintainer="Sharique Chaudhary <khanshariq92213@gmail.com>"
 LABEL description="A cross-platform, interactive CLI to scaffold modern web app templates with email feedback system"
-LABEL version="3.8.0"
+LABEL version="3.8.1"
 LABEL image="0xshariq/package-installer-cli"
 LABEL org.opencontainers.image.source="https://github.com/0xshariq/package-installer-cli"
 LABEL org.opencontainers.image.documentation="https://github.com/0xshariq/package-installer-cli/blob/main/README.md"
