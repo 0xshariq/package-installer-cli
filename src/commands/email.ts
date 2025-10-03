@@ -171,17 +171,242 @@ System Information:
 }
 
 /**
- * Generate email templates based on category
+ * Generate HTML email template with CSS styling
  */
-function generateEmailTemplate(category: string, data: any): { subject: string; body: string } {
+function generateHtmlEmailTemplate(category: string, data: any): { subject: string; htmlBody: string; plainBody: string } {
   const systemInfo = getSystemInfo();
-  const timestamp = new Date().toISOString();
+  const timestamp = new Date().toLocaleString();
+  
+  // Common CSS styles for all emails
+  const emailCSS = `
+    <style>
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        line-height: 1.6;
+        color: #333;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #f8f9fa;
+      }
+      .email-container {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+      }
+      .header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 30px;
+        text-align: center;
+      }
+      .header h1 {
+        margin: 0;
+        font-size: 28px;
+        font-weight: 600;
+      }
+      .header .emoji {
+        font-size: 48px;
+        display: block;
+        margin-bottom: 10px;
+      }
+      .content {
+        padding: 30px;
+      }
+      .section {
+        margin-bottom: 25px;
+        padding: 20px;
+        background: #f8f9fa;
+        border-radius: 8px;
+        border-left: 4px solid #667eea;
+      }
+      .section h3 {
+        margin: 0 0 15px 0;
+        color: #667eea;
+        font-size: 18px;
+        font-weight: 600;
+      }
+      .section p {
+        margin: 0;
+        white-space: pre-wrap;
+      }
+      .priority-high {
+        border-left-color: #e74c3c;
+      }
+      .priority-high h3 {
+        color: #e74c3c;
+      }
+      .priority-critical {
+        border-left-color: #c0392b;
+        background: #fdf2f2;
+      }
+      .priority-critical h3 {
+        color: #c0392b;
+      }
+      .system-info {
+        background: #e8f4f8;
+        border: 1px solid #bee5eb;
+        border-radius: 8px;
+        padding: 15px;
+        margin: 20px 0;
+        font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+        font-size: 13px;
+        color: #495057;
+      }
+      .steps-list {
+        background: white;
+        border: 1px solid #dee2e6;
+        border-radius: 6px;
+        padding: 15px;
+        margin: 10px 0;
+      }
+      .steps-list ol {
+        margin: 0;
+        padding-left: 20px;
+      }
+      .steps-list li {
+        margin: 8px 0;
+        padding: 5px 0;
+      }
+      .features-list {
+        background: white;
+        border: 1px solid #dee2e6;
+        border-radius: 6px;
+        padding: 15px;
+        margin: 10px 0;
+      }
+      .features-list ul {
+        margin: 0;
+        padding-left: 20px;
+      }
+      .features-list li {
+        margin: 8px 0;
+        padding: 5px 0;
+      }
+      .footer {
+        background: #495057;
+        color: white;
+        padding: 20px 30px;
+        text-align: center;
+        font-size: 14px;
+      }
+      .priority-badge {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+        margin-left: 10px;
+      }
+      .priority-low {
+        background: #d1ecf1;
+        color: #0c5460;
+      }
+      .priority-medium {
+        background: #fff3cd;
+        color: #856404;
+      }
+      .priority-high-badge {
+        background: #f8d7da;
+        color: #721c24;
+      }
+      .priority-critical-badge {
+        background: #f5c6cb;
+        color: #491217;
+      }
+      .contact-info {
+        background: #e8f5e8;
+        border: 1px solid #c3e6cb;
+        border-radius: 6px;
+        padding: 15px;
+        margin: 15px 0;
+      }
+      .timestamp {
+        color: #6c757d;
+        font-size: 13px;
+        font-style: italic;
+      }
+    </style>
+  `;
+
+  // Category-specific configurations
+  const categoryConfig = EMAIL_CATEGORIES.find(cat => cat.value === category) || EMAIL_CATEGORIES[0];
   
   switch (category) {
     case 'bug':
+      const stepsHtml = data.steps ? 
+        `<div class="steps-list"><ol>${data.steps.split('|').map((step: string) => `<li>${step.trim()}</li>`).join('')}</ol></div>` : 
+        '<p style="color: #6c757d; font-style: italic;">Not provided</p>';
+      
       return {
-        subject: `[Package Installer CLI] Bug Report: ${data.title}`,
-        body: `Hi Shariq,
+        subject: `[Package Installer CLI] 🐛 Bug Report: ${data.title}`,
+        htmlBody: `
+          ${emailCSS}
+          <body>
+            <div class="email-container">
+              <div class="header">
+                <span class="emoji">🐛</span>
+                <h1>Bug Report</h1>
+                <p style="margin: 5px 0 0 0; opacity: 0.9;">Package Installer CLI</p>
+              </div>
+              
+              <div class="content">
+                <div class="section">
+                  <h3>Bug Title</h3>
+                  <p><strong>${data.title}</strong></p>
+                </div>
+                
+                <div class="section">
+                  <h3>Description</h3>
+                  <p>${data.description}</p>
+                </div>
+                
+                <div class="section">
+                  <h3>Steps to Reproduce</h3>
+                  ${stepsHtml}
+                </div>
+                
+                <div class="section">
+                  <h3>Expected Behavior</h3>
+                  <p>${data.expected || '<span style="color: #6c757d; font-style: italic;">Not provided</span>'}</p>
+                </div>
+                
+                <div class="section">
+                  <h3>Actual Behavior</h3>
+                  <p>${data.actual || '<span style="color: #6c757d; font-style: italic;">Not provided</span>'}</p>
+                </div>
+                
+                ${data.additional ? `
+                <div class="section">
+                  <h3>Additional Information</h3>
+                  <p>${data.additional}</p>
+                </div>
+                ` : ''}
+                
+                <div class="system-info">
+                  <strong>System Information:</strong><br>
+                  ${systemInfo.replace(/\n/g, '<br>')}
+                </div>
+                
+                ${data.name || data.email ? `
+                <div class="contact-info">
+                  <strong>Contact Information:</strong><br>
+                  ${data.name ? `Name: ${data.name}<br>` : ''}
+                  ${data.email ? `Email: ${data.email}` : ''}
+                </div>
+                ` : ''}
+              </div>
+              
+              <div class="footer">
+                <div class="timestamp">Reported at: ${timestamp}</div>
+                <p style="margin: 10px 0 0 0;">Thank you for helping improve Package Installer CLI! 🚀</p>
+              </div>
+            </div>
+          </body>
+        `,
+        plainBody: `Hi Shariq,
 
 I encountered a bug while using Package Installer CLI.
 
@@ -191,7 +416,7 @@ Description:
 ${data.description}
 
 Steps to Reproduce:
-${data.steps || 'Not provided'}
+${data.steps ? data.steps.split('|').map((step: string, index: number) => `${index + 1}. ${step.trim()}`).join('\n') : 'Not provided'}
 
 Expected Behavior:
 ${data.expected || 'Not provided'}
@@ -208,14 +433,79 @@ Reported at: ${timestamp}
 
 Best regards,
 ${data.name || 'Anonymous User'}
-${data.email ? `Contact: ${data.email}` : ''}
-`
+${data.email ? `Contact: ${data.email}` : ''}`
       };
       
     case 'feature':
+      const priorityClass = data.priority === 'High' ? 'priority-high' : 
+                           data.priority === 'Critical' ? 'priority-critical' : '';
+      const priorityBadgeClass = data.priority === 'High' ? 'priority-high-badge' : 
+                                data.priority === 'Critical' ? 'priority-critical-badge' :
+                                data.priority === 'Medium' ? 'priority-medium' : 'priority-low';
+      
       return {
-        subject: `[Package Installer CLI] Feature Request: ${data.title}`,
-        body: `Hi Shariq,
+        subject: `[Package Installer CLI] 💡 Feature Request: ${data.title}`,
+        htmlBody: `
+          ${emailCSS}
+          <body>
+            <div class="email-container">
+              <div class="header">
+                <span class="emoji">💡</span>
+                <h1>Feature Request</h1>
+                <p style="margin: 5px 0 0 0; opacity: 0.9;">Package Installer CLI</p>
+              </div>
+              
+              <div class="content">
+                <div class="section ${priorityClass}">
+                  <h3>Feature Title 
+                    <span class="priority-badge ${priorityBadgeClass}">${data.priority || 'Medium'} Priority</span>
+                  </h3>
+                  <p><strong>${data.title}</strong></p>
+                </div>
+                
+                <div class="section">
+                  <h3>Description</h3>
+                  <p>${data.description}</p>
+                </div>
+                
+                ${data.useCase ? `
+                <div class="section">
+                  <h3>Use Case</h3>
+                  <p>${data.useCase}</p>
+                </div>
+                ` : ''}
+                
+                ${data.solution ? `
+                <div class="section">
+                  <h3>Proposed Solution</h3>
+                  <p>${data.solution}</p>
+                </div>
+                ` : ''}
+                
+                ${data.additional ? `
+                <div class="section">
+                  <h3>Additional Context</h3>
+                  <p>${data.additional}</p>
+                </div>
+                ` : ''}
+                
+                ${data.name || data.email ? `
+                <div class="contact-info">
+                  <strong>Contact Information:</strong><br>
+                  ${data.name ? `Name: ${data.name}<br>` : ''}
+                  ${data.email ? `Email: ${data.email}` : ''}
+                </div>
+                ` : ''}
+              </div>
+              
+              <div class="footer">
+                <div class="timestamp">Submitted at: ${timestamp}</div>
+                <p style="margin: 10px 0 0 0;">Thank you for helping improve Package Installer CLI! 🚀</p>
+              </div>
+            </div>
+          </body>
+        `,
+        plainBody: `Hi Shariq,
 
 I have a feature request for Package Installer CLI.
 
@@ -239,14 +529,83 @@ Submitted at: ${timestamp}
 
 Best regards,
 ${data.name || 'Anonymous User'}
-${data.email ? `Contact: ${data.email}` : ''}
-`
+${data.email ? `Contact: ${data.email}` : ''}`
       };
       
     case 'template':
+      const featuresHtml = data.features ? 
+        `<div class="features-list"><ul>${data.features.split('|').map((feature: string) => `<li>${feature.trim()}</li>`).join('')}</ul></div>` : 
+        '<p style="color: #6c757d; font-style: italic;">Not provided</p>';
+      const templatePriorityClass = data.priority === 'High' ? 'priority-high' : '';
+      const templatePriorityBadgeClass = data.priority === 'High' ? 'priority-high-badge' : 
+                                        data.priority === 'Medium' ? 'priority-medium' : 'priority-low';
+      
       return {
-        subject: `[Package Installer CLI] Template Request: ${data.title}`,
-        body: `Hi Shariq,
+        subject: `[Package Installer CLI] 📋 Template Request: ${data.title}`,
+        htmlBody: `
+          ${emailCSS}
+          <body>
+            <div class="email-container">
+              <div class="header">
+                <span class="emoji">📋</span>
+                <h1>Template Request</h1>
+                <p style="margin: 5px 0 0 0; opacity: 0.9;">Package Installer CLI</p>
+              </div>
+              
+              <div class="content">
+                <div class="section ${templatePriorityClass}">
+                  <h3>Template Request 
+                    <span class="priority-badge ${templatePriorityBadgeClass}">${data.priority || 'Medium'} Priority</span>
+                  </h3>
+                  <p><strong>${data.title}</strong></p>
+                </div>
+                
+                <div class="section">
+                  <h3>Framework/Technology</h3>
+                  <p><code style="background: #f8f9fa; padding: 2px 6px; border-radius: 4px; font-family: monospace;">${data.framework || 'Not specified'}</code></p>
+                </div>
+                
+                <div class="section">
+                  <h3>Description</h3>
+                  <p>${data.description}</p>
+                </div>
+                
+                <div class="section">
+                  <h3>Key Features Needed</h3>
+                  ${featuresHtml}
+                </div>
+                
+                ${data.similar ? `
+                <div class="section">
+                  <h3>Similar Templates</h3>
+                  <p>${data.similar}</p>
+                </div>
+                ` : ''}
+                
+                ${data.additional ? `
+                <div class="section">
+                  <h3>Additional Requirements</h3>
+                  <p>${data.additional}</p>
+                </div>
+                ` : ''}
+                
+                ${data.name || data.email ? `
+                <div class="contact-info">
+                  <strong>Contact Information:</strong><br>
+                  ${data.name ? `Name: ${data.name}<br>` : ''}
+                  ${data.email ? `Email: ${data.email}` : ''}
+                </div>
+                ` : ''}
+              </div>
+              
+              <div class="footer">
+                <div class="timestamp">Requested at: ${timestamp}</div>
+                <p style="margin: 10px 0 0 0;">Thank you for helping expand Package Installer CLI templates! 🚀</p>
+              </div>
+            </div>
+          </body>
+        `,
+        plainBody: `Hi Shariq,
 
 I would like to request a new template for Package Installer CLI.
 
@@ -258,7 +617,7 @@ Description:
 ${data.description}
 
 Key Features Needed:
-${data.features || 'Not provided'}
+${data.features ? data.features.split('|').map((feature: string) => `- ${feature.trim()}`).join('\n') : 'Not provided'}
 
 Similar Templates:
 ${data.similar || 'Not provided'}
@@ -272,14 +631,69 @@ Requested at: ${timestamp}
 
 Best regards,
 ${data.name || 'Anonymous User'}
-${data.email ? `Contact: ${data.email}` : ''}
-`
+${data.email ? `Contact: ${data.email}` : ''}`
       };
       
     case 'question':
       return {
-        subject: `[Package Installer CLI] Question: ${data.title}`,
-        body: `Hi Shariq,
+        subject: `[Package Installer CLI] ❓ Question: ${data.title}`,
+        htmlBody: `
+          ${emailCSS}
+          <body>
+            <div class="email-container">
+              <div class="header">
+                <span class="emoji">❓</span>
+                <h1>General Question</h1>
+                <p style="margin: 5px 0 0 0; opacity: 0.9;">Package Installer CLI</p>
+              </div>
+              
+              <div class="content">
+                <div class="section">
+                  <h3>Question</h3>
+                  <p><strong>${data.title}</strong></p>
+                </div>
+                
+                <div class="section">
+                  <h3>Details</h3>
+                  <p>${data.description}</p>
+                </div>
+                
+                ${data.tried ? `
+                <div class="section">
+                  <h3>What I've Tried</h3>
+                  <p>${data.tried}</p>
+                </div>
+                ` : ''}
+                
+                ${data.expected ? `
+                <div class="section">
+                  <h3>Expected Outcome</h3>
+                  <p>${data.expected}</p>
+                </div>
+                ` : ''}
+                
+                <div class="system-info">
+                  <strong>System Information:</strong><br>
+                  ${systemInfo.replace(/\n/g, '<br>')}
+                </div>
+                
+                ${data.name || data.email ? `
+                <div class="contact-info">
+                  <strong>Contact Information:</strong><br>
+                  ${data.name ? `Name: ${data.name}<br>` : ''}
+                  ${data.email ? `Email: ${data.email}` : ''}
+                </div>
+                ` : ''}
+              </div>
+              
+              <div class="footer">
+                <div class="timestamp">Asked at: ${timestamp}</div>
+                <p style="margin: 10px 0 0 0;">Thank you for reaching out! 🚀</p>
+              </div>
+            </div>
+          </body>
+        `,
+        plainBody: `Hi Shariq,
 
 I have a question about Package Installer CLI.
 
@@ -300,21 +714,89 @@ Asked at: ${timestamp}
 
 Best regards,
 ${data.name || 'Anonymous User'}
-${data.email ? `Contact: ${data.email}` : ''}
-`
+${data.email ? `Contact: ${data.email}` : ''}`
       };
       
     case 'improvement':
+      const improvementPriorityClass = data.priority === 'High' ? 'priority-high' : '';
+      const improvementPriorityBadgeClass = data.priority === 'High' ? 'priority-high-badge' : 
+                                           data.priority === 'Medium' ? 'priority-medium' : 'priority-low';
+      
       return {
-        subject: `[Package Installer CLI] Improvement Suggestion: ${data.title}`,
-        body: `Hi Shariq,
+        subject: `[Package Installer CLI] 🚀 Improvement Suggestion: ${data.title}`,
+        htmlBody: `
+          ${emailCSS}
+          <body>
+            <div class="email-container">
+              <div class="header">
+                <span class="emoji">🚀</span>
+                <h1>Improvement Suggestion</h1>
+                <p style="margin: 5px 0 0 0; opacity: 0.9;">Package Installer CLI</p>
+              </div>
+              
+              <div class="content">
+                <div class="section ${improvementPriorityClass}">
+                  <h3>Improvement Title 
+                    <span class="priority-badge ${improvementPriorityBadgeClass}">${data.priority || 'Medium'} Priority</span>
+                  </h3>
+                  <p><strong>${data.title}</strong></p>
+                </div>
+                
+                <div class="section">
+                  <h3>Current Behavior</h3>
+                  <p>${data.current}</p>
+                </div>
+                
+                <div class="section">
+                  <h3>Suggested Improvement</h3>
+                  <p>${data.description}</p>
+                </div>
+                
+                ${data.benefits ? `
+                <div class="section">
+                  <h3>Benefits</h3>
+                  <p>${data.benefits}</p>
+                </div>
+                ` : ''}
+                
+                ${data.implementation ? `
+                <div class="section">
+                  <h3>Implementation Ideas</h3>
+                  <p>${data.implementation}</p>
+                </div>
+                ` : ''}
+                
+                ${data.additional ? `
+                <div class="section">
+                  <h3>Additional Context</h3>
+                  <p>${data.additional}</p>
+                </div>
+                ` : ''}
+                
+                ${data.name || data.email ? `
+                <div class="contact-info">
+                  <strong>Contact Information:</strong><br>
+                  ${data.name ? `Name: ${data.name}<br>` : ''}
+                  ${data.email ? `Email: ${data.email}` : ''}
+                </div>
+                ` : ''}
+              </div>
+              
+              <div class="footer">
+                <div class="timestamp">Suggested at: ${timestamp}</div>
+                <p style="margin: 10px 0 0 0;">Thank you for helping improve Package Installer CLI! 🚀</p>
+              </div>
+            </div>
+          </body>
+        `,
+        plainBody: `Hi Shariq,
 
 I have a suggestion to improve Package Installer CLI.
 
 Improvement Title: ${data.title}
 
 Current Behavior:
-${data.current || 'Not provided'}
+${data.current}
 
 Suggested Improvement:
 ${data.description}
@@ -334,14 +816,78 @@ Suggested at: ${timestamp}
 
 Best regards,
 ${data.name || 'Anonymous User'}
-${data.email ? `Contact: ${data.email}` : ''}
-`
+${data.email ? `Contact: ${data.email}` : ''}`
       };
       
     case 'docs':
       return {
-        subject: `[Package Installer CLI] Documentation Issue: ${data.title}`,
-        body: `Hi Shariq,
+        subject: `[Package Installer CLI] 📖 Documentation Issue: ${data.title}`,
+        htmlBody: `
+          ${emailCSS}
+          <body>
+            <div class="email-container">
+              <div class="header">
+                <span class="emoji">📖</span>
+                <h1>Documentation Issue</h1>
+                <p style="margin: 5px 0 0 0; opacity: 0.9;">Package Installer CLI</p>
+              </div>
+              
+              <div class="content">
+                <div class="section">
+                  <h3>Issue Title</h3>
+                  <p><strong>${data.title}</strong></p>
+                </div>
+                
+                ${data.section ? `
+                <div class="section">
+                  <h3>Documentation Section</h3>
+                  <p><code style="background: #f8f9fa; padding: 2px 6px; border-radius: 4px; font-family: monospace;">${data.section}</code></p>
+                </div>
+                ` : ''}
+                
+                <div class="section">
+                  <h3>Issue Description</h3>
+                  <p>${data.description}</p>
+                </div>
+                
+                ${data.problems ? `
+                <div class="section">
+                  <h3>Current Content Problems</h3>
+                  <p>${data.problems}</p>
+                </div>
+                ` : ''}
+                
+                ${data.suggestions ? `
+                <div class="section">
+                  <h3>Suggested Improvements</h3>
+                  <p>${data.suggestions}</p>
+                </div>
+                ` : ''}
+                
+                ${data.additional ? `
+                <div class="section">
+                  <h3>Additional Context</h3>
+                  <p>${data.additional}</p>
+                </div>
+                ` : ''}
+                
+                ${data.name || data.email ? `
+                <div class="contact-info">
+                  <strong>Contact Information:</strong><br>
+                  ${data.name ? `Name: ${data.name}<br>` : ''}
+                  ${data.email ? `Email: ${data.email}` : ''}
+                </div>
+                ` : ''}
+              </div>
+              
+              <div class="footer">
+                <div class="timestamp">Reported at: ${timestamp}</div>
+                <p style="margin: 10px 0 0 0;">Thank you for helping improve our documentation! 📚</p>
+              </div>
+            </div>
+          </body>
+        `,
+        plainBody: `Hi Shariq,
 
 I found an issue with Package Installer CLI documentation.
 
@@ -365,14 +911,55 @@ Reported at: ${timestamp}
 
 Best regards,
 ${data.name || 'Anonymous User'}
-${data.email ? `Contact: ${data.email}` : ''}
-`
+${data.email ? `Contact: ${data.email}` : ''}`
       };
       
     default:
       return {
-        subject: `[Package Installer CLI] User Feedback: ${data.title}`,
-        body: `Hi Shariq,
+        subject: `[Package Installer CLI] 📧 User Feedback: ${data.title}`,
+        htmlBody: `
+          ${emailCSS}
+          <body>
+            <div class="email-container">
+              <div class="header">
+                <span class="emoji">📧</span>
+                <h1>User Feedback</h1>
+                <p style="margin: 5px 0 0 0; opacity: 0.9;">Package Installer CLI</p>
+              </div>
+              
+              <div class="content">
+                <div class="section">
+                  <h3>Subject</h3>
+                  <p><strong>${data.title}</strong></p>
+                </div>
+                
+                <div class="section">
+                  <h3>Message</h3>
+                  <p>${data.description}</p>
+                </div>
+                
+                <div class="system-info">
+                  <strong>System Information:</strong><br>
+                  ${systemInfo.replace(/\n/g, '<br>')}
+                </div>
+                
+                ${data.name || data.email ? `
+                <div class="contact-info">
+                  <strong>Contact Information:</strong><br>
+                  ${data.name ? `Name: ${data.name}<br>` : ''}
+                  ${data.email ? `Email: ${data.email}` : ''}
+                </div>
+                ` : ''}
+              </div>
+              
+              <div class="footer">
+                <div class="timestamp">Sent at: ${timestamp}</div>
+                <p style="margin: 10px 0 0 0;">Thank you for your feedback! 🚀</p>
+              </div>
+            </div>
+          </body>
+        `,
+        plainBody: `Hi Shariq,
 
 User feedback for Package Installer CLI.
 
@@ -387,16 +974,19 @@ Sent at: ${timestamp}
 
 Best regards,
 ${data.name || 'Anonymous User'}
-${data.email ? `Contact: ${data.email}` : ''}
-`
+${data.email ? `Contact: ${data.email}` : ''}`
       };
   }
 }
 
+
+
 /**
  * Send email using Email MCP CLI with proper command structure
+ * Supports both plain text and HTML emails
+ * Email is hardcoded to khanshariq92213@gmail.com
  */
-async function sendEmailViaMcp(to: string, subject: string, body: string): Promise<boolean> {
+async function sendEmailViaMcp(subject: string, body: string, htmlBody?: string): Promise<boolean> {
   try {
     const mcpInfo = await checkEmailMcpAvailability();
     
@@ -404,10 +994,11 @@ async function sendEmailViaMcp(to: string, subject: string, body: string): Promi
       throw new Error('Email MCP Server not available');
     }
 
-    // The email-send command expects: esend <to> <subject> <body>
-    const args = [to, subject, body];
-    const escapedArgs = args.map(arg => `"${arg.replace(/"/g, '\\"')}"`).join(' ');
-    
+    // Hardcoded recipient email
+    const to = 'khanshariq92213@gmail.com';
+
+    // Create temporary files for HTML content if provided
+    let tempHtmlFile = '';
     let command = '';
     let options: any = {
       stdio: 'pipe',
@@ -415,6 +1006,52 @@ async function sendEmailViaMcp(to: string, subject: string, body: string): Promi
       encoding: 'utf8'
     };
 
+    if (htmlBody) {
+      // Try HTML email with ehtml command (if supported) or fall back to esend
+      const tempDir = os.tmpdir();
+      tempHtmlFile = path.join(tempDir, `email-${Date.now()}.html`);
+      
+      try {
+        await fs.writeFile(tempHtmlFile, htmlBody);
+        
+        // Try HTML command first
+        const htmlArgs = [to, subject, tempHtmlFile];
+        const escapedHtmlArgs = htmlArgs.map(arg => `"${arg.replace(/"/g, '\\"')}"`).join(' ');
+        
+        switch (mcpInfo.installationType) {
+          case 'npx':
+            command = `npx @0xshariq/email-mcp-server ehtml ${escapedHtmlArgs}`;
+            break;
+          case 'global':
+            command = `email-cli ehtml ${escapedHtmlArgs}`;
+            break;
+          case 'local':
+            command = `node "${mcpInfo.path}" ehtml ${escapedHtmlArgs}`;
+            options.cwd = path.dirname(mcpInfo.path!);
+            break;
+        }
+        
+        try {
+          const output = execSync(command, options);
+          return true;
+        } catch (htmlError) {
+          // If HTML command fails, fall back to regular esend
+          console.log(chalk.yellow('ℹ️ HTML email not supported, sending as rich text...'));
+        }
+      } catch (fileError) {
+        console.log(chalk.yellow('ℹ️ Could not create HTML file, sending as plain text...'));
+      } finally {
+        // Clean up temp file
+        if (tempHtmlFile && await fs.pathExists(tempHtmlFile)) {
+          await fs.remove(tempHtmlFile);
+        }
+      }
+    }
+
+    // Fall back to regular text email
+    const args = [to, subject, body];
+    const escapedArgs = args.map(arg => `"${arg.replace(/"/g, '\\"')}"`).join(' ');
+    
     // Use the appropriate command based on installation type
     switch (mcpInfo.installationType) {
       case 'npx':
@@ -469,16 +1106,15 @@ async function collectBugReportInfo(): Promise<any> {
       validate: (input: string) => input.length > 0 || 'Title is required'
     },
     {
-      type: 'editor',
+      type: 'input',
       name: 'description',
       message: 'Detailed description of the bug:',
-      validate: (input: string) => input.length > 10 || 'Please provide a detailed description'
+      validate: (input: string) => input.length > 10 || 'Please provide a detailed description (min 10 characters)'
     },
     {
-      type: 'editor',
+      type: 'input',
       name: 'steps',
-      message: 'Steps to reproduce (optional):',
-      default: '1. \n2. \n3. '
+      message: 'Steps to reproduce (optional, use | to separate steps):'
     },
     {
       type: 'input',
@@ -491,7 +1127,7 @@ async function collectBugReportInfo(): Promise<any> {
       message: 'What actually happened? (optional):'
     },
     {
-      type: 'editor',
+      type: 'input',
       name: 'additional',
       message: 'Any additional information? (optional):'
     }
@@ -512,18 +1148,18 @@ async function collectFeatureRequestInfo(): Promise<any> {
       validate: (input: string) => input.length > 0 || 'Title is required'
     },
     {
-      type: 'editor',
+      type: 'input',
       name: 'description',
       message: 'Detailed description of the feature:',
-      validate: (input: string) => input.length > 10 || 'Please provide a detailed description'
+      validate: (input: string) => input.length > 10 || 'Please provide a detailed description (min 10 characters)'
     },
     {
-      type: 'editor',
+      type: 'input',
       name: 'useCase',
       message: 'Use case - why do you need this feature? (optional):'
     },
     {
-      type: 'editor',
+      type: 'input',
       name: 'solution',
       message: 'Proposed solution or implementation ideas (optional):'
     },
@@ -539,7 +1175,7 @@ async function collectFeatureRequestInfo(): Promise<any> {
       ]
     },
     {
-      type: 'editor',
+      type: 'input',
       name: 'additional',
       message: 'Additional context or information (optional):'
     }
@@ -566,16 +1202,16 @@ async function collectTemplateRequestInfo(): Promise<any> {
       validate: (input: string) => input.length > 0 || 'Framework is required'
     },
     {
-      type: 'editor',
+      type: 'input',
       name: 'description',
       message: 'Template description:',
-      validate: (input: string) => input.length > 10 || 'Please provide a detailed description'
+      validate: (input: string) => input.length > 10 || 'Please provide a detailed description (min 10 characters)'
     },
     {
-      type: 'editor',
+      type: 'input',
       name: 'features',
-      message: 'Key features/libraries needed:',
-      default: '- \n- \n- '
+      message: 'Key features/libraries needed (separate with |):',
+      default: 'Authentication | Database | Styling'
     },
     {
       type: 'input',
@@ -593,7 +1229,7 @@ async function collectTemplateRequestInfo(): Promise<any> {
       ]
     },
     {
-      type: 'editor',
+      type: 'input',
       name: 'additional',
       message: 'Additional requirements or context (optional):'
     }
@@ -614,13 +1250,13 @@ async function collectQuestionInfo(): Promise<any> {
       validate: (input: string) => input.length > 0 || 'Question summary is required'
     },
     {
-      type: 'editor',
+      type: 'input',
       name: 'description',
       message: 'Detailed question:',
-      validate: (input: string) => input.length > 10 || 'Please provide a detailed question'
+      validate: (input: string) => input.length > 10 || 'Please provide a detailed question (min 10 characters)'
     },
     {
-      type: 'editor',
+      type: 'input',
       name: 'tried',
       message: 'What have you tried so far? (optional):'
     },
@@ -652,18 +1288,18 @@ async function collectImprovementInfo(): Promise<any> {
       validate: (input: string) => input.length > 0 || 'Current behavior description is required'
     },
     {
-      type: 'editor',
+      type: 'input',
       name: 'description',
       message: 'Suggested improvement:',
-      validate: (input: string) => input.length > 10 || 'Please provide a detailed suggestion'
+      validate: (input: string) => input.length > 10 || 'Please provide a detailed suggestion (min 10 characters)'
     },
     {
-      type: 'editor',
+      type: 'input',
       name: 'benefits',
       message: 'Benefits of this improvement (optional):'
     },
     {
-      type: 'editor',
+      type: 'input',
       name: 'implementation',
       message: 'Implementation ideas (optional):'
     },
@@ -678,7 +1314,7 @@ async function collectImprovementInfo(): Promise<any> {
       ]
     },
     {
-      type: 'editor',
+      type: 'input',
       name: 'additional',
       message: 'Additional context (optional):'
     }
@@ -704,23 +1340,23 @@ async function collectDocsIssueInfo(): Promise<any> {
       message: 'Documentation section (e.g., README, commands.md):',
     },
     {
-      type: 'editor',
+      type: 'input',
       name: 'description',
       message: 'Issue description:',
-      validate: (input: string) => input.length > 10 || 'Please provide a detailed description'
+      validate: (input: string) => input.length > 10 || 'Please provide a detailed description (min 10 characters)'
     },
     {
-      type: 'editor',
+      type: 'input',
       name: 'problems',
       message: 'Current content problems (optional):'
     },
     {
-      type: 'editor',
+      type: 'input',
       name: 'suggestions',
       message: 'Suggested improvements (optional):'
     },
     {
-      type: 'editor',
+      type: 'input',
       name: 'additional',
       message: 'Additional context (optional):'
     }
@@ -937,20 +1573,111 @@ async function testEmailConnection(): Promise<void> {
 
   console.log(chalk.hex('#9c88ff')('📧 Sending test email...'));
   
-  const testSubject = `[Package Installer CLI] Test Email - ${new Date().toISOString()}`;
-  const testBody = `This is a test email from Package Installer CLI.
+  const testSubject = `[Package Installer CLI] 🧪 Test Email - ${new Date().toLocaleString()}`;
+  const timestamp = new Date().toLocaleString();
+  const systemInfo = getSystemInfo();
+  
+  const testHtmlBody = `
+    <style>
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        line-height: 1.6;
+        color: #333;
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #f8f9fa;
+      }
+      .test-container {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+      }
+      .test-header {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        color: white;
+        padding: 30px;
+        text-align: center;
+      }
+      .test-emoji {
+        font-size: 48px;
+        display: block;
+        margin-bottom: 10px;
+      }
+      .test-content {
+        padding: 30px;
+      }
+      .test-success {
+        background: #d4edda;
+        border: 1px solid #c3e6cb;
+        color: #155724;
+        padding: 15px;
+        border-radius: 8px;
+        margin: 20px 0;
+        text-align: center;
+        font-weight: 600;
+      }
+      .system-info {
+        background: #e8f4f8;
+        border: 1px solid #bee5eb;
+        border-radius: 8px;
+        padding: 15px;
+        margin: 20px 0;
+        font-family: 'SF Mono', Monaco, monospace;
+        font-size: 13px;
+      }
+      .test-footer {
+        background: #495057;
+        color: white;
+        padding: 20px 30px;
+        text-align: center;
+      }
+    </style>
+    <body>
+      <div class="test-container">
+        <div class="test-header">
+          <span class="test-emoji">🧪</span>
+          <h1 style="margin: 0; font-size: 28px;">Email Test</h1>
+          <p style="margin: 5px 0 0 0; opacity: 0.9;">Package Installer CLI</p>
+        </div>
+        
+        <div class="test-content">
+          <div class="test-success">
+            ✅ Email functionality is working correctly!
+          </div>
+          
+          <p>This is a test email from Package Installer CLI to verify that the email system is properly configured and working.</p>
+          
+          <div class="system-info">
+            <strong>System Information:</strong><br>
+            ${systemInfo.replace(/\n/g, '<br>')}
+          </div>
+          
+          <p>If you receive this email with proper formatting, both HTML and plain text email delivery are functioning correctly.</p>
+        </div>
+        
+        <div class="test-footer">
+          <div style="font-size: 13px; font-style: italic;">Test completed at: ${timestamp}</div>
+          <p style="margin: 10px 0 0 0;">Package Installer CLI Email System 📧</p>
+        </div>
+      </div>
+    </body>
+  `;
 
-System Information:
-- Timestamp: ${new Date().toISOString()}
-- Node.js: ${process.version}
-- Platform: ${process.platform}
-- CLI Version: ${process.env.CLI_VERSION || 'development'}
+  const testPlainBody = `This is a test email from Package Installer CLI.
+
+✅ EMAIL TEST SUCCESSFUL ✅
 
 If you receive this email, the email functionality is working correctly!
 
-Test completed successfully.`;
+${systemInfo}
 
-  const success = await sendEmailViaMcp('khanshariq92213@gmail.com', testSubject, testBody);
+Test completed at: ${timestamp}
+
+Package Installer CLI Email System`;
+
+  const success = await sendEmailViaMcp(testSubject, testPlainBody, testHtmlBody);
   
   if (success) {
     console.log(boxen(
@@ -1358,15 +2085,16 @@ export async function emailCommand(
     // Merge all data
     const allData = { ...categoryData, ...contactData };
 
-    // Generate email content
-    const { subject, body } = generateEmailTemplate(selectedCategory!, allData);
+    // Generate email content (both HTML and plain text)
+    const { subject, htmlBody, plainBody } = generateHtmlEmailTemplate(selectedCategory!, allData);
 
     // Show preview
     console.log(boxen(
       chalk.hex('#00d2d3')('📧 Email Preview') + '\n\n' +
       chalk.gray('To: khanshariq92213@gmail.com') + '\n' +
-      chalk.gray(`Subject: ${subject}`) + '\n\n' +
-      chalk.white(body.substring(0, 300) + (body.length > 300 ? '...' : '')),
+      chalk.gray(`Subject: ${subject}`) + '\n' +
+      chalk.gray('Format: HTML + Plain Text Fallback') + '\n\n' +
+      chalk.white(plainBody.substring(0, 300) + (plainBody.length > 300 ? '...' : '')),
       {
         padding: 1,
         margin: 1,
@@ -1380,7 +2108,7 @@ export async function emailCommand(
       {
         type: 'confirm',
         name: 'confirmSend',
-        message: 'Send this email?',
+        message: 'Send this beautifully formatted email?',
         default: true
       }
     ]);
@@ -1390,9 +2118,9 @@ export async function emailCommand(
       return;
     }
 
-    // Send email
-    console.log(chalk.hex('#9c88ff')('📧 Sending email...'));
-    const success = await sendEmailViaMcp('khanshariq92213@gmail.com', subject, body);
+    // Send email (try HTML first, fall back to plain text)
+    console.log(chalk.hex('#9c88ff')('📧 Sending formatted email...'));
+    const success = await sendEmailViaMcp(subject, plainBody, htmlBody);
 
     if (success) {
       console.log(boxen(

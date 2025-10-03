@@ -63,6 +63,7 @@ Available for all commands:
 | [`env`](#env-command) | Environment analysis | Tool detection, optimization tips | ✅ Available |
 | [`clean`](#clean-command) | Clean project artifacts | Selective cleanup, preview mode | ✅ Available |
 | [`cache`](#cache-command) | Manage CLI cache and data | Performance optimization | ✅ Available |
+| [`email`](#email-command) | Contact developer with feedback | Bug reports, feature requests | ✅ Available |
 | [`upgrade-cli`](#upgrade-cli-command) | Upgrade CLI version | Breaking change detection | ✅ Available |
 | [`deploy`](#deploy-command) | Deploy to cloud platforms | Multiple platforms | 🚧 Coming Soon |
 
@@ -865,6 +866,232 @@ pi cache info
 - ⚡ **2-3x faster** project analysis with metadata cache
 - ⚡ **60% faster** package updates with version cache
 - ⚡ **Instant** recommendations with usage pattern cache
+
+---
+
+### `email` Command
+
+Contact the developer with feedback, bug reports, feature requests, and questions through an integrated email system.
+
+**Syntax:**
+```bash
+pi email [category] [options]
+```
+
+**Interactive Feedback:**
+```bash
+# Interactive category selection
+pi email
+
+# Email Categories:
+# 🐛 Bug Report - Report bugs with detailed reproduction steps
+# 💡 Feature Request - Suggest new features with use cases
+# 📋 Template Request - Request new project templates
+# ❓ General Question - Ask questions about CLI usage
+# 🚀 Improvement Suggestion - Suggest improvements to existing features
+# 📖 Documentation Issue - Report documentation problems
+```
+
+**Direct Category Access:**
+```bash
+# Direct feedback categories
+pi email bug           # Report a bug with detailed form
+pi email feature       # Submit feature request
+pi email template      # Request new project template
+pi email question      # Ask general questions
+pi email improvement   # Suggest improvements
+pi email docs          # Report documentation issues
+
+# Quick feedback mode (minimal prompts)
+pi email bug --quick
+pi email feature --quick
+```
+
+**System Management:**
+```bash
+# Check email system status
+pi email --status
+# Shows: Email MCP Server availability, configuration status, version info
+
+# Test email functionality
+pi email --test
+# Sends actual test email to verify setup
+
+# Show setup instructions
+pi email --setup
+# Configuration guide for Email MCP Server
+
+# Show installation instructions
+pi email --install
+# Step-by-step Email MCP Server installation
+
+# Show all email commands
+pi email --commands
+# Complete Email MCP Server command reference
+
+# Development troubleshooting
+pi email --dev
+# Local development setup and troubleshooting guide
+```
+
+**Email Categories & Templates:**
+
+**🐛 Bug Report:**
+- Bug title and detailed description
+- Steps to reproduce the issue
+- Expected vs actual behavior
+- System information (automatically included)
+- Additional context and screenshots
+
+**💡 Feature Request:**
+- Feature title and description
+- Use case and business justification
+- Proposed implementation approach
+- Priority level (Low/Medium/High/Critical)
+- Additional requirements and context
+
+**📋 Template Request:**
+- Template name and framework/technology
+- Required features and libraries
+- Similar existing templates
+- Priority level and specific requirements
+- Implementation suggestions
+
+**❓ General Question:**
+- Question summary and details
+- What you've tried so far
+- Expected outcome or solution
+- Project context if relevant
+
+**🚀 Improvement Suggestion:**
+- Current behavior description
+- Suggested improvement details
+- Benefits and use cases
+- Implementation ideas
+- Priority assessment
+
+**📖 Documentation Issue:**
+- Documentation section affected
+- Issue description and problems
+- Suggested improvements
+- Additional context
+
+**Email System Integration:**
+
+**📧 Email MCP Server Integration:**
+- Uses `@0xshariq/email-mcp-server` npm package
+- Multiple installation methods (global, npx, local)
+- Professional email formatting and templates
+- System information auto-collection
+- Configurable SMTP settings
+
+**🔧 Installation Methods:**
+```bash
+# Global installation (recommended)
+npm install -g @0xshariq/email-mcp-server
+
+# One-time usage (no installation)
+npx @0xshariq/email-mcp-server
+
+# Check installation status
+pi email --status
+```
+
+**Configuration Setup:**
+```bash
+# Show configuration guide
+pi email --setup
+
+# Required environment variables:
+# EMAIL_HOST=smtp.gmail.com
+# EMAIL_PORT=587
+# EMAIL_USER=your-email@gmail.com
+# EMAIL_PASS=your-app-password
+```
+
+**Available Options:**
+| Option | Description | Example |
+|--------|-------------|---------|
+| `--help` | Show comprehensive help | `pi email --help` |
+| `--list` | List all available categories | `pi email --list` |
+| `--status` | Check Email MCP Server status | `pi email --status` |
+| `--test` | Send test email | `pi email --test` |
+| `--setup` | Show configuration guide | `pi email --setup` |
+| `--install` | Show installation instructions | `pi email --install` |
+| `--commands` | Show all email commands | `pi email --commands` |
+| `--dev` | Development troubleshooting | `pi email --dev` |
+| `--quick` | Quick feedback mode | `pi email bug --quick` |
+
+**System Status Information:**
+```bash
+pi email --status
+
+# Email System Status:
+# ✅ Email MCP Server: Available (v1.6.0)
+# ℹ️ Type: global
+# ℹ️ Configuration: ✅ Configured
+# ℹ️ Target Email: your_email@gmail.com
+# ℹ️ Package: @0xshariq/email-mcp-server
+#
+# Available Commands:
+# • esend - Send basic email (up to 3 recipients)
+# • eattach - Send email with attachments
+# • ebulk - Send bulk emails to many recipients
+# • eread - Read recent emails
+# • esearch - Search emails with filters
+#
+# 🎉 Ready to send emails! Use: pi email <category>
+```
+
+**Development Mode:**
+```bash
+pi email --dev
+
+# Development Setup Options:
+# 1. Use Global Install (Recommended for testing):
+#    npm install -g @0xshariq/email-mcp-server
+#
+# 2. Configure Local Development:
+#    cd ~/path/to/email-mcp-server
+#    npm install  # Install dependencies
+#    cp .env.example .env  # Create .env file
+#
+# 3. One-time Usage (No setup needed):
+#    npx @0xshariq/email-mcp-server esend "email" "subject" "body"
+```
+
+**Email Features:**
+- ✅ **Professional Templates** - Category-specific email formatting
+- ✅ **System Information** - Auto-includes OS, Node.js, CLI version
+- ✅ **Contact Management** - Optional user contact for follow-up
+- ✅ **Multi-Installation Support** - Works with global, npx, or local setup
+- ✅ **Configuration Detection** - Smart setup status checking
+- ✅ **Fallback Options** - Alternative contact methods if email fails
+- ✅ **Development Support** - Special modes for local development
+
+**Contact Information:**
+- **Primary**: khanshariq92213@gmail.com
+- **GitHub Issues**: [Create an issue](https://github.com/0xshariq/package-installer-cli/issues)
+- **Documentation**: [Project Wiki](https://github.com/0xshariq/package-installer-cli/wiki)
+
+**Quick Examples:**
+```bash
+# Report a critical bug
+pi email bug
+# → Opens detailed bug report form with system info
+
+# Quick feature suggestion
+pi email feature --quick
+# → Minimal prompts for fast feedback
+
+# Check if email is working
+pi email --test
+# → Sends test email to verify setup
+
+# Get help with setup
+pi email --dev
+# → Complete troubleshooting guide
+```
 
 ---
 
