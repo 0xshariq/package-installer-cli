@@ -981,33 +981,84 @@ pi email --dev
 **📧 Email MCP Server Integration:**
 - Uses `@0xshariq/email-mcp-server` npm package
 - Multiple installation methods (global, npx, local)
-- Professional email formatting and templates
+- Professional HTML email formatting with CSS styling
 - System information auto-collection
-- Configurable SMTP settings
+- Interactive email configuration setup
+- Multiple email provider support
 
-**🔧 Installation Methods:**
+**🔧 Installation & Configuration:**
 ```bash
-# Global installation (recommended)
+# Step 1: Install Email MCP Server
 npm install -g @0xshariq/email-mcp-server
 
-# One-time usage (no installation)
-npx @0xshariq/email-mcp-server
+# Step 2: Interactive email configuration
+pi email --setup
 
-# Check installation status
+# Interactive setup will guide you through:
+# 1. Select email provider (Gmail, Outlook, Yahoo, Custom SMTP)
+# 2. Enter your email address
+# 3. Setup app password (for Gmail) or email password
+# 4. Automatic SMTP configuration
+# 5. Secure credential storage
+
+# Step 3: Test the configuration
+pi email --test
+
+# Check installation status anytime
 pi email --status
 ```
 
-**Configuration Setup:**
-```bash
-# Show configuration guide
-pi email --setup
+**Email Provider Setup:**
 
-# Required environment variables:
-# EMAIL_HOST=smtp.gmail.com
-# EMAIL_PORT=587
-# EMAIL_USER=your-email@gmail.com
-# EMAIL_PASS=your-app-password
+**📧 Gmail Configuration:**
+```bash
+# Gmail requires App Passwords (not regular password)
+# 1. Enable 2-Factor Authentication
+# 2. Google Account Settings > Security > App passwords
+# 3. Generate app password for "Mail"
+# 4. Use the 16-character app password in setup
 ```
+
+**🔷 Outlook/Hotmail Configuration:**
+```bash
+# Outlook.com/Hotmail support
+# 1. Use your regular email and password
+# 2. May require app password if 2FA enabled
+# 3. Automatic SMTP configuration (smtp.live.com:587)
+```
+
+**🟡 Yahoo Mail Configuration:**
+```bash
+# Yahoo Mail support
+# 1. Enable "Less secure app access" or use app password
+# 2. Use your Yahoo email and password/app password
+# 3. Automatic SMTP configuration (smtp.mail.yahoo.com:587)
+```
+
+**⚙️ Custom SMTP Configuration:**
+```bash
+# For custom email providers
+# 1. Enter your SMTP host (e.g., mail.your-domain.com)
+# 2. Specify SMTP port (usually 587 or 465)
+# 3. Enter your email credentials
+# 4. Test connection automatically
+```
+
+**Email Sender Options:**
+
+When sending feedback emails, you can choose:
+
+**📧 Use Configured Email (.env):**
+- Uses your pre-configured email credentials
+- Faster sending (no credential entry needed)
+- Secure storage of credentials
+- Recommended for regular use
+
+**✉️ Use Custom Email:**
+- Enter different email credentials for one-time use
+- Useful for testing or temporary access
+- Doesn't save credentials permanently
+- Good for shared computers or different accounts
 
 **Available Options:**
 | Option | Description | Example |
