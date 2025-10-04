@@ -99,3 +99,4 @@ jspm_packages/
 
 .npmignore
 .gitignore
+pnpm-workspace.yaml
