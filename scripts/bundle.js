@@ -117,7 +117,7 @@ async function createBundle() {
     await fs.writeJson(`${bundleDir}/pkg-ready/package.json`, pkgPackageJson, { spaces: 2 });
     
     // Use pkg with the bundled ESM file
-    execSync(`pkg ${bundleDir}/pkg-ready --out-path ${bundleDir}/executables --compress Gzip --targets node23-linux-x64,node23-macos-x64,node23-win-x64`, { stdio: 'inherit' });
+    execSync(`pkg ${bundleDir}/pkg-ready --out-path ${bundleDir}/executables --compress Gzip --targets node22-linux-x64,node22-macos-x64,node22-win-x64`, { stdio: 'inherit' });
 
     // 6. Create distribution info
     const packageJson = await fs.readJson('./package.json');
