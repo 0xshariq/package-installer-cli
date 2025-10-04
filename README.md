@@ -149,7 +149,6 @@ pi clean
 | **Rust** | Basic, Web, CLI | ✅ | cargo |
 | **Go** | Web, API | ✅ | go mod |
 | **Ruby** | Rails, basic | ✅ | bundler |
-| **PHP** | Laravel, basic | ✅ | composer |
 
 *For detailed information, see [docs/templates.md](docs/templates.md)*
 
