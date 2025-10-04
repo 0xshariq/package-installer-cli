@@ -7,22 +7,21 @@ import path from 'path';
 import fs from 'fs-extra';
 import { createStandardHelp, CommandHelpConfig } from '../utils/helpFormatter.js';
 import { displayCommandBanner } from '../utils/banner.js';
-import {
-    EmailTemplate,
-    SystemInfo,
-    generateEmailTemplate,
-    generateTestEmailTemplate,
-    collectBugReportData,
-    collectFeatureRequestData,
-    collectTemplateRequestData,
-    collectQuestionData,
-    collectImprovementData,
-    collectDocsData,
-    collectContactInfo,
-    collectQuickFeedback
+import { 
+  EmailTemplate,
+  SystemInfo,
+  generateEmailTemplate,
+  generateTestEmailTemplate,
+  collectBugReportData,
+  collectFeatureRequestData,
+  collectTemplateRequestData,
+  collectQuestionData,
+  collectImprovementData,
+  collectDocsData,
+  collectCustomMessageData,
+  collectContactInfo,
+  collectQuickFeedback
 } from '../email-templates/index.js';
-
-// Email categories for user feedback
 export interface EmailCategory {
     name: string;
     value: string;
@@ -73,6 +72,13 @@ const EMAIL_CATEGORIES: EmailCategory[] = [
         description: 'Report issues with documentation',
         emoji: '📖',
         template: 'docs-issue'
+    },
+    {
+        name: '✉️ Custom Message',
+        value: 'custom',
+        description: 'Send a custom formatted message',
+        emoji: '✉️',
+        template: 'custom-message'
     }
 ];
 
@@ -1256,6 +1262,9 @@ export async function emailCommand(
                     break;
                 case 'docs':
                     categoryData = await collectDocsData();
+                    break;
+                case 'custom':
+                    categoryData = await collectCustomMessageData();
                     break;
                 default:
                     categoryData = await collectQuestionData(); // Fallback
