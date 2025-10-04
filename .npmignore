@@ -1,22 +1,32 @@
 # Source files - only include built JS files
 src/
 *.ts
-
-# Development files
 tsconfig.json
-.gitignore
-.github/
+
+# Development and build files
 .git/
+.github/
+.gitignore
+.npmignore
+bundle/
+scripts/
 
 # IDE and editor files
 .vscode/
+.idea/
+*.swp
+*.swo
 
-
-# Documentation that's not needed in package
+# Documentation not needed in package
 docs/
 CONTRIBUTING.md
-.github/
 *.dev.md
+
+# Docker files
+Dockerfile
+docker-compose.yml
+docker-build.sh
+.dockerignore
 
 # Cache and temporary files
 .cache/
@@ -25,20 +35,27 @@ CONTRIBUTING.md
 *.log
 npm-debug.log*
 yarn-debug.log*
+yarn-error.log*
 pnpm-debug.log*
-
-# Archive files
-*.zip
-
 
 # Package manager lock files
 package-lock.json
 yarn.lock
 
-# Docker Config Files
-Dockerfile*
-docker-compose*.yml
-.dockerignore
+# Test files
+*.test.js
+*.test.ts
+test/
+tests/
 
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
 
-*.sh
+# Node modules
+node_modules/
