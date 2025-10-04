@@ -11,7 +11,9 @@
   "scripts": {
     "build": "tsc -p .",
     "start": "node ./dist/index.js",
-    "clean": "rm -rf dist"
+    "clean": "rm -rf dist",
+    "bundle": "node scripts/bundle.js",
+    "bundle:clean": "rm -rf bundle"
   },
   "author": "Sharique Chaudhary",
   "license": "MIT",
@@ -56,8 +58,25 @@
     "tailwind",
     "storage",
     "testing",
-    "monitoring"
+    "monitoring",
+    "pypi",
+    "crates",
+    "rubygem"
   ],
+  "pkg": {
+    "scripts": "dist/**/*.js",
+    "assets": [
+      "templates/**/*",
+      "features/**/*",
+      "template.json"
+    ],
+    "targets": [
+      "node23-linux-x64",
+      "node23-macos-x64",
+      "node23-win-x64"
+    ],
+    "outputPath": "bundle/executables"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/0xshariq/package-installer-cli.git"
@@ -91,6 +110,9 @@
     "@types/inquirer": "^9.0.9",
     "@types/node": "^24.3.0",
     "@types/semver": "^7.7.0",
+    "@vercel/ncc": "^0.38.1",
+    "esbuild": "^0.25.10",
+    "pkg": "^5.8.1",
     "typescript": "^5.9.2"
   }
 }
