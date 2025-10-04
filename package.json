@@ -71,9 +71,9 @@
       "template.json"
     ],
     "targets": [
-      "node23-linux-x64",
-      "node23-macos-x64",
-      "node23-win-x64"
+      "node22-linux-x64",
+      "node22-macos-x64",
+      "node22-win-x64"
     ],
     "outputPath": "bundle/executables"
   },
@@ -86,8 +86,6 @@
     "url": "https://github.com/0xshariq/package-installer-cli/issues"
   },
   "dependencies": {
-    "@types/figlet": "^1.7.0",
-    "@types/glob": "^9.0.0",
     "blessed": "^0.1.81",
     "boxen": "^8.0.1",
     "chalk": "^5.6.0",
@@ -105,8 +103,8 @@
     "terminal-kit": "^3.1.2"
   },
   "devDependencies": {
-    "@types/chalk": "^2.2.4",
     "@types/fs-extra": "^11.0.4",
+    "@types/figlet": "^1.7.0",
     "@types/inquirer": "^9.0.9",
     "@types/node": "^24.3.0",
     "@types/semver": "^7.7.0",
