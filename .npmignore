@@ -59,3 +59,5 @@ Thumbs.db
 
 # Node modules
 node_modules/
+
+/pnpm-workspace.yaml
