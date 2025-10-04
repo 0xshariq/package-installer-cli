@@ -31,7 +31,7 @@ async function createBundle() {
       entryPoints: ['./dist/index.js'],
       bundle: true,
       platform: 'node',
-      target: 'node22',
+      target: 'node20',
       outfile: `${bundleDir}/standalone/index.js`,
       format: 'esm',
       minify: true,
@@ -58,7 +58,7 @@ async function createBundle() {
       entryPoints: ['./dist/index.js'],
       bundle: true,
       platform: 'node',
-      target: 'node22',
+      target: 'node20',
       outfile: `${bundleDir}/pkg-ready/index.js`,
       format: 'esm',
       minify: false, // Keep unminified for pkg compatibility
@@ -117,7 +117,7 @@ async function createBundle() {
     await fs.writeJson(`${bundleDir}/pkg-ready/package.json`, pkgPackageJson, { spaces: 2 });
     
     // Use pkg with the bundled ESM file
-    execSync(`pkg ${bundleDir}/pkg-ready --out-path ${bundleDir}/executables --compress Gzip --targets node22-linux-x64,node22-macos-x64,node22-win-x64`, { stdio: 'inherit' });
+    execSync(`pkg ${bundleDir}/pkg-ready --out-path ${bundleDir}/executables --compress Gzip --targets node20-linux-x64,node20-macos-x64,node20-win-x64`, { stdio: 'inherit' });
 
     // 6. Create distribution info
     const packageJson = await fs.readJson('./package.json');

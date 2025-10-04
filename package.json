@@ -71,9 +71,9 @@
       "template.json"
     ],
     "targets": [
-      "node22-linux-x64",
-      "node22-macos-x64",
-      "node22-win-x64"
+      "node20-linux-x64",
+      "node20-macos-x64",
+      "node20-win-x64"
     ],
     "outputPath": "bundle/executables"
   },
@@ -109,8 +109,8 @@
     "@types/node": "^24.3.0",
     "@types/semver": "^7.7.0",
     "@vercel/ncc": "^0.38.1",
+    "@yao-pkg/pkg": "^5.11.5",
     "esbuild": "^0.25.10",
-    "pkg": "^5.8.1",
     "typescript": "^5.9.2"
   }
 }
