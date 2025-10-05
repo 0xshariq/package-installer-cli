@@ -201,9 +201,9 @@ Package Installer CLI Analytics
 **Available Options:**
 | Option | Description | Example |
 |--------|-------------|---------|
-| `--format` | Output format (table/json) | `--format=json` |
 | `--detailed` | Show detailed analysis | `--detailed` |
-| `--export` | Export analysis to file | `--export=analysis.json` |
+| `--reset` | Reset analytics history | `--reset` |
+| `--export <method>` | Export analysis to file (json, xml, yaml) | `--export json` |
 
 **Real-time Data Sources:**
 - ✅ **Live Project Scanning** - Current directory analysis
