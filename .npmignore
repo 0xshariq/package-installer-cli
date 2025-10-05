@@ -8,7 +8,9 @@ tsconfig.json
 .github/
 .gitignore
 .npmignore
-bundle/
+bundle-standalone/
+bundle-executables/
+binary/
 scripts/
 
 # IDE and editor files

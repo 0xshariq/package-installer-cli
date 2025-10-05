@@ -13,7 +13,9 @@ lerna-debug.log*
 dist/
 
 # Bundle output (for distribution to other package managers)
-bundle/
+bundle-standalone/
+bundle-executables/
+binary/
 
 # Runtime data
 pids
