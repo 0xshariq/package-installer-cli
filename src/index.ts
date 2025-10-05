@@ -194,7 +194,7 @@ program
   .command('upgrade-cli')
   .alias('upgrade')
   .description(chalk.hex('#ff6b6b')('🚀 ') + chalk.hex('#fd79a8')('Update Package Installer CLI to the latest version'))
-  .on('--help', () => {
+  .on('--help', () => {``
     showUpgradeHelp();
   })
   .action(async () => {
@@ -210,7 +210,7 @@ program
   .command('analyze')
   .alias('stats')
   .description(chalk.hex('#667eea')('📊 ') + chalk.hex('#4facfe')('Show CLI usage analytics and framework statistics'))
-  .option('--export', 'Export analytics data to JSON file')
+  .option('--export <method>', 'Export analytics data to specified format (json, xml, yaml)')
   .option('--reset', 'Reset analytics history')
   .option('--detailed', 'Show detailed analytics breakdown')
   .option('-h, --help', 'Show this help message')
