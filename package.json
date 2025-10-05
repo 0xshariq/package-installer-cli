@@ -12,8 +12,10 @@
     "build": "tsc -p .",
     "start": "node ./dist/index.js",
     "clean": "rm -rf dist",
-    "bundle": "node scripts/bundle.js",
-    "bundle:clean": "rm -rf bundle"
+    "bundle": "node scripts/advanced-bundle.js",
+    "bundle:simple": "node scripts/independent-bundle.js",
+    "bundle:custom": "./scripts/build-nodejs.sh",
+    "bundle:clean": "rm -rf bundle-standalone bundle-executables distribution-info.json node-builds"
   },
   "author": "Sharique Chaudhary",
   "license": "MIT",
@@ -63,20 +65,6 @@
     "crates",
     "rubygem"
   ],
-  "pkg": {
-    "scripts": "dist/**/*.js",
-    "assets": [
-      "templates/**/*",
-      "features/**/*",
-      "template.json"
-    ],
-    "targets": [
-      "node20-linux-x64",
-      "node20-macos-x64",
-      "node20-win-x64"
-    ],
-    "outputPath": "bundle/executables"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/0xshariq/package-installer-cli.git"
@@ -103,14 +91,16 @@
     "terminal-kit": "^3.1.2"
   },
   "devDependencies": {
-    "@types/fs-extra": "^11.0.4",
     "@types/figlet": "^1.7.0",
+    "@types/fs-extra": "^11.0.4",
     "@types/inquirer": "^9.0.9",
     "@types/node": "^24.3.0",
     "@types/semver": "^7.7.0",
     "@vercel/ncc": "^0.38.1",
-    "@yao-pkg/pkg": "^5.11.5",
+    "@yao-pkg/pkg": "^6.7.0",
     "esbuild": "^0.25.10",
+    "nexe": "5.0.0-beta.4",
+    "shadcn": "^3.4.0",
     "typescript": "^5.9.2"
   }
 }
