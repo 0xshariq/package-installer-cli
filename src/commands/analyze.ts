@@ -30,14 +30,16 @@ export function showAnalyzeHelp(): void {
       'stats [options]   # alias'
     ],
     options: [
-      { flag: '--export', description: 'Export analytics data to JSON file' },
+      { flag: '--export <method>', description: 'Export analytics data to specified file format (json, xml, yaml)' },
       { flag: '--reset', description: 'Reset analytics history' },
       { flag: '--detailed', description: 'Show detailed analytics breakdown' }
     ],
     examples: [
       { command: 'analyze', description: 'Show complete analytics dashboard' },
       { command: 'analyze --detailed', description: 'Show detailed breakdown with more metrics' },
-      { command: 'analyze --export', description: 'Export analytics data to JSON file' },
+      { command: 'analyze --export json', description: 'Export analytics data to JSON file' },
+      { command: 'analyze --export xml', description: 'Export analytics data to XML file' },
+      { command: 'analyze --export yaml', description: 'Export analytics data to YAML file' },
       { command: 'analyze --reset', description: 'Clear all analytics history' },
       { command: 'stats', description: 'Use alias command' }
     ],
@@ -56,7 +58,7 @@ export function showAnalyzeHelp(): void {
     ],
     tips: [
       'Analytics data is collected from ~/.package-installer-cli/history.json',
-      'Use --export to backup your analytics data',
+      'Use --export to backup your analytics data in JSON, XML, or YAML format',
       'Use --reset to start fresh analytics tracking'
     ]
   };
@@ -84,7 +86,7 @@ export async function analyzeCommand(options: any = {}): Promise<void> {
     
     // Handle specific options
     if (options.export) {
-      await exportAnalyticsData(historyData);
+      await exportAnalyticsData(historyData, options.export || 'json');
       return;
     }
     
@@ -709,18 +711,193 @@ function displayRecentActivity(data: any): void {
 }
 
 /**
- * Export analytics data
+ * Export analytics data in specified format
  */
-async function exportAnalyticsData(data: any): Promise<void> {
+async function exportAnalyticsData(data: any, method: string = 'json'): Promise<void> {
   const timestamp = new Date().toISOString().split('T')[0];
-  const filename = `analytics-export-${timestamp}.json`;
   
-  await fs.writeJson(filename, data, { spaces: 2 });
+  // Ensure method is a string and normalize it
+  const methodStr = typeof method === 'string' ? method : 'json';
+  const normalizedMethod = methodStr.toLowerCase().trim();
   
-  displaySuccessMessage(
-    'Analytics data exported',
-    [`Saved to ${filename}`, 'Contains all CLI usage statistics and project data']
-  );
+  let filename = '';
+  let content = '';
+  
+  try {
+    switch (normalizedMethod) {
+      case 'xml':
+        filename = `analytics-export-${timestamp}.xml`;
+        content = convertToXML(data);
+        await fs.writeFile(filename, content, 'utf8');
+        break;
+        
+      case 'yaml':
+      case 'yml':
+        filename = `analytics-export-${timestamp}.yaml`;
+        content = convertToYAML(data);
+        await fs.writeFile(filename, content, 'utf8');
+        break;
+        
+      case 'json':
+      default:
+        filename = `analytics-export-${timestamp}.json`;
+        await fs.writeJson(filename, data, { spaces: 2 });
+        break;
+    }
+    
+    displaySuccessMessage(
+      `Analytics exported as ${normalizedMethod.toUpperCase()}`,
+      [
+        `📄 Saved to: ${filename}`,
+        `📊 Format: ${normalizedMethod.toUpperCase()}`,
+        `📈 Contains all CLI usage statistics and project data`,
+        `💾 Size: ${await getFileSize(filename)}`
+      ]
+    );
+    
+  } catch (error) {
+    console.error(chalk.red('❌ Export failed:'), error);
+    console.log(chalk.yellow('\n💡 Supported formats: json, xml, yaml, yml'));
+    console.log(chalk.gray('   Example: analyze --export json'));
+  }
+}
+
+/**
+ * Convert analytics data to XML format
+ */
+function convertToXML(data: any): string {
+  const xmlHeader = '<?xml version="1.0" encoding="UTF-8"?>\n';
+  const xmlContent = objectToXML(data, 'analytics');
+  return xmlHeader + xmlContent;
+}
+
+/**
+ * Convert object to XML recursively
+ */
+function objectToXML(obj: any, rootName: string = 'root', indent: string = ''): string {
+  if (obj === null || obj === undefined) {
+    return `${indent}<${rootName}></${rootName}>\n`;
+  }
+  
+  if (typeof obj === 'string' || typeof obj === 'number' || typeof obj === 'boolean') {
+    return `${indent}<${rootName}>${escapeXML(String(obj))}</${rootName}>\n`;
+  }
+  
+  if (Array.isArray(obj)) {
+    let xml = `${indent}<${rootName}>\n`;
+    obj.forEach((item, index) => {
+      xml += objectToXML(item, 'item', indent + '  ');
+    });
+    xml += `${indent}</${rootName}>\n`;
+    return xml;
+  }
+  
+  if (typeof obj === 'object') {
+    let xml = `${indent}<${rootName}>\n`;
+    Object.entries(obj).forEach(([key, value]) => {
+      const safeKey = key.replace(/[^a-zA-Z0-9_-]/g, '_');
+      xml += objectToXML(value, safeKey, indent + '  ');
+    });
+    xml += `${indent}</${rootName}>\n`;
+    return xml;
+  }
+  
+  return `${indent}<${rootName}>${escapeXML(String(obj))}</${rootName}>\n`;
+}
+
+/**
+ * Escape XML special characters
+ */
+function escapeXML(str: string): string {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&apos;');
+}
+
+/**
+ * Convert analytics data to YAML format
+ */
+function convertToYAML(data: any): string {
+  return objectToYAML(data, 0);
+}
+
+/**
+ * Convert object to YAML recursively
+ */
+function objectToYAML(obj: any, indent: number = 0): string {
+  const spaces = '  '.repeat(indent);
+  
+  if (obj === null || obj === undefined) {
+    return 'null\n';
+  }
+  
+  if (typeof obj === 'string') {
+    // Escape strings that might need quotes
+    if (obj.includes('\n') || obj.includes('"') || obj.includes("'") || obj.includes(':')) {
+      return `"${obj.replace(/"/g, '\\"')}"\n`;
+    }
+    return `${obj}\n`;
+  }
+  
+  if (typeof obj === 'number' || typeof obj === 'boolean') {
+    return `${obj}\n`;
+  }
+  
+  if (Array.isArray(obj)) {
+    if (obj.length === 0) return '[]\n';
+    
+    let yaml = '\n';
+    obj.forEach(item => {
+      yaml += `${spaces}- `;
+      if (typeof item === 'object' && item !== null) {
+        const itemYaml = objectToYAML(item, indent + 1);
+        yaml += itemYaml.substring(itemYaml.indexOf('\n') + 1);
+      } else {
+        yaml += objectToYAML(item, 0).trim() + '\n';
+      }
+    });
+    return yaml;
+  }
+  
+  if (typeof obj === 'object') {
+    if (Object.keys(obj).length === 0) return '{}\n';
+    
+    let yaml = '\n';
+    Object.entries(obj).forEach(([key, value]) => {
+      yaml += `${spaces}${key}: `;
+      if (typeof value === 'object' && value !== null) {
+        yaml += objectToYAML(value, indent + 1);
+      } else {
+        yaml += objectToYAML(value, 0);
+      }
+    });
+    return yaml;
+  }
+  
+  return `${obj}\n`;
+}
+
+/**
+ * Get file size in human readable format
+ */
+async function getFileSize(filename: string): Promise<string> {
+  try {
+    const stats = await fs.stat(filename);
+    const bytes = stats.size;
+    
+    if (bytes === 0) return '0 Bytes';
+    
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  } catch (error) {
+    return 'Unknown';
+  }
 }
 
 /**
