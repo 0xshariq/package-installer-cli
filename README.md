@@ -83,7 +83,7 @@ docker-compose --profile dev run --rm package-installer-dev
 |-----|-------------|----------|
 | `latest` | Latest stable release | Production usage |
 | `dev` | Development version | Testing new features |
-| `v3.7.0` | Specific version | Version pinning |
+| `v3.10.0` | Specific version | Version pinning |
 
 ### Volume Mounts
 
