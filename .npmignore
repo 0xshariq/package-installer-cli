@@ -12,6 +12,7 @@ bundle-standalone/
 bundle-executables/
 binary/
 scripts/
+webpack.config.mjs
 
 # IDE and editor files
 .vscode/
