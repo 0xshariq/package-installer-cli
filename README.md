@@ -1,30 +1,10 @@
 # 📦 Package Installer CLI
 
-<div align="center">
-
-![Interactive CLI Demo](docs/assets/cli-spinners.gif)
-
 [![npm version](https://img.shields.io/npm/v/@0xshariq/package-installer.svg)](https://www.npmjs.com/package/@0xshariq/package-installer)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Node.js](https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen.svg)](https://nodejs.org/)
 
-</div>
-
 A **powerful, cross-platform CLI** for modern development workflows. Create projects, manage dependencies, analyze codebases, and streamline your development process with intelligent automation.
-
-## 🎬 See It In Action
-
-<div align="center">
-
-**✨ Interactive Command Selection**
-
-![Interactive Selection](docs/assets/inquirer-demo.gif)
-
-**📊 Beautiful Terminal Experience**
-
-![VS Code Integration](docs/assets/vscode-demo.png)
-
-</div>
 
 ## 🚀 Core Features
 
@@ -37,8 +17,6 @@ A **powerful, cross-platform CLI** for modern development workflows. Create proj
 - **🗄️ Intelligent Caching**: Performance optimization with smart caching
 - **📈 Usage Analytics**: Real-time insights and productivity metrics
 - **⚡ Cross-Platform**: Windows, macOS, Linux support
-
-
 
 ## 📥 Installation
 
@@ -116,43 +94,24 @@ docker-compose --profile dev run --rm package-installer-dev
 
 ## 🎯 Quick Start
 
-![Package Installer CLI Demo](docs/assets/cli-spinners.gif)
-
-### ⚡ Interactive Project Creation
-
-![Interactive CLI Selection](docs/assets/inquirer-demo.gif)
-
-### 🚀 One-Command Deployment
-
 ```bash
-# Deploy to cloud platforms with auto-detection
-pi deploy --auto-detect
+# Create new project interactively
+pi create my-app
 
-# Interactive platform selection
+# Deploy to cloud platforms
 pi deploy
-```
 
-### 📊 Project Analytics
-
-```bash
 # Analyze existing project
-pi analyze --detailed
+pi analyze
 
-# Generate comprehensive report
-pi analyze --export
-```
-
-### 🔧 Development Workflow
-
-```bash
 # Check project health
-pi doctor --fix
+pi doctor
 
-# Update dependencies safely
-pi update --latest
+# Update dependencies
+pi update
 
 # Clean development artifacts
-pi clean --all
+pi clean
 ```
 
 ## 📚 Documentation
@@ -178,7 +137,6 @@ pi clean --all
 | `pi env` | Environment analysis | `--check`, `--generate`, `--validate` |
 | `pi clone` | Clone and setup repositories | `--offline`, `--shallow`, `--branch` |
 | `pi add` | Add features to projects | `--list` to see all features |
-| `pi deploy` | Deploy to cloud platforms | `--auto-detect`, `--dry-run`, `--watch` |
 | `pi clean` | Clean development artifacts | `--all`, `--dry-run` |
 | `pi cache` | Manage CLI cache | `clear`, `stats`, `optimize` |
 | `pi check` | Check package versions | `--verbose` for details |
@@ -186,32 +144,6 @@ pi clean --all
 | `pi email` | Send feedback and messages | Direct communication with developer |
 
 *For complete documentation, see [docs/commands.md](docs/commands.md)*
-
-## 📊 Enhanced Analytics Dashboard
-
-![CLI Analytics Dashboard](docs/assets/vscode-demo.png)
-
-The `pi analyze` command provides comprehensive project analytics and usage insights:
-
-### 🎯 Key Features
-- **📈 Usage Statistics**: Command frequency and productivity metrics
-- **🏗️ Project Analytics**: Framework and language breakdowns
-- **⚡ Performance Insights**: Efficiency ratings and development velocity
-- **🏆 Achievement System**: Unlock badges based on your CLI usage
-- **📊 Export Options**: Export data in JSON, XML, or YAML formats
-
-### 🚀 Quick Analytics
-```bash
-# View analytics dashboard
-pi analyze
-
-# Detailed breakdown with insights
-pi analyze --detailed
-
-# Export analytics data
-pi analyze --export json
-pi analyze --export xml --detailed
-```
 
 ## 🏗️ Supported Technologies
 
