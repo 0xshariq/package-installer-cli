@@ -23,6 +23,14 @@
         "djangoTemplate"
       ]
     },
+    "electron": {
+      "type": "desktop",
+      "description": "Framework for building cross-platform desktop applications with JavaScript, HTML, and CSS",
+      "languages": ["javascript", "typescript"],
+      "templates": [
+        "template"
+      ]
+    },
     "expressjs": {
       "type": "backend",
       "description": "Fast, unopinionated web framework for Node.js",
