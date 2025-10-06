@@ -89,4 +89,3 @@ echo "   ✅ Template configuration"
 echo ""
 echo "🧪 Test a binary:"
 echo "   ./binary/node-binaries/pi-linux-x64 --help"
-
