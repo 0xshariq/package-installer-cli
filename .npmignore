@@ -21,8 +21,12 @@ scripts/
 
 # Documentation not needed in package
 docs/
+docs/assets/
 CONTRIBUTING.md
 *.dev.md
+marketing-strategy.md
+suggested-commands.md
+COMMAND-IMPLEMENTATION-PLAN.md
 
 # Docker files
 Dockerfile

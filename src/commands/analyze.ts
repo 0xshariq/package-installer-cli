@@ -195,7 +195,7 @@ async function displayDetailedAnalyticsDashboard(data: any): Promise<void> {
 }
 
 /**
- * Display summary overview
+ * Display summary overview with enhanced visual appeal
  */
 function displaySummaryOverview(data: any): void {
   const totalCommands = data.statistics?.totalCommands || 0;
@@ -204,56 +204,206 @@ function displaySummaryOverview(data: any): void {
   const uniqueFrameworks = Object.keys(data.statistics?.frameworks || {}).length;
   const uniqueLanguages = Object.keys(data.statistics?.languages || {}).length;
   
-  console.log(boxen(
-    gradientString(['#e056fd', '#f18a8a'])('🎯 Package Installer CLI Usage Summary') + '\n\n' +
-    chalk.white('Total Commands Executed: ') + chalk.cyan(totalCommands) + '\n' +
-    chalk.white('Projects Created: ') + chalk.green(totalProjects) + '\n' +
-    chalk.white('Features Used: ') + chalk.yellow(totalFeatures) + '\n' +
-    chalk.white('Frameworks Explored: ') + chalk.blue(uniqueFrameworks) + '\n' +
-    chalk.white('Languages Used: ') + chalk.magenta(uniqueLanguages) + '\n\n' +
-    chalk.gray('Your coding journey with Package Installer CLI'),
-    {
-      padding: 1,
-      margin: { top: 1, bottom: 1, left: 2, right: 2 },
-      borderStyle: 'round',
-      borderColor: 'magenta'
-    }
-  ));
+  // Calculate productivity score
+  const productivityScore = calculateProductivityScore(totalCommands, totalProjects, totalFeatures);
+  const scoreColor = productivityScore >= 80 ? '#10ac84' : productivityScore >= 60 ? '#ffa502' : productivityScore >= 40 ? '#ff6b6b' : '#95afc0';
+  
+  const summaryContent = 
+    gradientString(['#e056fd', '#f18a8a'])('🚀 Package Installer CLI Analytics Dashboard') + '\n' +
+    gradientString(['#74b9ff', '#0984e3'])('━'.repeat(60)) + '\n\n' +
+    
+    // Main metrics row
+    chalk.hex('#00d2d3')('📈 OVERVIEW METRICS') + '\n\n' +
+    `${chalk.white('⚡ Commands Executed:')} ${chalk.cyan.bold(totalCommands.toString().padStart(8))} ${getUsageEmoji(totalCommands)}\n` +
+    `${chalk.white('🏗️  Projects Created: ')} ${chalk.green.bold(totalProjects.toString().padStart(8))} ${getProjectEmoji(totalProjects)}\n` +
+    `${chalk.white('🎯 Features Added:   ')} ${chalk.yellow.bold(totalFeatures.toString().padStart(8))} ${getFeatureEmoji(totalFeatures)}\n` +
+    `${chalk.white('🎨 Frameworks Used:  ')} ${chalk.blue.bold(uniqueFrameworks.toString().padStart(8))} ${getFrameworkEmoji(uniqueFrameworks)}\n` +
+    `${chalk.white('🔤 Languages Used:   ')} ${chalk.magenta.bold(uniqueLanguages.toString().padStart(8))} ${getLanguageEmoji(uniqueLanguages)}\n\n` +
+    
+    // Productivity section
+    chalk.hex('#ff6b6b')('🎯 PRODUCTIVITY SCORE') + '\n\n' +
+    `${chalk.white('Overall Score:')} ${chalk.hex(scoreColor).bold(productivityScore + '/100')} ` +
+    getScoreBar(productivityScore) + '\n' +
+    chalk.gray(`${getProductivityMessage(productivityScore)}`) + '\n\n' +
+    
+    // Journey summary
+    chalk.hex('#9c88ff')('✨ YOUR CODING JOURNEY') + '\n\n' +
+    chalk.gray('You\'ve been building amazing projects with Package Installer CLI!\n') +
+    chalk.gray(`Keep exploring new frameworks and features to boost your productivity.`);
+  
+  console.log(boxen(summaryContent, {
+    padding: 2,
+    margin: { top: 1, bottom: 1 },
+    borderStyle: 'double',
+    borderColor: 'magenta',
+    backgroundColor: '#1a1a2e'
+  }));
+}
+
+// Helper functions for enhanced display
+function getUsageEmoji(count: number): string {
+  if (count >= 100) return '🔥';
+  if (count >= 50) return '⚡';
+  if (count >= 20) return '👍';
+  if (count >= 5) return '🌱';
+  return '🆕';
+}
+
+function getProjectEmoji(count: number): string {
+  if (count >= 20) return '🏆';
+  if (count >= 10) return '🎯';
+  if (count >= 5) return '📈';
+  if (count >= 1) return '🚀';
+  return '💡';
+}
+
+function getFeatureEmoji(count: number): string {
+  if (count >= 30) return '🌟';
+  if (count >= 15) return '⭐';
+  if (count >= 5) return '✨';
+  if (count >= 1) return '💫';
+  return '🔮';
+}
+
+function getFrameworkEmoji(count: number): string {
+  if (count >= 5) return '🎨';
+  if (count >= 3) return '🎭';
+  if (count >= 2) return '🎪';
+  if (count >= 1) return '🎨';
+  return '🎁';
+}
+
+function getLanguageEmoji(count: number): string {
+  if (count >= 4) return '🌈';
+  if (count >= 3) return '🌊';
+  if (count >= 2) return '🌟';
+  if (count >= 1) return '💎';
+  return '🔤';
+}
+
+function getScoreBar(score: number): string {
+  const barLength = 20;
+  const filled = Math.round((score / 100) * barLength);
+  const empty = barLength - filled;
+  
+  let bar = '';
+  if (score >= 80) {
+    bar = chalk.green('█'.repeat(filled)) + chalk.gray('░'.repeat(empty));
+  } else if (score >= 60) {
+    bar = chalk.yellow('█'.repeat(filled)) + chalk.gray('░'.repeat(empty));
+  } else if (score >= 40) {
+    bar = chalk.red('█'.repeat(filled)) + chalk.gray('░'.repeat(empty));
+  } else {
+    bar = chalk.gray('█'.repeat(filled)) + chalk.gray('░'.repeat(empty));
+  }
+  
+  return `[${bar}]`;
+}
+
+function getProductivityMessage(score: number): string {
+  if (score >= 90) return 'Outstanding! You\'re a CLI power user! 🏆';
+  if (score >= 80) return 'Excellent productivity! Keep up the great work! 🌟';
+  if (score >= 70) return 'Great job! You\'re making good use of the CLI 👏';
+  if (score >= 60) return 'Good progress! Try exploring more features 📈';
+  if (score >= 40) return 'Getting started! Consider using more commands 🚀';
+  if (score >= 20) return 'Just beginning! Explore the help with "pi --help" 💡';
+  return 'Welcome! Start your journey by creating your first project! 🌱';
 }
 
 /**
- * Display command usage statistics
+ * Display command usage statistics with enhanced visuals
  */
 function displayCommandStatistics(data: any): void {
   const commands = data.commands || {};
   const totalCommands = data.statistics?.totalCommands || 0;
   const commandEntries = Object.entries(commands);
   
-  console.log(boxen(
-    gradientString(['#4facfe', '#00f2fe'])('📊 Command Usage Statistics') + '\n\n' +
-    (totalCommands > 0 && commandEntries.length > 0
-      ? commandEntries
-          .sort(([,a]: any, [,b]: any) => b - a)
-          .slice(0, 8)
-          .map(([cmd, count]: any) => {
-            const percentage = ((count / totalCommands) * 100).toFixed(1);
-            const maxCount = Math.max(...Object.values(commands).map(c => Number(c)));
-            const barLength = Math.min(Math.ceil((count / maxCount) * 30), 30);
-            const bar = '█'.repeat(barLength);
-            return chalk.white(`  ${cmd.padEnd(15)} `) + 
-                   chalk.cyan(bar.padEnd(30)) + 
-                   chalk.gray(` ${count} (${percentage}%)`);
-          }).join('\n') + '\n\n' +
-          chalk.gray(`Total commands executed: ${totalCommands}`)
-      : chalk.gray('  No command usage data available yet\n  Start using the CLI to see your most used commands!')
-    ),
-    {
-      padding: 1,
-      margin: { top: 1, bottom: 1, left: 2, right: 2 },
-      borderStyle: 'round',
-      borderColor: 'cyan'
+  let content = gradientString(['#4facfe', '#00f2fe'])('📊 Command Usage Statistics') + '\n' +
+                gradientString(['#74b9ff', '#0984e3'])('━'.repeat(45)) + '\n\n';
+  
+  if (totalCommands > 0 && commandEntries.length > 0) {
+    const sortedCommands = commandEntries.sort(([,a]: any, [,b]: any) => b - a).slice(0, 8);
+    const maxCount = Math.max(...Object.values(commands).map(c => Number(c)));
+    
+    // Add header
+    content += chalk.hex('#00d2d3')('Command'.padEnd(12)) + ' ' +
+               chalk.hex('#ffa502')('Usage'.padEnd(35)) + ' ' +
+               chalk.hex('#10ac84')('Count') + '\n\n';
+    
+    sortedCommands.forEach(([cmd, count]: any, index: number) => {
+      const percentage = ((count / totalCommands) * 100).toFixed(1);
+      const barLength = Math.min(Math.ceil((count / maxCount) * 25), 25);
+      
+      // Create a colorful progress bar
+      let bar = '';
+      const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#feca57', '#ff9ff3', '#54a0ff'];
+      const color = colors[index % colors.length];
+      bar = chalk.hex(color)('█'.repeat(barLength)) + chalk.gray('░'.repeat(25 - barLength));
+      
+      // Get command emoji
+      const emoji = getCommandEmoji(cmd);
+      
+      content += `${emoji} ${chalk.white(cmd.padEnd(10))} ${bar} ${chalk.cyan(count.toString().padStart(4))} ${chalk.gray('(' + percentage + '%)')}\n`;
+    });
+    
+    content += '\n' + chalk.hex('#95afc0')(`📈 Total: ${totalCommands} commands • Most used: ${sortedCommands[0][0]}`);
+    
+    // Add usage insights
+    const insights = generateUsageInsights(sortedCommands, totalCommands);
+    if (insights) {
+      content += '\n\n' + chalk.hex('#9c88ff')('💡 Insights: ') + chalk.gray(insights);
     }
-  ));
+  } else {
+    content += chalk.gray('🔍 No command usage data available yet\n\n') +
+               chalk.gray('Start using the CLI to see your command patterns!\n') +
+               chalk.hex('#00d2d3')('Try: ') + chalk.white('pi create my-app') + chalk.gray(' or ') + chalk.white('pi add auth');
+  }
+  
+  console.log(boxen(content, {
+    padding: 1,
+    margin: { top: 1, bottom: 1 },
+    borderStyle: 'round',
+    borderColor: 'cyan',
+    backgroundColor: '#0d1b2a'
+  }));
+}
+
+function getCommandEmoji(command: string): string {
+  const emojis: Record<string, string> = {
+    'create': '🏗️',
+    'add': '➕',
+    'analyze': '📊',
+    'update': '⬆️',
+    'check': '✅',
+    'doctor': '🩺',
+    'clean': '🧹',
+    'clone': '📂',
+    'deploy': '🚀',
+    'env': '🌍',
+    'upgrade-cli': '📦',
+    'email': '📧',
+    'cache': '💾'
+  };
+  return emojis[command] || '⚡';
+}
+
+function generateUsageInsights(sortedCommands: any[], totalCommands: number): string {
+  if (sortedCommands.length === 0) return '';
+  
+  const topCommand = sortedCommands[0];
+  const topPercentage = ((topCommand[1] / totalCommands) * 100).toFixed(0);
+  
+  if (topCommand[0] === 'create' && parseInt(topPercentage) > 40) {
+    return 'You love creating new projects! Consider exploring "pi add" to enhance them.';
+  } else if (topCommand[0] === 'analyze' && parseInt(topPercentage) > 30) {
+    return 'Great job staying analytical! You\'re monitoring your projects well.';
+  } else if (topCommand[0] === 'add' && parseInt(topPercentage) > 30) {
+    return 'You\'re actively enhancing projects with features - excellent!';
+  } else if (sortedCommands.length >= 5) {
+    return 'Balanced CLI usage across multiple commands - you\'re a power user!';
+  }
+  
+  return `${topCommand[0]} is your go-to command (${topPercentage}% usage)`;
 }
 
 /**
@@ -296,7 +446,7 @@ function displayDetailedCommandStatistics(data: any): void {
  * Display project statistics
  */
 /**
- * Display performance insights
+ * Display enhanced performance insights
  */
 function displayPerformanceInsights(data: any): void {
   const commands = data.commands || {};
@@ -305,20 +455,162 @@ function displayPerformanceInsights(data: any): void {
   
   const totalCommands = Object.values(commands).reduce((sum: number, count: any) => sum + Number(count), 0);
   const productivityScore = calculateProductivityScore(totalCommands, projects.length, features.length);
+  const commandsPerProject = projects.length > 0 ? (totalCommands / projects.length).toFixed(1) : '0';
+  const featuresPerProject = projects.length > 0 ? (features.length / projects.length).toFixed(1) : '0';
   
-  console.log(boxen(
-    gradientString(['#74b9ff', '#00b894'])('⚡ Performance Insights') + '\n\n' +
-    chalk.white(`Productivity Score: `) + chalk.green(`${productivityScore}/100`) + '\n' +
-    chalk.white(`Commands per Project: `) + chalk.blue((projects.length > 0 ? (totalCommands / projects.length).toFixed(1) : '0')) + '\n' +
-    chalk.white(`Features per Project: `) + chalk.cyan((projects.length > 0 ? (features.length / projects.length).toFixed(1) : '0')) + '\n\n' +
-    chalk.gray('💡 ') + chalk.white(getProductivityTip(productivityScore)),
-    {
-      padding: 1,
-      margin: { top: 1, bottom: 1, left: 2, right: 2 },
-      borderStyle: 'round',
-      borderColor: 'blue'
-    }
-  ));
+  // Calculate efficiency metrics
+  const efficiencyRating = getEfficiencyRating(parseFloat(commandsPerProject), parseFloat(featuresPerProject));
+  const developmentVelocity = getDevelopmentVelocity(projects, features);
+  
+  let content = gradientString(['#74b9ff', '#00b894'])('⚡ Performance & Productivity Insights') + '\n' +
+                gradientString(['#0984e3', '#00b894'])('━'.repeat(50)) + '\n\n';
+  
+  // Performance metrics grid
+  content += chalk.hex('#00d2d3')('📊 CORE METRICS') + '\n\n';
+  content += `${chalk.white('🎯 Productivity Score:')} ${getScoreDisplay(productivityScore)}\n`;
+  content += `${chalk.white('⚡ Commands per Project:')} ${chalk.blue(commandsPerProject)} ${getCommandsRating(parseFloat(commandsPerProject))}\n`;
+  content += `${chalk.white('🔧 Features per Project:')} ${chalk.cyan(featuresPerProject)} ${getFeaturesRating(parseFloat(featuresPerProject))}\n`;
+  content += `${chalk.white('🚀 Development Velocity:')} ${chalk.yellow(developmentVelocity)} ${getVelocityEmoji(developmentVelocity)}\n`;
+  content += `${chalk.white('⭐ Efficiency Rating:')} ${chalk.magenta(efficiencyRating)} ${getEfficiencyEmoji(efficiencyRating)}\n\n`;
+  
+  // Insights section
+  content += chalk.hex('#ff6b6b')('💡 INSIGHTS & RECOMMENDATIONS') + '\n\n';
+  const insights = generatePerformanceInsights(productivityScore, commandsPerProject, featuresPerProject, projects.length);
+  content += chalk.gray(insights.join('\n• '));
+  
+  // Achievement badges
+  const badges = generateAchievementBadges(totalCommands, projects.length, features.length, productivityScore);
+  if (badges.length > 0) {
+    content += '\n\n' + chalk.hex('#9c88ff')('🏆 ACHIEVEMENTS UNLOCKED') + '\n\n';
+    content += badges.join(' ');
+  }
+  
+  console.log(boxen(content, {
+    padding: 2,
+    margin: { top: 1, bottom: 1 },
+    borderStyle: 'double',
+    borderColor: 'blue',
+    backgroundColor: '#1a1a2e'
+  }));
+}
+
+function getScoreDisplay(score: number): string {
+  const color = score >= 80 ? '#10ac84' : score >= 60 ? '#ffa502' : score >= 40 ? '#ff6b6b' : '#95afc0';
+  return chalk.hex(color).bold(`${score}/100`) + ' ' + getScoreBar(score);
+}
+
+function getCommandsRating(commands: number): string {
+  if (commands >= 10) return chalk.green('🔥 Power User');
+  if (commands >= 7) return chalk.yellow('⚡ Active');
+  if (commands >= 5) return chalk.blue('👍 Good');
+  if (commands >= 3) return chalk.gray('🌱 Growing');
+  return chalk.gray('🆕 New');
+}
+
+function getFeaturesRating(features: number): string {
+  if (features >= 5) return chalk.green('🌟 Feature Rich');
+  if (features >= 3) return chalk.yellow('✨ Enhanced');
+  if (features >= 2) return chalk.blue('💫 Improved');
+  if (features >= 1) return chalk.gray('🔮 Basic');
+  return chalk.gray('💡 Minimal');
+}
+
+function getEfficiencyRating(commandsPerProject: number, featuresPerProject: number): string {
+  const efficiency = (commandsPerProject * 0.6) + (featuresPerProject * 0.4);
+  if (efficiency >= 8) return 'Excellent';
+  if (efficiency >= 6) return 'Very Good';
+  if (efficiency >= 4) return 'Good';
+  if (efficiency >= 2) return 'Fair';
+  return 'Getting Started';
+}
+
+function getEfficiencyEmoji(rating: string): string {
+  const emojis: Record<string, string> = {
+    'Excellent': '🏆',
+    'Very Good': '🌟',
+    'Good': '👍',
+    'Fair': '📈',
+    'Getting Started': '🌱'
+  };
+  return emojis[rating] || '⚡';
+}
+
+function getDevelopmentVelocity(projects: any[], features: any[]): string {
+  const totalItems = projects.length + features.length;
+  if (totalItems >= 50) return 'Lightning Fast';
+  if (totalItems >= 30) return 'Very Fast';
+  if (totalItems >= 20) return 'Fast';
+  if (totalItems >= 10) return 'Moderate';
+  if (totalItems >= 5) return 'Steady';
+  return 'Just Started';
+}
+
+function getVelocityEmoji(velocity: string): string {
+  const emojis: Record<string, string> = {
+    'Lightning Fast': '⚡',
+    'Very Fast': '🚀',
+    'Fast': '🏃',
+    'Moderate': '🚶',
+    'Steady': '🐢',
+    'Just Started': '🌱'
+  };
+  return emojis[velocity] || '📈';
+}
+
+function generatePerformanceInsights(score: number, commandsPerProject: string, featuresPerProject: string, projectCount: number): string[] {
+  const insights: string[] = [];
+  
+  if (score >= 80) {
+    insights.push('Outstanding performance! You\'re maximizing CLI potential.');
+  } else if (score >= 60) {
+    insights.push('Great productivity! Consider exploring more advanced features.');
+  } else if (score >= 40) {
+    insights.push('Good progress! Try using more CLI commands for better workflow.');
+  } else {
+    insights.push('Getting started! Run "pi --help" to discover powerful features.');
+  }
+  
+  const commandsNum = parseFloat(commandsPerProject);
+  if (commandsNum < 3 && projectCount > 0) {
+    insights.push('Consider using more commands per project for better automation.');
+  } else if (commandsNum >= 8) {
+    insights.push('Excellent command usage! You\'re leveraging CLI automation well.');
+  }
+  
+  const featuresNum = parseFloat(featuresPerProject);
+  if (featuresNum < 2 && projectCount > 0) {
+    insights.push('Try adding more features with "pi add" to enhance your projects.');
+  } else if (featuresNum >= 4) {
+    insights.push('Great feature adoption! Your projects are well-equipped.');
+  }
+  
+  if (projectCount >= 10) {
+    insights.push('Impressive project count! You\'re a prolific builder.');
+  } else if (projectCount >= 5) {
+    insights.push('Good project activity! Keep building and experimenting.');
+  }
+  
+  return insights;
+}
+
+function generateAchievementBadges(commands: number, projects: number, features: number, score: number): string[] {
+  const badges: string[] = [];
+  
+  if (commands >= 100) badges.push(chalk.hex('#ffd700')('🥇 Command Master'));
+  else if (commands >= 50) badges.push(chalk.hex('#c0c0c0')('🥈 Command Expert'));
+  else if (commands >= 25) badges.push(chalk.hex('#cd7f32')('🥉 Command User'));
+  
+  if (projects >= 20) badges.push(chalk.hex('#ff6b6b')('🏗️ Architect'));
+  else if (projects >= 10) badges.push(chalk.hex('#4ecdc4')('🚀 Builder'));
+  else if (projects >= 5) badges.push(chalk.hex('#45b7d1')('🌱 Creator'));
+  
+  if (features >= 30) badges.push(chalk.hex('#9c88ff')('🌟 Feature Master'));
+  else if (features >= 15) badges.push(chalk.hex('#feca57')('✨ Feature Explorer'));
+  
+  if (score >= 90) badges.push(chalk.hex('#10ac84')('👑 CLI Legend'));
+  else if (score >= 80) badges.push(chalk.hex('#00d2d3')('⚡ Power User'));
+  
+  return badges;
 }
 
 /**

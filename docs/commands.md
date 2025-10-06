@@ -65,7 +65,14 @@ Available for all commands:
 | [`cache`](#cache-command) | Manage CLI cache and data | Performance optimization | ✅ Available |
 | [`email`](#email-command) | Contact developer with feedback | Bug reports, feature requests | ✅ Available |
 | [`upgrade-cli`](#upgrade-cli-command) | Upgrade CLI version | Breaking change detection | ✅ Available |
-| [`deploy`](#deploy-command) | Deploy to cloud platforms | Multiple platforms | 🚧 Coming Soon |
+| [`deploy`](#deploy-command) | Deploy to cloud platforms | Auto-detection, 17 platforms | ✅ Available |
+| [`benchmark`](#benchmark-command) | Performance analysis | Build time, bundle size, memory | 🚧 Coming Soon |
+| [`security`](#security-command) | Security scanning & fixes | Vulnerability detection, auto-fix | 🚧 Coming Soon |
+| [`migrate`](#migrate-command) | Framework migration wizard | React→Next.js, Vue→Nuxt, etc. | 🚧 Coming Soon |
+| [`ai`](#ai-command) | AI-powered development assistant | Code review, test generation | 🚧 Coming Soon |
+| [`docs`](#docs-command) | Documentation generator | README, API docs, interactive | 🚧 Coming Soon |
+| [`compare`](#compare-command) | Project comparison tool | Dependencies, configs, metrics | 🚧 Coming Soon |
+| [`explain`](#explain-command) | Code & project explanation | Structure analysis, complexity | 🚧 Coming Soon |
 
 
 ## 🛠️ Core Commands
@@ -1568,3 +1575,226 @@ pi doctor --export=debug.json
 - 🚀 [Deployment Documentation](deploy.md) - Deployment strategies and platforms
 
 **Repository:** [Package Installer CLI on GitHub](https://github.com/0xshariq/package-installer-cli)
+
+---
+
+## 🚀 **Next-Generation Commands** (Coming Soon)
+
+### `benchmark` Command
+
+**Performance Analysis & Optimization**
+
+Analyze your project's performance metrics and get optimization recommendations.
+
+**Syntax:**
+```bash
+pi benchmark [options]
+```
+
+**Features:**
+- 📊 **Build Performance**: Measure build times, bundle sizes, and compilation speed
+- 🔍 **Bundle Analysis**: Detailed breakdown of bundle composition and size
+- ⚡ **Runtime Metrics**: Memory usage, startup time, and runtime performance
+- 🏆 **Comparisons**: Compare against industry standards and similar projects
+- 📈 **Historical Tracking**: Track performance improvements over time
+- 🎯 **Optimization Tips**: AI-powered suggestions for performance improvements
+
+**Examples:**
+```bash
+# Basic performance analysis
+pi benchmark
+
+# Compare with similar projects
+pi benchmark --compare
+
+# Generate detailed report
+pi benchmark --report --export json
+
+# Continuous benchmarking
+pi benchmark --watch --threshold 10%
+```
+
+---
+
+### `security` Command
+
+**Security Scanning & Vulnerability Management**
+
+Comprehensive security analysis with automated fixing capabilities.
+
+**Syntax:**
+```bash
+pi security [options]
+```
+
+**Features:**
+- 🔐 **Vulnerability Scanning**: Deep dependency and code security analysis
+- 🛡️ **Auto-Fix**: Automatically fix common security issues
+- 📋 **Compliance Checks**: OWASP, GDPR, and industry standard compliance
+- 🚨 **Real-time Monitoring**: Continuous security monitoring
+- 📊 **Security Reports**: Detailed security posture reports
+- 🎯 **Risk Assessment**: Priority-based vulnerability management
+
+**Examples:**
+```bash
+# Full security audit
+pi security
+
+# Auto-fix security issues
+pi security --fix
+
+# Generate security report
+pi security --report --compliance gdpr
+```
+
+---
+
+### `migrate` Command
+
+**Framework Migration Wizard**
+
+Intelligent framework and library migration with automated code transformation.
+
+**Syntax:**
+```bash
+pi migrate [options]
+```
+
+**Features:**
+- 🔄 **Framework Migrations**: React→Next.js, Vue→Nuxt, Express→Fastify, etc.
+- 🤖 **Code Transformation**: Automated AST-based code updates
+- 📦 **Dependency Migration**: Smart dependency mapping and updates
+- ⚙️ **Config Conversion**: Automatic configuration file transformation
+
+**Examples:**
+```bash
+# Interactive migration wizard
+pi migrate
+
+# Specific framework migration
+pi migrate --from react --to nextjs
+
+# Preview changes without applying
+pi migrate --dry-run --from vue --to nuxt
+```
+
+---
+
+### `ai` Command
+
+**AI-Powered Development Assistant**
+
+Advanced AI integration for code analysis, generation, and optimization.
+
+**Syntax:**
+```bash
+pi ai [prompt] [options]
+```
+
+**Features:**
+- 🤖 **Code Review**: AI-powered code analysis and suggestions
+- 🧪 **Test Generation**: Automatic test case generation
+- 🔧 **Code Refactoring**: Intelligent code improvement suggestions
+- 📝 **Documentation**: Auto-generate documentation from code
+
+**Examples:**
+```bash
+# AI code review
+pi ai "review this component for best practices"
+
+# Generate tests
+pi ai --generate tests --file src/utils.js
+
+# Refactor code
+pi ai --refactor --pattern "convert to functional components"
+```
+
+---
+
+### `docs` Command
+
+**Automatic Documentation Generator**
+
+Generate beautiful, comprehensive documentation from your codebase.
+
+**Syntax:**
+```bash
+pi docs [options]
+```
+
+**Features:**
+- 📚 **README Generation**: Smart README creation from project structure
+- 🔗 **API Documentation**: Extract and format API documentation
+- 📖 **Interactive Docs**: Generate browsable documentation sites
+- 🎨 **Custom Themes**: Beautiful documentation themes
+
+**Examples:**
+```bash
+# Generate complete documentation
+pi docs
+
+# Generate only API docs
+pi docs --api --output ./api-docs
+
+# Interactive documentation site
+pi docs --interactive --serve --port 3000
+```
+
+---
+
+### `compare` Command
+
+**Project & Dependency Comparison Tool**
+
+Compare projects, dependencies, configurations, and performance metrics.
+
+**Syntax:**
+```bash
+pi compare <project1> <project2> [options]
+```
+
+**Features:**
+- 📊 **Dependency Analysis**: Compare package.json differences
+- ⚙️ **Configuration Diff**: Side-by-side config comparison
+- 📈 **Performance Metrics**: Compare build times, bundle sizes
+- 🔍 **Code Quality**: Compare code quality metrics
+
+**Examples:**
+```bash
+# Compare two projects
+pi compare ./project-a ./project-b
+
+# Focus on dependencies only
+pi compare . ../other-project --deps-only
+```
+
+---
+
+### `explain` Command
+
+**Code & Project Intelligence**
+
+Intelligent explanation of code structure, complexity, and architectural decisions.
+
+**Syntax:**
+```bash
+pi explain [file/directory] [options]
+```
+
+**Features:**
+- 🧠 **Code Analysis**: Explain code functionality and purpose
+- 📊 **Complexity Metrics**: Detailed complexity analysis
+- 🏗️ **Architecture Overview**: Project structure explanation
+- 📚 **Dependency Insights**: Explain why dependencies are needed
+
+**Examples:**
+```bash
+# Explain entire project
+pi explain
+
+# Explain specific file
+pi explain src/components/UserProfile.tsx
+
+# Beginner-friendly explanations
+pi explain --level beginner --verbose
+```
