@@ -368,7 +368,12 @@ program
 // DEPLOY COMMAND - Future deployment features
 program
   .command('deploy')
-  .description(chalk.hex('#ff9a9e')('🚀 ') + chalk.hex('#fd79a8')('Deploy your project (Coming Soon)'))
+  .description(chalk.hex('#ff9a9e')('🚀 ') + chalk.hex('#fd79a8')('Deploy your projects to various cloud platforms'))
+  .option('-p, --platform <platform>', 'Specify deployment platform (vercel, aws, github-pages)')
+  .option('-l, --list', 'List all available deployment platforms')
+  .option('-c, --config', 'Configure deployment settings')
+  .option('--build', 'Build project before deployment')
+  .option('--env <file>', 'Use environment variables from file')
   .on('--help', () => {
     showDeployHelp();
   })
