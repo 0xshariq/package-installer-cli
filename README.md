@@ -9,12 +9,13 @@ A **powerful, cross-platform CLI** for modern development workflows. Create proj
 ## 🚀 Core Features
 
 - **🎨 Project Creation**: React, Next.js, Express, Angular, Vue, Rust templates
-- **� Code Analysis**: Comprehensive project analytics and insights
+- **🚀 Cloud Deployment**: Seamless deployment to Vercel, AWS, GitHub Pages
+- **📊 Code Analysis**: Comprehensive project analytics and insights
 - **📦 Dependency Management**: Smart updates across multiple package managers
 - **🩺 Health Diagnostics**: Automated issue detection and fixes
 - **🌍 Environment Analysis**: Development environment optimization
-- **�️ Intelligent Caching**: Performance optimization with smart caching
-- **� Usage Analytics**: Real-time insights and productivity metrics
+- **🗄️ Intelligent Caching**: Performance optimization with smart caching
+- **📈 Usage Analytics**: Real-time insights and productivity metrics
 - **⚡ Cross-Platform**: Windows, macOS, Linux support
 
 ## 📥 Installation
@@ -96,6 +97,9 @@ docker-compose --profile dev run --rm package-installer-dev
 ```bash
 # Create new project interactively
 pi create my-app
+
+# Deploy to cloud platforms
+pi deploy
 
 # Analyze existing project
 pi analyze
