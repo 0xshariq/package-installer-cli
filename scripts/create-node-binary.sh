@@ -66,3 +66,7 @@ echo "✅ All packages bundled into cli-with-packages.js (ESM)!"
 echo "   ✅ Size: $(du -h binary/temp/cli-with-packages.js 2>/dev/null | cut -f1)"
 
 echo "✨ Node.js ESM CLI bundle ready in binary/temp/cli-with-packages.js"
+
+# Remove unnecessary chunk/module files, keep only cli-with-packages.js
+find binary/temp -type f -name '*.cli-with-packages.js' ! -name 'cli-with-packages.js' -delete
+echo "🧹 Removed unnecessary chunk/module files."
