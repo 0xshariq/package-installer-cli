@@ -21,14 +21,20 @@ pnpm run build
 echo "🔗 Bundling ALL dependencies from package.json to ESM with webpack..."
 npx webpack --config webpack.config.mjs
 
-# Step 2.5: Prepend fileURLToPath global polyfill to cli-with-packages.js
-echo "🩹 Injecting fileURLToPath global polyfill..."
+# Step 2.5: Prepend fileURLToPath global polyfill to cli-with-packages.js, keeping shebang at the top
+echo "🩹 Injecting fileURLToPath global polyfill (shebang safe)..."
 POLYFILL="import { fileURLToPath } from 'url';\nglobalThis.fileURLToPath = fileURLToPath;\n"
 CLI_FILE="binary/temp/cli-with-packages.js"
 if [ -f "$CLI_FILE" ]; then
   TMP_FILE="${CLI_FILE}.tmp"
-  echo -e "$POLYFILL" | cat - "$CLI_FILE" > "$TMP_FILE" && mv "$TMP_FILE" "$CLI_FILE"
-  echo "✅ Polyfill injected."
+  SHEBANG_LINE=$(head -n 1 "$CLI_FILE")
+  tail -n +2 "$CLI_FILE" > "$TMP_FILE.body"
+  echo -e "$SHEBANG_LINE" > "$TMP_FILE"
+  echo -e "$POLYFILL" >> "$TMP_FILE"
+  cat "$TMP_FILE.body" >> "$TMP_FILE"
+  mv "$TMP_FILE" "$CLI_FILE"
+  rm "$TMP_FILE.body"
+  echo "✅ Polyfill injected with shebang preserved."
 else
   echo "❌ cli-with-packages.js not found, skipping polyfill injection."
 fi
