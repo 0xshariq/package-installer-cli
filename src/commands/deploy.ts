@@ -5,6 +5,8 @@
 import chalk from 'chalk';
 import boxen from 'boxen';
 import inquirer from 'inquirer';
+import fs from 'fs';
+import path from 'path';
 import { createStandardHelp, type CommandHelpConfig } from '../utils/helpFormatter.js';
 import { deployToVercel } from '../deploy/vercel/vercel.js';
 import { deployToAWS } from '../deploy/aws/aws.js';
@@ -24,6 +26,360 @@ import { deployToFly } from '../deploy/fly-io/fly-io.js';
 import { deployToGoReleaser } from '../deploy/goreleaser/goreleaser.js';
 import { deployToCapistrano } from '../deploy/capistrano/capistrano.js';
 
+// Project detection types
+interface ProjectInfo {
+  type: string;
+  framework?: string;
+  buildDir?: string;
+  hasEnvFile: boolean;
+  envFiles: string[];
+  suggestedPlatforms: string[];
+  buildCommand?: string;
+  startCommand?: string;
+}
+
+interface DeployOptions {
+  platform?: string;
+  interactive?: boolean;
+  autoDetect?: boolean;
+  build?: boolean;
+  envFile?: string;
+  dryRun?: boolean;
+  force?: boolean;
+  watch?: boolean;
+  quiet?: boolean;
+  verbose?: boolean;
+}
+
+/**
+ * Detect project type and framework
+ */
+function detectProjectInfo(): ProjectInfo {
+  const projectInfo: ProjectInfo = {
+    type: 'unknown',
+    hasEnvFile: false,
+    envFiles: [],
+    suggestedPlatforms: []
+  };
+
+  const cwd = process.cwd();
+  
+  // Check for package.json (Node.js projects)
+  const packageJsonPath = path.join(cwd, 'package.json');
+  if (fs.existsSync(packageJsonPath)) {
+    try {
+      const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
+      projectInfo.type = 'nodejs';
+      projectInfo.buildCommand = packageJson.scripts?.build;
+      projectInfo.startCommand = packageJson.scripts?.start;
+
+      // Detect framework from dependencies
+      const deps = { ...packageJson.dependencies, ...packageJson.devDependencies };
+      
+      if (deps.next) {
+        projectInfo.framework = 'nextjs';
+        projectInfo.buildDir = '.next';
+        projectInfo.suggestedPlatforms = ['vercel', 'netlify', 'aws', 'railway'];
+      } else if (deps.react || deps['react-dom']) {
+        projectInfo.framework = 'react';
+        projectInfo.buildDir = 'build';
+        projectInfo.suggestedPlatforms = ['vercel', 'netlify', 'aws', 'github-pages'];
+      } else if (deps.vue || deps['@vue/cli']) {
+        projectInfo.framework = 'vue';
+        projectInfo.buildDir = 'dist';
+        projectInfo.suggestedPlatforms = ['vercel', 'netlify', 'aws', 'firebase'];
+      } else if (deps['@angular/core']) {
+        projectInfo.framework = 'angular';
+        projectInfo.buildDir = 'dist';
+        projectInfo.suggestedPlatforms = ['vercel', 'netlify', 'firebase', 'aws'];
+      } else if (deps.nuxt) {
+        projectInfo.framework = 'nuxtjs';
+        projectInfo.buildDir = '.nuxt';
+        projectInfo.suggestedPlatforms = ['vercel', 'netlify', 'railway'];
+      } else if (deps.svelte || deps['@sveltejs/kit']) {
+        projectInfo.framework = 'svelte';
+        projectInfo.buildDir = 'build';
+        projectInfo.suggestedPlatforms = ['vercel', 'netlify', 'railway'];
+      } else if (deps.express) {
+        projectInfo.framework = 'express';
+        projectInfo.suggestedPlatforms = ['heroku', 'railway', 'fly-io', 'aws'];
+      } else if (deps.nestjs || deps['@nestjs/core']) {
+        projectInfo.framework = 'nestjs';
+        projectInfo.suggestedPlatforms = ['heroku', 'railway', 'fly-io', 'google-cloud'];
+      } else {
+        projectInfo.suggestedPlatforms = ['heroku', 'railway', 'fly-io'];
+      }
+    } catch (error) {
+      console.log(chalk.yellow('Warning: Could not parse package.json'));
+    }
+  }
+
+  // Check for Gemfile (Ruby projects)
+  if (fs.existsSync(path.join(cwd, 'Gemfile'))) {
+    projectInfo.type = 'ruby';
+    const gemfileContent = fs.readFileSync(path.join(cwd, 'Gemfile'), 'utf8');
+    if (gemfileContent.includes('rails')) {
+      projectInfo.framework = 'rails';
+      projectInfo.suggestedPlatforms = ['heroku', 'capistrano', 'railway', 'fly-io'];
+    } else {
+      projectInfo.framework = 'ruby';
+      projectInfo.suggestedPlatforms = ['heroku', 'capistrano'];
+    }
+  }
+
+  // Check for go.mod (Go projects)
+  if (fs.existsSync(path.join(cwd, 'go.mod'))) {
+    projectInfo.type = 'go';
+    projectInfo.framework = 'go';
+    projectInfo.suggestedPlatforms = ['goreleaser', 'fly-io', 'railway', 'google-cloud'];
+  }
+
+  // Check for requirements.txt or pyproject.toml (Python projects)
+  if (fs.existsSync(path.join(cwd, 'requirements.txt')) || fs.existsSync(path.join(cwd, 'pyproject.toml'))) {
+    projectInfo.type = 'python';
+    if (fs.existsSync(path.join(cwd, 'manage.py'))) {
+      projectInfo.framework = 'django';
+    } else if (fs.existsSync(path.join(cwd, 'app.py')) || fs.existsSync(path.join(cwd, 'main.py'))) {
+      projectInfo.framework = 'flask';
+    }
+    projectInfo.suggestedPlatforms = ['heroku', 'railway', 'fly-io', 'google-cloud'];
+  }
+
+  // Check for Dockerfile
+  if (fs.existsSync(path.join(cwd, 'Dockerfile'))) {
+    projectInfo.suggestedPlatforms.unshift('docker-hub', 'fly-io', 'railway');
+  }
+
+  // Check for serverless.yml
+  if (fs.existsSync(path.join(cwd, 'serverless.yml'))) {
+    projectInfo.suggestedPlatforms.unshift('serverless');
+  }
+
+  // Check for static files (HTML/CSS/JS)
+  if (fs.existsSync(path.join(cwd, 'index.html')) && projectInfo.type === 'unknown') {
+    projectInfo.type = 'static';
+    projectInfo.framework = 'static';
+    projectInfo.suggestedPlatforms = ['github-pages', 'netlify', 'vercel', 'firebase'];
+  }
+
+  // Check for environment files
+  const envFiles = ['.env', '.env.local', '.env.production', '.env.staging', '.env.development'];
+  envFiles.forEach(file => {
+    if (fs.existsSync(path.join(cwd, file))) {
+      projectInfo.envFiles.push(file);
+      projectInfo.hasEnvFile = true;
+    }
+  });
+
+  // Default suggestions if none found
+  if (projectInfo.suggestedPlatforms.length === 0) {
+    projectInfo.suggestedPlatforms = ['vercel', 'netlify', 'heroku', 'railway'];
+  }
+
+  return projectInfo;
+}
+
+/**
+ * Parse command line options
+ */
+function parseDeployOptions(): DeployOptions {
+  const args = process.argv.slice(2);
+  const options: DeployOptions = {};
+
+  // Parse platform
+  const platformIndex = args.findIndex(arg => arg === '--platform' || arg === '-p');
+  if (platformIndex !== -1 && args[platformIndex + 1]) {
+    options.platform = args[platformIndex + 1];
+  }
+
+  // Parse env file
+  const envIndex = args.findIndex(arg => arg === '--env');
+  if (envIndex !== -1 && args[envIndex + 1]) {
+    options.envFile = args[envIndex + 1];
+  }
+
+  // Parse boolean flags
+  options.interactive = args.includes('--interactive') || args.includes('-i');
+  options.autoDetect = args.includes('--auto-detect') || args.includes('-a');
+  options.build = args.includes('--build');
+  options.dryRun = args.includes('--dry-run');
+  options.force = args.includes('--force') || args.includes('-f');
+  options.watch = args.includes('--watch') || args.includes('-w');
+  options.quiet = args.includes('--quiet') || args.includes('-q');
+  options.verbose = args.includes('--verbose') || args.includes('-v');
+
+  return options;
+}
+
+/**
+ * Display project information
+ */
+function displayProjectInfo(projectInfo: ProjectInfo, options: DeployOptions): void {
+  if (options.quiet) return;
+
+  console.log(chalk.cyan('📦 Project Information'));
+  console.log(chalk.gray('========================\n'));
+  
+  console.log(`${chalk.blue('Type:')} ${projectInfo.type}`);
+  if (projectInfo.framework) {
+    console.log(`${chalk.blue('Framework:')} ${projectInfo.framework}`);
+  }
+  if (projectInfo.buildCommand) {
+    console.log(`${chalk.blue('Build Command:')} ${projectInfo.buildCommand}`);
+  }
+  if (projectInfo.startCommand) {
+    console.log(`${chalk.blue('Start Command:')} ${projectInfo.startCommand}`);
+  }
+  if (projectInfo.buildDir) {
+    console.log(`${chalk.blue('Build Directory:')} ${projectInfo.buildDir}`);
+  }
+  
+  if (projectInfo.envFiles.length > 0) {
+    console.log(`${chalk.blue('Environment Files:')} ${projectInfo.envFiles.join(', ')}`);
+  }
+
+  if (projectInfo.suggestedPlatforms.length > 0) {
+    console.log(`${chalk.blue('Suggested Platforms:')} ${projectInfo.suggestedPlatforms.slice(0, 3).join(', ')}`);
+  }
+  
+  console.log(); // Empty line
+}
+
+/**
+ * Interactive platform selection with project-specific suggestions
+ */
+async function interactivePlatformSelection(projectInfo: ProjectInfo): Promise<string> {
+  console.log(chalk.cyan('🚀 Select Deployment Platform\n'));
+
+  // Show suggested platforms first if available
+  if (projectInfo.suggestedPlatforms.length > 0) {
+    console.log(chalk.green('💡 Recommended for your project:'));
+    projectInfo.suggestedPlatforms.slice(0, 3).forEach((platform, index) => {
+      console.log(`   ${index + 1}. ${platform}`);
+    });
+    console.log();
+
+    const { useRecommended } = await inquirer.prompt([
+      {
+        type: 'confirm',
+        name: 'useRecommended',
+        message: `Deploy to ${chalk.green(projectInfo.suggestedPlatforms[0])} (recommended)?`,
+        default: true
+      }
+    ]);
+
+    if (useRecommended) {
+      return projectInfo.suggestedPlatforms[0];
+    }
+  }
+
+  // Show all platforms
+  const { platform } = await inquirer.prompt([
+    {
+      type: 'list',
+      name: 'platform',
+      message: 'Choose deployment platform:',
+      choices: [
+        {
+          name: '🔐 Auth0 - Authentication and identity management',
+          value: 'auth0',
+          short: 'Auth0'
+        },
+        {
+          name: '☁️ AWS - S3 static sites and Lambda functions',
+          value: 'aws',
+          short: 'AWS'
+        },
+        {
+          name: '💎 Capistrano - Ruby deployment automation',
+          value: 'capistrano',
+          short: 'Capistrano'
+        },
+        {
+          name: '☁️ Cloud Foundry - Enterprise cloud platform',
+          value: 'cloud-foundry',
+          short: 'Cloud Foundry'
+        },
+        {
+          name: '☁️ Cloudflare - Pages, Workers, and Workers Sites',
+          value: 'cloudflare',
+          short: 'Cloudflare'
+        },
+        {
+          name: '🌊 DigitalOcean - App Platform and container registry',
+          value: 'digitalocean',
+          short: 'DigitalOcean'
+        },
+        {
+          name: '🐳 Docker Hub - Container registry and deployment',
+          value: 'docker-hub',
+          short: 'Docker Hub'
+        },
+        {
+          name: '🔥 Firebase - Hosting, Functions, and Firestore',
+          value: 'firebase',
+          short: 'Firebase'
+        },
+        {
+          name: '🪂 Fly.io - Deploy apps close to users globally',
+          value: 'fly-io',
+          short: 'Fly.io'
+        },
+        {
+          name: '📚 GitHub Pages - Static sites and documentation',
+          value: 'github-pages',
+          short: 'GitHub Pages'
+        },
+        {
+          name: '🌐 Google Cloud - App Engine, Cloud Run, and Functions',
+          value: 'google-cloud',
+          short: 'Google Cloud'
+        },
+        {
+          name: '🚀 GoReleaser - Release Go binaries fast and easily',
+          value: 'goreleaser',
+          short: 'GoReleaser'
+        },
+        {
+          name: '⚡ Heroku - Cloud application platform',
+          value: 'heroku',
+          short: 'Heroku'
+        },
+        {
+          name: '🟢 Netlify - Static sites and serverless functions',
+          value: 'netlify',
+          short: 'Netlify'
+        },
+        {
+          name: '🚂 Railway - Modern app hosting platform',
+          value: 'railway',
+          short: 'Railway'
+        },
+        {
+          name: '⚡ Serverless Framework - Multi-cloud serverless deployment',
+          value: 'serverless',
+          short: 'Serverless'
+        },
+        {
+          name: '🔺 Vercel - Frontend and fullstack applications',
+          value: 'vercel',
+          short: 'Vercel'
+        }
+      ]
+    }
+  ]);
+
+  return platform;
+}
+
+interface DeploymentResult {
+  success: boolean;
+  url?: string;
+  message?: string;
+}
+
+
+
 /**
  * Display help for deploy command
  */
@@ -41,14 +397,25 @@ export function showDeployHelp(): void {
       { flag: '--platform, -p <platform>', description: 'Specify deployment platform (auth0, aws, capistrano, cloud-foundry, cloudflare, digitalocean, docker-hub, firebase, fly-io, github-pages, google-cloud, goreleaser, heroku, netlify, railway, serverless, vercel)' },
       { flag: '--list, -l', description: 'List all available deployment platforms' },
       { flag: '--config, -c', description: 'Configure deployment settings' },
+      { flag: '--interactive, -i', description: 'Interactive mode with auto-detection (default)' },
+      { flag: '--auto-detect, -a', description: 'Auto-detect project type and suggest platforms' },
       { flag: '--build', description: 'Build project before deployment' },
-      { flag: '--env <file>', description: 'Use environment variables from file' }
+      { flag: '--env <file>', description: 'Use environment variables from file (.env by default)' },
+      { flag: '--dry-run', description: 'Show what would be deployed without actually deploying' },
+      { flag: '--force, -f', description: 'Skip confirmation prompts' },
+      { flag: '--watch, -w', description: 'Watch for changes and auto-deploy' },
+      { flag: '--quiet, -q', description: 'Suppress non-essential output' },
+      { flag: '--verbose, -v', description: 'Show detailed deployment information' }
     ],
     examples: [
-      { command: 'pi deploy', description: 'Interactive deployment platform selection' },
-      { command: 'pi deploy --platform <platform>', description: 'Deploy to platforms which are supported by cli.' },
+      { command: 'pi deploy', description: 'Interactive mode with auto-detection' },
+      { command: 'pi deploy --auto-detect', description: 'Auto-detect and suggest best platforms' },
+      { command: 'pi deploy --platform vercel', description: 'Deploy directly to Vercel' },
+      { command: 'pi deploy --platform aws --build', description: 'Build and deploy to AWS' },
+      { command: 'pi deploy --dry-run', description: 'Preview deployment without executing' },
       { command: 'pi deploy --list', description: 'Show all available platforms' },
-      { command: 'pi deploy --config', description: 'Configure deployment settings' }
+      { command: 'pi deploy --config', description: 'Configure deployment settings' },
+      { command: 'pi deploy --watch', description: 'Watch for changes and auto-deploy' }
     ],
     additionalSections: [
       {
@@ -102,9 +469,9 @@ export async function deployCommand(): Promise<void> {
     return;
   }
 
-  // Handle command line arguments
+  // Parse command line options
+  const options = parseDeployOptions();
   const args = process.argv.slice(2);
-  const platformIndex = args.findIndex(arg => arg === '--platform' || arg === '-p');
   const listFlag = args.includes('--list') || args.includes('-l');
   const configFlag = args.includes('--config') || args.includes('-c');
 
@@ -118,110 +485,60 @@ export async function deployCommand(): Promise<void> {
     return;
   }
 
-  let selectedPlatform: string | null = null;
+  // Detect project information
+  const projectInfo = detectProjectInfo();
 
-  // Check if platform is specified via command line
-  if (platformIndex !== -1 && args[platformIndex + 1]) {
-    selectedPlatform = args[platformIndex + 1];
+  // Display project info unless in quiet mode
+  if (!options.quiet) {
+    displayProjectInfo(projectInfo, options);
   }
 
-  // If no platform specified, show interactive selection
+  // Auto-detect mode - just show suggestions and exit
+  if (options.autoDetect) {
+    console.log(chalk.cyan('🎯 Recommended deployment platforms for your project:\n'));
+    projectInfo.suggestedPlatforms.slice(0, 5).forEach((platform, index) => {
+      console.log(`${index + 1}. ${chalk.green(platform)} - Deploy with: ${chalk.blue(`pi deploy --platform ${platform}`)}`);
+    });
+    console.log(chalk.gray('\nRun without --auto-detect to start interactive deployment.'));
+    return;
+  }
+
+  let selectedPlatform: string | null = options.platform || null;
+
+  // If no platform specified, show interactive selection with suggestions
   if (!selectedPlatform) {
-    const { platform } = await inquirer.prompt([
-      {
-        type: 'list',
-        name: 'platform',
-        message: 'Select deployment platform:',
-        choices: [
-          {
-            name: '� Auth0 - Authentication and identity management',
-            value: 'auth0',
-            short: 'Auth0'
-          },
-          {
-            name: '☁️ AWS - S3 static sites and Lambda functions', 
-            value: 'aws',
-            short: 'AWS'
-          },
-          {
-            name: '� Capistrano - Ruby deployment automation',
-            value: 'capistrano',
-            short: 'Capistrano'
-          },
-          {
-            name: '☁️ Cloud Foundry - Enterprise cloud platform',
-            value: 'cloud-foundry',
-            short: 'Cloud Foundry'
-          },
-          {
-            name: '☁️ Cloudflare - Pages, Workers, and Workers Sites',
-            value: 'cloudflare',
-            short: 'Cloudflare'
-          },
-          {
-            name: '🌊 DigitalOcean - App Platform and container registry',
-            value: 'digitalocean',
-            short: 'DigitalOcean'
-          },
-          {
-            name: '🐳 Docker Hub - Container registry and deployment',
-            value: 'docker-hub',
-            short: 'Docker Hub'
-          },
-          {
-            name: '🔥 Firebase - Hosting, Functions, and Firestore',
-            value: 'firebase',
-            short: 'Firebase'
-          },
-          {
-            name: '🪂 Fly.io - Deploy apps close to users globally',
-            value: 'fly-io',
-            short: 'Fly.io'
-          },
-          {
-            name: '📚 GitHub Pages - Static sites and documentation',
-            value: 'github-pages',
-            short: 'GitHub Pages'
-          },
-          {
-            name: '🌐 Google Cloud - App Engine, Cloud Run, and Functions',
-            value: 'google-cloud',
-            short: 'Google Cloud'
-          },
-          {
-            name: '� GoReleaser - Release Go binaries fast and easily',
-            value: 'goreleaser',
-            short: 'GoReleaser'
-          },
-          {
-            name: '⚡ Heroku - Cloud application platform',
-            value: 'heroku',
-            short: 'Heroku'
-          },
-          {
-            name: '🟢 Netlify - Static sites and serverless functions',
-            value: 'netlify',
-            short: 'Netlify'
-          },
-          {
-            name: '� Railway - Modern app hosting platform',
-            value: 'railway',
-            short: 'Railway'
-          },
-          {
-            name: '⚡ Serverless Framework - Multi-cloud serverless deployment',
-            value: 'serverless',
-            short: 'Serverless'
-          },
-          {
-            name: '� Vercel - Frontend and fullstack applications',
-            value: 'vercel',
-            short: 'Vercel'
-          }
-        ]
-      }
-    ]);
-    selectedPlatform = platform;
+    selectedPlatform = await interactivePlatformSelection(projectInfo);
+  }
+
+  // Dry run mode - show what would be deployed
+  if (options.dryRun) {
+    console.log(chalk.cyan('🔍 Dry Run Mode - Preview Deployment\n'));
+    console.log(`Platform: ${chalk.green(selectedPlatform)}`);
+    console.log(`Project: ${chalk.blue(projectInfo.type)} ${projectInfo.framework ? `(${projectInfo.framework})` : ''}`);
+    console.log(`Build Command: ${chalk.blue(projectInfo.buildCommand || 'Not specified')}`);
+    console.log(`Environment Files: ${chalk.blue(projectInfo.envFiles.join(', ') || 'None')}`);
+    if (options.build) {
+      console.log(`${chalk.yellow('Would run build step')}`);
+    }
+    console.log(chalk.gray('\nNo actual deployment performed. Remove --dry-run to deploy.'));
+    return;
+  }
+
+  // Build project if requested
+  if (options.build && projectInfo.buildCommand) {
+    console.log(chalk.cyan('🔨 Building project...'));
+    const { spawn } = await import('child_process');
+    await new Promise((resolve, reject) => {
+      const buildProcess = spawn('npm', ['run', 'build'], { stdio: 'inherit' });
+      buildProcess.on('close', (code) => {
+        if (code === 0) {
+          console.log(chalk.green('✅ Build completed successfully'));
+          resolve(void 0);
+        } else {
+          reject(new Error(`Build failed with code ${code}`));
+        }
+      });
+    });
   }
 
   // Validate platform

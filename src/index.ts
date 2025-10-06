@@ -365,15 +365,22 @@ program
     }
   });
 
-// DEPLOY COMMAND - Future deployment features
+// DEPLOY COMMAND - Deploy projects to cloud platforms
 program
   .command('deploy')
   .description(chalk.hex('#ff9a9e')('🚀 ') + chalk.hex('#fd79a8')('Deploy your projects to various cloud platforms'))
-  .option('-p, --platform <platform>', 'Specify deployment platform (vercel, aws, github-pages)')
+  .option('-p, --platform <platform>', 'Specify deployment platform')
   .option('-l, --list', 'List all available deployment platforms')
   .option('-c, --config', 'Configure deployment settings')
+  .option('-i, --interactive', 'Interactive mode with auto-detection (default)')
+  .option('-a, --auto-detect', 'Auto-detect project type and suggest platforms')
   .option('--build', 'Build project before deployment')
-  .option('--env <file>', 'Use environment variables from file')
+  .option('--env <file>', 'Use environment variables from file (.env by default)')
+  .option('--dry-run', 'Show what would be deployed without actually deploying')
+  .option('-f, --force', 'Skip confirmation prompts')
+  .option('-w, --watch', 'Watch for changes and auto-deploy')
+  .option('-q, --quiet', 'Suppress non-essential output')
+  .option('-v, --verbose', 'Show detailed deployment information')
   .on('--help', () => {
     showDeployHelp();
   })
