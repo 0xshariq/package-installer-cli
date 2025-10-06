@@ -16,9 +16,22 @@ mkdir -p binary/node-binaries
 echo "📦 Building TypeScript..."
 pnpm run build
 
+
 # Step 2: Bundle ALL dependencies from package.json using webpack (ESM format)
 echo "🔗 Bundling ALL dependencies from package.json to ESM with webpack..."
 npx webpack --config webpack.config.mjs
+
+# Step 2.5: Prepend fileURLToPath global polyfill to cli-with-packages.js
+echo "🩹 Injecting fileURLToPath global polyfill..."
+POLYFILL="import { fileURLToPath } from 'url';\nglobalThis.fileURLToPath = fileURLToPath;\n"
+CLI_FILE="binary/temp/cli-with-packages.js"
+if [ -f "$CLI_FILE" ]; then
+  TMP_FILE="${CLI_FILE}.tmp"
+  echo -e "$POLYFILL" | cat - "$CLI_FILE" > "$TMP_FILE" && mv "$TMP_FILE" "$CLI_FILE"
+  echo "✅ Polyfill injected."
+else
+  echo "❌ cli-with-packages.js not found, skipping polyfill injection."
+fi
 
 # Step 3: Copy all required assets to temp folder
 echo "📁 Copying assets to bundle..."

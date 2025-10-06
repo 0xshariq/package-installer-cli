@@ -1,12 +1,16 @@
 #!/usr/bin/env node
+import { fileURLToPath } from 'url';
+import path from 'path';
 
+// Polyfill for legacy code expecting globals
+(globalThis as any).fileURLToPath = fileURLToPath;
+(globalThis as any).path = path;
 import { Command } from 'commander';
 import chalk from 'chalk';
 import gradient from 'gradient-string';
 import boxen from 'boxen';
 import { readFileSync } from 'fs';
 import { dirname, join } from 'path';
-import { fileURLToPath } from 'url';
 
 // Import command handlers
 import { createProject, showCreateHelp } from './commands/create.js';
