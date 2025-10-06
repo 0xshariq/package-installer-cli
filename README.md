@@ -137,6 +137,7 @@ pi clean
 | `pi env` | Environment analysis | `--check`, `--generate`, `--validate` |
 | `pi clone` | Clone and setup repositories | `--offline`, `--shallow`, `--branch` |
 | `pi add` | Add features to projects | `--list` to see all features |
+| `pi deploy` | Deploy to cloud platforms | `--auto-detect`, `--dry-run`, `--watch` |
 | `pi clean` | Clean development artifacts | `--all`, `--dry-run` |
 | `pi cache` | Manage CLI cache | `clear`, `stats`, `optimize` |
 | `pi check` | Check package versions | `--verbose` for details |

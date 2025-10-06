@@ -286,10 +286,10 @@ gem install capistrano                  # Capistrano
 
 ## 🚀 Quick Start
 
-### Interactive Deployment
+### 🎯 Smart Interactive Mode (Recommended)
 
 ```bash
-# Start interactive deployment with platform selection
+# Auto-detect project and show smart recommendations
 pi deploy
 
 # Select from all 17 platforms:
@@ -355,6 +355,49 @@ pi deploy --config
 # • Environment variables management
 # • Domain configuration
 # • View platform setup commands
+```
+
+### 🔍 Auto-Detection Mode
+
+```bash
+# Just see recommendations without deploying
+pi deploy --auto-detect
+
+# Example output:
+🎯 Recommended deployment platforms for your project:
+
+1. vercel - Deploy with: pi deploy --platform vercel
+2. netlify - Deploy with: pi deploy --platform netlify  
+3. aws - Deploy with: pi deploy --platform aws
+4. railway - Deploy with: pi deploy --platform railway
+5. firebase - Deploy with: pi deploy --platform firebase
+
+Run without --auto-detect to start interactive deployment.
+```
+
+### 🎮 Advanced Options
+
+```bash
+# Preview deployment without executing
+pi deploy --dry-run
+
+# Auto-build before deployment
+pi deploy --build
+
+# Use custom environment file
+pi deploy --env .env.production
+
+# Force deployment (skip confirmations)
+pi deploy --force
+
+# Watch for changes and auto-deploy (future feature)
+pi deploy --watch
+
+# Quiet mode (minimal output)
+pi deploy --quiet
+
+# Verbose mode (detailed output)  
+pi deploy --verbose
 ```
 
 ## 📖 Platform-Specific Guides
