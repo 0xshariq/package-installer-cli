@@ -73,16 +73,13 @@ function checkDevelopmentTools(): Tool[] {
   const tools = [
     { name: 'Node.js', command: 'node', flag: '--version' },
     { name: 'npm', command: 'npm', flag: '--version' },
-    { name: 'yarn', command: 'yarn', flag: '--version' },
     { name: 'pnpm', command: 'pnpm', flag: '--version' },
     { name: 'Git', command: 'git', flag: '--version' },
     { name: 'Docker', command: 'docker', flag: '--version' },
     { name: 'Python', command: 'python3', flag: '--version' },
     { name: 'Rust', command: 'rustc', flag: '--version' },
     { name: 'Go', command: 'go', flag: 'version' },
-    { name: 'PHP', command: 'php', flag: '--version' },
     { name: 'Ruby', command: 'ruby', flag: '--version' },
-    { name: 'Java', command: 'java', flag: '--version' },
     { name: 'VS Code', command: 'code', flag: '--version' }
   ];
 
