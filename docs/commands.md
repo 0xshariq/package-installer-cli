@@ -53,6 +53,7 @@ Available for all commands:
 
 | Command | Purpose | Key Features | Status |
 |---------|---------|-------------|--------|
+| [`auth`](#auth-command) | Register, Login Logout | Interactive authentication with 2fa | ✅ Available |
 | [`create`](#create-command) | Create new projects from templates | Interactive selection, modern tooling | ✅ Available |
 | [`analyze`](#analyze-command) | Project analytics dashboard | Usage stats, performance insights | ✅ Available |
 | [`update`](#update-command) | Update project dependencies | Multi-language support, safety checks | ✅ Available |
@@ -76,6 +77,66 @@ Available for all commands:
 
 
 ## 🛠️ Core Commands
+### `auth` Command
+
+Manage CLI authentication with secure local user accounts. Supports registration, login, logout, status, and user management. All authentication is local and stored securely in your home directory (no external service required).
+
+**Syntax:**
+```bash
+pi auth [subcommand] [options]
+```
+
+**Subcommands:**
+| Subcommand      | Description                                 |
+|-----------------|---------------------------------------------|
+| `login`         | Login interactively or with --email/--password |
+| `register`      | Register a new user (interactive or non-interactive) |
+| `logout`        | Logout the current session                  |
+| `status`        | Show login status (who is logged in)        |
+| `whoami`        | Print the email of the current user         |
+| `list-users`    | List all registered user emails             |
+
+**Options:**
+| Option                | Description                                 |
+|-----------------------|---------------------------------------------|
+| `--email <email>`     | Email for login/register (non-interactive)  |
+| `--password <pass>`   | Password for login/register (non-interactive) |
+| `-h, --help`          | Show help for the auth command or subcommand |
+
+**Examples:**
+```bash
+# Register a new user interactively
+pi auth register
+
+# Register non-interactively
+pi auth register --email user@example.com --password hunter2
+
+# Login interactively
+pi auth login
+
+# Login non-interactively
+pi auth login --email user@example.com --password hunter2
+
+# Show current login status
+pi auth status
+
+# Show current user email
+pi auth whoami
+
+# List all registered users
+pi auth list-users
+
+# Logout
+pi auth logout
+```
+
+**How it works:**
+- User credentials are stored locally in `~/.package-installer-cli/auth.json` with secure password hashing (scrypt + salt).
+- Session info is stored in `~/.package-installer-cli/session.json`.
+- No external authentication provider is required.
+- All subcommands are available via `pi auth <subcommand>`.
+- For more details, run `pi auth --help`.
+
 
 ### `create` Command
 
