@@ -151,6 +151,24 @@
       "languages": ["rust"],
       "templates": ["advance-rust-template", "basic-rust-template"]
     },
+    "tauri": {
+      "type": "desktop",
+      "description": "Framework for building tiny, fast binaries for all major desktop platforms",
+      "languages": ["javascript", "typescript", "rust"],
+      "templates": {
+        "rust": [
+          "tauri-rust-template"
+        ],
+        "typescript": [
+          "angular-frontend",
+          "reactjs-frontend"
+        ],
+        "javascript": [
+          "reactjs-frontend",
+          "angular-frontend"
+        ]
+      }
+    },
     "vuejs": {
       "type": "frontend",
       "description": "Progressive JavaScript framework for building UIs",
