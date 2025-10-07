@@ -52,8 +52,10 @@ async function interactiveRegister() {
     console.log(chalk.red('Passwords do not match'));
     return;
   }
+  let created = false;
   try {
     await authStore.createUser(email, password);
+    created = true;
   } catch (err: any) {
     if (err.message && err.message.includes('already exists')) {
       console.log(chalk.red('❌ User already exists. Please login or use a different email.'));
@@ -71,12 +73,14 @@ async function interactiveRegister() {
   } else {
     console.log(chalk.yellow('⚠️  2FA is not enabled. You can enable it anytime with: pi auth verify'));
   }
-  // Auto-login after registration
-  const ok = await authStore.login(email, password);
-  if (ok) {
-    console.log(chalk.green('✅ User registered and logged in.'));
-  } else {
-    console.log(chalk.yellow('User registered, but auto-login failed. Please login manually.'));
+  // Always auto-login after registration if user was created
+  if (created) {
+    const ok = await authStore.login(email, password);
+    if (ok) {
+      console.log(chalk.green('✅ User registered and logged in.'));
+    } else {
+      console.log(chalk.yellow('User registered, but auto-login failed. Please login manually.'));
+    }
   }
 }
 
@@ -134,7 +138,9 @@ export async function handleAuthOptions(subcommand?: string, value?: string, opt
   }
 
   try {
-    switch (subcommand) {
+    // Normalize subcommand for robust matching
+    const cmd = (subcommand || '').toLowerCase();
+    switch (cmd) {
       case 'login': {
         if (opts.email && opts.password) {
           try {
