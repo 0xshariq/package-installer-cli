@@ -26,11 +26,13 @@ import { cacheCommand,showCacheHelp } from './commands/cache.js';
 import { environmentCommand, showEnvironmentHelp } from './commands/env.js';
 import { doctorCommand, showDoctorHelp } from './commands/doctor.js';
 import { emailCommand, showEmailHelp } from './commands/email.js';
+import { handleAuthOptions, showAuthHelp } from './commands/auth.js';
 
 // Import utilities
 import { initializeCache } from './utils/cacheManager.js';
 import { displayBanner, displayCommandBanner } from './utils/banner.js';
 import { getPackageJsonPath } from './utils/pathResolver.js';
+import { authStore, initAuthStore } from './utils/authStore.js';
 
 // Get current file directory for ESM
 const __filename = fileURLToPath(import.meta.url);
@@ -55,6 +57,15 @@ const VERSION = packageJson.version;
 // Initialize CLI program
 const program = new Command();
 
+// Initialize auth store early
+(async () => {
+  try {
+    await initAuthStore();
+  } catch (err) {
+    // non-fatal
+  }
+})();
+
 // Create beautiful blue gradient for CLI name
 const gradientTitle = gradient(['#0072ff', '#00c6ff', '#0072ff']);
 const piGradient = gradient(['#00c6ff', '#0072ff']);
@@ -68,6 +79,47 @@ program
     sortSubcommands: true,
     subcommandTerm: (cmd) => cmd.name(),
   });
+
+// Global preAction: enforce login for most commands, whitelist a few
+program.hook('preAction', async (thisCommand, actionCommand) => {
+  const name = actionCommand.name();
+  // Commands allowed without login (help, version, auth, cache --help etc.)
+  const allowed = ['auth', 'help', 'version', 'cache'];
+  if (allowed.includes(name)) return;
+
+  // Also allow if user requested help/version via flags anywhere on the command line
+  const argv = process.argv.slice(2).map(a => a.toLowerCase());
+  const helpFlags = ['-h', '--help'];
+  const versionFlags = ['-v', '-V', '--version'];
+  if (argv.some(a => helpFlags.includes(a) || versionFlags.includes(a))) return;
+
+  const logged = await authStore.isLoggedIn();
+  if (!logged) {
+    console.log('\n' + chalk.red('❌ You must be logged in to use this command.'));
+    console.log(chalk.gray(`Run: pi auth --help to see authentication options`));
+    process.exit(1);
+  }
+
+  // 2FA enforcement and usage limit for unverified users
+  const session = await authStore.getSession();
+  if (session && session.email) {
+    const isVerified = await authStore.isVerified(session.email);
+    // Allow verify, logout, help for unverified users
+    const authSub = argv[1] || '';
+    if (!isVerified) {
+      if (name === 'auth' && ['verify', 'logout', '', undefined].includes(authSub)) return;
+      // Usage limit enforcement for unverified users
+      const allowed = await authStore.incrementUsage(session.email).catch(() => false);
+      if (!allowed) {
+        console.log('\n' + chalk.red('❌ You have reached the maximum number of allowed commands as an unverified user.')); 
+        console.log(chalk.yellow('Please verify your account with: pi auth verify'));
+        process.exit(1);
+      }
+      // Show warning for unverified users
+      console.log(chalk.yellow('⚠️  Your account is not verified. You have limited access until you complete 2FA.'));
+    }
+  }
+});
 
 /**
  * Enhanced error handler with better formatting
@@ -190,6 +242,25 @@ program
       await addCommand(feature, provider, options);
     } catch (error) {
       handleCommandError('add feature', error as Error);
+    }
+  });
+
+// AUTH COMMAND - authentication and user management (subcommand pattern like cache)
+program
+  .command('auth')
+  .description(chalk.hex('#00d2d3')('🔐 ') + chalk.hex('#95afc0')('Authentication and user management'))
+  .argument('[subcommand]', 'Auth subcommand (login, register, logout, status, whoami, list-users)')
+  .argument('[value]', 'Optional value for subcommand (not used)')
+  .option('--email <email>', 'Email for login/register')
+  .option('--password <password>', 'Password for login/register')
+  .option('-h, --help', 'Show help for auth command')
+  .allowUnknownOption(true)
+  .on('--help', () => { showAuthHelp(); })
+  .action(async (subcommand, value, options) => {
+    try {
+      await handleAuthOptions(subcommand, value, options);
+    } catch (error) {
+      handleCommandError('auth', error as Error);
     }
   });
 
@@ -422,6 +493,7 @@ program.on('--help', () => {
     chalk.hex('#95afc0')('  ') + piGradient('pi') + ' ' + commandGradient('check') + chalk.hex('#95afc0')('                   # Check package versions') + '\n' +
     chalk.hex('#95afc0')('  ') + piGradient('pi') + ' ' + commandGradient('check') + chalk.hex('#95afc0')(' react             # Check specific package') + '\n' +
     chalk.hex('#95afc0')('  ') + piGradient('pi') + ' ' + commandGradient('email') + chalk.hex('#95afc0')('                   # Contact developer with feedback') + '\n' +
+    chalk.hex('#95afc0')('  ') + piGradient('pi') + ' ' + commandGradient('auth') + chalk.hex('#95afc0')('                    # Manage CLI authentication (login/register/status)') + '\n' +
 
     chalk.hex('#ff6b6b')('🌍 REPOSITORY & DEPLOYMENT') + '\n' +
     chalk.hex('#95afc0')('  ') + piGradient('pi') + ' ' + commandGradient('clone') + chalk.hex('#95afc0')('                   # Clone repositories interactively') + '\n' +
@@ -466,9 +538,10 @@ if (process.argv.length === 2) {
     chalk.hex('#ff6b6b')('  ') + piGradient('pi') + ' ' + gradient(['#ff6b6b', '#ff9a9e'])('update') + chalk.hex('#95afc0')('           # Update packages to latest versions') + '\n' +
     chalk.hex('#00d2d3')('  ') + piGradient('pi') + ' ' + gradient(['#00d2d3', '#0084ff'])('clone') + chalk.hex('#95afc0')(' user/repo   # Clone and setup GitHub repositories') + '\n' +
     chalk.hex('#00d2d3')('  ') + piGradient('pi') + ' ' + gradient(['#00d2d3', '#4facfe'])('email') + chalk.hex('#95afc0')('            # Contact developer with feedback') + '\n\n' +
-    chalk.hex('#ffa502')('Need help? Try these:') + '\n\n' +
+  chalk.hex('#ffa502')('Need help? Try these:') + '\n\n' +
     chalk.hex('#ff6b6b')('  ') + piGradient('pi') + ' ' + chalk.hex('#ff6b6b')('--help') + chalk.hex('#95afc0')('           # See all available commands') + '\n' +
     chalk.hex('#95afc0')('  ') + piGradient('pi') + ' ' + chalk.hex('#95afc0')('command --help') + chalk.hex('#95afc0')('   # Get detailed help for any command') + '\n\n' +
+  chalk.hex('#95afc0')('  ') + piGradient('pi') + ' ' + chalk.hex('#95afc0')('auth --help') + chalk.hex('#95afc0')('      # Detailed help for authentication commands') + '\n\n' +
     chalk.hex('#00d2d3')('💡 Pro tip: All commands are interactive - just run them and follow prompts!'),
     {
       padding: 1,
@@ -489,4 +562,11 @@ if (process.argv.length === 2) {
 })();
 
 // Parse command line arguments
+// If user asked for auth help explicitly (pi auth --help), show our formatted auth help and exit
+const preArgs = process.argv.slice(2).map(a => String(a).toLowerCase());
+if (preArgs[0] === 'auth' && (preArgs.includes('--help') || preArgs.includes('-h'))) {
+  try { showAuthHelp(); } catch {};
+  process.exit(0);
+}
+
 program.parse();
