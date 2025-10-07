@@ -79,7 +79,20 @@ Available for all commands:
 ## 🛠️ Core Commands
 ### `auth` Command
 
-Manage CLI authentication with secure local user accounts. Supports registration, login, logout, status, and user management. All authentication is local and stored securely in your home directory (no external service required).
+Manage CLI authentication with secure local user accounts. Supports registration, login, logout, status, user management, and mandatory 2FA (Google Authenticator/TOTP) for full access. All authentication is local and stored securely in your home directory (no external service required).
+
+**2FA & Usage Limits:**
+- 🔒 2FA (Google Authenticator or compatible app) is required for unlimited CLI access.
+- Unverified users can only use 3 commands (excluding `auth verify`, `auth logout`, and help/version) before verification is required.
+- After 3 commands, unverified users are blocked from all other commands until they complete 2FA with `pi auth verify`.
+
+**How it works:**
+- User credentials are stored locally in `~/.package-installer-cli/auth.json` with secure password hashing (scrypt + salt).
+- Session info is stored in `~/.package-installer-cli/session.json`.
+- 2FA secret and verification status are stored per user.
+- No external authentication provider is required.
+- All subcommands are available via `pi auth <subcommand>`.
+- For more details, run `pi auth --help`.
 
 **Syntax:**
 ```bash
@@ -91,6 +104,7 @@ pi auth [subcommand] [options]
 |-----------------|---------------------------------------------|
 | `login`         | Login interactively or with --email/--password |
 | `register`      | Register a new user (interactive or non-interactive) |
+| `verify`        | Enable and verify 2FA for your account      |
 | `logout`        | Logout the current session                  |
 | `status`        | Show login status (who is logged in)        |
 | `whoami`        | Print the email of the current user         |
@@ -116,6 +130,9 @@ pi auth login
 
 # Login non-interactively
 pi auth login --email user@example.com --password hunter2
+
+# Enable and verify 2FA (required for unlimited access)
+pi auth verify
 
 # Show current login status
 pi auth status
