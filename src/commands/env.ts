@@ -173,7 +173,7 @@ STRIPE_PUBLISHABLE_KEY=pk_test_...
 `;
 
     await fs.writeFile(envPath, envContent);
-    console.log(chalk.green(`✅ Generated .env.example template at ${envPath}`));
+    console.log(chalk.green(`✅ Generated .env template at ${envPath}`));
   } catch (error) {
     console.error(chalk.red('❌ Failed to generate .env template:'), error);
   }
