@@ -80,6 +80,7 @@ export function showCacheHelp(): void {
   createStandardHelp(helpConfig);
 }
 
+const CLI_CACHE_DIR = '.package-installer-cli';
 /**
  * Main cache command function
  */
@@ -150,7 +151,7 @@ export async function cacheCommand(subcommand?: string, type?: string, options: 
       console.log(chalk.gray(`   Template Files: ${stats.templateFiles?.size || Object.keys(stats.templateFiles || {}).length || 0}`));
 
       // Show cache size
-      const cacheDir = path.join(os.homedir(), '.pi-cache');
+      const cacheDir = path.join(os.homedir(), CLI_CACHE_DIR);
       if (await fs.pathExists(cacheDir)) {
         const size = await getDirectorySize(cacheDir);
         console.log(chalk.gray(`   Cache Size: ${(size / 1024 / 1024).toFixed(2)} MB`));
@@ -192,7 +193,7 @@ async function cacheStatsCommand(): Promise<void> {
     console.log(chalk.gray(`   Hit Ratio: ${hitRatio}%`));
 
     // Storage information
-    const cacheDir = path.join(os.homedir(), '.pi-cache');
+    const cacheDir = path.join(os.homedir(), CLI_CACHE_DIR);
     if (await fs.pathExists(cacheDir)) {
       const size = await getDirectorySize(cacheDir);
       console.log(chalk.gray(`   Cache Size: ${(size / 1024 / 1024).toFixed(2)} MB`));
@@ -215,7 +216,7 @@ async function cacheClearCommand(type?: string): Promise<void> {
   const spinner = ora('Clearing cache...').start();
 
   try {
-    const cacheDir = path.join(os.homedir(), '.pi-cache');
+    const cacheDir = path.join(os.homedir(), CLI_CACHE_DIR);
 
     if (type) {
       // Clear specific cache type
@@ -271,7 +272,7 @@ async function cacheInfoCommand(): Promise<void> {
   console.log(gradientString(['#00d2d3', '#0084ff'])('\n🔧 Cache Configuration\n'));
 
 
-  const cacheDir = path.join(os.homedir(), '.package-installer-cli');
+  const cacheDir = path.join(os.homedir(), CLI_CACHE_DIR);
   const cacheFile = path.join(cacheDir, 'cache.json');
 
   console.log(chalk.cyan('Cache Configuration:'));
@@ -313,7 +314,7 @@ async function cacheSizeCommand(): Promise<void> {
   const spinner = ora('Calculating cache size...').start();
 
   try {
-    const cacheDir = path.join(os.homedir(), '.pi-cache');
+    const cacheDir = path.join(os.homedir(), CLI_CACHE_DIR);
 
     if (!await fs.pathExists(cacheDir)) {
       spinner.warn('Cache directory not found');
@@ -360,7 +361,7 @@ async function cacheOptimizeCommand(): Promise<void> {
   const spinner = ora('Optimizing cache...').start();
 
   try {
-    const cacheDir = path.join(os.homedir(), '.pi-cache');
+    const cacheDir = path.join(os.homedir(), CLI_CACHE_DIR);
     const cacheFile = path.join(cacheDir, 'cache.json');
 
     if (!await fs.pathExists(cacheFile)) {
