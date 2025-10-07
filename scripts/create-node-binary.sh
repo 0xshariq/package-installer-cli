@@ -39,7 +39,17 @@ else
   echo "❌ cli-with-packages.js not found, skipping polyfill injection."
 fi
 
-# Step 3: Copy all required assets to temp folder
+
+# Step 3: Fix octal escape sequences in cli-with-packages.js (Node.js v24+ strict mode)
+echo "🩹 Replacing octal escapes (\\033) with hex (\\x1b) in cli-with-packages.js..."
+if [ -f "$CLI_FILE" ]; then
+  sed -i 's/\\033/\\x1b/g' "$CLI_FILE"
+  echo "✅ Octal escapes replaced."
+else
+  echo "❌ cli-with-packages.js not found, skipping octal escape fix."
+fi
+
+# Step 4: Copy all required assets to temp folder
 echo "📁 Copying assets to bundle..."
 cp -r dist binary/temp/
 cp -r templates binary/temp/
