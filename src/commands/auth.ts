@@ -69,17 +69,31 @@ async function interactiveRegister() {
     { name: 'enable2fa', type: 'confirm', message: 'Would you like to enable 2FA (recommended)?', default: true }
   ]);
   if (enable2fa) {
-    await setupAndVerifyTotp(email);
+    const verified = await setupAndVerifyTotp(email);
+    // If verification failed, do not auto-login
+    if (!verified) {
+      console.log(chalk.yellow('User registered but 2FA setup failed. You can enable 2FA later with: pi auth verify'));
+    }
   } else {
     console.log(chalk.yellow('⚠️  2FA is not enabled. You can enable it anytime with: pi auth verify'));
   }
   // Always auto-login after registration if user was created
   if (created) {
-    const ok = await authStore.login(email, password);
-    if (ok) {
-      console.log(chalk.green('✅ User registered and logged in.'));
+    // Create session (auto-login)
+    if (enable2fa) {
+      // If 2FA was enabled and verified, record TOTP timestamp
+      // note: setupAndVerifyTotp returned verification status in `verified`
+  if ((await authStore.isVerified(email))) {
+  await authStore.createSession(email);
+        console.log(chalk.green('✅ User registered, 2FA enabled, and logged in.'));
+      } else {
+        // 2FA attempted but not verified
+        await authStore.createSession(email);
+        console.log(chalk.yellow('User registered but 2FA not verified. You are logged in with limited access.'));
+      }
     } else {
-      console.log(chalk.yellow('User registered, but auto-login failed. Please login manually.'));
+      await authStore.createSession(email);
+      console.log(chalk.green('✅ User registered and logged in.'));
     }
   }
 }
@@ -149,28 +163,29 @@ export async function handleAuthOptions(subcommand?: string, value?: string, opt
               console.log(chalk.red('❌ Invalid email or password'));
               return;
             }
-            // Check verification
+            // Check verification and handle totp provided for non-interactive flows
             const secret = await authStore.getTotpSecret(opts.email);
             const isVerified = await authStore.isVerified(opts.email);
             if (!secret) {
               console.log(chalk.red('❌ This account does not have 2FA set up. Please register again.'));
-              await authStore.logout();
               return;
             }
             if (!isVerified) {
-              console.log(chalk.red('❌ This account is not verified. Please complete TOTP verification during registration.'));
-              await authStore.logout();
+              console.log(chalk.red('❌ This account is not verified. Please complete TOTP verification with: pi auth verify'));
               return;
             }
-            // Prompt for TOTP code
-            const { code } = await inquirer.prompt([
-              { name: 'code', message: 'Enter 6-digit code from your Authenticator app:', type: 'input', validate: (v: string) => /^\d{6}$/.test(v) || 'Enter a 6-digit code' }
-            ]);
+            // If user provided --totp in opts, use it; otherwise prompt
+            let code = opts.totp;
+            if (!code) {
+              const resp = await inquirer.prompt([{ name: 'code', message: 'Enter 6-digit code from your Authenticator app:', type: 'input', validate: (v: string) => /^\d{6}$/.test(v) || 'Enter a 6-digit code' }]);
+              code = resp.code;
+            }
             if (!authenticator.check(code, secret)) {
               console.log(chalk.red('❌ Invalid code. Login aborted.'));
-              await authStore.logout();
               return;
             }
+            // Create session now that password and 2FA are verified
+            await authStore.createSession(opts.email);
             console.log(chalk.green('✅ Logged in successfully'));
           } catch (err: any) {
             if (err.message && err.message.includes('already exists')) {
@@ -195,12 +210,10 @@ export async function handleAuthOptions(subcommand?: string, value?: string, opt
           const isVerified = await authStore.isVerified(email);
           if (!secret) {
             console.log(chalk.red('❌ This account does not have 2FA set up. Please register again.'));
-            await authStore.logout();
             return;
           }
           if (!isVerified) {
-            console.log(chalk.red('❌ This account is not verified. Please complete TOTP verification during registration.'));
-            await authStore.logout();
+            console.log(chalk.red('❌ This account is not verified. Please complete TOTP verification with: pi auth verify'));
             return;
           }
           const { code } = await inquirer.prompt([
@@ -208,9 +221,9 @@ export async function handleAuthOptions(subcommand?: string, value?: string, opt
           ]);
           if (!authenticator.check(code, secret)) {
             console.log(chalk.red('❌ Invalid code. Login aborted.'));
-            await authStore.logout();
             return;
           }
+          await authStore.createSession(email);
           console.log(chalk.green('✅ Logged in successfully'));
         }
         return;
@@ -228,13 +241,9 @@ export async function handleAuthOptions(subcommand?: string, value?: string, opt
               return;
             }
             await authStore.setVerified(opts.email, true);
-            // Auto-login after registration
-            const ok = await authStore.login(opts.email, opts.password);
-            if (ok) {
-              console.log(chalk.green('✅ User registered, verified, and logged in.'));
-            } else {
-              console.log(chalk.yellow('User registered and verified, but auto-login failed. Please login manually.'));
-            }
+            // Auto-login after registration (create session now that 2FA is verified)
+            await authStore.createSession(opts.email);
+            console.log(chalk.green('✅ User registered, verified, and logged in.'));
           } catch (err: any) {
             console.log(chalk.red('❌'), err.message || String(err));
           }

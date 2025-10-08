@@ -86,7 +86,7 @@ export class AuthStore {
   async incrementUsage(email: string): Promise<boolean> {
     const rec = this.records.find(r => r.email === email.toLowerCase());
     if (!rec) throw new Error('User not found');
-    if (rec.verified) return true; // No limit for verified
+    if (rec.verified) return true; // No limit for verified users
     if (typeof rec.usageCount !== 'number') rec.usageCount = 0;
     if (typeof rec.usageLimit !== 'number') rec.usageLimit = 3;
     if (rec.usageCount >= rec.usageLimit) return false;
@@ -94,8 +94,6 @@ export class AuthStore {
     await this.save();
     return true;
   }
-
-  // Reset usage when user is verified
 
   async verifyUser(email: string, password: string): Promise<boolean> {
     const record = this.records.find(r => r.email === email.toLowerCase());
@@ -128,9 +126,12 @@ export class AuthStore {
 
   async login(email: string, password: string): Promise<boolean> {
     const ok = await this.verifyUser(email, password);
-    if (!ok) return false;
+    return !!ok;
+  }
+
+  // Create a session file for an already-verified authentication (does not verify password)
+  async createSession(email: string): Promise<void> {
     await fs.writeJson(this.sessionFile, { email: email.toLowerCase(), loggedAt: new Date().toISOString() }, { spaces: 2 });
-    return true;
   }
 
   async logout(): Promise<void> {
@@ -169,10 +170,6 @@ export class AuthStore {
     const rec = this.records.find(r => r.email === email.toLowerCase());
     if (!rec) throw new Error('User not found');
     rec.verified = verified;
-    if (verified) {
-      rec.usageCount = undefined;
-      rec.usageLimit = undefined;
-    }
     await this.save();
   }
 

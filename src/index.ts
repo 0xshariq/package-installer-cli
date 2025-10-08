@@ -100,22 +100,20 @@ program.hook('preAction', async (thisCommand, actionCommand) => {
     process.exit(1);
   }
 
-  // 2FA enforcement and usage limit for unverified users
+  // Previously there were additional 2FA/usage checks here. Per request, only enforce login at preAction.
+  // Enforce usage limit for unverified users: allow auth verify/logout/help/version
   const session = await authStore.getSession();
   if (session && session.email) {
     const isVerified = await authStore.isVerified(session.email);
-    // Allow verify, logout, help for unverified users
-    const authSub = argv[1] || '';
     if (!isVerified) {
+      const authSub = argv[1] || '';
       if (name === 'auth' && ['verify', 'logout', '', undefined].includes(authSub)) return;
-      // Usage limit enforcement for unverified users
-      const allowed = await authStore.incrementUsage(session.email).catch(() => false);
-      if (!allowed) {
-        console.log('\n' + chalk.red('❌ You have reached the maximum number of allowed commands as an unverified user.')); 
+      const allowedUsage = await authStore.incrementUsage(session.email).catch(() => false);
+      if (!allowedUsage) {
+        console.log('\n' + chalk.red('❌ You have reached the maximum number of allowed commands as an unverified user.'));
         console.log(chalk.yellow('Please verify your account with: pi auth verify'));
         process.exit(1);
       }
-      // Show warning for unverified users
       console.log(chalk.yellow('⚠️  Your account is not verified. You have limited access until you complete 2FA.'));
     }
   }
@@ -253,6 +251,7 @@ program
   .argument('[value]', 'Optional value for subcommand (not used)')
   .option('--email <email>', 'Email for login/register')
   .option('--password <password>', 'Password for login/register')
+  .option('--totp <code>', 'TOTP code for non-interactive login')
   .option('-h, --help', 'Show help for auth command')
   .allowUnknownOption(true)
   .on('--help', () => { showAuthHelp(); })
