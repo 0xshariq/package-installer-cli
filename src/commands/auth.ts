@@ -45,7 +45,7 @@ async function setupAndVerifyTotp(email: string) {
 async function interactiveRegister() {
   const { email, password, confirm } = await inquirer.prompt([
     { name: 'email', message: 'Email:', type: 'input', validate: (v: string) => /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v) || 'Enter a valid email' },
-    { name: 'password', message: 'Password (min 8 chars):', type: 'password', mask: '*', validate: (v: string) => v.length >= 8 || 'Password must be at least 8 characters' },
+  { name: 'password', message: 'Password (min 8 chars):', type: 'password', validate: (v: string) => v.length >= 8 || 'Password must be at least 8 characters' },
     { name: 'confirm', message: 'Confirm Password:', type: 'password', mask: '*' },
   ]);
   if (password !== confirm) {
@@ -101,7 +101,7 @@ async function interactiveRegister() {
 async function interactiveLogin() {
   const responses = await inquirer.prompt([
     { name: 'email', message: 'Email:', type: 'input', validate: (v: string) => /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v) || 'Enter a valid email' },
-    { name: 'password', message: 'Password:', type: 'password', mask: '*', validate: (v: string) => v.length >= 8 || 'Password must be at least 8 characters' },
+  { name: 'password', message: 'Password:', type: 'password', validate: (v: string) => v.length >= 8 || 'Password must be at least 8 characters' },
   ]);
   const { email, password } = responses as { email: string; password: string };
   try {
@@ -174,15 +174,24 @@ export async function handleAuthOptions(subcommand?: string, value?: string, opt
               console.log(chalk.red('❌ This account is not verified. Please complete TOTP verification with: pi auth verify'));
               return;
             }
-            // If user provided --totp in opts, use it; otherwise prompt
+            // TOTP: allow up to 3 interactive attempts. If --totp provided, use it (single check).
             let code = opts.totp;
-            if (!code) {
-              const resp = await inquirer.prompt([{ name: 'code', message: 'Enter 6-digit code from your Authenticator app:', type: 'input', validate: (v: string) => /^\d{6}$/.test(v) || 'Enter a 6-digit code' }]);
-              code = resp.code;
-            }
-            if (!authenticator.check(code, secret)) {
-              console.log(chalk.red('❌ Invalid code. Login aborted.'));
-              return;
+            if (code) {
+              if (!authenticator.check(code, secret)) {
+                console.log(chalk.red('❌ Invalid TOTP code provided. Login failed.'));
+                return;
+              }
+            } else {
+              let ok = false;
+              for (let i = 0; i < 3; ++i) {
+                const resp = await inquirer.prompt([{ name: 'code', message: 'Enter 6-digit code from your Authenticator app:', type: 'input', validate: (v: string) => /^\d{6}$/.test(v) || 'Enter a 6-digit code' }]);
+                if (authenticator.check(resp.code, secret)) { ok = true; break; }
+                console.log(chalk.red('❌ Invalid code. Try again.'));
+              }
+              if (!ok) {
+                console.log(chalk.red('❌ Too many invalid attempts. Login failed.'));
+                return;
+              }
             }
             // Create session now that password and 2FA are verified
             await authStore.createSession(opts.email);
@@ -216,11 +225,15 @@ export async function handleAuthOptions(subcommand?: string, value?: string, opt
             console.log(chalk.red('❌ This account is not verified. Please complete TOTP verification with: pi auth verify'));
             return;
           }
-          const { code } = await inquirer.prompt([
-            { name: 'code', message: 'Enter 6-digit code from your Authenticator app:', type: 'input', validate: (v: string) => /^\d{6}$/.test(v) || 'Enter a 6-digit code' }
-          ]);
-          if (!authenticator.check(code, secret)) {
-            console.log(chalk.red('❌ Invalid code. Login aborted.'));
+          // Interactive login: allow up to 3 attempts
+          let okTotp = false;
+          for (let i = 0; i < 3; ++i) {
+            const { code } = await inquirer.prompt([{ name: 'code', message: 'Enter 6-digit code from your Authenticator app:', type: 'input', validate: (v: string) => /^\d{6}$/.test(v) || 'Enter a 6-digit code' }]);
+            if (authenticator.check(code, secret)) { okTotp = true; break; }
+            console.log(chalk.red('❌ Invalid code. Try again.'));
+          }
+          if (!okTotp) {
+            console.log(chalk.red('❌ Too many invalid attempts. Login failed.'));
             return;
           }
           await authStore.createSession(email);
