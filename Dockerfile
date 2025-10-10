@@ -36,30 +36,13 @@ RUN pnpm run build && \
 # Production stage - smaller final image
 FROM node:22-alpine AS production
 
-# Install essential runtime dependencies for CLI operations and email functionality
-RUN apk add --no-cache \
-    git \
-    bash \
-    curl \
-    openssl \
-    ca-certificates \
-    && rm -rf /var/cache/apk/* \
-    && update-ca-certificates
+# Install minimal runtime dependencies (only system CA certificates for TLS)
+RUN apk add --no-cache ca-certificates && rm -rf /var/cache/apk/*
 
 # Set working directory
 WORKDIR /app
 
-# Copy package files
-COPY package*.json pnpm-lock.yaml* ./
-
-# Enable pnpm and install only production dependencies
-RUN corepack enable pnpm && \
-    corepack prepare pnpm@latest --activate && \
-    pnpm install --frozen-lockfile --production && \
-    pnpm store prune && \
-    rm -rf ~/.local/share/pnpm/store /tmp/* /var/cache/apk/*
-
-# Copy built application and required assets from builder stage
+# Copy built application and required assets from builder stage (includes pruned node_modules)
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/templates ./templates
 COPY --from=builder /app/features ./features
