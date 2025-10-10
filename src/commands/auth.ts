@@ -4,6 +4,7 @@ import { authStore, initAuthStore } from '../utils/authStore.js';
 import { createStandardHelp, CommandHelpConfig } from '../utils/helpFormatter.js';
 import { authenticator } from 'otplib';
 import qrcode from 'qrcode-terminal';
+import boxen from 'boxen';
 
 async function setupTotp(email: string) {
   // Generate TOTP secret
@@ -45,7 +46,7 @@ async function setupAndVerifyTotp(email: string) {
 async function interactiveRegister() {
   const { email, password, confirm } = await inquirer.prompt([
     { name: 'email', message: 'Email:', type: 'input', validate: (v: string) => /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v) || 'Enter a valid email' },
-  { name: 'password', message: 'Password (min 8 chars):', type: 'password', validate: (v: string) => v.length >= 8 || 'Password must be at least 8 characters' },
+    { name: 'password', message: 'Password (min 8 chars):', type: 'password', validate: (v: string) => v.length >= 8 || 'Password must be at least 8 characters' },
     { name: 'confirm', message: 'Confirm Password:', type: 'password', mask: '*' },
   ]);
   if (password !== confirm) {
@@ -54,14 +55,15 @@ async function interactiveRegister() {
   }
   let created = false;
   try {
+    console.log(boxen(chalk.bold('Registering new user'), { padding: 1, borderColor: 'green' }));
     await authStore.createUser(email, password);
     created = true;
   } catch (err: any) {
     if (err.message && err.message.includes('already exists')) {
-      console.log(chalk.red('❌ User already exists. Please login or use a different email.'));
+      console.log(boxen(chalk.red('User already exists. Please login or use a different email.'), { padding: 1, borderColor: 'red' }));
       return;
     }
-    console.log(chalk.red('❌'), err.message || String(err));
+    console.log(boxen(chalk.red('Registration failed: ' + (err.message || String(err))), { padding: 1, borderColor: 'red' }));
     return;
   }
   // Suggest 2FA setup
@@ -69,32 +71,20 @@ async function interactiveRegister() {
     { name: 'enable2fa', type: 'confirm', message: 'Would you like to enable 2FA (recommended)?', default: true }
   ]);
   if (enable2fa) {
+    console.log(chalk.gray('Setting up 2FA...'));
     const verified = await setupAndVerifyTotp(email);
-    // If verification failed, do not auto-login
     if (!verified) {
-      console.log(chalk.yellow('User registered but 2FA setup failed. You can enable 2FA later with: pi auth verify'));
+      console.log(boxen(chalk.yellow('2FA setup incomplete. You can enable it later with: pi auth verify'), { padding: 1 }));
     }
   } else {
-    console.log(chalk.yellow('⚠️  2FA is not enabled. You can enable it anytime with: pi auth verify'));
+    console.log(boxen(chalk.yellow('⚠️  2FA is not enabled. You can enable it anytime with: pi auth verify'), { padding: 1 }));
   }
   // Always auto-login after registration if user was created
   if (created) {
     // Create session (auto-login)
-    if (enable2fa) {
-      // If 2FA was enabled and verified, record TOTP timestamp
-      // note: setupAndVerifyTotp returned verification status in `verified`
-  if ((await authStore.isVerified(email))) {
-  await authStore.createSession(email);
-        console.log(chalk.green('✅ User registered, 2FA enabled, and logged in.'));
-      } else {
-        // 2FA attempted but not verified
-        await authStore.createSession(email);
-        console.log(chalk.yellow('User registered but 2FA not verified. You are logged in with limited access.'));
-      }
-    } else {
-      await authStore.createSession(email);
-      console.log(chalk.green('✅ User registered and logged in.'));
-    }
+    await authStore.createSession(email);
+    console.log(boxen(chalk.green('✅ Registered and logged in — welcome!'), { padding: 1, borderColor: 'green' }));
+    if (!enable2fa) console.log(chalk.yellow('Note: 2FA not enabled. Enable with: pi auth verify'));
   }
 }
 
@@ -244,21 +234,25 @@ export async function handleAuthOptions(subcommand?: string, value?: string, opt
       case 'register': {
         if (opts.email && opts.password) {
           try {
+            console.log(boxen(chalk.bold('Registering new user'), { padding: 1, borderColor: 'green' }));
             await authStore.createUser(opts.email, opts.password);
-            // TOTP setup
-            const secret = await setupTotp(opts.email);
-            await authStore.setTotpSecret(opts.email, secret);
-            const verified = await verifyTotpPrompt(secret);
-            if (!verified) {
-              console.log(chalk.red('❌ Verification failed. Registration incomplete.'));
-              return;
+            // Suggest 2FA setup flow same as interactive
+            if (opts.enable2fa || opts.enable2fa === undefined) {
+              const secret = await setupTotp(opts.email);
+              await authStore.setTotpSecret(opts.email, secret);
+              const verified = await verifyTotpPrompt(secret);
+              if (!verified) {
+                console.log(boxen(chalk.yellow('2FA verification failed. Registration saved but 2FA incomplete.'), { padding: 1 }));
+                await authStore.createSession(opts.email);
+                return;
+              }
+              await authStore.setVerified(opts.email, true);
             }
-            await authStore.setVerified(opts.email, true);
-            // Auto-login after registration (create session now that 2FA is verified)
+            // Create session
             await authStore.createSession(opts.email);
-            console.log(chalk.green('✅ User registered, verified, and logged in.'));
+            console.log(boxen(chalk.green('✅ User registered and logged in.'), { padding: 1, borderColor: 'green' }));
           } catch (err: any) {
-            console.log(chalk.red('❌'), err.message || String(err));
+            console.log(boxen(chalk.red('Registration failed: ' + (err.message || String(err))), { padding: 1, borderColor: 'red' }));
           }
         } else {
           await interactiveRegister();
