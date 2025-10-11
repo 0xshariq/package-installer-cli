@@ -32,15 +32,15 @@ export async function createProjectFromTemplate(options: CreateProjectOptions): 
         // Handle "." as project name - create in current directory
         let projectPath: string;
         let actualProjectName: string;
-        
+
         if (projectName === '.') {
             projectPath = process.cwd();
             actualProjectName = path.basename(process.cwd());
-            
-            // Check if current directory is empty
+
+            // Check if current directory is empty (allow if user is already in intended dir)
             const currentDirContents = await fs.readdir(projectPath);
             if (currentDirContents.length > 0) {
-                const hasImportantFiles = currentDirContents.some(file => 
+                const hasImportantFiles = currentDirContents.some(file =>
                     !file.startsWith('.') && file !== 'node_modules'
                 );
                 if (hasImportantFiles) {
@@ -51,7 +51,7 @@ export async function createProjectFromTemplate(options: CreateProjectOptions): 
         } else {
             projectPath = path.resolve(process.cwd(), projectName);
             actualProjectName = projectName;
-            
+
             // Check if directory already exists
             if (await fs.pathExists(projectPath)) {
                 spinner.fail(chalk.red(`Directory ${projectName} already exists`));
@@ -75,14 +75,57 @@ export async function createProjectFromTemplate(options: CreateProjectOptions): 
         // Copy template files with filtering
         spinner.text = chalk.hex('#00d2d3')('Copying template files...');
         if (projectName === '.') {
-            // Copy files directly to current directory
-            await copyTemplateFilesToCurrentDir(templatePath, projectPath);
+            // If template has a single top-level directory, copy its contents into current dir
+            const nonSystemFiles = templateContents.filter(item =>
+                !item.startsWith('.') &&
+                item !== 'node_modules' &&
+                item !== 'dist' &&
+                item !== 'build'
+            );
+            if (nonSystemFiles.length === 1) {
+                const singleItem = nonSystemFiles[0];
+                const singleItemPath = path.join(templatePath, singleItem);
+                const stats = await fs.stat(singleItemPath);
+                if (stats.isDirectory()) {
+                    await fs.copy(singleItemPath, projectPath, {
+                        filter: (src) => {
+                            const fileName = path.basename(src);
+                            if (fileName === '.DS_Store' || fileName === 'Thumbs.db' || fileName === '.gitkeep') return false;
+                            const rel = path.relative(singleItemPath, src);
+                            if (rel.split(path.sep).includes('node_modules') || rel.split(path.sep).includes('.git') || rel.split(path.sep).includes('dist') || rel.split(path.sep).includes('build') || rel.split(path.sep).includes('.next')) return false;
+                            return true;
+                        }
+                    });
+                } else {
+                    // Single file, just copy it
+                    await fs.copy(singleItemPath, path.join(projectPath, singleItem));
+                }
+            } else {
+                // Multiple items in template root, copy all to current dir
+                for (const item of templateContents) {
+                    const sourcePath = path.join(templatePath, item);
+                    const destPath = path.join(projectPath, item);
+                    const stats = await fs.stat(sourcePath);
+                    if (stats.isDirectory()) {
+                        if (item === 'node_modules' || item === '.git' || item === 'dist' || item === 'build' || item === '.next') continue;
+                        await fs.copy(sourcePath, destPath, {
+                            filter: (src) => {
+                                const fileName = path.basename(src);
+                                return fileName !== '.DS_Store' && fileName !== 'Thumbs.db' && fileName !== '.gitkeep';
+                            }
+                        });
+                    } else {
+                        if (item === '.DS_Store' || item === 'Thumbs.db' || item === '.gitkeep') continue;
+                        await fs.copy(sourcePath, destPath);
+                    }
+                }
+            }
         } else {
             // Create directory and copy files
             await fs.ensureDir(projectPath);
             await copyTemplateFiles(templatePath, projectPath);
         }
-        
+
         spinner.succeed(chalk.green('✅ Project structure created'));
 
         // Process template files (replace placeholders, etc.)
@@ -92,7 +135,7 @@ export async function createProjectFromTemplate(options: CreateProjectOptions): 
         await installDependenciesForCreate(projectPath);
 
         return projectPath;
-        
+
     } catch (error: any) {
         spinner.fail(chalk.red('❌ Failed to create project'));
         throw error;
@@ -180,13 +223,41 @@ async function copyTemplateFiles(templatePath: string, projectPath: string): Pro
  */
 async function copyTemplateFilesToCurrentDir(templatePath: string, projectPath: string): Promise<void> {
     const templateContents = await fs.readdir(templatePath);
-    
+
+    // Filter out system and unwanted files/directories
+    const nonSystemFiles = templateContents.filter(item => 
+        !item.startsWith('.') &&
+        item !== 'node_modules' &&
+        item !== 'dist' &&
+        item !== 'build'
+    );
+
+    // If the template has a single top-level directory, copy its contents into current dir
+    if (nonSystemFiles.length === 1) {
+        const singleItem = nonSystemFiles[0];
+        const singleItemPath = path.join(templatePath, singleItem);
+        const stats = await fs.stat(singleItemPath);
+        if (stats.isDirectory()) {
+            await fs.copy(singleItemPath, projectPath, {
+                filter: (src) => {
+                    const fileName = path.basename(src);
+                    if (fileName === '.DS_Store' || fileName === 'Thumbs.db' || fileName === '.gitkeep') return false;
+                    // Skip unwanted directories inside the template
+                    const rel = path.relative(singleItemPath, src);
+                    if (rel.split(path.sep).includes('node_modules') || rel.split(path.sep).includes('.git') || rel.split(path.sep).includes('dist') || rel.split(path.sep).includes('build') || rel.split(path.sep).includes('.next')) return false;
+                    return true;
+                }
+            });
+            return;
+        }
+    }
+
     for (const item of templateContents) {
         const sourcePath = path.join(templatePath, item);
         const destPath = path.join(projectPath, item);
-        
+
         const stats = await fs.stat(sourcePath);
-        
+
         if (stats.isDirectory()) {
             // Skip common directories that shouldn't be copied
             if (item === 'node_modules' || item === '.git' || 
