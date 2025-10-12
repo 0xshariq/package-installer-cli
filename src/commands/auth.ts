@@ -9,7 +9,7 @@ import boxen from 'boxen';
 async function setupTotp(email: string) {
   // Generate TOTP secret
   const secret = authenticator.generateSecret();
-  const otpauth = authenticator.keyuri(email, 'PackageInstallerCLI', secret);
+  const otpauth = authenticator.keyuri(email, 'Package-Installer-CLI', secret);
   // Show QR code in terminal
   console.log(chalk.cyan('\nScan this QR code with Google Authenticator or a compatible app:'));
   qrcode.generate(otpauth, { small: true });
