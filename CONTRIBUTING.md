@@ -630,33 +630,63 @@ mkdir -p templates/nextjs/typescript/app-router
 }
 ```
 
-#### 4. Template Registration
+#### 4. Template Registration (new structure)
 
-Update `src/utils/templateCreator.ts`:
+This project now uses a category-first `template.json` layout. Top-level keys are categories (for example `desktop`, `mobile`, `javascript`, `go`, `c++_c`), and each category contains frameworks as objects. Each framework may declare a `type` (used by prompts), `description`, `languages`, `ui`, `options`, and `templates`.
 
-```typescript
-// Add your template to the appropriate framework section
-const FRAMEWORK_TEMPLATES = {
-  nextjs: {
-    name: 'Next.js',
-    templates: [
-      {
-        name: 'App Router (TypeScript)',
-        path: 'nextjs/typescript/app-router',
-        language: 'typescript',
-        description: 'Modern Next.js with App Router and TypeScript'
-      },
-      // ... existing templates
-      {
-        name: 'Your New Template',
-        path: 'nextjs/typescript/your-template',
-        language: 'typescript',
-        description: 'Description of your template'
-      }
-    ]
+Example `template.json` fragment:
+
+```json
+{
+  "desktop": {
+    "electron": {
+      "type": "desktop",
+      "description": "Framework for building cross-platform desktop applications",
+      "languages": ["javascript", "typescript"],
+      "templates": ["electron-basic", "electron-tailwind"]
+    }
+  },
+  "javascript": {
+    "nextjs": {
+      "type": "frontend",
+      "description": "Full-stack React framework",
+      "languages": ["javascript","typescript"],
+      "ui": ["shadcn","material-ui"],
+      "options": ["tailwind","src"],
+      "templates": ["src-shadcn-tailwind-template"]
+    }
   }
-};
+}
 ```
+
+How to register a new template:
+
+1. Add a new framework entry under the appropriate category in `template.json`.
+2. For each framework, set `type`, `description`, `languages`, and `templates` or `templates` grouped by language.
+3. Use the helper functions in `src/utils/prompts.ts` when writing code that enumerates templates:
+
+- `getAvailableTypes()` — returns the unique list of `type` values (e.g., `desktop`, `frontend`, `mobile`).
+- `getAvailableFrameworks(type?: string)` — returns all frameworks or those matching a `type`.
+- `getFrameworkConfig(framework)` — get the configuration object for a framework.
+
+Example: adding templates for `nextjs` should look like:
+
+```json
+"javascript": {
+  "nextjs": {
+    "type": "frontend",
+    "description": "Full-stack React framework",
+    "languages": ["javascript","typescript"],
+    "ui": ["shadcn"],
+    "options": ["tailwind","src"],
+    "templates": ["src-shadcn-tailwind-template"]
+  }
+}
+```
+
+Notes:
+- When adding language-specific templates, you can provide `templates` as an object keyed by language. The prompts will select the appropriate templates based on the framework and language.
+- Be careful to avoid committing large `node_modules` or build artifacts inside `templates/` — the template validator checks for unwanted directories.
 
 #### 5. Testing Your Template
 
