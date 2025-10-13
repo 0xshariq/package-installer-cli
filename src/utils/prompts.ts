@@ -9,6 +9,7 @@ import fs from 'fs-extra';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { getCliRootPath, getFeaturesJsonPath } from './pathResolver.js';
+import { getFrameworkConfig, getTemplateConfig } from './templateResolver.js';
 
 export interface FrameworkOptions {
   tailwind?: boolean;
@@ -17,24 +18,69 @@ export interface FrameworkOptions {
   bundler?: string;   // only for reactjs
 }
 
-// Helper functions to read template.json
-function getTemplateConfig() {
-  const cliDir = getCliRootPath();
-  const templatePath = path.join(cliDir, 'template.json');
-  if (!fs.existsSync(templatePath)) {
-    throw new Error(`template.json not found at: ${templatePath}`);
+// Reuse centralized getTemplateConfig from templateResolver
+
+function getAvailableFrameworks(typeFilter?: string): string[] {
+  const config = getTemplateConfig();
+  const frameworks: string[] = [];
+  // template.json groups frameworks by top-level categories
+  for (const categoryKey of Object.keys(config)) {
+    const cat = config[categoryKey];
+    if (cat && typeof cat === 'object') {
+      for (const fw of Object.keys(cat)) {
+        // If a typeFilter is provided, check the framework's declared 'type' or the category key
+        if (typeFilter) {
+          const fwConfig = cat[fw];
+          const declaredType = (fwConfig && fwConfig.type) || categoryKey;
+          if (declaredType === typeFilter) {
+            frameworks.push(fw);
+          }
+        } else {
+          frameworks.push(fw);
+        }
+      }
+    }
   }
-  return JSON.parse(fs.readFileSync(templatePath, 'utf-8'));
+  return frameworks;
 }
 
-function getAvailableFrameworks(): string[] {
+/**
+ * Return a list of unique 'type' values available in template.json (e.g., 'mobile','desktop','frontend')
+ */
+function getAvailableTypes(): string[] {
   const config = getTemplateConfig();
-  return Object.keys(config.frameworks);
+  const types = new Set<string>();
+  for (const categoryKey of Object.keys(config)) {
+    const cat = config[categoryKey];
+    if (cat && typeof cat === 'object') {
+      for (const fw of Object.keys(cat)) {
+        const fwConfig = cat[fw];
+        if (fwConfig && fwConfig.type) {
+          types.add(fwConfig.type);
+        } else {
+          // fallback to top-level category as type
+          types.add(categoryKey);
+        }
+      }
+    }
+  }
+  // Filter out types that should not be shown to the user
+  const blacklist = new Set(['api', 'frontend', 'backend', 'fullstack']);
+  return Array.from(types).filter(t => !blacklist.has(String(t).toLowerCase())).sort();
 }
 
-function getFrameworkConfig(framework: string) {
+// `getFrameworkConfig` is provided by `templateResolver.ts` and imported above.
+
+function getCategories(): string[] {
   const config = getTemplateConfig();
-  return config.frameworks[framework];
+  return Object.keys(config);
+}
+
+function getFrameworksForCategory(category: string): string[] {
+  const config = getTemplateConfig();
+  const cat = config[category];
+  if (!cat || typeof cat !== 'object') return [];
+  return Object.keys(cat);
 }
 
 function getFrameworkDescription(framework: string): string {
@@ -44,6 +90,22 @@ function getFrameworkDescription(framework: string): string {
 
 function capitalize(str: string): string {
   return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+// Human-friendly display names for types/categories
+const DISPLAY_NAME_MAP: Record<string, string> = {
+  'c++_c': 'C++/C',
+  'javascript': 'JavaScript',
+  'go': 'Go',
+  'mobile': 'Mobile',
+  'desktop': 'Desktop',
+  'rust': 'Rust',
+  'python': 'Python',
+  'ruby': 'Ruby'
+};
+
+function displayTypeName(key: string): string {
+  return DISPLAY_NAME_MAP[key] || capitalize(key.replace(/[-_]/g, ' '));
 }
 
 /**
@@ -84,17 +146,41 @@ export async function promptProjectName(): Promise<string> {
  * Framework selection prompt with enhanced styling
  */
 export async function promptFrameworkSelection(): Promise<string> {
-  const frameworks = getAvailableFrameworks();
-  
+  // First prompt: type selection (e.g., mobile, desktop, frontend)
+  const types = getAvailableTypes();
+
+  console.log(chalk.hex('#00d2d3')('\n🚀 Project Type Selection\n'));
+
+  const { selectedType } = await inquirer.prompt([
+    {
+      type: 'list',
+      name: 'selectedType',
+      message: `${chalk.blue('❯')} Choose a project type/category:`,
+      choices: types.map(t => ({
+        name: `${chalk.green('●')} ${chalk.bold(displayTypeName(t))}`,
+        value: t,
+        short: displayTypeName(t)
+      })),
+      pageSize: 12
+    }
+  ]);
+
+  // Then prompt frameworks within the selected type
+  const frameworks = getAvailableFrameworks(selectedType);
+  if (!frameworks || frameworks.length === 0) {
+    console.log(chalk.yellow('⚠️  No frameworks found in selected category'));
+    return '';
+  }
+
   console.log(chalk.hex('#00d2d3')('\n🚀 Framework Selection\n'));
-  
+
   const { framework } = await inquirer.prompt([
     {
       type: 'list',
       name: 'framework',
       message: `${chalk.blue('❯')} Choose your framework:`,
       choices: frameworks.map(fw => ({
-        name: `${chalk.green('●')} ${chalk.bold(capitalize(fw))} ${chalk.gray('- ' + getFrameworkDescription(fw))}`,
+        name: `${chalk.green('●')} ${chalk.bold(capitalize(fw))} ${chalk.gray('- ' + (getFrameworkDescription(fw) || ''))}`,
         value: fw,
         short: capitalize(fw)
       })),
