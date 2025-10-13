@@ -6,9 +6,7 @@
 import inquirer from 'inquirer';
 import chalk from 'chalk';
 import fs from 'fs-extra';
-import path from 'path';
-import { fileURLToPath } from 'url';
-import { getCliRootPath, getFeaturesJsonPath } from './pathResolver.js';
+import { getFeaturesJsonPath } from './pathResolver.js';
 import { getFrameworkConfig, getTemplateConfig } from './templateResolver.js';
 
 export interface FrameworkOptions {
@@ -114,7 +112,7 @@ function displayTypeName(key: string): string {
  */
 export async function promptProjectName(): Promise<string> {
   console.log(chalk.hex('#00d2d3')('\n📝 Project Setup\n'));
-  
+
   const { projectName } = await inquirer.prompt([
     {
       type: 'input',
@@ -197,7 +195,7 @@ export async function promptFrameworkSelection(): Promise<string> {
  */
 export async function promptLanguageSelection(framework: string): Promise<string> {
   const config = getFrameworkConfig(framework);
-  
+
   if (!config.languages || config.languages.length <= 1) {
     const defaultLang = config.languages?.[0] || 'javascript';
     console.log(chalk.cyan(`💻 Using ${chalk.bold(defaultLang)} as default language`));
@@ -227,7 +225,7 @@ export async function promptLanguageSelection(framework: string): Promise<string
       pageSize: 6
     },
   ]);
-  
+
   return language;
 }
 
@@ -328,7 +326,7 @@ export async function promptTemplateSelection(framework: string, language?: stri
  */
 export async function promptFrameworkOptions(framework: string): Promise<FrameworkOptions> {
   const config = getFrameworkConfig(framework);
-  
+
   if (!config || (!config.ui && !config.options && !config.bundlers)) {
     return {};
   }
@@ -345,9 +343,9 @@ export async function promptFrameworkOptions(framework: string): Promise<Framewo
         name: 'ui',
         message: `${chalk.blue('❯')} Choose a UI library:`,
         choices: [
-          { 
-            name: `${chalk.gray('◯')} None - Build your own UI`, 
-            value: 'none' 
+          {
+            name: `${chalk.gray('◯')} None - Build your own UI`,
+            value: 'none'
           },
           ...config.ui.map((uiLib: string) => ({
             name: `${chalk.green('●')} ${capitalize(uiLib)}`,
@@ -411,7 +409,7 @@ export async function promptFrameworkOptions(framework: string): Promise<Framewo
  */
 export async function promptTemplateConfirmation(framework: string, language: string, templateName: string, options: FrameworkOptions): Promise<boolean> {
   console.log(chalk.hex('#00d2d3')('\n✅ Project Summary\n'));
-  
+
   console.log(chalk.white('📦 Project Configuration:'));
   console.log(`   Framework: ${chalk.green(framework)}`);
   console.log(`   Language: ${chalk.blue(language)}`);
@@ -430,7 +428,7 @@ export async function promptTemplateConfirmation(framework: string, language: st
   if (options.bundler) {
     console.log(`   Bundler: ${chalk.blue(options.bundler)}`);
   }
-  
+
   const { confirm } = await inquirer.prompt([
     {
       type: 'confirm',
@@ -448,7 +446,7 @@ export async function promptTemplateConfirmation(framework: string, language: st
  */
 export async function promptFeatureSelection(): Promise<string[]> {
   console.log(chalk.hex('#00d2d3')('\n🚀 Feature Enhancement\n'));
-  
+
   const { addFeatures } = await inquirer.prompt([
     {
       type: 'confirm',
@@ -495,13 +493,13 @@ export async function promptFeatureSelection(): Promise<string[]> {
 export async function promptFeatureProvider(category: string, framework: string): Promise<string | null> {
   const featuresPath = getFeaturesJsonPath();
   const featuresConfig = JSON.parse(fs.readFileSync(featuresPath, 'utf-8'));
-  
+
   if (!featuresConfig[category]) {
     return null;
   }
 
   const providers = Object.keys(featuresConfig[category]);
-  
+
   if (providers.length === 0) {
     console.log(chalk.yellow(`⚠️  No providers found for ${category}`));
     return null;
@@ -558,6 +556,6 @@ export function shouldShowTemplates(framework: string): boolean {
   // Frameworks WITH options should generate template names based on user choices
   const hasOptions = !!(config?.options || config?.ui || config?.bundlers);
   const hasTemplates = !!(config?.templates && config.templates.length > 0);
-  
+
   return hasTemplates && !hasOptions;
 }

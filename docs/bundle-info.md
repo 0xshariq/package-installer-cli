@@ -51,7 +51,7 @@ The new bundle system uses a **streamlined single-file approach** with all depen
 3. Uses **esbuild** to bundle `dist/index.js` + ALL 35+ npm packages → `cli-with-packages.js`
 4. Bundles with `platform: 'node'`, `format: 'esm'`, `target: 'node22'`, `packages: 'bundle'`
 5. Creates ~30-50MB single-file CLI with zero external dependencies
-6. Copies assets: `dist/`, `templates/`, `features/`, `template.json`
+6. Copies assets: `dist/`, `templates/`, `features/`, `templates/template.json`
 7. Creates standalone Node.js binaries for Linux, macOS, and Windows using @yao-pkg/pkg
 
 **Output**:
@@ -59,7 +59,7 @@ The new bundle system uses a **streamlined single-file approach** with all depen
 - `binary/temp/dist/` - Compiled TypeScript (for binary packaging)
 - `binary/temp/templates/` - All project templates
 - `binary/temp/features/` - All feature definitions
-- `binary/temp/template.json` - Configuration
+-- `binary/temp/templates/template.json` - Configuration
 - `binary/node-binaries/pi-linux-x64` - Linux binary
 - `binary/node-binaries/pi-macos-x64` - macOS binary
 - `binary/node-binaries/pi-win-x64.exe` - Windows binary
@@ -76,7 +76,7 @@ bash scripts/create-node-binary.sh
 1. Calls `create-node-binary.sh` if binaries don't exist
 2. Creates two bundle directories: `bundle-standalone/` and `bundle-executables/`
 3. Copies `cli-with-packages.js` (complete self-contained execution)
-4. Copies ONLY required assets: `templates/`, `features/`, `template.json`
+4. Copies ONLY required assets: `templates/`, `features/`, `templates/template.json`
 5. Creates minimal `package.json` (no dependencies listed - all bundled)
 6. Creates platform-specific wrapper scripts pointing to `cli-with-packages.js`
 7. Generates comprehensive README files for each bundle
@@ -133,7 +133,7 @@ bundle-standalone/  (or bundle-executables/)
 ├── cli-with-packages.js    # 30-50MB - Bundled CLI with ALL dependencies
 ├── package.json            # Minimal manifest (no dependencies)
 ├── README.md               # Usage instructions
-├── template.json           # CLI configuration
+├── templates/template.json           # CLI configuration
 ├── features/               # 17MB - All feature definitions
 │   ├── features.json
 │   ├── auth/

@@ -5,6 +5,7 @@
 
 import path from 'path';
 import fs from 'fs-extra';
+
 // Local lightweight FrameworkOptions type to avoid circular runtime imports
 export interface FrameworkOptions {
   tailwind?: boolean;
@@ -24,7 +25,7 @@ export interface ProjectInfo {
 // Helper functions to read template.json
 function getTemplateConfig() {
   const cliDir = getCliRootPath();
-  const templatePath = path.join(cliDir, 'template.json');
+  const templatePath = path.join(cliDir, '/templates/template.json');
   if (!fs.existsSync(templatePath)) {
     throw new Error(`template.json not found at: ${templatePath}`);
   }

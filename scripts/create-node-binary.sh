@@ -54,7 +54,7 @@ echo "📁 Copying assets to bundle..."
 cp -r dist binary/temp/
 cp -r templates binary/temp/
 cp -r features binary/temp/
-cp template.json binary/temp/
+cp templates/template.json binary/temp/
 echo "✅ Copied dist, templates, features, and config"
 
 # Step 4: Create package.json with NO dependencies (all bundled in cli-with-packages.js)

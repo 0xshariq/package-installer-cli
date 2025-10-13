@@ -28,7 +28,7 @@ cp binary/temp/cli-with-packages.js bundle-standalone/cli-with-packages.js
 # Copy only required assets (templates, features, config)
 cp -r templates bundle-standalone/
 cp -r features bundle-standalone/
-cp template.json bundle-standalone/
+cp templates/template.json bundle-standalone/
 
 # Create minimal package.json
 cat > bundle-standalone/package.json << 'EOF'
@@ -63,7 +63,7 @@ echo "📦 Creating bundle-executables..."
 cp binary/temp/cli-with-packages.js bundle-executables/cli-with-packages.js
 cp -r templates bundle-executables/
 cp -r features bundle-executables/
-cp template.json bundle-executables/
+cp templates/template.json bundle-executables/
 
 cat > bundle-executables/package.json << 'EOF'
 {

@@ -632,15 +632,16 @@ mkdir -p templates/nextjs/typescript/app-router
 
 #### 4. Template Registration (new structure)
 
-This project now uses a category-first `template.json` layout. Top-level keys are categories (for example `desktop`, `mobile`, `javascript`, `go`, `c++_c`), and each category contains frameworks as objects. Each framework may declare a `type` (used by prompts), `description`, `languages`, `ui`, `options`, and `templates`.
 
-Example `template.json` fragment:
+This project now uses a category-first `templates/template.json` layout. Top-level keys are categories (for example `desktop`, `mobile`, `javascript`, `go`, `c++_c`), and each category contains frameworks as objects. Each framework may declare a `type` (used by prompts), `description`, `languages`, `ui`, `options`, and `templates`.
+
+Example `templates/template.json` fragment:
 
 ```json
 {
   "desktop": {
     "electron": {
-      "type": "desktop",
+      "type": "desktop",     
       "description": "Framework for building cross-platform desktop applications",
       "languages": ["javascript", "typescript"],
       "templates": ["electron-basic", "electron-tailwind"]
@@ -661,7 +662,7 @@ Example `template.json` fragment:
 
 How to register a new template:
 
-1. Add a new framework entry under the appropriate category in `template.json`.
+1. Add a new framework entry under the appropriate category in `templates/template.json`.
 2. For each framework, set `type`, `description`, `languages`, and `templates` or `templates` grouped by language.
 3. Use the helper functions in `src/utils/prompts.ts` when writing code that enumerates templates:
 

@@ -422,7 +422,7 @@ export default defineConfig({
 ```
 custom-template/
 ├── template/             # Template files
-├── template.json         # Template configuration
+├── templates/template.json         # Template configuration
 ├── hooks/               # Template hooks
 │   ├── pre-install.js   # Pre-installation logic
 │   └── post-install.js  # Post-installation logic
