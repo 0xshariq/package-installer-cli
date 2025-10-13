@@ -95,6 +95,7 @@ function capitalize(str: string): string {
 // Human-friendly display names for types/categories
 const DISPLAY_NAME_MAP: Record<string, string> = {
   'c++_c': 'C++/C',
+  'combination-templates': 'Combination Templates',
   'javascript': 'JavaScript',
   'go': 'Go',
   'mobile': 'Mobile',
@@ -146,27 +147,27 @@ export async function promptProjectName(): Promise<string> {
  * Framework selection prompt with enhanced styling
  */
 export async function promptFrameworkSelection(): Promise<string> {
-  // First prompt: type selection (e.g., mobile, desktop, frontend)
-  const types = getAvailableTypes();
+  // First prompt: category selection (top-level keys from template.json)
+  const categories = getCategories();
 
-  console.log(chalk.hex('#00d2d3')('\n🚀 Project Type Selection\n'));
+  console.log(chalk.hex('#00d2d3')('\n🚀 Choose a category\n'));
 
-  const { selectedType } = await inquirer.prompt([
+  const { category } = await inquirer.prompt([
     {
       type: 'list',
-      name: 'selectedType',
-      message: `${chalk.blue('❯')} Choose a project type/category:`,
-      choices: types.map(t => ({
-        name: `${chalk.green('●')} ${chalk.bold(displayTypeName(t))}`,
-        value: t,
-        short: displayTypeName(t)
+      name: 'category',
+      message: `${chalk.blue('❯')} Choose a category:`,
+      choices: categories.map(cat => ({
+        name: `${chalk.green('●')} ${chalk.bold(displayTypeName(cat))}`,
+        value: cat,
+        short: displayTypeName(cat)
       })),
       pageSize: 12
     }
   ]);
 
-  // Then prompt frameworks within the selected type
-  const frameworks = getAvailableFrameworks(selectedType);
+  // Then prompt frameworks within the selected category
+  const frameworks = getFrameworksForCategory(category);
   if (!frameworks || frameworks.length === 0) {
     console.log(chalk.yellow('⚠️  No frameworks found in selected category'));
     return '';
@@ -233,35 +234,93 @@ export async function promptLanguageSelection(framework: string): Promise<string
 /**
  * Template selection with enhanced styling
  */
-export async function promptTemplateSelection(framework: string): Promise<string> {
+export async function promptTemplateSelection(framework: string, language?: string): Promise<string> {
   const config = getFrameworkConfig(framework);
-  
+
   if (!config || !config.templates) {
     return '';
   }
 
-  if (config.templates.length === 1) {
-    console.log(chalk.cyan(`📋 Using ${chalk.bold(config.templates[0])} template`));
-    return config.templates[0];
+  const templatesEntry = config.templates;
+
+  // If templates is an array
+  if (Array.isArray(templatesEntry)) {
+    if (templatesEntry.length === 1) {
+      console.log(chalk.cyan(`📋 Using ${chalk.bold(templatesEntry[0])} template`));
+      return templatesEntry[0];
+    }
+
+    console.log(chalk.hex('#00d2d3')('\n📋 Template Selection\n'));
+
+    const { template } = await inquirer.prompt([
+      {
+        type: 'list',
+        name: 'template',
+        message: `${chalk.blue('❯')} Choose a template for ${chalk.bold(framework)}:`,
+        choices: templatesEntry.map((template: string) => ({
+          name: `${chalk.green('▸')} ${template.replace(/-/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())}`,
+          value: template,
+          short: template
+        })),
+        pageSize: 8
+      }
+    ]);
+
+    return template;
   }
 
-  console.log(chalk.hex('#00d2d3')('\n📋 Template Selection\n'));
+  // If templates is an object keyed by language
+  if (typeof templatesEntry === 'object') {
+    const langKey = language || Object.keys(templatesEntry)[0];
+    const list = templatesEntry[langKey] || [];
 
-  const { template } = await inquirer.prompt([
-    {
-      type: 'list',
-      name: 'template',
-      message: `${chalk.blue('❯')} Choose a template for ${chalk.bold(framework)}:`,
-      choices: config.templates.map((template: string) => ({
-        name: `${chalk.green('▸')} ${template.replace(/-/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())}`,
-        value: template,
-        short: template
-      })),
-      pageSize: 8
+    if (list.length === 0) {
+      // Fallback: flatten all templates across languages
+      const flattenedAny = Object.values(templatesEntry).flat() as any[];
+      const flattened = flattenedAny.map(String) as string[];
+      if (flattened.length === 0) return '';
+      console.log(chalk.hex('#00d2d3')('\n📋 Template Selection\n'));
+      const unique = Array.from(new Set(flattened)) as string[];
+      const { template } = await inquirer.prompt([
+        {
+          type: 'list',
+          name: 'template',
+          message: `${chalk.blue('❯')} Choose a template for ${chalk.bold(framework)}:`,
+          choices: unique.map((template: string) => ({
+            name: `${chalk.green('▸')} ${template.replace(/-/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())}`,
+            value: template,
+            short: template
+          })),
+          pageSize: 8
+        }
+      ]);
+      return template;
     }
-  ]);
 
-  return template;
+    if (list.length === 1) {
+      console.log(chalk.cyan(`📋 Using ${chalk.bold(list[0])} template`));
+      return list[0];
+    }
+
+    console.log(chalk.hex('#00d2d3')('\n📋 Template Selection\n'));
+    const { template } = await inquirer.prompt([
+      {
+        type: 'list',
+        name: 'template',
+        message: `${chalk.blue('❯')} Choose a template for ${chalk.bold(framework)} (${chalk.bold(langKey)}):`,
+        choices: list.map((template: string) => ({
+          name: `${chalk.green('▸')} ${template.replace(/-/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())}`,
+          value: template,
+          short: template
+        })),
+        pageSize: 8
+      }
+    ]);
+
+    return template;
+  }
+
+  return '';
 }
 
 /**

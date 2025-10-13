@@ -51,7 +51,7 @@ export function generateVersionBanner(): string {
   const version = getPackageVersion();
   return boxen(
     chalk.hex('#00d2d3')('📦 Version: ') + chalk.hex('#ffa502')(`v${version}`) + 
-    chalk.hex('#95afc0')('  •  ') + chalk.hex('#00d2d3')('🎯 Frameworks: ') + chalk.hex('#ffa502')('12+') +
+    chalk.hex('#95afc0')('  •  ') + chalk.hex('#00d2d3')('🎯 Frameworks: ') + chalk.hex('#ffa502')('75') +
     chalk.hex('#95afc0')('  •  ') + chalk.hex('#00d2d3')('📋 Templates: ') + chalk.hex('#ffa502')('50+') +
     chalk.hex('#95afc0')('  •  ') + chalk.hex('#00d2d3')('⚡ Status: ') + chalk.hex('#10ac84')('Ready to scaffold!'),
     {

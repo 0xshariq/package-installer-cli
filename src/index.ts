@@ -33,6 +33,7 @@ import { initializeCache } from './utils/cacheManager.js';
 import { displayBanner, displayCommandBanner } from './utils/banner.js';
 import { getPackageJsonPath } from './utils/pathResolver.js';
 import { authStore, initAuthStore } from './utils/authStore.js';
+import { startTimer, stopTimer, formatDuration, nowIso } from './utils/timer.js';
 
 // Get current file directory for ESM
 const __filename = fileURLToPath(import.meta.url);
@@ -83,6 +84,10 @@ program
 // Global preAction: enforce login for most commands, whitelist a few
 program.hook('preAction', async (thisCommand, actionCommand) => {
   const name = actionCommand.name();
+  // start a timer for this command
+  startTimer(name);
+  // record user input time
+  (actionCommand as any).__userInputTime = nowIso();
   // Commands allowed without login (help, version, auth, cache --help etc.)
   const allowed = ['auth', 'help', 'version', 'cache'];
   if (allowed.includes(name)) return;
@@ -116,6 +121,20 @@ program.hook('preAction', async (thisCommand, actionCommand) => {
       }
       console.log(chalk.yellow('⚠️  Your account is not verified. You have limited access until you complete 2FA.'));
     }
+  }
+});
+
+// postAction: stop timers and print execution times
+program.hook('postAction', async (thisCommand, actionCommand) => {
+  const name = actionCommand.name();
+  try {
+    const durationMs = stopTimer(name);
+    const userInputTime = (actionCommand as any).__userInputTime || 'N/A';
+    console.log('\n' + chalk.hex('#00d2d3')('⏱️  Command timing'));
+    console.log(`   ${chalk.gray('User input time:')} ${chalk.cyan(userInputTime)}`);
+    console.log(`   ${chalk.gray('Execution time:')} ${chalk.green(formatDuration(durationMs))}`);
+  } catch (err) {
+    // ignore timing errors
   }
 });
 

@@ -10,8 +10,8 @@ import { createStandardHelp, CommandHelpConfig } from '../utils/helpFormatter.js
 import { displayCommandBanner } from '../utils/banner.js';
 import {
   promptProjectName,
-  promptFrameworkSelection, 
-  promptLanguageSelection, 
+  promptFrameworkSelection,
+  promptLanguageSelection,
   promptTemplateSelection,
   promptFrameworkOptions,
   promptTemplateConfirmation,
@@ -21,20 +21,20 @@ import {
   hasUIOptions,
   hasBundlerOptions,
   shouldShowTemplates,
-  type FrameworkOptions 
+  type FrameworkOptions
 } from '../utils/prompts.js';
-import { 
-  resolveTemplatePath, 
+import {
+  resolveTemplatePath,
   generateTemplateName,
   templateExists,
   ProjectInfo,
   getFrameworkConfig
 } from '../utils/templateResolver.js';
 import { createProjectFromTemplate, installDependenciesForCreate } from '../utils/templateCreator.js';
-import { 
-  updateTemplateUsage, 
-  getCachedTemplateFiles, 
-  cacheTemplateFiles, 
+import {
+  updateTemplateUsage,
+  getCachedTemplateFiles,
+  cacheTemplateFiles,
   getDirectorySize,
   cacheProjectData
 } from '../utils/cacheManager.js';
@@ -86,7 +86,7 @@ export function showCreateHelp(): void {
           'Flask - Lightweight Python web apps',
           'Go - Fast and efficient web services',
           'React-Native - Mobile apps for iOS and Android',
-          'Combination Templates - reactjs+express+shadcn,reactjs=nestjs+shadcn' 
+          'Combination Templates - reactjs+express+shadcn,reactjs=nestjs+shadcn'
         ]
       }
     ],
@@ -96,7 +96,7 @@ export function showCreateHelp(): void {
       'All templates support both JavaScript and TypeScript'
     ]
   };
-  
+
   createStandardHelp(helpConfig);
 }
 
@@ -106,7 +106,7 @@ export function showCreateHelp(): void {
 export async function createProject(providedName?: string, options?: any): Promise<void> {
   const startTime = Date.now();
   const cacheManager = new CacheManager();
-  
+
   // Check for special flags
   if (providedName === '--help' || providedName === '-h' || options?.help || options?.['--help'] || options?.['-h']) {
     showCreateHelp();
@@ -141,18 +141,18 @@ export async function createProject(providedName?: string, options?: any): Promi
 
     // Step 3: Language selection (framework-specific from template.json)
     const selectedLanguage = await promptLanguageSelection(selectedFramework);
-    
+
     // Step 4: Framework-specific options (UI, Tailwind, bundlers, etc.)
     let options: FrameworkOptions = {};
     if (hasFrameworkOptions(selectedFramework) || hasUIOptions(selectedFramework) || hasBundlerOptions(selectedFramework)) {
       options = await promptFrameworkOptions(selectedFramework);
     }
-    
+
     // Step 5: Template selection and generation
     let templateName = '';
     if (shouldShowTemplates(selectedFramework)) {
       // For frameworks WITHOUT options - show template selection list
-      templateName = await promptTemplateSelection(selectedFramework);
+      templateName = await promptTemplateSelection(selectedFramework, selectedLanguage);
     } else if (hasFrameworkOptions(selectedFramework) || hasUIOptions(selectedFramework) || hasBundlerOptions(selectedFramework)) {
       // For frameworks WITH options - generate template name from user choices
       templateName = generateTemplateName(selectedFramework, options);
@@ -208,18 +208,18 @@ export async function createProject(providedName?: string, options?: any): Promi
     // Step 11.5: Cache template usage and project data
     try {
       await updateTemplateUsage(
-        templateName || selectedFramework, 
-        selectedFramework, 
+        templateName || selectedFramework,
+        selectedFramework,
         selectedLanguage
       );
-      
+
       const templateFiles = await getCachedTemplateFiles(templateName || selectedFramework);
       await cacheTemplateFiles(
         templateName || selectedFramework,
         templatePath,
         templateFiles || {}
       );
-      
+
       await cacheProjectData(
         projectPath,
         projectName,
@@ -233,14 +233,14 @@ export async function createProject(providedName?: string, options?: any): Promi
     const selectedFeatures = await promptFeatureSelection();
     if (selectedFeatures.length > 0) {
       console.log(chalk.hex('#00d2d3')('\n🚀 Adding Features...\n'));
-      
+
       // Import the add command dynamically to avoid circular imports
       const { addCommand } = await import('./add.js');
-      
+
       for (const category of selectedFeatures) {
         try {
           console.log(chalk.cyan(`🔧 Adding ${category} feature...`));
-          
+
           // Use the add command directly with the detected framework
           await addCommand(category, undefined, {
             framework: selectedFramework,
@@ -248,7 +248,7 @@ export async function createProject(providedName?: string, options?: any): Promi
             list: false,
             verbose: false
           });
-          
+
           console.log(chalk.green(`✅ Successfully added ${category} feature`));
         } catch (error) {
           console.log(chalk.yellow(`⚠️  Failed to add ${category} feature, skipping...`));
@@ -289,7 +289,7 @@ export async function createProject(providedName?: string, options?: any): Promi
       console.log(`   ${chalk.gray('Features:')} ${chalk.magenta(selectedFeatures.join(', '))}`);
     }
     console.log(`\n${chalk.hex('#95afc0')('Navigate to your project:')} ${chalk.bold(providedName === '.' ? 'Already in project directory!' : `cd ${projectName}`)}`);
-    
+
   } catch (error) {
     // Track command failure
     const duration = Date.now() - startTime;
@@ -300,7 +300,7 @@ export async function createProject(providedName?: string, options?: any): Promi
       success: false,
       duration
     });
-    
+
     console.log(chalk.red('\n❌ Error creating project:'));
     console.log(chalk.red(error instanceof Error ? error.message : String(error)));
     process.exit(1);
