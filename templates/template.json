@@ -627,7 +627,9 @@
       "languages": [],
       "ui": [],
       "options": [],
-      "templates": []
+      "templates": [
+        "template"
+      ]
     },
     "flask": {
       "type": "backend",
