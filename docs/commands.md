@@ -68,6 +68,7 @@ Available for all commands:
 | [`upgrade-cli`](#upgrade-cli-command) | Upgrade CLI version | Breaking change detection | ✅ Available |
 | [`deploy`](#deploy-command) | Deploy to cloud platforms | Auto-detection, 17 platforms | ✅ Available |
 | [`benchmark`](#benchmark-command) | Performance analysis | Build time, bundle size, memory | 🚧 Coming Soon |
+| [`size`](#size-command) | Display File Size | Folder And File Size | 🚧 Coming Soon |
 | [`security`](#security-command) | Security scanning & fixes | Vulnerability detection, auto-fix | 🚧 Coming Soon |
 | [`migrate`](#migrate-command) | Framework migration wizard | React→Next.js, Vue→Nuxt, etc. | 🚧 Coming Soon |
 | [`ai`](#ai-command) | AI-powered development assistant | Code review, test generation | 🚧 Coming Soon |
