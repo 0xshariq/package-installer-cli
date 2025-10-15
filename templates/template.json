@@ -436,6 +436,7 @@
       "type": "",
       "description": "Lightweight alternative to React.",
       "languages": [
+        "javascript",
         "typescript"
       ],
       "ui": [],
@@ -487,6 +488,7 @@
       "type": "",
       "description": "High-performance reactive UI library.",
       "languages": [
+        "javascript",
         "typescript"
       ],
       "ui": [],
@@ -497,6 +499,17 @@
       "type": "",
       "description": "Web Components framework by Ionic team.",
       "languages": [
+        "typescript"
+      ],
+      "ui": [],
+      "options": [],
+      "templates": []
+    },
+    "sveltejs": {
+      "type": "",
+      "description": "Cybernetically enhanced web apps.",
+      "languages": [
+        "javascript",
         "typescript"
       ],
       "ui": [],
