@@ -590,7 +590,9 @@
       "languages": [],
       "ui": [],
       "options": [],
-      "templates": []
+      "templates": [
+        "template"
+      ]
     },
     "dash": {
       "type": "python",
@@ -598,7 +600,9 @@
       "languages": [],
       "ui": [],
       "options": [],
-      "templates": []
+      "templates": [
+        "template"
+      ]
     },
     "django": {
       "type": "backend",
@@ -619,7 +623,9 @@
       "languages": [],
       "ui": [],
       "options": [],
-      "templates": []
+      "templates": [
+        "template"
+      ]
     },
     "fastapi": {
       "type": "api",
@@ -650,7 +656,9 @@
       "languages": [],
       "ui": [],
       "options": [],
-      "templates": []
+      "templates": [
+        "template"
+      ]
     },
     "quart": {
       "type": "python",
@@ -658,7 +666,9 @@
       "languages": [],
       "ui": [],
       "options": [],
-      "templates": []
+      "templates": [
+        "template"
+      ]
     },
     "streamlit": {
       "type": "python",
@@ -666,7 +676,9 @@
       "languages": [],
       "ui": [],
       "options": [],
-      "templates": []
+      "templates": [
+        "template"
+      ]
     },
     "tornado": {
       "type": "python",
@@ -674,7 +686,9 @@
       "languages": [],
       "ui": [],
       "options": [],
-      "templates": []
+      "templates": [
+        "template"
+      ]
     }
   },
   "ruby": {
