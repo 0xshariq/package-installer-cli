@@ -391,7 +391,8 @@ async function sendEmailViaMcp(
     subject: string,
     body: string,
     htmlBody?: string,
-    customCredentials?: { email: string; password: string; provider?: string }
+    customCredentials?: { email: string; password: string; provider?: string },
+    forceHtml: boolean = false
 ): Promise<boolean> {
     let tempEnvFile = '';
     let tempHtmlFile = '';
@@ -413,7 +414,7 @@ async function sendEmailViaMcp(
         const to = 'khanshariq92213@gmail.com';
 
         // Handle custom credentials if provided
-        if (customCredentials) {
+    if (customCredentials) {
             // Create temporary .env file with custom credentials
             const tempDir = os.tmpdir();
             tempEnvFile = path.join(tempDir, `temp-email-config-${Date.now()}.env`);
@@ -448,8 +449,8 @@ EMAIL_TLS=true
 
             await fs.writeFile(tempEnvFile, tempEnvContent);
 
-            // Set environment variable to use the temporary config
-            process.env.EMAIL_CONFIG_PATH = tempEnvFile;
+            // Ensure execOptions.env contains the temporary config path so child process will see it
+            execOptions.env = { ...(process.env || {}), EMAIL_CONFIG_PATH: tempEnvFile };
         }
 
         // Create temporary files for HTML content if provided
@@ -488,7 +489,7 @@ EMAIL_TLS=true
                     try {
                         console.log(chalk.yellow('ℹ️ ehtml failed, attempting to send HTML as attachment (eattach)'));
                         const attachArgs = [to, subject, 'Please see attached HTML message', tempHtmlFile];
-                        const escapedAttachArgs = attachArgs.map(arg => `"${arg.replace(/"/g, '\\"')}"`).join(' ');
+                        const escapedAttachArgs = attachArgs.map(arg => `"${arg.replace(/"/g, '\"')}"`).join(' ');
                         switch (mcpInfo.installationType) {
                             case 'npx':
                                 command = `npx @0xshariq/email-mcp-server eattach ${escapedAttachArgs}`;
@@ -504,6 +505,11 @@ EMAIL_TLS=true
                         const out = execSync(command, execOptions);
                         return true;
                     } catch (attachError) {
+                        // If forceHtml is requested, fail immediately instead of falling back
+                        if (forceHtml) {
+                            console.log(chalk.red('❌ HTML delivery failed and --force-html was specified. Not falling back to plain text.'));
+                            return false;
+                        }
                         console.log(chalk.yellow('ℹ️ eattach also failed, will fall back to plain text send with HTML stripped'));
                     }
                 }
@@ -909,6 +915,7 @@ export async function showEmailHelp(): Promise<void> {
         options: [
             { flag: '-h, --help', description: 'Show this help message' },
             { flag: '-l, --list', description: 'List all available email categories' },
+            { flag: '--force-html', description: 'Require HTML and fail if HTML cannot be sent (no fallback to plain text)' },
             { flag: '--install', description: 'Show Email MCP Server installation instructions' },
             { flag: '--setup', description: 'Configure your email credentials for sending feedback' },
             { flag: '--status', description: 'Check email system status and availability' },
@@ -982,6 +989,7 @@ export async function emailCommand(
         install?: boolean;
         commands?: boolean;
         dev?: boolean;
+        forceHtml?: boolean;
     } = {}
 ): Promise<void> {
     try {
@@ -1236,7 +1244,7 @@ export async function emailCommand(
             };
         }
 
-        const success = await sendEmailViaMcp(subject, plainBody, htmlBody, customCredentials);
+    const success = await sendEmailViaMcp(subject, plainBody, htmlBody, customCredentials, !!options.forceHtml);
 
         if (success) {
             console.log(boxen(

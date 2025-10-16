@@ -8,14 +8,23 @@ Package Installer CLI offers a wide variety of pre-configured templates for mode
 
 ### Available Template Categories
 
-| Category | Templates | Languages | Status |
-|----------|-----------|-----------|--------|
-| **Frontend** | React, Angular, Vue.js | TypeScript, JavaScript | ✅ Available |
-| **Backend** | Express.js, NestJS | TypeScript, JavaScript | ✅ Available |
-| **Fullstack** | React+Express, React+NestJS , Next.js| TypeScript, JavaScript | ✅ Available |
-| **System** | Rust Basic, Rust Advanced | Rust | ✅ Available |
-| **Mobile** | React Native | TypeScript, JavaScript |  ✅ Available |
-| **Desktop** | Electron, Tauri | TypeScript, JavaScript, Rust | 🚧 Coming Soon |
+The CLI organizes templates into the following high-level categories. Each category contains framework-specific templates and language options. Below is a short summary — full framework/template lists are available in the repository `templates/template.json` and via `pi create` interactive prompts.
+
+| Category | Representative Frameworks | Languages |
+|----------|--------------------------|-----------|
+| C++/C | cppcms, crow, restbed, ulfius, wt | C, C++ |
+| Combination Templates | react+express, react+nestjs | JavaScript, TypeScript |
+| Desktop | electron, tauri, flutter, qt, nwjs, capacitor | JavaScript, TypeScript, Rust, Dart, Python |
+| Game | bevy, godot, unity, unreal, threejs, pygame, babylonjs | Rust, C#, C++, JavaScript, Python |
+| Go | gin, echo, beego, buffalo, chi | Go |
+| Javascript | react, next, vue, angular, express, nestjs, svelte, remix | JavaScript, TypeScript |
+| Mobile | react-native, flutter, ionic, nativescript, swiftui | JavaScript, TypeScript, Dart, Swift |
+| Python | django, flask, fastapi, tornado, streamlit | Python |
+| Ruby | rails, sinatra, hanami, roda | Ruby |
+| Rust | axum, rocket, warp, tide, poem | Rust |
+| Web3 | hardhat, truffle, anchor, foundry, ethers.js, brownie | Solidity, Rust, Python, JavaScript |
+
+Use the `pi create` command interactively to explore templates per category and language.
 
 ## 🚀 Frontend Templates
 

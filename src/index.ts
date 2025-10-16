@@ -467,6 +467,7 @@ program
   .option('--setup', chalk.hex('#95afc0')('Show email configuration setup guide'))
   .option('--status', chalk.hex('#95afc0')('Check email system status and availability'))
   .option('--test', chalk.hex('#95afc0')('Send a test email to verify functionality'))
+  .option('--force-html', chalk.hex('#95afc0')('Require HTML and fail if HTML cannot be sent (no fallback)'))
   .option('--commands', chalk.hex('#95afc0')('Show all available Email MCP Server commands'))
   .option('--dev', chalk.hex('#95afc0')('Show development setup information and troubleshooting'))
   .option('--quick', chalk.hex('#95afc0')('Quick feedback mode with minimal prompts'))
