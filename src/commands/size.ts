@@ -56,40 +56,124 @@ async function listLargestFiles(p: string, limit = 10): Promise<Array<{file: str
   return results.slice(0, limit);
 }
 
-export function showSizeHelp() {
-  console.log(chalk.hex('#00d2d3')('\n🧾 Size Command\n'));
-  console.log('Usage:');
-  console.log('  size <path> [--top N]  # Show size of file/folder and top N largest files');
+export async function showSizeHelp() {
+  const { createStandardHelp } = await import('../utils/helpFormatter.js');
+  const helpConfig = {
+    commandName: 'Size',
+    emoji: '📏',
+    description: 'Show size of files and directories. Supports multiple paths and summary output.',
+    usage: ['size [paths...]', 'size -a [paths...]', 'size --top <n> [paths...]'],
+    options: [
+      { flag: '-a, --all', description: 'Show sizes for all files and folders (verbose)' },
+      { flag: '--top <n>', description: 'Show top N largest files (default 10)' }
+    ],
+    examples: [
+      { command: 'size .', description: 'Show size for current directory' },
+      { command: 'size src package.json', description: 'Show sizes for multiple paths' },
+      { command: 'size -a src', description: 'List all files and folders sizes under src' }
+    ]
+  };
+
+  // createStandardHelp is exported as named function; call it
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  createStandardHelp(helpConfig as any);
 }
 
-export async function sizeCommand(target?: string, options?: any) {
+export async function sizeCommand(targets?: string[] | string, options?: any) {
   try {
     displayCommandBanner('size', 'Show file or folder sizes');
 
-    const p = target ? path.resolve(process.cwd(), target) : process.cwd();
-    if (!await fs.pathExists(p)) {
-      console.log(chalk.red(`❌ Path not found: ${p}`));
-      return;
+    // Normalize targets to an array
+    let paths: string[] = [];
+    if (!targets) {
+      paths = ['.'];
+    } else if (Array.isArray(targets)) {
+      paths = targets.length === 0 ? ['.'] : targets;
+    } else if (typeof targets === 'string') {
+      paths = [targets];
     }
 
-    const stats = await fs.stat(p);
-    if (stats.isFile()) {
-      console.log(`${chalk.cyan('File:')} ${p}`);
-      console.log(`${chalk.cyan('Size:')} ${chalk.bold(humanBytes(stats.size))}`);
-      return;
+    // Resolve and dedupe
+    paths = Array.from(new Set(paths.map(p => p === '.' ? process.cwd() : path.resolve(process.cwd(), p))));
+
+  const topN = options?.top ? Number(options.top) : 10;
+  const showAll = !!options?.all;
+
+    let combinedTotal = 0;
+    const combinedFiles: Array<{file:string,size:number}> = [];
+
+    for (const p of paths) {
+      if (!await fs.pathExists(p)) {
+        console.log(chalk.red(`❌ Path not found: ${p}`));
+        continue;
+      }
+
+      const stats = await fs.stat(p);
+      if (stats.isFile()) {
+        console.log(`\n${chalk.cyan('File:')} ${p}`);
+        console.log(`${chalk.cyan('Size:')} ${chalk.bold(humanBytes(stats.size))}`);
+        combinedTotal += stats.size;
+        combinedFiles.push({ file: p, size: stats.size });
+        continue;
+      }
+
+      console.log(`\n${chalk.cyan('Directory:')} ${p}`);
+      const total = await folderSize(p);
+      combinedTotal += total;
+      console.log(`${chalk.cyan('Total size:')} ${chalk.bold(humanBytes(total))}`);
+
+      if (showAll) {
+        // Walk directory and print sizes for every file and nested folder
+        console.log(chalk.hex('#00d2d3')('\nListing all files and folders with sizes (may be verbose):'));
+        async function walkAndPrint(curr: string) {
+          try {
+            const s = await fs.stat(curr);
+            if (s.isFile()) {
+              console.log(`${chalk.yellow(humanBytes(s.size)).padEnd(10)} ${chalk.gray(curr)}`);
+              combinedFiles.push({ file: curr, size: s.size });
+              return;
+            }
+            if (s.isDirectory()) {
+              const items = await fs.readdir(curr);
+              let folderTotal = 0;
+              for (const it of items) {
+                const ip = path.join(curr, it);
+                const childSize = await folderSize(ip);
+                folderTotal += childSize;
+                await walkAndPrint(ip);
+              }
+              console.log(`${chalk.blue('Dir Total:')} ${chalk.bold(humanBytes(folderTotal)).padEnd(10)} ${chalk.gray(curr)}`);
+            }
+          } catch (err) {
+            // ignore
+          }
+        }
+        await walkAndPrint(p);
+      } else if (topN > 0) {
+        console.log(`\n${chalk.hex('#667eea')('Top ' + topN + ' largest files in ' + p + ':')}`);
+        const largest = await listLargestFiles(p, topN);
+        largest.forEach((f, idx) => {
+          console.log(`${String(idx+1).padStart(2)}. ${chalk.yellow(humanBytes(f.size)).padEnd(10)} ${chalk.gray(f.file)}`);
+          combinedFiles.push(f);
+        });
+      }
     }
 
-    console.log(`${chalk.cyan('Directory:')} ${p}`);
-    const total = await folderSize(p);
-    console.log(`${chalk.cyan('Total size:')} ${chalk.bold(humanBytes(total))}`);
+    // Combined summary
+    if (paths.length > 1) {
+      console.log('\n' + chalk.hex('#00d2d3')('📦 Combined Summary'));
+      console.log(`${chalk.cyan('Paths scanned:')} ${paths.length}`);
+      console.log(`${chalk.cyan('Combined size:')} ${chalk.bold(humanBytes(combinedTotal))}`);
 
-    const top = options?.top ? Number(options.top) : 10;
-    if (top > 0) {
-      console.log(`\n${chalk.hex('#667eea')('Top ' + top + ' largest files:')}`);
-      const largest = await listLargestFiles(p, top);
-      largest.forEach((f, idx) => {
-        console.log(`${String(idx+1).padStart(2)}. ${chalk.yellow(humanBytes(f.size)).padEnd(10)} ${chalk.gray(f.file)}`);
-      });
+      if (topN > 0 && combinedFiles.length > 0) {
+        const uniqCombined = Array.from(new Map(combinedFiles.map(f => [f.file, f])).values());
+        uniqCombined.sort((a,b) => b.size - a.size);
+        console.log(`\n${chalk.hex('#667eea')('Top ' + topN + ' largest files across all inputs:')}`);
+        uniqCombined.slice(0, topN).forEach((f, idx) => {
+          console.log(`${String(idx+1).padStart(2)}. ${chalk.yellow(humanBytes(f.size)).padEnd(10)} ${chalk.gray(f.file)}`);
+        });
+      }
     }
 
   } catch (err: any) {
