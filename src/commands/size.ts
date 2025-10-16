@@ -65,7 +65,8 @@ export async function showSizeHelp() {
     usage: ['size [paths...]', 'size -a [paths...]', 'size --top <n> [paths...]'],
     options: [
       { flag: '-a, --all', description: 'Show sizes for all files and folders (verbose)' },
-      { flag: '--top <n>', description: 'Show top N largest files (default 10)' }
+      { flag: '--top <n>', description: 'Show top N largest files (default 10)' },
+      { flag: '--json', description: 'Output machine-readable JSON' }
     ],
     examples: [
       { command: 'size .', description: 'Show size for current directory' },
@@ -99,11 +100,13 @@ export async function sizeCommand(targets?: string[] | string, options?: any) {
 
   const topN = options?.top ? Number(options.top) : 10;
   const showAll = !!options?.all;
+  const jsonOutput = !!options?.json;
 
     let combinedTotal = 0;
     const combinedFiles: Array<{file:string,size:number}> = [];
 
-    for (const p of paths) {
+  const resultsPerPath: Array<any> = [];
+  for (const p of paths) {
       if (!await fs.pathExists(p)) {
         console.log(chalk.red(`❌ Path not found: ${p}`));
         continue;
@@ -111,26 +114,34 @@ export async function sizeCommand(targets?: string[] | string, options?: any) {
 
       const stats = await fs.stat(p);
       if (stats.isFile()) {
-        console.log(`\n${chalk.cyan('File:')} ${p}`);
-        console.log(`${chalk.cyan('Size:')} ${chalk.bold(humanBytes(stats.size))}`);
+        const entry = { path: p, type: 'file', size: stats.size };
+        if (jsonOutput) resultsPerPath.push(entry);
+        else {
+          console.log(`\n${chalk.cyan('File:')} ${p}`);
+          console.log(`${chalk.cyan('Size:')} ${chalk.bold(humanBytes(stats.size))}`);
+        }
         combinedTotal += stats.size;
         combinedFiles.push({ file: p, size: stats.size });
         continue;
       }
 
-      console.log(`\n${chalk.cyan('Directory:')} ${p}`);
       const total = await folderSize(p);
       combinedTotal += total;
-      console.log(`${chalk.cyan('Total size:')} ${chalk.bold(humanBytes(total))}`);
+      if (jsonOutput) resultsPerPath.push({ path: p, type: 'directory', size: total });
+      else {
+        console.log(`\n${chalk.cyan('Directory:')} ${p}`);
+        console.log(`${chalk.cyan('Total size:')} ${chalk.bold(humanBytes(total))}`);
+      }
 
       if (showAll) {
         // Walk directory and print sizes for every file and nested folder
-        console.log(chalk.hex('#00d2d3')('\nListing all files and folders with sizes (may be verbose):'));
+        if (!jsonOutput) console.log(chalk.hex('#00d2d3')('\nListing all files and folders with sizes (may be verbose):'));
         async function walkAndPrint(curr: string) {
           try {
             const s = await fs.stat(curr);
             if (s.isFile()) {
-              console.log(`${chalk.yellow(humanBytes(s.size)).padEnd(10)} ${chalk.gray(curr)}`);
+              if (jsonOutput) resultsPerPath.push({ path: curr, type: 'file', size: s.size });
+              else console.log(`${chalk.yellow(humanBytes(s.size)).padEnd(10)} ${chalk.gray(curr)}`);
               combinedFiles.push({ file: curr, size: s.size });
               return;
             }
@@ -143,7 +154,8 @@ export async function sizeCommand(targets?: string[] | string, options?: any) {
                 folderTotal += childSize;
                 await walkAndPrint(ip);
               }
-              console.log(`${chalk.blue('Dir Total:')} ${chalk.bold(humanBytes(folderTotal)).padEnd(10)} ${chalk.gray(curr)}`);
+              if (jsonOutput) resultsPerPath.push({ path: curr, type: 'directory', size: folderTotal });
+              else console.log(`${chalk.blue('Dir Total:')} ${chalk.bold(humanBytes(folderTotal)).padEnd(10)} ${chalk.gray(curr)}`);
             }
           } catch (err) {
             // ignore
@@ -151,16 +163,35 @@ export async function sizeCommand(targets?: string[] | string, options?: any) {
         }
         await walkAndPrint(p);
       } else if (topN > 0) {
-        console.log(`\n${chalk.hex('#667eea')('Top ' + topN + ' largest files in ' + p + ':')}`);
         const largest = await listLargestFiles(p, topN);
-        largest.forEach((f, idx) => {
-          console.log(`${String(idx+1).padStart(2)}. ${chalk.yellow(humanBytes(f.size)).padEnd(10)} ${chalk.gray(f.file)}`);
-          combinedFiles.push(f);
-        });
+        if (jsonOutput) {
+          const last = resultsPerPath[resultsPerPath.length - 1];
+          if (last) last.top = largest.map(f => ({ file: f.file, size: f.size }));
+        } else {
+          console.log(`\n${chalk.hex('#667eea')('Top ' + topN + ' largest files in ' + p + ':')}`);
+          largest.forEach((f, idx) => {
+            console.log(`${String(idx+1).padStart(2)}. ${chalk.yellow(humanBytes(f.size)).padEnd(10)} ${chalk.gray(f.file)}`);
+            combinedFiles.push(f);
+          });
+        }
       }
     }
 
-    // Combined summary
+    // JSON output
+    if (jsonOutput) {
+      const uniqCombined = Array.from(new Map(combinedFiles.map(f => [f.file, f])).values());
+      uniqCombined.sort((a,b) => b.size - a.size);
+      const out = {
+        scannedPaths: paths,
+        perPath: resultsPerPath,
+        combinedSize: combinedTotal,
+        topFiles: uniqCombined.slice(0, topN).map(f => ({ file: f.file, size: f.size }))
+      };
+      console.log(JSON.stringify(out, null, 2));
+      return;
+    }
+
+    // Combined summary (human)
     if (paths.length > 1) {
       console.log('\n' + chalk.hex('#00d2d3')('📦 Combined Summary'));
       console.log(`${chalk.cyan('Paths scanned:')} ${paths.length}`);
