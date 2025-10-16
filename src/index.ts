@@ -206,6 +206,7 @@ program
   .description(chalk.hex('#95afc0')('📏 Show size of files or directories'))
   .argument('[paths...]', chalk.hex('#95afc0')('One or more paths to files or directories (defaults to cwd)'))
   .option('-a, --all', 'Show all files and folders with their sizes')
+  .option('--json', 'Output machine-readable JSON')
   .option('--top <n>', 'Show top N largest files', '10')
   .option('-h, --help', 'Display help for this command')
   .on('--help', () => { showSizeHelp(); })
