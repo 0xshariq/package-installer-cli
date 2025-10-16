@@ -367,7 +367,6 @@ pi update --global typescript nodemon
 
 ---
 
-### `add` Command
 ### `size` Command
 
 Display file or folder sizes with a breakdown of the largest files.
@@ -394,6 +393,7 @@ pi size ./my-project/package.json
 - Useful for identifying large assets before publishing or bundling.
 
 
+### `add` Command
 Add features and integrations to existing projects with smart configuration.
 
 **Syntax:**
