@@ -211,6 +211,9 @@ function getSystemInfo(): SystemInfo {
  * Check if email is configured and prompt for setup if needed
  */
 async function ensureEmailConfigured(): Promise<boolean> {
+    // If Email MCP Server is available but not configured, run the external setup command
+    // interactively so the user can persist configuration. This keeps setup centralized
+    // in the email CLI implementation.
     const mcpInfo = await checkEmailMcpAvailability();
     if (!mcpInfo.available) {
         console.log(chalk.yellow('⚠️ Email MCP Server not installed. Please install it first:'));
@@ -219,34 +222,35 @@ async function ensureEmailConfigured(): Promise<boolean> {
     }
 
     if (!mcpInfo.configured) {
-        console.log(chalk.yellow('⚠️ Email not configured. Delegating setup to Email MCP Server setup command...'));
-        // Attempt to run external setup command (npx/global/local)
+        console.log(chalk.yellow('⚠️ Email not configured. Running email CLI setup to configure your environment...'));
         try {
             let setupCmd = '';
             const execOptions: any = { stdio: 'inherit', encoding: 'utf8' };
+            // Prefer the globally installed email-cli setup command if available, otherwise use npx
             switch (mcpInfo.installationType) {
-                case 'npx':
-                    setupCmd = 'npx @0xshariq/email-mcp-server setup';
-                    break;
                 case 'global':
                     setupCmd = 'email-cli setup';
+                    break;
+                case 'npx':
+                    // npx may prompt to install/run interactively
+                    setupCmd = 'npx @0xshariq/email-mcp-server setup';
                     break;
                 case 'local':
                     setupCmd = `node "${mcpInfo.path}" setup`;
                     execOptions.cwd = path.dirname(mcpInfo.path!);
                     break;
                 default:
-                    setupCmd = 'npx @0xshariq/email-mcp-server setup';
+                    setupCmd = 'email-cli setup';
             }
-            // Run the setup command interactively so user can persist configs
+
             execSync(setupCmd, execOptions);
 
-            // Re-check availability/config
+            // Re-check availability/configuration
             const refreshed = await checkEmailMcpAvailability();
             return refreshed.available && !!refreshed.configured;
         } catch (err) {
             console.log(chalk.red('❌ Failed to run external email setup command. Please run manually:'));
-            console.log(chalk.cyan('npx @0xshariq/email-mcp-server setup'));
+            console.log(chalk.cyan('email-cli setup') + '  ' + chalk.gray('(or: npx @0xshariq/email-mcp-server setup)'));
             return false;
         }
     }
