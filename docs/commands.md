@@ -614,19 +614,19 @@ Advanced diagnostics and automated issue resolution for development environments
 
 **Syntax:**
 ```bash
-pi doctor [options]
+pi size <paths...> [--top N]
 ```
 
 **Comprehensive System Check:**
 ```bash
-# Full system diagnostics
-pi doctor
+# Show size of current directory and top 10 largest files
+pi size
 
-# Diagnostic Report:
-# 🏥 Package Installer CLI Doctor
-# ================================
-#
-# ✅ System Environment
+# Show multiple folders/files and top 20 largest files across them
+pi size ./my-project ./other-project package.json --top 20
+
+# Show size for current directory and a specific file
+pi size . ./package.json
 # ├── OS: Linux x64 ✓
 # ├── Node.js: v20.10.0 ✓
 # ├── Package Managers: npm ✓, pnpm ✓, yarn ✓
