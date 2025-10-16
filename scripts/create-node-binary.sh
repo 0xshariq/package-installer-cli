@@ -10,7 +10,6 @@ echo "🚀 Creating Node.js ESM bundle with all packages..."
 # Clean and prepare output directories
 rm -rf binary
 mkdir -p binary/temp
-mkdir -p binary/node-binaries
 
 # Step 1: Build TypeScript
 echo "📦 Building TypeScript..."
