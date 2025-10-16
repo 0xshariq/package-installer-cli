@@ -84,7 +84,7 @@ docker-compose --profile dev run --rm package-installer-dev
 |-----|-------------|----------|
 | `latest` | Latest stable release | Production usage |
 | `dev` | Development version | Testing new features |
-| `v3.10.0` | Specific version | Version pinning |
+| `v3.14.0` | Specific version | Version pinning |
 
 ### Volume Mounts
 
@@ -148,13 +148,21 @@ pi clean
 
 ## 🏗️ Supported Technologies
 
-| Language/Framework | Project Creation | Dependency Updates | Package Managers |
-|-------------------|-----------------|-------------------|------------------|
-| **JavaScript/TypeScript** | React, Next.js, Express, Angular, Vue | ✅ | npm, yarn, pnpm |
-| **Python** | Django, Flask | ✅ | pip, poetry |
-| **Rust** | Basic, Web, CLI | ✅ | cargo |
-| **Go** | Web, API | ✅ | go mod |
-| **Ruby** | Rails, basic | ✅ | bundler |
+| Category | Representative Frameworks / Tools | Primary Languages |
+|----------|------------------------------------|-------------------|
+| C++/C | cppcms, crow, restbed, ulfius, wt | C, C++ |
+| Combination Templates | react+express, react+nestjs (fullstack combos) | JS, TS |
+| Desktop | electron, tauri, flutter, qt, nwjs, capacitor | JS, TS, Rust, Dart, Python |
+| Game | bevy, godot, unity, unreal, threejs, pygame, babylonjs | Rust, C#, C++, JS, Python |
+| Go | gin, echo, beego, buffalo, chi, gqlgen | Go |
+| Javascript | react, next, vue, angular, express, nestjs, svelte, remix | JavaScript, TypeScript |
+| Mobile | react-native, flutter, ionic, nativescript, swiftui | JavaScript, TypeScript, Dart, Swift |
+| Python | django, flask, fastapi, flask, tornado, streamlit | Python |
+| Ruby | rails, sinatra, hanami, roda | Ruby |
+| Rust | axum, rocket, warp, tide, poem, gotham | Rust |
+| Web3 | hardhat, truffle, anchor, foundry, ethers.js, brownie | Solidity, Rust, Python, JS |
+
+*For detailed information and per-template lists, see [docs/templates.md](docs/templates.md)*
 
 *For detailed information, see [docs/templates.md](docs/templates.md)*
 
