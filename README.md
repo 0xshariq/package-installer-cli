@@ -141,6 +141,7 @@ pi clean
 | `pi cache` | Manage CLI cache | `clear`, `stats`, `optimize` |
 | `pi check` | Check package versions | `--verbose` for details |
 | `pi upgrade-cli` | Upgrade CLI version | Breaking change detection |
+| `pi size` | Show sizes for files and folders (accepts multiple paths; use `.` for current directory) | Shows per-path sizes, combined total, and top-N largest files |
 | `pi email` | Send feedback and messages | Direct communication with developer |
 
 *For complete documentation, see [docs/commands.md](docs/commands.md)*
