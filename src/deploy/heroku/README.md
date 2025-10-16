@@ -6,6 +6,10 @@ Deploy your applications to Heroku, the cloud application platform that enables 
 
 ### 1. Install Heroku CLI
 
+This CLI will automatically install the heroku cli<br>
+You don't have to manually install the heroku cli <br>
+If any error occurs then you can install manually
+
 **macOS:**
 ```bash
 brew tap heroku/brew && brew install heroku

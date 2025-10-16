@@ -14,6 +14,9 @@ Deploy your applications to Railway, a modern app hosting platform with built-in
 ## Prerequisites
 
 ### 1. Install Railway CLI
+This CLI will automatically install the railway cli<br>
+You don't have to manually install the railway cli <br>
+If any error occurs then you can install manually
 
 **macOS/Linux:**
 ```bash

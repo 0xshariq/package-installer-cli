@@ -480,11 +480,11 @@ export function showCheckHelp(): void {
       'check [options]'
     ],
     options: [
-      { flag: '-v, --verbose', description: 'Show detailed information for all packages' }
+      // verbose flag removed: command now shows full information by default
     ],
     examples: [
       { command: 'check', description: 'Check all packages in current project' },
-      { command: 'check --verbose', description: 'Check all packages with detailed info' },
+  { command: 'check', description: 'Check all packages with detailed info' },
       { command: 'check react', description: 'Check specific package version' },
       { command: 'check @types/node', description: 'Check scoped packages' },
       { command: 'check --help', description: 'Show this help message' }
@@ -502,7 +502,6 @@ export function showCheckHelp(): void {
       }
     ],
     tips: [
-      'Use --verbose for detailed package information including security vulnerabilities',
       'Check specific packages by name for targeted updates'
     ]
   };
@@ -522,20 +521,15 @@ export async function checkCommand(packageName?: string, options?: { verbose?: b
     return;
   }
 
-  // Check for verbose flag
-  const isVerbose = packageName === '--verbose' || packageName === '-v' || options?.verbose;
-
-  // If verbose is the first argument, check all packages with verbose output
-  if (packageName === '--verbose' || packageName === '-v') {
-    packageName = undefined;
-  }
+  // The check command now shows full details by default (verbose removed)
+  const isVerbose = true;
 
   try {
     // Display command banner
     displayCommandBanner('Check', 'Check package versions and updates for your project dependencies');
     console.log('\n' + chalk.hex('#f39c12')('🔍 Starting package check...'));
 
-    if (packageName && packageName !== '--verbose' && packageName !== '-v') {
+    if (packageName) {
       await checkSinglePackage(packageName, isVerbose);
     } else {
       await checkProjectPackages(isVerbose);
@@ -1008,15 +1002,15 @@ function displayPackageInfo(packages: PackageInfo[], projectType?: ProjectType, 
     console.log(`${chalk.hex('#00d2d3')('📋')} ${projectType.name} (${chalk.cyan(projectType.packageManager)})`);
   }
 
-  // Determine how many packages to show
-  const packagesToShow = verbose ? packages : packages.slice(0, 12);
-  
-  // Group packages by status for better organization
+  // Since verbose mode is removed, show all packages by default
+  const packagesToShow = packages;
+
+  // Group packages by status for better organization (show all)
   const groupedPackages = [
-    ...deprecatedPackages.slice(0, verbose ? deprecatedPackages.length : 3),
-    ...outdatedPackages.slice(0, verbose ? outdatedPackages.length : 8),
-    ...upToDatePackages.slice(0, verbose ? upToDatePackages.length : 6)
-  ].slice(0, verbose ? packages.length : 12);
+    ...deprecatedPackages,
+    ...outdatedPackages,
+    ...upToDatePackages
+  ];
 
   if (groupedPackages.length > 0) {
     console.log('\n');
@@ -1048,30 +1042,7 @@ function displayPackageInfo(packages: PackageInfo[], projectType?: ProjectType, 
   }
 
   // Show remaining packages summary when not in verbose mode
-  if (!verbose && packages.length > 12) {
-    const remaining = packages.length - groupedPackages.length;
-    const remainingOutdated = packages.filter(pkg => pkg.needsUpdate && !groupedPackages.includes(pkg)).length;
-    const remainingUpToDate = packages.filter(pkg => !pkg.needsUpdate && !pkg.isDeprecated && !groupedPackages.includes(pkg)).length;
-
-    console.log('\n' + chalk.gray('─'.repeat(80)));
-    const hiddenSummary = [
-      remainingUpToDate > 0 ? `${chalk.hex('#10ac84')('✅')} ${remainingUpToDate} more up-to-date` : null,
-      remainingOutdated > 0 ? `${chalk.hex('#f39c12')('⚠️')} ${remainingOutdated} more need updates` : null
-    ].filter(Boolean).join('  •  ');
-    
-    if (hiddenSummary) {
-      console.log(`${chalk.dim(`+${remaining} hidden:`)} ${hiddenSummary}`);
-    }
-    
-    // Show sample of remaining package names
-    if (remainingOutdated > 0) {
-      const sampleNames = packages.filter(pkg => pkg.needsUpdate && !groupedPackages.includes(pkg))
-        .slice(0, 4).map(pkg => pkg.name).join(', ');
-      console.log(`${chalk.dim('Outdated:')} ${sampleNames}${remainingOutdated > 4 ? '...' : ''}`);
-    }
-
-    console.log(`\n${chalk.cyan('💡')} Use ${chalk.bold('--verbose')} to see all ${packages.length} packages`);
-  }
+  // No 'hidden' summary - all packages are shown
 
   // Compact recommendations section
   if (outdatedPackages.length > 0 || deprecatedPackages.length > 0) {

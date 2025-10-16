@@ -15,6 +15,10 @@ Deploy static sites, JAMstack applications, and serverless functions to Netlify'
 
 ### 1. Install Netlify CLI
 
+This CLI will automatically install the netlify cli<br>
+You don't have to manually install the netlify cli <br>
+If any error occurs then you can install manually
+
 ```bash
 npm install -g netlify-cli
 ```

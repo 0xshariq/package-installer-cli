@@ -13,6 +13,10 @@ Deploy your applications to Google Cloud Platform using the official Google Clou
 
 ### 1. Install Google Cloud CLI
 
+This CLI will automatically install the google-cloud cli<br>
+You don't have to manually install the google-cloud cli <br>
+If any error occurs then you can install manually
+
 **macOS:**
 ```bash
 brew install google-cloud-sdk

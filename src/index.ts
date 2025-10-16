@@ -15,6 +15,7 @@ import { dirname, join } from 'path';
 // Import command handlers
 import { createProject, showCreateHelp } from './commands/create.js';
 import { checkCommand, showCheckHelp } from './commands/check.js';
+import { sizeCommand, showSizeHelp } from './commands/size.js';
 import { cloneRepo, showCloneHelp } from './commands/clone.js';
 import { addCommand, showAddHelp } from './commands/add.js';
 import { showUpgradeHelp, upgradeCliCommand } from './commands/upgrade-cli.js';
@@ -196,6 +197,21 @@ program
       await checkCommand(packageName, options);
     } catch (error) {
       handleCommandError('check packages', error as Error);
+    }
+  });
+
+// SIZE COMMAND - Show file/folder sizes
+program
+  .command('size')
+  .description(chalk.hex('#95afc0')('📏 Show size of files or directories'))
+  .argument('[path]', chalk.hex('#95afc0')('Path to file or directory (defaults to cwd)'))
+  .option('--top <n>', 'Show top N largest files', '10')
+  .on('--help', () => { showSizeHelp(); })
+  .action(async (target, options) => {
+    try {
+      await sizeCommand(target, options);
+    } catch (error) {
+      handleCommandError('size', error as Error);
     }
   });
 

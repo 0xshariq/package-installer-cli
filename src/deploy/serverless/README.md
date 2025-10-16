@@ -13,6 +13,9 @@ Deploy serverless applications to multiple cloud providers using the Serverless 
 
 ### 1. Install Serverless Framework
 
+This CLI will automatically install the serverless cli<br>
+You don't have to manually install the serverless cli <br>
+If any error occurs then you can install manually
 ```bash
 npm install -g serverless
 ```

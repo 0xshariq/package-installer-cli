@@ -6,6 +6,10 @@ Deploy applications to Fly.io, the platform that runs your code in Firecracker m
 
 ### 1. Install Fly CLI
 
+This CLI will automatically install the fly cli<br>
+You don't have to manually install the fly cli <br>
+If any error occurs then you can install manually
+
 **macOS/Linux:**
 ```bash
 curl -L https://fly.io/install.sh | sh

@@ -38,6 +38,10 @@ pi deploy --list
 ### GitHub CLI Installation
 The GitHub CLI is required for seamless integration. The Package Installer CLI will guide you if it's missing:
 
+This CLI will automatically install the github-pages cli<br>
+You don't have to manually install the github-pages cli <br>
+If any error occurs then you can install manually
+
 **Official GitHub CLI Installation:**
 
 ```bash

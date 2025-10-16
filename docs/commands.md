@@ -58,7 +58,7 @@ Available for all commands:
 | [`analyze`](#analyze-command) | Project analytics dashboard | Usage stats, performance insights | ✅ Available |
 | [`update`](#update-command) | Update project dependencies | Multi-language support, safety checks | ✅ Available |
 | [`add`](#add-command) | Add features to existing projects | Framework detection, smart config | ✅ Available |
-| [`check`](#check-command) | Check package versions | Security scanning, detailed reports | ✅ Available |
+| [`check`](#check-command) | Check package versions | Security scanning, detailed reports (full info by default) | ✅ Available |
 | [`clone`](#clone-command) | Clone and setup repositories | Multiple platforms, auto setup | ✅ Available |
 | [`doctor`](#doctor-command) | Diagnose and fix issues | Auto-fix, comprehensive checks | ✅ Available |
 | [`env`](#env-command) | Environment analysis | Tool detection, optimization tips | ✅ Available |
@@ -68,7 +68,7 @@ Available for all commands:
 | [`upgrade-cli`](#upgrade-cli-command) | Upgrade CLI version | Breaking change detection | ✅ Available |
 | [`deploy`](#deploy-command) | Deploy to cloud platforms | Auto-detection, 17 platforms | ✅ Available |
 | [`benchmark`](#benchmark-command) | Performance analysis | Build time, bundle size, memory | 🚧 Coming Soon |
-| [`size`](#size-command) | Display File Size | Folder And File Size | 🚧 Coming Soon |
+| [`size`](#size-command) | Display File & Folder Sizes | Show total folder size and top-N largest files | ✅ Available |
 | [`security`](#security-command) | Security scanning & fixes | Vulnerability detection, auto-fix | 🚧 Coming Soon |
 | [`migrate`](#migrate-command) | Framework migration wizard | React→Next.js, Vue→Nuxt, etc. | 🚧 Coming Soon |
 | [`ai`](#ai-command) | AI-powered development assistant | Code review, test generation | 🚧 Coming Soon |
@@ -368,6 +368,31 @@ pi update --global typescript nodemon
 ---
 
 ### `add` Command
+### `size` Command
+
+Display file or folder sizes with a breakdown of the largest files.
+
+**Syntax:**
+```bash
+pi size <path> [--top N]
+```
+
+**Examples:**
+```bash
+# Show size of current directory and top 10 largest files
+pi size
+
+# Show size of a specific folder and top 20 largest files
+pi size ./my-project --top 20
+
+# Show size of a specific file
+pi size ./my-project/package.json
+```
+
+**Notes:**
+- The command prints a human-friendly total size and a ranked list of the largest files.
+- Useful for identifying large assets before publishing or bundling.
+
 
 Add features and integrations to existing projects with smart configuration.
 

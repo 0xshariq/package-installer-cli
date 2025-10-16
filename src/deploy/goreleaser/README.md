@@ -14,6 +14,10 @@ go mod init github.com/yourusername/yourproject
 
 ### 2. Install GoReleaser
 
+This CLI will automatically install the goreleaser cli<br>
+You don't have to manually install the goreleaser cli <br>
+If any error occurs then you can install manually
+
 **macOS:**
 ```bash
 brew install goreleaser
