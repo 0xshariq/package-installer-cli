@@ -203,186 +203,15 @@ function getSystemInfo(): SystemInfo {
 
 
 
-/**
- * Configure Email MCP Server with user's email credentials
- */
-async function configureEmailMcp(): Promise<boolean> {
-    try {
-        console.log(boxen(
-            chalk.hex('#00d2d3')('🔧 Email Configuration Setup') + '\n\n' +
-            chalk.white('To send emails, we need to configure your email credentials.') + '\n' +
-            chalk.hex('#95afc0')('Your credentials will be stored securely and used only for sending feedback emails.') + '\n\n' +
-            chalk.hex('#ffa502')('Supported Email Providers:') + '\n' +
-            chalk.hex('#95afc0')('• Gmail (recommended)') + '\n' +
-            chalk.hex('#95afc0')('• Outlook/Hotmail') + '\n' +
-            chalk.hex('#95afc0')('• Yahoo') + '\n' +
-            chalk.hex('#95afc0')('• Custom SMTP servers'),
-            {
-                padding: 1,
-                margin: 1,
-                borderStyle: 'round',
-                borderColor: 'cyan'
-            }
-        ));
-
-        // Collect email configuration
-        const emailConfig = await inquirer.prompt([
-            {
-                type: 'list',
-                name: 'provider',
-                message: 'Select your email provider:',
-                choices: [
-                    { name: '📧 Gmail', value: 'gmail' },
-                    { name: '🔷 Outlook/Hotmail', value: 'outlook' },
-                    { name: '🟡 Yahoo', value: 'yahoo' },
-                    { name: '⚙️ Custom SMTP', value: 'custom' }
-                ]
-            },
-            {
-                type: 'input',
-                name: 'email',
-                message: 'Enter your email address:',
-                validate: (input: string) => {
-                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                    return emailRegex.test(input) || 'Please enter a valid email address';
-                }
-            },
-            {
-                type: 'password',
-                name: 'password',
-                message: (answers: any) => {
-                    if (answers.provider === 'gmail') {
-                        return 'Enter your Gmail App Password (not regular password):';
-                    }
-                    return 'Enter your email password or app password:';
-                },
-                validate: (input: string) => input.length > 0 || 'Password is required'
-            }
-        ]);
-
-        // Add custom SMTP settings if needed
-        let smtpConfig: any = {};
-        if (emailConfig.provider === 'custom') {
-            smtpConfig = await inquirer.prompt([
-                {
-                    type: 'input',
-                    name: 'host',
-                    message: 'SMTP Host (e.g., smtp.gmail.com):',
-                    validate: (input: string) => input.length > 0 || 'SMTP host is required'
-                },
-                {
-                    type: 'input',
-                    name: 'port',
-                    message: 'SMTP Port (e.g., 587):',
-                    default: '587',
-                    validate: (input: string) => {
-                        const port = parseInt(input);
-                        return (port > 0 && port <= 65535) || 'Please enter a valid port number';
-                    }
-                }
-            ]);
-        }
-
-        // Set provider-specific SMTP settings
-        let host: string, port: string;
-        switch (emailConfig.provider) {
-            case 'gmail':
-                host = 'smtp.gmail.com';
-                port = '587';
-                break;
-            case 'outlook':
-                host = 'smtp.live.com';
-                port = '587';
-                break;
-            case 'yahoo':
-                host = 'smtp.mail.yahoo.com';
-                port = '587';
-                break;
-            case 'custom':
-                host = smtpConfig.host;
-                port = smtpConfig.port;
-                break;
-            default:
-                host = 'smtp.gmail.com';
-                port = '587';
-        }
-
-        // Show provider-specific setup instructions
-        if (emailConfig.provider === 'gmail') {
-            console.log(boxen(
-                chalk.hex('#ffa502')('📧 Gmail Setup Instructions') + '\n\n' +
-                chalk.hex('#95afc0')('For Gmail, you need to use an App Password:') + '\n' +
-                chalk.hex('#95afc0')('1. Enable 2-Factor Authentication in your Google Account') + '\n' +
-                chalk.hex('#95afc0')('2. Go to Google Account Settings > Security') + '\n' +
-                chalk.hex('#95afc0')('3. Under "2-Step Verification", click "App passwords"') + '\n' +
-                chalk.hex('#95afc0')('4. Generate a new app password for "Mail"') + '\n' +
-                chalk.hex('#95afc0')('5. Use that 16-character password above') + '\n\n' +
-                chalk.hex('#00d2d3')('💡 Regular Gmail passwords will NOT work!'),
-                {
-                    padding: 1,
-                    margin: 1,
-                    borderStyle: 'round',
-                    borderColor: 'yellow'
-                }
-            ));
-        }
-
-        // Create .env content
-        const envContent = `# Email MCP Server Configuration
-# Generated by Package Installer CLI
-EMAIL_HOST=${host}
-EMAIL_PORT=${port}
-EMAIL_USER=${emailConfig.email}
-EMAIL_PASS=${emailConfig.password}
-EMAIL_SECURE=false
-EMAIL_TLS=true
-`;
-
-        // Find Email MCP Server directory and create .env file
-        const mcpInfo = await checkEmailMcpAvailability();
-        let envFilePath: string;
-
-        if (mcpInfo.installationType === 'local' && mcpInfo.path) {
-            // Local installation - create .env in the project directory
-            const projectDir = path.dirname(mcpInfo.path);
-            envFilePath = path.join(projectDir, '.env');
-        } else {
-            // Global or npx installation - create .env in home directory
-            const configDir = path.join(os.homedir(), '.email-mcp-server');
-            await fs.ensureDir(configDir);
-            envFilePath = path.join(configDir, '.env');
-        }
-
-        // Write .env file
-        await fs.writeFile(envFilePath, envContent, 'utf8');
-
-        console.log(boxen(
-            chalk.green('✅ Email Configuration Saved!') + '\n\n' +
-            chalk.white('Email credentials have been configured successfully.') + '\n' +
-            chalk.hex('#95afc0')(`Configuration saved to: ${chalk.cyan(envFilePath)}`) + '\n\n' +
-            chalk.hex('#00d2d3')('You can now send feedback emails using the CLI!') + '\n' +
-            chalk.hex('#95afc0')('Test the setup with: ') + chalk.cyan('pi email --test'),
-            {
-                padding: 1,
-                margin: 1,
-                borderStyle: 'round',
-                borderColor: 'green'
-            }
-        ));
-
-        return true;
-    } catch (error: any) {
-        console.error(chalk.red(`❌ Failed to configure email: ${error.message}`));
-        return false;
-    }
-}
+// NOTE: interactive configuration was removed. We delegate permanent setup
+// to the Email MCP Server installer (npx @0xshariq/email-mcp-server setup or email-cli setup).
+// The CLI will instruct the user to run the external setup command which persists config.
 
 /**
  * Check if email is configured and prompt for setup if needed
  */
 async function ensureEmailConfigured(): Promise<boolean> {
     const mcpInfo = await checkEmailMcpAvailability();
-
     if (!mcpInfo.available) {
         console.log(chalk.yellow('⚠️ Email MCP Server not installed. Please install it first:'));
         console.log(chalk.cyan('npm install -g @0xshariq/email-mcp-server'));
@@ -390,8 +219,36 @@ async function ensureEmailConfigured(): Promise<boolean> {
     }
 
     if (!mcpInfo.configured) {
-        console.log(chalk.yellow('⚠️ Email not configured. Setting up email configuration...'));
-        return await configureEmailMcp();
+        console.log(chalk.yellow('⚠️ Email not configured. Delegating setup to Email MCP Server setup command...'));
+        // Attempt to run external setup command (npx/global/local)
+        try {
+            let setupCmd = '';
+            const execOptions: any = { stdio: 'inherit', encoding: 'utf8' };
+            switch (mcpInfo.installationType) {
+                case 'npx':
+                    setupCmd = 'npx @0xshariq/email-mcp-server setup';
+                    break;
+                case 'global':
+                    setupCmd = 'email-cli setup';
+                    break;
+                case 'local':
+                    setupCmd = `node "${mcpInfo.path}" setup`;
+                    execOptions.cwd = path.dirname(mcpInfo.path!);
+                    break;
+                default:
+                    setupCmd = 'npx @0xshariq/email-mcp-server setup';
+            }
+            // Run the setup command interactively so user can persist configs
+            execSync(setupCmd, execOptions);
+
+            // Re-check availability/config
+            const refreshed = await checkEmailMcpAvailability();
+            return refreshed.available && !!refreshed.configured;
+        } catch (err) {
+            console.log(chalk.red('❌ Failed to run external email setup command. Please run manually:'));
+            console.log(chalk.cyan('npx @0xshariq/email-mcp-server setup'));
+            return false;
+        }
     }
 
     return true;
@@ -537,6 +394,13 @@ async function sendEmailViaMcp(
     customCredentials?: { email: string; password: string; provider?: string }
 ): Promise<boolean> {
     let tempEnvFile = '';
+    let tempHtmlFile = '';
+    let execOptions: any = {
+        stdio: 'pipe',
+        timeout: 45000,
+        encoding: 'utf8',
+        env: { ...(process.env || {}) }
+    };
 
     try {
         const mcpInfo = await checkEmailMcpAvailability();
@@ -589,21 +453,15 @@ EMAIL_TLS=true
         }
 
         // Create temporary files for HTML content if provided
-        let tempHtmlFile = '';
         let command = '';
-        let options: any = {
-            stdio: 'pipe',
-            timeout: 45000,
-            encoding: 'utf8'
-        };
 
         if (htmlBody) {
-            // Try HTML email with ehtml command (if supported) or fall back to esend
+            // Try HTML email with ehtml command (if supported) or fall back to eattach/esend
             const tempDir = os.tmpdir();
             tempHtmlFile = path.join(tempDir, `email-${Date.now()}.html`);
 
             try {
-                await fs.writeFile(tempHtmlFile, htmlBody);
+                await fs.writeFile(tempHtmlFile, htmlBody, 'utf8');
 
                 // Try HTML command first
                 const htmlArgs = [to, subject, tempHtmlFile];
@@ -618,25 +476,41 @@ EMAIL_TLS=true
                         break;
                     case 'local':
                         command = `node "${mcpInfo.path}" ehtml ${escapedHtmlArgs}`;
-                        options.cwd = path.dirname(mcpInfo.path!);
+                        execOptions.cwd = path.dirname(mcpInfo.path!);
                         break;
                 }
 
                 try {
-                    const output = execSync(command, options);
+                    const output = execSync(command, execOptions);
                     return true;
                 } catch (htmlError) {
-                    // If HTML command fails, fall back to regular esend
-                    console.log(chalk.yellow('ℹ️ HTML email not supported, sending as rich text...'));
+                    // If ehtml isn't available or fails, try sending as attachment (eattach)
+                    try {
+                        console.log(chalk.yellow('ℹ️ ehtml failed, attempting to send HTML as attachment (eattach)'));
+                        const attachArgs = [to, subject, 'Please see attached HTML message', tempHtmlFile];
+                        const escapedAttachArgs = attachArgs.map(arg => `"${arg.replace(/"/g, '\\"')}"`).join(' ');
+                        switch (mcpInfo.installationType) {
+                            case 'npx':
+                                command = `npx @0xshariq/email-mcp-server eattach ${escapedAttachArgs}`;
+                                break;
+                            case 'global':
+                                command = `email-cli eattach ${escapedAttachArgs}`;
+                                break;
+                            case 'local':
+                                command = `node "${mcpInfo.path}" eattach ${escapedAttachArgs}`;
+                                execOptions.cwd = path.dirname(mcpInfo.path!);
+                                break;
+                        }
+                        const out = execSync(command, execOptions);
+                        return true;
+                    } catch (attachError) {
+                        console.log(chalk.yellow('ℹ️ eattach also failed, will fall back to plain text send with HTML stripped'));
+                    }
                 }
             } catch (fileError) {
                 console.log(chalk.yellow('ℹ️ Could not create HTML file, sending as plain text...'));
-            } finally {
-                // Clean up temp file
-                if (tempHtmlFile && await fs.pathExists(tempHtmlFile)) {
-                    await fs.remove(tempHtmlFile);
-                }
             }
+            // Do not remove tempHtmlFile here yet; cleanup in finally block below
         }
 
         // Fall back to regular text email
@@ -653,13 +527,13 @@ EMAIL_TLS=true
                 break;
             case 'local':
                 command = `node "${mcpInfo.path}" esend ${escapedArgs}`;
-                options.cwd = path.dirname(mcpInfo.path!);
+                execOptions.cwd = path.dirname(mcpInfo.path!);
                 break;
             default:
                 throw new Error('Unknown installation type');
         }
 
-        const output = execSync(command, options);
+        const output = execSync(command, execOptions);
         return true;
 
     } catch (error: any) {
@@ -687,6 +561,9 @@ EMAIL_TLS=true
         try {
             if (tempEnvFile && await fs.pathExists(tempEnvFile)) {
                 await fs.remove(tempEnvFile);
+            }
+            if (tempHtmlFile && await fs.pathExists(tempHtmlFile)) {
+                await fs.remove(tempHtmlFile);
             }
             if (process.env.EMAIL_CONFIG_PATH) {
                 delete process.env.EMAIL_CONFIG_PATH;
@@ -1127,10 +1004,40 @@ export async function emailCommand(
         }
 
         // Handle setup flag
-        if (options.setup) {
-            await configureEmailMcp();
-            return;
-        }
+            if (options.setup) {
+                // Delegate permanent setup to the Email MCP Server installer (npx/global/local)
+                const mcpInfo = await checkEmailMcpAvailability();
+                if (!mcpInfo.available) {
+                    console.log(chalk.yellow('⚠️ Email MCP Server not installed. Please install it first:'));
+                    console.log(chalk.cyan('npm install -g @0xshariq/email-mcp-server'));
+                    return;
+                }
+
+                try {
+                    let setupCmd = '';
+                    const execOptions: any = { stdio: 'inherit', encoding: 'utf8' };
+                    switch (mcpInfo.installationType) {
+                        case 'npx':
+                            setupCmd = 'npx @0xshariq/email-mcp-server setup';
+                            break;
+                        case 'global':
+                            setupCmd = 'email-cli setup';
+                            break;
+                        case 'local':
+                            setupCmd = `node "${mcpInfo.path}" setup`;
+                            execOptions.cwd = path.dirname(mcpInfo.path!);
+                            break;
+                        default:
+                            setupCmd = 'npx @0xshariq/email-mcp-server setup';
+                    }
+                    execSync(setupCmd, execOptions);
+                } catch (err) {
+                    console.log(chalk.red('❌ Failed to run external email setup command. Please run manually:'));
+                    console.log(chalk.cyan('npx @0xshariq/email-mcp-server setup'));
+                }
+
+                return;
+            }
 
         // Handle status flag
         if (options.status) {
