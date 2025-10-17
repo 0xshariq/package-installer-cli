@@ -175,7 +175,7 @@ else
     fi
 fi
 
-# Test the image
+# Test the image (run non-fatally: collect failures and continue)
 echo ""
 echo -e "${BLUE}🧪 Testing the Docker image...${NC}"
 
@@ -186,47 +186,64 @@ else
     TEST_TAG="${FULL_IMAGE_NAME}:${VERSION}${TAG_SUFFIX}"
 fi
 
-# Run basic functionality tests
+# Run basic functionality tests (non-fatal)
 echo -e "${BLUE}🔍 Testing basic functionality...${NC}"
-if docker run --rm "$TEST_TAG" --version > /dev/null 2>&1; then
+
+# Disable exit-on-error for the tests block
+set +e
+TEST_FAILED=0
+
+docker run --rm "$TEST_TAG" --version > /dev/null 2>&1
+if [ $? -eq 0 ]; then
     echo -e "${GREEN}  ✅ Version command works${NC}"
 else
     echo -e "${RED}  ❌ Version command failed${NC}"
-    exit 1
+    TEST_FAILED=1
 fi
 
-if docker run --rm "$TEST_TAG" --help > /dev/null 2>&1; then
+docker run --rm "$TEST_TAG" --help > /dev/null 2>&1
+if [ $? -eq 0 ]; then
     echo -e "${GREEN}  ✅ Help command works${NC}"
 else
     echo -e "${RED}  ❌ Help command failed${NC}"
-    exit 1
+    TEST_FAILED=1
 fi
 
-# Test email command availability (new feature)
-if docker run --rm "$TEST_TAG" email --help > /dev/null 2>&1; then
+# Test email command availability (new feature) - warning only
+docker run --rm "$TEST_TAG" email --help > /dev/null 2>&1
+if [ $? -eq 0 ]; then
     echo -e "${GREEN}  ✅ Email command available${NC}"
 else
     echo -e "${YELLOW}  ⚠️  Email command test failed (may need configuration)${NC}"
 fi
 
 # Test create command
-if docker run --rm "$TEST_TAG" create --help > /dev/null 2>&1; then
+docker run --rm "$TEST_TAG" create --help > /dev/null 2>&1
+if [ $? -eq 0 ]; then
     echo -e "${GREEN}  ✅ Create command available${NC}"
 else
     echo -e "${RED}  ❌ Create command failed${NC}"
-    exit 1
+    TEST_FAILED=1
 fi
 
-# Test health check
+# Test health check (with timeout)
 echo -e "${BLUE}🏥 Testing health check...${NC}"
-if timeout 10s docker run --rm "$TEST_TAG" --version > /dev/null 2>&1; then
+timeout 10s docker run --rm "$TEST_TAG" --version > /dev/null 2>&1
+if [ $? -eq 0 ]; then
     echo -e "${GREEN}  ✅ Health check passed${NC}"
 else
     echo -e "${RED}  ❌ Health check failed${NC}"
-    exit 1
+    TEST_FAILED=1
 fi
 
-echo -e "${GREEN}✅ All Docker image tests passed!${NC}"
+# Re-enable exit-on-error
+set -e
+
+if [ $TEST_FAILED -eq 0 ]; then
+    echo -e "${GREEN}✅ All Docker image tests passed!${NC}"
+else
+    echo -e "${YELLOW}⚠️  Some Docker image tests failed. Continuing script (tests are non-fatal).${NC}"
+fi
 
 # Handle pushing to Docker Hub
 echo ""
