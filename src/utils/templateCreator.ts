@@ -25,7 +25,47 @@ export interface CreateProjectOptions {
  * Create a project from a template with progress indicators and error handling
  */
 export async function createProjectFromTemplate(options: CreateProjectOptions): Promise<string> {
-    const { projectName, templatePath } = options;
+    const { projectName } = options;
+    // allow adjusting templatePath if a specific templateName was provided
+    let templatePath = options.templatePath;
+    const templateName = options.templateName;
+    const language = options.language;
+
+    // If a specific templateName was provided, try to resolve it under the given templatePath
+    if (templateName) {
+        // 1) language-specific location
+        if (language) {
+            const langCandidate = path.join(templatePath, language, templateName);
+            if (await fs.pathExists(langCandidate) && (await fs.stat(langCandidate)).isDirectory()) {
+                templatePath = langCandidate;
+            }
+        }
+
+        // 2) direct template folder under templatePath
+        if (templatePath === options.templatePath) {
+            const directCandidate = path.join(templatePath, templateName);
+            if (await fs.pathExists(directCandidate) && (await fs.stat(directCandidate)).isDirectory()) {
+                templatePath = directCandidate;
+            }
+        }
+
+        // 3) scan any subdirectories of templatePath to find an exact match (covers category mismatches)
+        if (templatePath === options.templatePath) {
+            try {
+                const items = await fs.readdir(options.templatePath, { withFileTypes: true });
+                for (const it of items) {
+                    if (!it.isDirectory()) continue;
+                    const candidate = path.join(options.templatePath, it.name, templateName);
+                    if (await fs.pathExists(candidate) && (await fs.stat(candidate)).isDirectory()) {
+                        templatePath = candidate;
+                        break;
+                    }
+                }
+            } catch (err) {
+                // ignore scanning errors and let subsequent validation handle missing template
+            }
+        }
+    }
     const spinner = ora(chalk.hex('#10ac84')('Creating project structure...')).start();
     
     try {
