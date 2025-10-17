@@ -73,6 +73,39 @@
       "templates": [
         "react-nest-shadcn-template"
       ]
+    },
+    "nextjs+next-auth+shadcn": {
+      "type": "fullstack",
+      "description": "Next.js full-stack solution with Next-Auth for authentication and Shadcn UI",
+      "languages": [
+        "javascript",
+        "typescript"
+      ],
+      "templates": [
+        "nextjs-next-auth-shadcn"
+      ]
+    },
+    "nextjs+clerk+shadcn": {
+      "type": "fullstack",
+      "description": "Next.js full-stack solution with Clerk for authentication and Shadcn UI",
+      "languages": [
+        "javascript",
+        "typescript"
+      ],
+      "templates": [
+        "nextjs-clerk-shadcn"
+      ]
+    },
+    "nextjs+auth0+shadcn": {
+      "type": "fullstack",
+      "description": "Next.js full-stack solution with Auth0 for authentication and Shadcn UI",
+      "languages": [
+        "javascript",
+        "typescript"
+      ],
+      "templates": [
+        "nextjs-auth0-shadcn"
+      ]
     }
   },
   "desktop": {
