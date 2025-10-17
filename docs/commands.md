@@ -428,6 +428,7 @@ pi add docker          # Docker configuration
 pi add ui              # UI libraries (Tailwind, Material-UI, etc.)
 pi add testing         # Testing frameworks
 pi add database        # Database integrations
+pi add aws s3,ecs,ec2  # AWS S3,ECS and EC2 integrations
 ```
 
 **Feature Categories:**
