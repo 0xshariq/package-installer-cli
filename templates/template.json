@@ -213,7 +213,9 @@
       ],
       "ui": [],
       "options": [],
-      "templates": []
+      "templates": [
+        "template"
+      ]
     },
     "unreal": {
       "type": "game",
@@ -224,7 +226,9 @@
       ],
       "ui": [],
       "options": [],
-      "templates": []
+      "templates": [
+        "template"
+      ]
     }
   },
   "go": {
