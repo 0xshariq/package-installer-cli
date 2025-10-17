@@ -789,7 +789,9 @@
       ],
       "ui": [],
       "options": [],
-      "templates": []
+      "templates": [
+        "template"
+      ]
     },
     "brownie": {
       "type": "web3",
@@ -807,7 +809,9 @@
       "languages": [],
       "ui": [],
       "options": [],
-      "templates": []
+      "templates": [
+        "template"
+      ]
     },
     "foundry": {
       "type": "web3",
