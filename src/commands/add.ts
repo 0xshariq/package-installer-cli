@@ -342,7 +342,7 @@ export async function showAddHelp(): Promise<void> {
       { command: 'add', description: 'Interactive feature selection' },
       { command: 'add auth', description: 'Show auth providers dropdown' },
       { command: 'add auth clerk', description: 'Add Clerk authentication' },
-      { command: 'add aws ec2', description: 'Add AWS EC2 integration' },
+      { command: 'add aws ec2,s3,ecs', description: 'Add AWS EC2, S3, and ECS integration' },
       { command: 'add ai openai', description: 'Add OpenAI integration' },
       { command: 'add database postgres', description: 'Add PostgreSQL integration' },
       { command: 'add payment stripe', description: 'Add Stripe payment integration' },
