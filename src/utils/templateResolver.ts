@@ -66,35 +66,40 @@ export function generateTemplateName(framework: string, options: FrameworkOption
   if (config.templates && config.templates.length > 0) {
     // Build template name based on selected options
     const parts: string[] = [];
-    
-    // Handle src option (only for nextjs and reactjs)
-    if ((framework === 'nextjs' || framework === 'reactjs') && config.options?.includes('src')) {
+    const templatesList: string[] = Array.isArray(config.templates) ? config.templates : [];
+
+    // Helper: check if any template mentions a token
+    const templateIncludes = (token: string) => templatesList.some(t => t.includes(token));
+
+    // Handle src option (only for nextjs) but only if templates actually include src/no-src
+    if ((framework === 'nextjs') && config.options?.includes('src') && templateIncludes('src')) {
       if (options.src) {
         parts.push('src');
       } else {
         parts.push('no-src');
       }
     }
-    
-    // Handle UI library - only add if actually selected (not "none")
-    // When UI is "none", templates simply omit the UI part from their names
-    if (config.ui && config.ui.length > 0) {
-      if (options.ui && options.ui !== 'none') {
-        parts.push(options.ui);
-      }
-      // For "none" selection, don't add any UI part to the template name
+
+    // Handle UI library - only add if actually selected (not "none") and templates reference the UI token
+    if (config.ui && config.ui.length > 0 && options.ui && options.ui !== 'none' && templateIncludes(options.ui)) {
+      parts.push(options.ui);
     }
-    
-    // Handle tailwind option
-    if (config.options?.includes('tailwind')) {
+
+    // Handle tailwind option only if templates contain tailwind/no-tailwind
+    if (config.options?.includes('tailwind') && templateIncludes('tailwind')) {
       if (options.tailwind) {
         parts.push('tailwind');
       } else {
         parts.push('no-tailwind');
       }
     }
-    
-    const generatedName = parts.join('-') + '-template';
+
+    // Handle bundler option only if templates reference bundler token
+    if (config.bundlers && Array.isArray(config.bundlers) && options.bundler && templateIncludes(options.bundler)) {
+      parts.push(options.bundler);
+    }
+
+    const generatedName = (parts.length > 0 ? parts.join('-') + '-template' : '');
     
     // Find exact match in templates array
     const exactMatch = config.templates.find((template: string) => template === generatedName);
@@ -185,6 +190,36 @@ export function resolveTemplatePath(projectInfo: ProjectInfo): string {
     if (!found) {
       // keep default baseFrameworkPath (top-level legacy location)
     }
+  }
+
+  // If a specific template name was provided, try to resolve that exact template folder
+  // across language subfolders and all top-level categories. This avoids returning a
+  // language directory (which would copy all templates) when the user selected a single template.
+  if (projectInfo && projectInfo.templateName) {
+    const requested = projectInfo.templateName;
+    // 1) try language-specific location under the discovered base path
+    if (projectInfo.language) {
+      const p = path.join(baseFrameworkPath, projectInfo.language, requested);
+      if (fs.existsSync(p) && fs.statSync(p).isDirectory()) return p;
+    }
+
+    // 2) try baseFrameworkPath/templateName
+    const direct = path.join(baseFrameworkPath, requested);
+    if (fs.existsSync(direct) && fs.statSync(direct).isDirectory()) return direct;
+
+    // 3) scan other categories under templates root to find the exact template folder
+    const topLevelItems = fs.readdirSync(templatesRoot, { withFileTypes: true });
+    for (const dirent of topLevelItems) {
+      if (!dirent.isDirectory()) continue;
+      const candidateLang = projectInfo.language
+        ? path.join(templatesRoot, dirent.name, framework, projectInfo.language, requested)
+        : null;
+      if (candidateLang && fs.existsSync(candidateLang) && fs.statSync(candidateLang).isDirectory()) return candidateLang;
+
+      const candidate = path.join(templatesRoot, dirent.name, framework, requested);
+      if (fs.existsSync(candidate) && fs.statSync(candidate).isDirectory()) return candidate;
+    }
+    // If nothing found, continue to the regular resolution logic which may return a sensible default.
   }
 
   // If a language-specific folder exists, prefer it
