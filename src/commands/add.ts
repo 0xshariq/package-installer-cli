@@ -397,6 +397,56 @@ export async function addCommand(
     // Ensure features are loaded first
     await ensureFeaturesLoaded();
 
+    // Batch processing: support comma-separated features and/or providers.
+    // Examples supported:
+    //  - pi add aws s3,ec2,ecs        (single feature, multiple providers)
+    //  - pi add auth,database         (multiple features, interactive providers)
+    //  - pi add auth,database clerk,prisma  (paired lists)
+    if (feature && (feature.includes(',') || (provider && provider.includes(',')))) {
+      const featureList = feature.split(',').map(f => f.trim()).filter(Boolean);
+      const providerList = provider ? provider.split(',').map(p => p.trim()).filter(Boolean) : [];
+
+      // Helper to dispatch a single pair
+      const runSingle = async (f: string, p?: string) => {
+        // call addCommand recursively for each pair; avoid infinite loop as we pass single items
+        await addCommand(f, p, options);
+      };
+
+      // If only one feature but multiple providers -> add each provider for that feature
+      if (featureList.length === 1 && providerList.length > 0) {
+        for (const p of providerList) {
+          await runSingle(featureList[0], p);
+        }
+        return;
+      }
+
+      // If multiple features and equal number of providers -> pair them
+      if (featureList.length > 1 && providerList.length === featureList.length) {
+        for (let i = 0; i < featureList.length; i++) {
+          await runSingle(featureList[i], providerList[i]);
+        }
+        return;
+      }
+
+      // If multiple features and a single provider -> apply provider to all features
+      if (featureList.length > 1 && providerList.length === 1) {
+        for (const f of featureList) {
+          await runSingle(f, providerList[0]);
+        }
+        return;
+      }
+
+      // If multiple features and no providers -> process each feature (interactive provider selection inside)
+      if (featureList.length > 1 && providerList.length === 0) {
+        for (const f of featureList) {
+          await runSingle(f, undefined);
+        }
+        return;
+      }
+
+      // Fallback: if single feature and single provider (shouldn't reach here) just continue
+    }
+
     // Handle list flag
     if (options.list || feature === '--list' || feature === '-l') {
       await listAvailableFeatures();
@@ -487,78 +537,7 @@ export async function addCommand(
     const featuresConfig = await getFeaturesConfig();
     const availableFeatures = Object.keys(featuresConfig.features || {});
 
-    // Handle different command syntax cases
-    if (!feature) {
-      // Case 1: "pi add" - Show interactive dropdown for all features
-      const selectedFeature = await promptFeatureCategory(availableFeatures);
-      if (!selectedFeature) return;
-      feature = selectedFeature;
-    }
-
-    // Validate feature exists
-    if (!availableFeatures.includes(feature)) {
-      console.log(chalk.red(`❌ Feature '${feature}' not found`));
-      console.log(chalk.yellow(`💡 Available features: ${availableFeatures.join(', ')}`));
-      return;
-    }
-
-    const currentFeatureConfig = featuresConfig.features[feature];
     
-    if (!provider) {
-      // Case 2: "pi add <category>" - Show providers for category
-      const providers = getFeatureProviders(feature, currentFeatureConfig);
-      if (providers.length === 0) {
-        console.log(chalk.yellow(`⚠️  No providers found for ${feature}`));
-        return;
-      }
-      
-      if (providers.length === 1) {
-        provider = providers[0];
-        console.log(chalk.cyan(`🔧 Using ${chalk.bold(provider)} (only provider available)`));
-      } else {
-        const selectedProvider = await promptFeatureProvider(feature, providers);
-        if (!selectedProvider) return;
-        provider = selectedProvider;
-      }
-    }
-
-    // Case 3: "pi add <category> <provider>" - Direct installation
-    // Validate provider exists for feature
-    const providers = getFeatureProviders(feature, currentFeatureConfig);
-    if (!providers.includes(provider)) {
-      console.log(chalk.red(`❌ Provider '${provider}' not found for ${feature}`));
-      console.log(chalk.yellow(`💡 Available providers: ${providers.join(', ')}`));
-      return;
-    }
-
-    // Check framework compatibility
-    if (!isFrameworkSupported(currentFeatureConfig, projectInfo.framework)) {
-      console.log(chalk.red(`❌ ${feature} (${provider}) is not supported for ${projectInfo.framework}`));
-      console.log(chalk.yellow(`💡 Supported frameworks: ${currentFeatureConfig.supportedFrameworks?.join(', ') || 'Not specified'}`));
-      return;
-    }
-
-    // Install the feature
-    console.log(chalk.hex('#00d2d3')(`\n🚀 Installing ${feature} (${provider})...\n`));
-    
-    try {
-      await addFeature(feature, provider, projectPath);
-      console.log(chalk.green(`\n✅ Successfully added ${feature} (${provider})`));
-      
-      // Show setup instructions
-      showEnhancedSetupInstructions(feature, provider);
-      
-      // Update history (if available)
-      try {
-        if ('addFeature' in historyManager && typeof historyManager.addFeature === 'function') {
-          await (historyManager as any).addFeature(feature, provider, projectPath);
-        }
-      } catch (error) {
-        // History update is optional
-      }
-    } catch (error) {
-      console.log(chalk.red(`\n❌ Failed to add ${feature} (${provider}): ${error}`));
-    }
     
     // Show additional project details
     if (projectInfo.packageManager) {
