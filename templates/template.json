@@ -385,7 +385,9 @@
       ],
       "ui": [],
       "options": [],
-      "templates": []
+      "templates": [
+        "template"
+      ]
     },
     "expressjs": {
       "type": "backend",
@@ -407,17 +409,21 @@
       ],
       "ui": [],
       "options": [],
-      "templates": []
+      "templates": [
+        "template"
+      ]
     },
     "infernojs": {
       "type": "",
       "description": "Ultra-fast React-like library.",
       "languages": [
-        "typescript"
+        "typescript","javascript"
       ],
       "ui": [],
       "options": [],
-      "templates": []
+      "templates": [
+        "template"
+      ]
     },
     "nestjs": {
       "type": "backend",
@@ -532,7 +538,9 @@
       ],
       "ui": [],
       "options": [],
-      "templates": []
+      "templates": [
+        "template"
+      ]
     },
     "stenciljs": {
       "type": "",
@@ -542,7 +550,9 @@
       ],
       "ui": [],
       "options": [],
-      "templates": []
+      "templates": [
+        "template"
+      ]
     },
     "sveltejs": {
       "type": "",
@@ -553,7 +563,9 @@
       ],
       "ui": [],
       "options": [],
-      "templates": []
+      "templates": [
+        "template"
+      ]
     },
     "vuejs": {
       "type": "frontend",
