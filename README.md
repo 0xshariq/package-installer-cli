@@ -121,7 +121,7 @@ pi clean
 | [� Installation](docs/installation.md) | Complete installation guide for all package managers |
 | [🐳 Docker](docs/docker.md) | Docker Usage and installation |
 | [📦 Bundle Info](docs/bundle-info.md) | Distribution bundle system and cross-platform packaging |
-| [�📋 Commands](docs/commands.md) | Complete command reference with examples |
+| [📋 Commands](docs/commands.md) | Complete command reference with examples |
 | [⚡ Features](docs/features.md) | Detailed feature documentation and usage |
 | [🎨 Templates](docs/templates.md) | Available templates and customization options |
 | [🚀 Deployment](docs/deploy.md) | Deployment options and platform integration |
