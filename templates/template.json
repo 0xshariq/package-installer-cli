@@ -58,7 +58,6 @@
       "type": "fullstack",
       "description": "Complete full-stack solution with React frontend, Express backend, and Shadcn UI",
       "languages": [
-        "javascript",
         "typescript"
       ],
       "templates": [
@@ -80,33 +79,30 @@
       "type": "fullstack",
       "description": "Next.js full-stack solution with Next-Auth for authentication and Shadcn UI",
       "languages": [
-        "javascript",
         "typescript"
       ],
       "templates": [
-        "nextjs-next-auth-shadcn"
+        "nextjs-next-auth-shadcn-template"
       ]
     },
     "nextjs+clerk+shadcn": {
       "type": "fullstack",
       "description": "Next.js full-stack solution with Clerk for authentication and Shadcn UI",
       "languages": [
-        "javascript",
         "typescript"
       ],
       "templates": [
-        "nextjs-clerk-shadcn"
+        "nextjs-clerk-shadcn-template"
       ]
     },
     "nextjs+auth0+shadcn": {
       "type": "fullstack",
       "description": "Next.js full-stack solution with Auth0 for authentication and Shadcn UI",
       "languages": [
-        "javascript",
         "typescript"
       ],
       "templates": [
-        "nextjs-auth0-shadcn"
+        "nextjs-auth0-shadcn-template"
       ]
     }
   },
