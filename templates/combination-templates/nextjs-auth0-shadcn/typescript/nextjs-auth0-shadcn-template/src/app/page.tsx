@@ -1,4 +1,4 @@
-import { auth0 } from "@/lib/auth0";
+import { auth0 } from "../lib/auth0";
 import { Button } from "@/components/button";
 
 export default async function Home() {
