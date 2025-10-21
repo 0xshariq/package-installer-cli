@@ -1,6 +1,11 @@
-def main():
-    print("Hello from fastapi!")
+from dash import Dash, html
 
+app = Dash(__name__)
 
-if __name__ == "__main__":
-    main()
+app.layout = html.Div([
+    html.H1("🚀 Dash App"),
+    html.P("Hello from Dash!")
+])
+
+if __name__ == '__main__':
+    app.run_server(debug=True)
