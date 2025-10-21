@@ -151,7 +151,7 @@ pi clean
 | Category | Representative Frameworks / Tools | Primary Languages |
 |----------|------------------------------------|-------------------|
 | C++/C | cppcms, crow, restbed, ulfius, wt | C, C++ |
-| Combination Templates | react+express, react+nestjs (fullstack combos) | JS, TS |
+| Combination Templates | react+express, react+nestjs (fullstack combos) | TS |
 | Desktop | electron, tauri, flutter, qt, nwjs, capacitor | JS, TS, Rust, Dart, Python |
 | Game | bevy, godot, unity, unreal, threejs, pygame, babylonjs | Rust, C#, C++, JS, Python |
 | Go | gin, echo, beego, buffalo, chi, gqlgen | Go |
