@@ -13,7 +13,7 @@ The CLI organizes templates into the following high-level categories. Each categ
 | Category | Representative Frameworks | Languages |
 |----------|--------------------------|-----------|
 | C++/C | cppcms, crow, restbed, ulfius, wt | C, C++ |
-| Combination Templates | react+express, react+nestjs | JavaScript, TypeScript |
+| Combination Templates | react+express, react+nestjs | TypeScript |
 | Desktop | electron, tauri, flutter, qt, nwjs, capacitor | JavaScript, TypeScript, Rust, Dart, Python |
 | Game | bevy, godot, unity, unreal, threejs, pygame, babylonjs | Rust, C#, C++, JavaScript, Python |
 | Go | gin, echo, beego, buffalo, chi | Go |
