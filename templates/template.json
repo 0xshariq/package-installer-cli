@@ -635,7 +635,9 @@
     "bottle": {
       "type": "python",
       "description": "Micro web framework, smaller than Flask.",
-      "languages": [],
+      "languages": [
+        "python"
+      ],
       "ui": [],
       "options": [],
       "templates": [
@@ -645,7 +647,9 @@
     "dash": {
       "type": "python",
       "description": "Plotly dashboards.",
-      "languages": [],
+      "languages": [
+        "python"
+      ],
       "ui": [],
       "options": [],
       "templates": [
@@ -668,7 +672,9 @@
     "falcon": {
       "type": "python",
       "description": "Micro web framework, smaller than Flask.",
-      "languages": [],
+      "languages": [
+        "python"
+      ],
       "ui": [],
       "options": [],
       "templates": [
@@ -678,7 +684,9 @@
     "fastapi": {
       "type": "api",
       "description": "Modern async framework (great for APIs).",
-      "languages": [],
+      "languages": [
+        "python"
+      ],
       "ui": [],
       "options": [],
       "templates": [
@@ -701,7 +709,9 @@
     "pyramid": {
       "type": "python",
       "description": "Flexible framework for larger apps.",
-      "languages": [],
+      "languages": [
+        "python"
+      ],
       "ui": [],
       "options": [],
       "templates": [
@@ -711,7 +721,9 @@
     "quart": {
       "type": "python",
       "description": "Async Flask-compatible framework.",
-      "languages": [],
+      "languages": [
+        "python"
+      ],
       "ui": [],
       "options": [],
       "templates": [
@@ -721,7 +733,9 @@
     "streamlit": {
       "type": "python",
       "description": "For AI/data web apps.",
-      "languages": [],
+      "languages": [
+        "python"
+      ],
       "ui": [],
       "options": [],
       "templates": [
@@ -731,7 +745,9 @@
     "tornado": {
       "type": "python",
       "description": "Scalable, non-blocking web server and framework.",
-      "languages": [],
+      "languages": [
+        "python"
+      ],
       "ui": [],
       "options": [],
       "templates": [
