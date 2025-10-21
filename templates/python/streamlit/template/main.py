@@ -1,6 +1,4 @@
-def main():
-    print("Hello from fastapi!")
+import streamlit as st
 
-
-if __name__ == "__main__":
-    main()
+st.title("🚀 Streamlit App")
+st.write("Hello from Streamlit!")
