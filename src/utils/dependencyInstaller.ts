@@ -87,8 +87,8 @@ async function findProjectFiles(projectPath: string, maxDepth: number = 3): Prom
   // Skip directories that are known to be non-essential
   const skipDirectories = new Set([
     'node_modules', '.git', 'dist', 'build', '.next', '.nuxt', 'coverage',
-    '.vscode', '.idea', '__pycache__', '.pytest_cache', 'target', 'vendor',
-    '.gradle', '.mvn', 'bin', 'obj', '.vs', 'logs', 'tmp', 'temp'
+    '.vscode', '__pycache__', '.pytest_cache', 'target', 'vendor',
+    '.gradle', '.mvn', 'obj', '.vs', 'logs', 'tmp', 'temp'
   ]);
 
   async function searchDirectory(currentPath: string, currentDepth: number) {
