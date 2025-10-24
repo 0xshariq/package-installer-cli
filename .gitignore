@@ -29,7 +29,7 @@ coverage/
 
 # IDE and editor files
 /.vscode/
-.idea/
+/.idea/
 *.swp
 *.swo
 
