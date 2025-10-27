@@ -11,9 +11,9 @@ Top-level folders you'll commonly use:
 - `typescript-main/` — The main TypeScript CLI implementation (core). Contains `package.json`, `src/`, build scripts and the `pi` CLI. Versioned independently (see `typescript-main/package.json`).
 - `python-wrapper/`, `ruby-wrapper/`, `rust-wrapper/`, `go-wrapper/` — Language-specific wrappers that adapt the CLI or provide language integrations where applicable.
 - `homebrew-tap/` — Homebrew tap for macOS installations.
-- `bundle-executables/`, `bundle-standalone/`, `binary/` — Bundled distributions and prebuilt binaries for different platforms.
-- `templates/` — Project templates used by the CLI to scaffold new projects.
-- `docs/` and `features/` — Documentation and feature definitions for templates and integrations.
+- `bundle-executables/`, `bundle-standalone/`, `binary/` — Bundled distributions and prebuilt binaries for different platforms (In typescript-main folder).
+- `templates/` — Project templates used by the CLI to scaffold new projects (In typescript-main folder).
+- `docs/` and `features/` — Documentation and feature definitions for templates and integrations (In typescript-main folder).
 
 Files of interest:
 
