@@ -1,5 +1,0 @@
-{
-    "dependencies": {
-        "@aws-sdk/client-cloudfront": "^3.883.0"
-    }
-}

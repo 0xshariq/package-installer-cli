@@ -1,5 +1,0 @@
-{
-    "dependencies": {
-        "@aws-sdk/client-ec2": "^3.883.0"
-    }
-}

@@ -1,5 +1,0 @@
-{
-    "dependencies": {
-        "@aws-sdk/client-codepipeline": "^3.883.0"
-    }
-}

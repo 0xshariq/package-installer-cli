@@ -1,5 +1,0 @@
-{
-    "dependencies": {
-        "@aws-sdk/client-cloudtrail": "^3.883.0"
-    }
-}

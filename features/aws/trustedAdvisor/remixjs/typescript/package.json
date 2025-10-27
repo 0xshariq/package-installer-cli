@@ -1,5 +1,0 @@
-{
-    "dependencies": {
-        "@aws-sdk/client-support": "^3.873.0"
-    }
-}
