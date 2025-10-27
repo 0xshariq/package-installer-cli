@@ -60,6 +60,16 @@ cd rust-wrapper
 # follow the folder's README / use cargo build there
 ```
 
+## READMEs (paths)
+
+- [Monorepo README](README.md)
+- [TypeScript core](typescript-main/README.md)
+- [Python wrapper](python-wrapper/README.md)
+- [Ruby wrapper](ruby-wrapper/README.md)
+- [Rust wrapper](rust-wrapper/README.md)
+- [Go wrapper](go-wrapper/README.md)
+- [Homebrew tap](homebrew-tap/README.md)
+
 ## Common tasks
 
 - Build core CLI: `cd typescript-main && pnpm run build`
@@ -104,15 +114,3 @@ Open issues on GitHub: https://github.com/0xshariq/package-installer-cli/issues
 - **RubyGems**: [package-installer-cli](https://rubygems.org/gems/package-installer-cli)
 - **crates.io**: [package-installer-cli](https://crates.io/crates/package-installer-cli)
 - **Docker Hub**: [0xshariq/package-installer-cli](https://hub.docker.com/r/0xshariq/package-installer-cli)
-
-## Repository READMEs (paths)
-
-Open these files to add package badges or package-specific information:
-
-- [Monorepo README](README.md)
-- [TypeScript core](typescript-main/README.md)
-- [Python wrapper](python-wrapper/README.md)
-- [Ruby wrapper](ruby-wrapper/README.md)
-- [Rust wrapper](rust-wrapper/README.md)
-- [Go wrapper](go-wrapper/README.md)
-- [Homebrew tap](homebrew-tap/README.md)
