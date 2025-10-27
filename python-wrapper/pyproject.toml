@@ -7,7 +7,7 @@ name = "package-installer-cli"
 version = "2.4.0"
 description = "A powerful CLI tool to bootstrap projects with pre-configured templates and features"
 readme = "README.md"
-license = {text = "MIT"}
+license = {text = "Apache-2.0"}
 authors = [
     {name = "0xshariq", email = "khanshariq92213@gmail.com"}
 ]
