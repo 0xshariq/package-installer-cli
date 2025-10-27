@@ -64,8 +64,8 @@ cd rust-wrapper
 
 - Build core CLI: `cd typescript-main && pnpm run build`
 - Run CLI locally: `cd typescript-main && pnpm start` (or `node ./dist/index.js`)
-- Create distribution bundles: `cd typescript-main && pnpm run bundle` (see package scripts for variants like `bundle:simple` and `bundle:custom`)
-- Clean builds: `cd typescript-main && pnpm run clean`
+- Create distribution bundles: `cd typescript-main && pnpm run build && pnpm run binary && pnpm run bundle` (you can use any package manager other than pnpm)
+- Clean builds (dist folder): `cd typescript-main && pnpm run clean`
 
 ## Templates and generated files
 
