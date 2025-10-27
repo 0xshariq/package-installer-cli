@@ -1,5 +1,0 @@
-{
-    "dependencies": {
-        "@aws-sdk/client-elastic-load-balancing": "3.883.0"
-    }
-}
