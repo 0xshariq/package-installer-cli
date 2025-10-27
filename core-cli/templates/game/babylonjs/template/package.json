@@ -1,0 +1,16 @@
+{
+  "name": "babylonjs-template",
+  "version": "1.0.0",
+  "description": "A basic 3D scene using Babylon.js",
+  "scripts": {
+    "start": "vite",
+    "build": "vite build"
+  },
+  "dependencies": {
+    "babylonjs": "^7.41.0",
+    "babylonjs-loaders": "^7.41.0"
+  },
+  "devDependencies": {
+    "vite": "^5.3.0"
+  }
+}

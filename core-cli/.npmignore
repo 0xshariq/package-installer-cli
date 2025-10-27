@@ -1,0 +1,37 @@
+# Source files - only include built JS files
+src/
+*.ts
+tsconfig.json
+
+# Development and build files
+.git/
+.github/
+.gitignore
+.npmignore
+bundle-standalone/
+bundle-executables/
+binary/
+scripts/
+webpack.config.mjs
+
+
+# Documentation not needed in package
+docs/
+docs/assets/
+CONTRIBUTING.md
+*.dev.md
+marketing-strategy.md
+suggested-commands.md
+COMMAND-IMPLEMENTATION-PLAN.md
+
+# Docker files
+Dockerfile
+docker-compose.yml
+docker-build.sh
+.dockerignore
+
+
+# Node modules
+node_modules/
+
+/pnpm-workspace.yaml
