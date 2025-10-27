@@ -1,0 +1,31 @@
+# MANIFEST.in
+
+# Include important files
+include README.md
+include LICENSE
+include CHANGELOG.md
+include pyproject.toml
+include requirements.txt
+include package.json
+include template.json
+include cli.py
+include __init__.py
+
+# Include package data
+recursive-include bundle-standalone *
+
+# Exclude development and build files
+exclude .gitignore
+exclude .pre-commit-config.yaml
+exclude tox.ini
+exclude pytest.ini
+exclude mypy.ini
+
+# Exclude directories
+prune .git
+prune .github
+prune tests
+prune docs
+prune build
+prune dist
+prune *.egg-info

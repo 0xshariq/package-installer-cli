@@ -1,0 +1,17 @@
+{
+  "extends": "expo/tsconfig.base",
+  "compilerOptions": {
+    "strict": true,
+    "paths": {
+      "@/*": [
+        "./*"
+      ]
+    }
+  },
+  "include": [
+    "**/*.ts",
+    "**/*.tsx",
+    ".expo/types/**/*.ts",
+    "expo-env.d.ts"
+, "components/ui/icon-symbol.jsx", "components/ui/icon-symbol.ios.jsx", "components/ui/collapsible.jsx", "constants/theme.js", "hooks/use-theme-color.js", "hooks/use-color-scheme.web.js", "hooks/use-color-scheme.js", "app/(tabs)/index.sx", "app/(tabs)/explore.jsx", "app/(tabs)/_layout.jsx", "app/modal.jsx", "app/_layout.jsx"  ]
+}

@@ -1,0 +1,23 @@
+[package]
+name = "my_anchor_project"
+version = "0.1.0"
+description = "A simple Solana program built with Anchor"
+edition = "2021"
+
+[lib]
+name = "my_anchor_project"
+crate-type = ["cdylib", "lib"]
+
+[features]
+no-entrypoint = []
+no-idl = []
+no-entrypoint = []
+default = []
+
+[dependencies]
+anchor-lang = "0.32.1"        # use the latest version available
+solana-program = "3.0.0"     # match Solana version with your CLI
+borsh = "1.5.7"              # serialization framework
+
+[dev-dependencies]
+anchor-lang = "0.30.1"
