@@ -12,10 +12,8 @@
     "build": "tsc -p .",
     "start": "node ./dist/index.js",
     "clean": "rm -rf dist",
-    "bundle": "node scripts/advanced-bundle.js",
-    "bundle:simple": "node scripts/independent-bundle.js",
-    "bundle:custom": "./scripts/build-nodejs.sh",
-    "bundle:clean": "rm -rf bundle-standalone bundle-executables distribution-info.json node-builds"
+    "binary": "./scripts/create-node-binary.sh",
+    "bundle": "./scripts/create-distribution-bundle.sh"
   },
   "author": "Sharique Chaudhary",
   "license": "MIT",
