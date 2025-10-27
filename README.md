@@ -94,7 +94,7 @@ find templates -type d \( -name 'node_modules' -o -name '.git' \) -exec rm -rf {
 Release steps typically involve:
 
 1. Bumping the version in the package (see `typescript-main/package.json`).
-2. Building the core and creating distribution bundles (`pnpm run build`, then `pnpm run bundle`).
+2. Building the core and creating distribution bundles (`pnpm run build`, then `pnpm run binary`, and lastly `pnpm run bundle`).
 3. Publishing packages or uploading release assets (binaries, installers, Homebrew tap updates).
 
 Automations (CI) may exist in `.github/workflows/` inside package folders — check each package for its own CI configuration.
@@ -114,3 +114,17 @@ Open issues on GitHub: https://github.com/0xshariq/package-installer-cli/issues
 - **RubyGems**: [package-installer-cli](https://rubygems.org/gems/package-installer-cli)
 - **crates.io**: [package-installer-cli](https://crates.io/crates/package-installer-cli)
 - **Docker Hub**: [0xshariq/package-installer-cli](https://hub.docker.com/r/0xshariq/package-installer-cli)
+
+## Repository READMEs (paths)
+
+Open these files to add package badges or package-specific information:
+
+- Root README: `README.md`
+- TypeScript core: `typescript-main/README.md`
+- Python wrapper: `python-wrapper/README.md`
+- Ruby wrapper: `ruby-wrapper/README.md`
+- Rust wrapper: `rust-wrapper/README.md`
+- Go wrapper: `go-wrapper/README.md`
+- Homebrew tap: `homebrew-tap/README.md`
+
+Tip: add the service badges (npm, PyPI, RubyGems, crates.io, Docker) near the top of each package's README to show the current published version and simplify maintenance.
