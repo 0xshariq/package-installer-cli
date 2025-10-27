@@ -1,7 +1,7 @@
 # � Package Installer CLI - Ruby Gem
 
 [![Gem Version](https://badge.fury.io/rb/package-installer-cli.svg)](https://badge.fury.io/rb/package-installer-cli)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![License: Apachse-2.0](https://img.shields.io/badge/License-Apachse-2.0-yellow.svg)](https://opensource.org/licenses/Apachse-2.0)
 [![Ruby](https://img.shields.io/badge/ruby-%3E%3D2.6.0-red.svg)](https://www.ruby-lang.org/)
 [![Node.js](https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen.svg)](https://nodejs.org/)
 

@@ -1,5 +1,10 @@
 # package-installer-cli — Monorepo
 
+[![npm version](https://img.shields.io/npm/v/@0xshariq/package-installer.svg)](https://www.npmjs.com/package/@0xshariq/package-installer)
+[![PyPI version](https://img.shields.io/pypi/v/package-installer-cli.svg)](https://pypi.org/project/package-installer-cli/)
+[![Gem Version](https://badge.fury.io/rb/package-installer-cli.svg)](https://badge.fury.io/rb/package-installer-cli)
+[![Crates.io](https://img.shields.io/crates/v/package-installer-cli.svg)](https://crates.io/crates/package-installer-cli)
+
 A monorepo that contains the official cross-platform interactive CLI for scaffolding modern application templates and several language-specific wrapper projects and bundles.
 
 This repository groups multiple packages and artifacts used to build, bundle and distribute the `package-installer` CLI (the `pi` / `package-installer` binary). Converting to a monorepo keeps related projects together, simplifies releases, and makes it easier to maintain shared templates and build scripts.
