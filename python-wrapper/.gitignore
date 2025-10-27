@@ -7,7 +7,7 @@ __pycache__/
 *.py[cod]
 *$py.class
 *.so
-
+bundle-standalone/
 # Distribution / packaging
 .Python
 develop-eggs/

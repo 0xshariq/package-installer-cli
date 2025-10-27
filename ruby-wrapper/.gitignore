@@ -27,6 +27,7 @@
 build/
 out/
 node_modules/
+bundle-standalone/
 
 # Package files
 *.tgz

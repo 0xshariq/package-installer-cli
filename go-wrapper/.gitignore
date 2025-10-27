@@ -14,7 +14,7 @@ build/
 *.test
 *.out
 go.work
-
+bundle-executables/
 # IDE
 .vscode/
 .idea/
