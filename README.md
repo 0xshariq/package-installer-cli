@@ -18,7 +18,7 @@ Top-level folders you'll commonly use:
 Files of interest:
 
 - Root `README.md` (this file)
-- `CONTRIBUTING.md` — how to contribute and release
+- `typescript-main/CONTRIBUTING.md` — how to contribute and release
 - `LICENSE` — project license (MIT)
 
 ## Quick start (local development)
