@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
 import subprocess
 import sys
-import os
 import platform
 from pathlib import Path
-
-def find_bundle_standalone():
+from typing import Optional
+def find_bundle_standalone() -> Optional[Path]:
     """Find the bundle-standalone directory in various installation scenarios"""
     # Get the directory where this script is located
     script_dir = Path(__file__).parent.resolve()
@@ -36,6 +35,7 @@ def find_bundle_standalone():
         if bundle_path.exists() and (bundle_path / "pi").exists():
             return bundle_path
     
+    return None
     return None
 
 def main():
