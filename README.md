@@ -109,12 +109,10 @@ Open issues on GitHub: https://github.com/0xshariq/package-installer-cli/issues
 
 Open these files to add package badges or package-specific information:
 
-- Root README: `README.md`
-- TypeScript core: `typescript-main/README.md`
-- Python wrapper: `python-wrapper/README.md`
-- Ruby wrapper: `ruby-wrapper/README.md`
-- Rust wrapper: `rust-wrapper/README.md`
-- Go wrapper: `go-wrapper/README.md`
-- Homebrew tap: `homebrew-tap/README.md`
-
-Tip: add the service badges (npm, PyPI, RubyGems, crates.io, Docker) near the top of each package's README to show the current published version and simplify maintenance.
+- [Monorepo README](README.md)
+- [TypeScript core](typescript-main/README.md)
+- [Python wrapper](python-wrapper/README.md)
+- [Ruby wrapper](ruby-wrapper/README.md)
+- [Rust wrapper](rust-wrapper/README.md)
+- [Go wrapper](go-wrapper/README.md)
+- [Homebrew tap](homebrew-tap/README.md)
