@@ -67,22 +67,6 @@ cd rust-wrapper
 - Create distribution bundles: `cd typescript-main && pnpm run build && pnpm run binary && pnpm run bundle` (you can use any package manager other than pnpm)
 - Clean builds (dist folder): `cd typescript-main && pnpm run clean`
 
-## Templates and generated files
-
-The `templates/` directory contains scaffold templates used by the CLI. Some folders (for example `bundle-standalone/`) are intentionally ignored by Git (`.gitignore`) because they contain generated or distribution artifacts.
-
-If you need to remove generated `node_modules` or `.git` folders inside `templates` while cleaning up, use the following (dry-run first):
-
-```bash
-find templates -type d \( -name 'node_modules' -o -name '.git' \) -print
-```
-
-Then delete if the list looks correct:
-
-```bash
-find templates -type d \( -name 'node_modules' -o -name '.git' \) -exec rm -rf {} +
-```
-
 ## Contribution & development workflow
 
 - Follow `CONTRIBUTING.md` for contribution guidelines, commit messages, and release process.
