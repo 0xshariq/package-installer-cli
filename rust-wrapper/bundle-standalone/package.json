@@ -1,0 +1,13 @@
+{
+  "type": "module",
+  "name": "package-installer-cli-standalone",
+  "version": "1.0.0",
+  "main": "cli-with-packages.js",
+  "bin": {
+    "pi": "./pi"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "license": "MIT"
+}
