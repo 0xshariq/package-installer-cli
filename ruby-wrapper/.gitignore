@@ -1,0 +1,33 @@
+# Ruby specific
+*.gem
+*.rbc
+/.config
+/coverage/
+/InstalledFiles
+/pkg/
+/spec/reports/
+/spec/examples.txt
+/test/tmp/
+/test/version_tmp/
+/tmp/
+.bundle/
+.byebug_history
+.rspec_status
+# vendor/bundle/ - Keep this for shipping bundled dependencies
+
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Build artifacts (but keep dist/ for the CLI)
+build/
+out/
+node_modules/
+
+# Package files
+*.tgz
+*.tar.gz
