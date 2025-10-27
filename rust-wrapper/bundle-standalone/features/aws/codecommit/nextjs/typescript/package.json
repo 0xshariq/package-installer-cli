@@ -1,5 +1,0 @@
-{
-    "dependencies": {
-        "@aws-sdk/client-codecommit": "^3.883.0"
-    }
-}

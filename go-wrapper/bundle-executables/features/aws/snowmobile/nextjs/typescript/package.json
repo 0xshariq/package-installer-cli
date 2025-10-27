@@ -1,5 +1,0 @@
-{
-    "dependencies": {
-        "@aws-sdk/client-snow-device-management": "^3.883.0"
-    }
-}

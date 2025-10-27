@@ -1,3 +1,0 @@
-###### Peter's Starter Template for a Flask Web App ######
-###### Requirements without Version Specifiers ######
-flask

@@ -1,5 +1,0 @@
-{
-    "dependencies": {
-        "@aws-sdk/client-braket": "^3.883.0"
-    }
-}

@@ -1,5 +1,0 @@
-{
-    "dependencies": {
-        "@aws-sdk/client-auto-scaling": "^3.883.0"
-    }
-}

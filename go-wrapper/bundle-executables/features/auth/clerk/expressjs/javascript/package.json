@@ -1,8 +1,0 @@
-{
-    "dependencies": {
-        "@clerk/express": "^1.7.21"
-    },
-    "devDependencies": {
-        "@clerk/types": "^4.78.0"
-    }
-}

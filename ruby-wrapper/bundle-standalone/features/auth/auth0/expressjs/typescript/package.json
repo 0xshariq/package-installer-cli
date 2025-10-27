@@ -1,5 +1,0 @@
-{
-    "dependencies": {
-        "express-openid-connect": "^2.19.2"
-    }
-}

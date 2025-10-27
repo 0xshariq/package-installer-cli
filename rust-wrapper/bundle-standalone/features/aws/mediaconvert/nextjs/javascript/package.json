@@ -1,5 +1,0 @@
-{
-    "dependencies": {
-        "@aws-sdk/client-mediaconvert": "^3.883.0"
-    }
-}

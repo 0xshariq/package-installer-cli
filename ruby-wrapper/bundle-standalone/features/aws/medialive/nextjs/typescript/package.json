@@ -1,5 +1,0 @@
-{
-    "dependencies": {
-        "@aws-sdk/client-medialive": "^3.883.0"
-    }
-}

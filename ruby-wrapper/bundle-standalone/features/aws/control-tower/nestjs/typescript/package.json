@@ -1,5 +1,0 @@
-{
-    "dependencies": {
-        "@aws-sdk/client-controltower": "^3.883.0"
-    }
-}
