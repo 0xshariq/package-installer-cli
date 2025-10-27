@@ -1,9 +1,3 @@
-# Node.js
-node_modules/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
 # Go
 build/
 *.exe
@@ -15,12 +9,6 @@ build/
 *.out
 go.work
 bundle-executables/
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
 
 # Distribution packages
 *.tar.gz

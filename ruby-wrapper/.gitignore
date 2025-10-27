@@ -13,20 +13,9 @@
 .bundle/
 .byebug_history
 .rspec_status
-# vendor/bundle/ - Keep this for shipping bundled dependencies
-
-
-# IDE files
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
 
 # Build artifacts (but keep dist/ for the CLI)
 build/
-out/
-node_modules/
 bundle-standalone/
 
 # Package files
