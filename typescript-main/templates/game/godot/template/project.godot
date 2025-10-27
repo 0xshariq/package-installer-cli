@@ -1,0 +1,4 @@
+[application]
+config/name="MyGodotGame"
+run/main_scene="res://main_scene.tscn"
+config/icon="res://assets/icon.png"

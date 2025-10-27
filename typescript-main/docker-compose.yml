@@ -1,0 +1,54 @@
+version: '3.2.0'
+
+services:
+  package-installer:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: 0xshariq/package-installer-cli:latest
+    container_name: package-installer-cli
+    volumes:
+      # Mount local directory for project development
+      - ./projects:/home/pi/projects
+      # Mount git config for authentication
+      - ~/.gitconfig:/home/pi/.gitconfig:ro
+      - ~/.ssh:/home/pi/.ssh:ro
+    environment:
+      - NODE_ENV=production
+    working_dir: /home/pi/projects
+    tty: true
+    stdin_open: true
+    networks:
+      - package-installer-network
+
+  # Development service with hot reload
+  package-installer-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    image: 0xshariq/package-installer-cli:dev
+    container_name: package-installer-cli-dev
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - ./projects:/home/pi/projects
+      - ~/.gitconfig:/home/pi/.gitconfig:ro
+      - ~/.ssh:/home/pi/.ssh:ro
+    environment:
+      - NODE_ENV=development
+    working_dir: /home/pi/projects
+    tty: true
+    stdin_open: true
+    command: ["sh", "-c", "cd /app && npm run build && node dist/index.js"]
+    networks:
+      - package-installer-network
+    profiles:
+      - dev
+
+networks:
+  package-installer-network:
+    driver: bridge
+
+volumes:
+  projects:
+    driver: local
