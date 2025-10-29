@@ -1,246 +1,798 @@
- {
-        "mongodb": {
-          "mongoose": {
-            "javascript": {
-              "expressjs": {},
-              "nextjs": {}
-            },
-            "typescript": {
-              "expressjs": {},
-              "nestjs": {},
-              "nextjs": {},
-              "remixjs": {}
-            }
+{
+  "mongodb": {
+    "mongoose": {
+      "javascript": {
+        "expressjs": {
+          "controllers/userController.js": {
+            "action": "create"
           },
-          "typegoose": {
-            "typescript": {
-              "expressjs": {},
-              "nestjs": {},
-              "nextjs": {},
-              "remixjs": {}
-            }
+          "routes/userRoutes.js": {
+            "action": "create"
+          },
+          "models/User.js": {
+            "action": "create"
+          },
+          "utils/mongodb.js": {
+            "action": "create"
+          },
+          "index.js": {
+            "action": "prepend"
+          },
+          "package.json": {
+            "action": "install"
+          },
+          ".env": {
+            "action": "append"
           }
         },
-        "mysql": {
-          "typeorm": {
-            "javascript": {
-              "expressjs": {},
-              "nextjs": {}
-            },
-            "typescript": {
-              "expressjs": {},
-              "nestjs": {},
-              "nextjs": {},
-              "remixjs": {}
-            }
+        "nextjs": {
+          "app/api/users/route.js": {
+            "action": "create"
           },
-          "prisma": {
-            "typescript": {
-              "expressjs": {},
-              "nestjs": {},
-              "nextjs": {},
-              "remixjs": {}
-            }
+          "models/User.js": {
+            "action": "create"
           },
-          "drizzle": {
-            "typescript": {
-              "expressjs": {},
-              "nestjs": {},
-              "nextjs": {},
-              "remixjs": {}
-            }
+          "lib/mongodb.js": {
+            "action": "create"
           },
-          "djangoORM": {
-            "python": {}
+          ".env": {
+            "action": "append"
           },
-          "SQLAlchemy": {
-            "python": {}
+          "package.json": {
+            "action": "install"
+          }
+        }
+      },
+      "typescript": {
+        "expressjs": {
+          "controllers/userController.ts": {
+            "action": "create"
           },
-          "Peewee": {
-            "python": {}
+          "routes/userRoutes.ts": {
+            "action": "create"
           },
-          "GORM": {
-            "go": {}
+          "models/User.ts": {
+            "action": "create"
           },
-          "Sequel": {
-            "ruby": {}
+          "utils/mongodb.ts": {
+            "action": "create"
+          },
+          "index.ts": {
+            "action": "prepend"
+          },
+          "package.json": {
+            "action": "install"
+          },
+          ".env": {
+            "action": "append"
           }
         },
-        "postgres": {
-          "typeorm": {
-            "javascript": {
-              "expressjs": {},
-              "nextjs": {}
-            },
-            "typescript": {
-              "expressjs": {},
-              "nestjs": {},
-              "nextjs": {},
-              "remixjs": {}
-            }
+        "nestjs": {
+          "src/user/user.controller.ts": {
+            "action": "create"
           },
-          "prisma": {
-            "typescript": {
-              "expressjs": {},
-              "nestjs": {},
-              "nextjs": {},
-              "remixjs": {},
-              "expressjs/.env": {
-                "action": "append"
-              },
-              "expressjs/controllers/prismaController.ts": {
-                "action": "create"
-              },
-              "expressjs/index.ts": {
-                "action": "prepend"
-              },
-              "expressjs/package.json": {
-                "action": "install"
-              },
-              "expressjs/prisma/schema.prisma": {
-                "action": "create"
-              },
-              "expressjs/routes/prismaRoutes.ts": {
-                "action": "create"
-              },
-              "expressjs/utils/prisma.ts": {
-                "action": "create"
-              },
-              "nestjs/.env": {
-                "action": "append"
-              },
-              "nestjs/package.json": {
-                "action": "install"
-              },
-              "nestjs/prisma/schema.prisma": {
-                "action": "create"
-              },
-              "nestjs/src/prisma.service.ts": {
-                "action": "create"
-              },
-              "nestjs/src/user/user.controller.ts": {
-                "action": "create"
-              },
-              "nestjs/src/user/user.module.ts": {
-                "action": "create"
-              },
-              "nestjs/src/user/user.service.ts": {
-                "action": "create"
-              },
-              "nextjs/.env": {
-                "action": "append"
-              },
-              "nextjs/app/api/users/route.ts": {
-                "action": "create"
-              },
-              "nextjs/lib/prisma.ts": {
-                "action": "create"
-              },
-              "nextjs/package.json": {
-                "action": "install"
-              },
-              "nextjs/prisma/schema.prisma": {
-                "action": "create"
-              },
-              "remixjs/.env": {
-                "action": "append"
-              },
-              "remixjs/app/prisma/schema.prisma": {
-                "action": "create"
-              },
-              "remixjs/app/routes/api.users.ts": {
-                "action": "create"
-              },
-              "remixjs/app/utils/prisma.ts": {
-                "action": "create"
-              },
-              "remixjs/package.json": {
-                "action": "install"
-              }
-            }
+          "src/user/user.module.ts": {
+            "action": "create"
           },
-          "drizzle": {
-            "typescript": {
-              "expressjs": {},
-              "nestjs": {},
-              "nextjs": {},
-              "remixjs": {},
-              "expressjs/.env": {
-                "action": "append"
-              },
-              "expressjs/controllers/drizzleController.ts": {
-                "action": "create"
-              },
-              "expressjs/index.ts": {
-                "action": "prepend"
-              },
-              "expressjs/package.json": {
-                "action": "install"
-              },
-              "expressjs/routes/drizzle.ts": {
-                "action": "create"
-              },
-              "expressjs/utils/drizzle.ts": {
-                "action": "create"
-              },
-              "nestjs/.env": {
-                "action": "append"
-              },
-              "nestjs/package.json": {
-                "action": "install"
-              },
-              "nestjs/src/drizzle/drizzle.controller.ts": {
-                "action": "create"
-              },
-              "nestjs/src/drizzle/drizzle.module.ts": {
-                "action": "create"
-              },
-              "nestjs/src/drizzle/drizzle.service.ts": {
-                "action": "create"
-              },
-              "nestjs/src/drizzle.ts": {
-                "action": "create"
-              },
-              "nextjs/.env": {
-                "action": "append"
-              },
-              "nextjs/app/api/users/route.ts": {
-                "action": "create"
-              },
-              "nextjs/lib/drizzle.ts": {
-                "action": "create"
-              },
-              "nextjs/package.json": {
-                "action": "install"
-              },
-              "remixjs/.env": {
-                "action": "append"
-              },
-              "remixjs/app/routes/api.drizzle.ts": {
-                "action": "create"
-              },
-              "remixjs/app/utils/drizzle.ts": {
-                "action": "create"
-              },
-              "remixjs/package.json": {
-                "action": "install"
-              }
-            }
+          "src/user/user.service.ts": {
+            "action": "create"
           },
-          "djangoORM": {
-            "python": {}
+          "src/user/user.schema.ts": {
+            "action": "create"
           },
-          "SQLAlchemy": {
-            "python": {}
+          ".env": {
+            "action": "append"
           },
-          "Peewee": {
-            "python": {}
+          "package.json": {
+            "action": "install"
+          }
+        },
+        "nextjs": {
+          "app/api/users/route.ts": {
+            "action": "create"
           },
-          "GORM": {
-            "go": {}
+          "models/User.ts": {
+            "action": "create"
           },
-          "Sequel": {
-            "ruby": {}
+          "lib/mongodb.ts": {
+            "action": "create"
+          },
+          ".env": {
+            "action": "append"
+          },
+          "package.json": {
+            "action": "install"
+          }
+        },
+        "remixjs": {
+          "app/models/User.ts": {
+            "action": "create"
+          },
+          "app/routes/api.users.ts": {
+            "action": "create"
+          },
+          "app/utils/mongodb.ts": {
+            "action": "create"
+          },
+          ".env": {
+            "action": "append"
+          },
+          "package.json": {
+            "action": "install"
           }
         }
       }
+    },
+    "typegoose": {
+      "typescript": {
+        "expressjs": {
+          "controllers/userController.ts": {
+            "action": "create"
+          },
+          "routes/userRoutes.ts": {
+            "action": "create"
+          },
+          "models/User.ts": {
+            "action": "create"
+          },
+          "utils/mongodb.ts": {
+            "action": "create"
+          },
+          "index.ts": {
+            "action": "prepend"
+          },
+          "package.json": {
+            "action": "install"
+          },
+          ".env": {
+            "action": "append"
+          }
+        },
+        "nestjs": {
+          "src/user/user.controller.ts": {
+            "action": "create"
+          },
+          "src/user/user.module.ts": {
+            "action": "create"
+          },
+          "src/user/user.service.ts": {
+            "action": "create"
+          },
+          "src/user/user.model.ts": {
+            "action": "create"
+          },
+          ".env": {
+            "action": "append"
+          },
+          "package.json": {
+            "action": "install"
+          }
+        },
+        "nextjs": {
+          "app/api/users/route.ts": {
+            "action": "create"
+          },
+          "models/User.ts": {
+            "action": "create"
+          },
+          "lib/mongodb.ts": {
+            "action": "create"
+          },
+          ".env": {
+            "action": "append"
+          },
+          "package.json": {
+            "action": "install"
+          }
+        },
+        "remixjs": {
+          "app/models/User.ts": {
+            "action": "create"
+          },
+          "app/routes/api.users.ts": {
+            "action": "create"
+          },
+          "app/utils/mongodb.ts": {
+            "action": "create"
+          },
+          ".env": {
+            "action": "append"
+          },
+          "package.json": {
+            "action": "install"
+          }
+        }
+      }
+    }
+  },
+  "mysql": {
+    "typeorm": {
+      "javascript": {
+        "expressjs": {
+          "controllers/typeormController.js": {
+            "action": "create"
+          },
+          "routes/typeormRoutes.js": {
+            "action": "create"
+          },
+          "index.js": {
+            "action": "prepend"
+          },
+          "utils/typeorm.js": {
+            "action": "create"
+          },
+          "package.json": {
+            "action": "install"
+          },
+          ".env": {
+            "action": "append"
+          }
+        },
+        "nextjs": {
+          "app/api/typeorm/route.js": {
+            "action": "create"
+          },
+          "lib/typeorm.js": {
+            "action": "create"
+          },
+          ".env": {
+            "action": "append"
+          },
+          "package.json": {
+            "action": "install"
+          }
+        }
+      },
+      "typescript": {
+        "expressjs": {
+          "controllers/typeormController.ts": {
+            "action": "create"
+          },
+          "routes/typeormRoutes.ts": {
+            "action": "create"
+          },
+          "index.ts": {
+            "action": "prepend"
+          },
+          "utils/typeorm.ts": {
+            "action": "create"
+          },
+          "package.json": {
+            "action": "install"
+          },
+          ".env": {
+            "action": "append"
+          }
+        },
+        "nestjs": {
+          "src/typeorm/typeorm.controller.ts": {
+            "action": "create"
+          },
+          "src/typeorm/typeorm.module.ts": {
+            "action": "create"
+          },
+          "src/typeorm/typeorm.service.ts": {
+            "action": "create"
+          },
+          "src/typeorm.ts": {
+            "action": "create"
+          },
+          "package.json": {
+            "action": "install"
+          },
+          ".env": {
+            "action": "append"
+          }
+        },
+        "nextjs": {
+          "app/api/typeorm/route.ts": {
+            "action": "create"
+          },
+          "lib/typeorm.ts": {
+            "action": "create"
+          },
+          ".env": {
+            "action": "append"
+          },
+          "package.json": {
+            "action": "install"
+          }
+        },
+        "remixjs": {
+          "app/routes/api.typeorm.ts": {
+            "action": "create"
+          },
+          "app/utils/typeorm.ts": {
+            "action": "create"
+          },
+          ".env": {
+            "action": "append"
+          },
+          "package.json": {
+            "action": "install"
+          }
+        }
+      }
+    },
+    "prisma": {
+      "typescript": {
+        "expressjs": {
+          "controllers/prismaController.ts": {
+            "action": "create"
+          },
+          "routes/prismaRoutes.ts": {
+            "action": "create"
+          },
+          "prisma/schema.prisma": {
+            "action": "create"
+          },
+          "utils/prisma.ts": {
+            "action": "create"
+          },
+          "index.ts": {
+            "action": "prepend"
+          },
+          "package.json": {
+            "action": "install"
+          },
+          ".env": {
+            "action": "append"
+          }
+        },
+        "nestjs": {
+          "prisma/schema.prisma": {
+            "action": "create"
+          },
+          "src/prisma.service.ts": {
+            "action": "create"
+          },
+          "src/user/user.controller.ts": {
+            "action": "create"
+          },
+          "src/user/user.module.ts": {
+            "action": "create"
+          },
+          "src/user/user.service.ts": {
+            "action": "create"
+          },
+          ".env": {
+            "action": "append"
+          },
+          "package.json": {
+            "action": "install"
+          }
+        },
+        "nextjs": {
+          "prisma/schema.prisma": {
+            "action": "create"
+          },
+          "app/api/users/route.ts": {
+            "action": "create"
+          },
+          "lib/prisma.ts": {
+            "action": "create"
+          },
+          ".env": {
+            "action": "append"
+          },
+          "package.json": {
+            "action": "install"
+          }
+        },
+        "remixjs": {
+          "app/prisma/schema.prisma": {
+            "action": "create"
+          },
+          "app/routes/api.users.ts": {
+            "action": "create"
+          },
+          "app/utils/prisma.ts": {
+            "action": "create"
+          },
+          ".env": {
+            "action": "append"
+          },
+          "package.json": {
+            "action": "install"
+          }
+        }
+      }
+    },
+    "drizzle": {
+      "typescript": {
+        "expressjs": {
+          "controllers/drizzleController.ts": {
+            "action": "create"
+          },
+          "routes/drizzleRoutes.ts": {
+            "action": "create"
+          },
+          "utils/drizzle.ts": {
+            "action": "create"
+          },
+          "index.ts": {
+            "action": "prepend"
+          },
+          "package.json": {
+            "action": "install"
+          },
+          ".env": {
+            "action": "append"
+          }
+        },
+        "nestjs": {
+          "src/drizzle.ts": {
+            "action": "create"
+          },
+          "src/drizzle/drizzle.controller.ts": {
+            "action": "create"
+          },
+          "src/drizzle/drizzle.module.ts": {
+            "action": "create"
+          },
+          "src/drizzle/drizzle.service.ts": {
+            "action": "create"
+          },
+          ".env": {
+            "action": "append"
+          },
+          "package.json": {
+            "action": "install"
+          }
+        },
+        "nextjs": {
+          "app/api/users/route.ts": {
+            "action": "create"
+          },
+          "lib/drizzle.ts": {
+            "action": "create"
+          },
+          ".env": {
+            "action": "append"
+          },
+          "package.json": {
+            "action": "install"
+          }
+        },
+        "remixjs": {
+          "app/routes/api.drizzle.ts": {
+            "action": "create"
+          },
+          "app/utils/drizzle.ts": {
+            "action": "create"
+          },
+          ".env": {
+            "action": "append"
+          },
+          "package.json": {
+            "action": "install"
+          }
+        }
+      }
+    },
+    "djangoORM": {
+      "python": {
+        "settings_mysql.py": {
+          "action": "create"
+        },
+        "requirements.txt": {
+          "action": "install"
+        }
+      }
+    },
+    "SQLAlchemy": {
+      "python": {
+        "mysql.py": {
+          "action": "create"
+        },
+        "requirements.txt": {
+          "action": "install"
+        }
+      }
+    },
+    "Peewee": {
+      "python": {}
+    },
+    "GORM": {
+      "go": {}
+    },
+    "Sequel": {
+      "ruby": {}
+    }
+  },
+  "postgres": {
+    "typeorm": {
+      "javascript": {
+        "expressjs": {
+          "controllers/typeormController.js": {
+            "action": "create"
+          },
+          "routes/typeormRoutes.js": {
+            "action": "create"
+          },
+          "index.js": {
+            "action": "prepend"
+          },
+          "utils/typeorm.js": {
+            "action": "create"
+          },
+          "package.json": {
+            "action": "install"
+          },
+          ".env": {
+            "action": "append"
+          }
+        },
+        "nextjs": {
+          "app/api/typeorm/route.js": {
+            "action": "create"
+          },
+          "lib/typeorm.js": {
+            "action": "create"
+          },
+          ".env": {
+            "action": "append"
+          },
+          "package.json": {
+            "action": "install"
+          }
+        }
+      },
+      "typescript": {
+        "expressjs": {
+          "controllers/typeormController.ts": {
+            "action": "create"
+          },
+          "routes/typeormRoutes.ts": {
+            "action": "create"
+          },
+          "index.ts": {
+            "action": "prepend"
+          },
+          "utils/typeorm.ts": {
+            "action": "create"
+          },
+          "package.json": {
+            "action": "install"
+          },
+          ".env": {
+            "action": "append"
+          }
+        },
+        "nestjs": {
+          "src/typeorm/typeorm.controller.ts": {
+            "action": "create"
+          },
+          "src/typeorm/typeorm.module.ts": {
+            "action": "create"
+          },
+          "src/typeorm/typeorm.service.ts": {
+            "action": "create"
+          },
+          "src/typeorm.ts": {
+            "action": "create"
+          },
+          "package.json": {
+            "action": "install"
+          },
+          ".env": {
+            "action": "append"
+          }
+        },
+        "nextjs": {
+          "app/api/typeorm/route.ts": {
+            "action": "create"
+          },
+          "lib/typeorm.ts": {
+            "action": "create"
+          },
+          ".env": {
+            "action": "append"
+          },
+          "package.json": {
+            "action": "install"
+          }
+        },
+        "remixjs": {
+          "app/routes/api.typeorm.ts": {
+            "action": "create"
+          },
+          "app/utils/typeorm.ts": {
+            "action": "create"
+          },
+          ".env": {
+            "action": "append"
+          },
+          "package.json": {
+            "action": "install"
+          }
+        }
+      }
+    },
+    "prisma": {
+      "typescript": {
+        "expressjs": {
+          "controllers/prismaController.ts": {
+            "action": "create"
+          },
+          "routes/prismaRoutes.ts": {
+            "action": "create"
+          },
+          "prisma/schema.prisma": {
+            "action": "create"
+          },
+          "utils/prisma.ts": {
+            "action": "create"
+          },
+          "index.ts": {
+            "action": "prepend"
+          },
+          "package.json": {
+            "action": "install"
+          },
+          ".env": {
+            "action": "append"
+          }
+        },
+        "nestjs": {
+          "prisma/schema.prisma": {
+            "action": "create"
+          },
+          "src/prisma.service.ts": {
+            "action": "create"
+          },
+          "src/user/user.controller.ts": {
+            "action": "create"
+          },
+          "src/user/user.module.ts": {
+            "action": "create"
+          },
+          "src/user/user.service.ts": {
+            "action": "create"
+          },
+          ".env": {
+            "action": "append"
+          },
+          "package.json": {
+            "action": "install"
+          }
+        },
+        "nextjs": {
+          "prisma/schema.prisma": {
+            "action": "create"
+          },
+          "app/api/users/route.ts": {
+            "action": "create"
+          },
+          "lib/prisma.ts": {
+            "action": "create"
+          },
+          ".env": {
+            "action": "append"
+          },
+          "package.json": {
+            "action": "install"
+          }
+        },
+        "remixjs": {
+          "app/prisma/schema.prisma": {
+            "action": "create"
+          },
+          "app/routes/api.users.ts": {
+            "action": "create"
+          },
+          "app/utils/prisma.ts": {
+            "action": "create"
+          },
+          ".env": {
+            "action": "append"
+          },
+          "package.json": {
+            "action": "install"
+          }
+        }
+      }
+    },
+    "drizzle": {
+      "typescript": {
+        "expressjs": {
+          "controllers/drizzleController.ts": {
+            "action": "create"
+          },
+          "routes/drizzleRoutes.ts": {
+            "action": "create"
+          },
+          "utils/drizzle.ts": {
+            "action": "create"
+          },
+          "index.ts": {
+            "action": "prepend"
+          },
+          "package.json": {
+            "action": "install"
+          },
+          ".env": {
+            "action": "append"
+          }
+        },
+        "nestjs": {
+          "src/drizzle.ts": {
+            "action": "create"
+          },
+          "src/drizzle/drizzle.controller.ts": {
+            "action": "create"
+          },
+          "src/drizzle/drizzle.module.ts": {
+            "action": "create"
+          },
+          "src/drizzle/drizzle.service.ts": {
+            "action": "create"
+          },
+          ".env": {
+            "action": "append"
+          },
+          "package.json": {
+            "action": "install"
+          }
+        },
+        "nextjs": {
+          "app/api/users/route.ts": {
+            "action": "create"
+          },
+          "lib/drizzle.ts": {
+            "action": "create"
+          },
+          ".env": {
+            "action": "append"
+          },
+          "package.json": {
+            "action": "install"
+          }
+        },
+        "remixjs": {
+          "app/routes/api.drizzle.ts": {
+            "action": "create"
+          },
+          "app/utils/drizzle.ts": {
+            "action": "create"
+          },
+          ".env": {
+            "action": "append"
+          },
+          "package.json": {
+            "action": "install"
+          }
+        }
+      }
+    },
+    "djangoORM": {
+      "python": {
+        "settings_postgres.py": {
+          "action": "create"
+        },
+        "requirements.txt": {
+          "action": "install"
+        }
+      }
+    },
+    "SQLAlchemy": {
+      "python": {
+        "postgres.py": {
+          "action": "create"
+        },
+        "requirements.txt": {
+          "action": "install"
+        }
+      }
+    },
+    "Peewee": {
+      "python": {}
+    },
+    "GORM": {
+      "go": {}
+    },
+    "Sequel": {
+      "ruby": {}
+    }
+  }
+}
