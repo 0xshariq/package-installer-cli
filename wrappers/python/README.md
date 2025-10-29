@@ -1,7 +1,7 @@
 # 📦 Package Installer CLI
 
 [![PyPI version](https://img.shields.io/pypi/v/package-installer-cli.svg)](https://pypi.org/project/package-installer-cli/)
-[![License: Apachse-2.0](https://img.shields.io/badge/License-Apachse-2.0-yellow.svg)](https://opensource.org/licenses/Apachse-2.0)
+[![License: Apache-2.0](https://img.shields.io/badge/License-Apache_2.0-yellow.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Python](https://img.shields.io/badge/python-%3E%3D3.8-brightgreen.svg)](https://python.org/)
 
 A **cross-platform, interactive CLI** to scaffold modern web application templates with support for multiple frameworks, languages, and development tools. Create production-ready projects in seconds!

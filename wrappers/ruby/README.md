@@ -1,9 +1,8 @@
 # � Package Installer CLI - Ruby Gem
 
 [![Gem Version](https://badge.fury.io/rb/package-installer-cli.svg)](https://badge.fury.io/rb/package-installer-cli)
-[![License: Apachse-2.0](https://img.shields.io/badge/License-Apachse-2.0-yellow.svg)](https://opensource.org/licenses/Apachse-2.0)
+[![License: Apache-2.0](https://img.shields.io/badge/License-Apache_2.0-yellow.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Ruby](https://img.shields.io/badge/ruby-%3E%3D2.6.0-red.svg)](https://www.ruby-lang.org/)
-[![Node.js](https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen.svg)](https://nodejs.org/)
 
 A **Ruby wrapper** around the Package Installer CLI - a cross-platform, interactive CLI to scaffold modern web application templates with support for multiple frameworks, languages, and development tools. Create production-ready projects in seconds!
 

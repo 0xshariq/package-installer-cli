@@ -1,6 +1,6 @@
 # 🍺 0xshariq's Homebrew Tap
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![License: Apache-2.0](https://img.shields.io/badge/License-Apache_2.0-yellow.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Homebrew](https://img.shields.io/badge/Homebrew-Available-orange.svg)](https://brew.sh/)
 
 A collection of **powerful CLI tools** and **development utilities** available through Homebrew. This tap provides easy installation and management of various tools for developers, system administrators, and DevOps engineers.
