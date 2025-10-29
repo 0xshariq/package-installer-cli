@@ -491,13 +491,45 @@
       }
     },
     "Peewee": {
-      "python": {}
+      "python": {
+        "mysql_peewee.py": {
+          "action": "create"
+        },
+        "requirements.txt": {
+          "action": "install"
+        }
+      }
     },
     "GORM": {
-      "go": {}
+      "go": {
+        "main_mysql.go": {
+          "action": "create"
+        },
+        "go.mod": {
+          "action": "install"
+        }
+      }
     },
     "Sequel": {
       "ruby": {}
+    },
+    "Sequelize": {
+      "javascript": {
+        "mysql_config.js": {
+          "action": "create"
+        },
+        "package.json": {
+          "action": "install"
+        }
+      },
+      "typescript": {
+        "mysql_config.ts": {
+          "action": "create"
+        },
+        "package.json": {
+          "action": "install"
+        }
+      }
     }
   },
   "postgres": {
@@ -786,13 +818,45 @@
       }
     },
     "Peewee": {
-      "python": {}
+      "python": {
+        "postgres_peewee.py": {
+          "action": "create"
+        },
+        "requirements.txt": {
+          "action": "install"
+        }
+      }
     },
     "GORM": {
-      "go": {}
+      "go": {
+        "main_postgres.go": {
+          "action": "create"
+        },
+        "go.mod": {
+          "action": "install"
+        }
+      }
     },
     "Sequel": {
       "ruby": {}
+    },
+    "Sequelize": {
+      "javascript": {
+        "postgres_config.js": {
+          "action": "create"
+        },
+        "package.json": {
+          "action": "install"
+        }
+      },
+      "typescript": {
+        "postgres_config.ts": {
+          "action": "create"
+        },
+        "package.json": {
+          "action": "install"
+        }
+      }
     }
   }
 }
