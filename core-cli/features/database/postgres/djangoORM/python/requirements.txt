@@ -1,0 +1,5 @@
+# Django ORM
+django>=5.0
+
+# PostgreSQL drivers
+psycopg2-binary>=2.9.9
