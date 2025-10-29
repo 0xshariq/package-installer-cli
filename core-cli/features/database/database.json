@@ -511,7 +511,14 @@
       }
     },
     "Sequel": {
-      "ruby": {}
+      "ruby": {
+        "mysql_sequel.rb": {
+          "action": "create"
+        },
+        "Gemfile": {
+          "action": "install"
+        }
+      }
     },
     "Sequelize": {
       "javascript": {
@@ -838,7 +845,14 @@
       }
     },
     "Sequel": {
-      "ruby": {}
+      "ruby": {
+        "postgres_sequel.rb": {
+          "action": "create"
+        },
+        "Gemfile": {
+          "action": "install"
+        }
+      }
     },
     "Sequelize": {
       "javascript": {
