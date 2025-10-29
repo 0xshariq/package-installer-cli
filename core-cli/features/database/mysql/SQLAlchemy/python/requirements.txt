@@ -1,0 +1,7 @@
+# SQLAlchemy ORM
+sqlalchemy>=2.0.25
+alembic>=1.13.2
+
+# MySQL drivers
+mysqlclient>=2.2.0
+pymysql>=1.1.0
