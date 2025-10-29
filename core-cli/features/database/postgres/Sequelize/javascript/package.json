@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "sequelize": "^6.37.0",
+    "pg": "^8.11.3"
+  }
+}
