@@ -50,22 +50,22 @@ For users who prefer a single binary without Node.js installation, we provide a 
 
 ```bash
 # Linux (x64)
-wget https://github.com/0xshariq/go_package_installer_cli/releases/latest/download/package-installer-cli-linux-amd64.tar.gz
+wget https://github.com/0xshariq/package_installer_cli/releases/latest/download/package-installer-cli-linux-amd64.tar.gz
 tar -xzf package-installer-cli-linux-amd64.tar.gz
 sudo mv package-installer-cli /usr/local/bin/
 
 # macOS (Intel)
-wget https://github.com/0xshariq/go_package_installer_cli/releases/latest/download/package-installer-cli-darwin-amd64.tar.gz
+wget https://github.com/0xshariq/package_installer_cli/releases/latest/download/package-installer-cli-darwin-amd64.tar.gz
 tar -xzf package-installer-cli-darwin-amd64.tar.gz
 sudo mv package-installer-cli /usr/local/bin/
 
 # macOS (Apple Silicon)
-wget https://github.com/0xshariq/go_package_installer_cli/releases/latest/download/package-installer-cli-darwin-arm64.tar.gz
+wget https://github.com/0xshariq/package_installer_cli/releases/latest/download/package-installer-cli-darwin-arm64.tar.gz
 tar -xzf package-installer-cli-darwin-arm64.tar.gz
 sudo mv package-installer-cli /usr/local/bin/
 
 # Windows (PowerShell)
-Invoke-WebRequest -Uri "https://github.com/0xshariq/go_package_installer_cli/releases/latest/download/package-installer-cli-windows-amd64.zip" -OutFile "package-installer-cli.zip"
+Invoke-WebRequest -Uri "https://github.com/0xshariq/package_installer_cli/releases/latest/download/package-installer-cli-windows-amd64.zip" -OutFile "package-installer-cli.zip"
 Expand-Archive -Path "package-installer-cli.zip" -DestinationPath "."
 # Add to PATH manually or move to a directory in PATH
 ```
@@ -81,7 +81,7 @@ go install github.com/0xshariq/go_package_installer_cli@latest
 
 ```bash
 # Prerequisites: Go 1.21+ and Node.js 18+
-git clone https://github.com/0xshariq/go_package_installer_cli.git
+git clone https://github.com/0xshariq/package_installer_cli.git
 cd go_package_installer_cli
 
 # Install Node.js dependencies and build TypeScript
@@ -114,22 +114,22 @@ chmod +x build.sh
 
 ```bash
 # Linux (x64)
-wget https://github.com/0xshariq/go_package_installer_cli/releases/latest/download/package-installer-cli-linux-amd64.tar.gz
+wget https://github.com/0xshariq/package_installer_cli/releases/latest/download/package-installer-cli-linux-amd64.tar.gz
 tar -xzf package-installer-cli-linux-amd64.tar.gz
 sudo mv package-installer-cli /usr/local/bin/
 
 # macOS (Intel)
-wget https://github.com/0xshariq/go_package_installer_cli/releases/latest/download/package-installer-cli-darwin-amd64.tar.gz
+wget https://github.com/0xshariq/package_installer_cli/releases/latest/download/package-installer-cli-darwin-amd64.tar.gz
 tar -xzf package-installer-cli-darwin-amd64.tar.gz
 sudo mv package-installer-cli /usr/local/bin/
 
 # macOS (Apple Silicon)
-wget https://github.com/0xshariq/go_package_installer_cli/releases/latest/download/package-installer-cli-darwin-arm64.tar.gz
+wget https://github.com/0xshariq/package_installer_cli/releases/latest/download/package-installer-cli-darwin-arm64.tar.gz
 tar -xzf package-installer-cli-darwin-arm64.tar.gz
 sudo mv package-installer-cli /usr/local/bin/
 
 # Windows (PowerShell)
-Invoke-WebRequest -Uri "https://github.com/0xshariq/go_package_installer_cli/releases/latest/download/package-installer-cli-windows-amd64.zip" -OutFile "package-installer-cli.zip"
+Invoke-WebRequest -Uri "https://github.com/0xshariq/package_installer_cli/releases/latest/download/package-installer-cli-windows-amd64.zip" -OutFile "package-installer-cli.zip"
 Expand-Archive -Path "package-installer-cli.zip" -DestinationPath "."
 # Add to PATH manually or move to a directory in PATH
 ```
@@ -164,10 +164,10 @@ pi upgrade-cli
 
 | Document | Description |
 |----------|-------------|
-| [📋 Commands](https://github.com/0xshariq/package-installer-cli/tree/main/docs/commands.md) | Complete command reference with examples |
-| [⚡ Features](https://github.com/0xshariq/package-installer-cli/tree/main/docs/features.md) | Detailed feature documentation and usage |
-| [🎨 Templates](https://github.com/0xshariq/package-installer-cli/tree/main/docs/templates.md) | Available templates and customization options |
-| [🚀 Deployment](https://github.com/0xshariq/package-installer-cli/tree/main/docs/deploy.md) | Deployment options and platform integration |
+| [📋 Commands](https://github.com/0xshariq/package-installer-cli/core-cli/tree/main/docs/commands.md) | Complete command reference with examples |
+| [⚡ Features](https://github.com/0xshariq/package-installer-cli/core-cli/tree/main/docs/features.md) | Detailed feature documentation and usage |
+| [🎨 Templates](https://github.com/0xshariq/package-installer-cli/core-cli/tree/main/docs/templates.md) | Available templates and customization options |
+| [🚀 Deployment](https://github.com/0xshariq/package-installer-cli/core-cli/tree/main/docs/deploy.md) | Deployment options and platform integration |
 
 ## 🛠️ Command Overview
 
@@ -181,7 +181,7 @@ pi upgrade-cli
 | `pi doctor` | Diagnose and fix project issues | `pi doctor` |
 | `pi clean` | Clean development artifacts | `pi clean [--all]` |
 
-*For complete command documentation, see [Commands](https://github.com/0xshariq/package-installer-cli/tree/main/docs/commands.md)*
+*For complete command documentation, see [Commands](https://github.com/0xshariq/package-installer-cli/core-cli/tree/main/docs/commands.md)*
 
 ## 🏗️ Supported Project Types
 
@@ -194,7 +194,7 @@ pi upgrade-cli
 | **Ruby** | Rails, Sinatra | bundler |
 | **PHP** | Laravel, Symfony | composer |
 
-*For detailed template information, see [Templates](https://github.com/0xshariq/package-installer-cli/tree/main/docs/templates.md)*
+*For detailed template information, see [Templates](https://github.com/0xshariq/package-installer-cli/core-cli/tree/main/docs/templates.md)*
 
 ## 🎯 System Requirements
 
@@ -252,7 +252,7 @@ A: The Go binary is a wrapper around the TypeScript CLI. This approach allows us
 A: Download the latest release from GitHub or run `go install github.com/0xshariq/go_package_installer_cli@latest`
 
 **Q: Can I build custom templates?**
-A: Yes, the CLI supports custom template system. See [templates](https://github.com/0xshariq/package-installer-cli/tree/main/docs/templates.md) for details.
+A: Yes, the CLI supports custom template system. See [templates](https://github.com/0xshariq/package-installer-cli/core-cli/tree/main/docs/templates.md) for details.
 
 ### Troubleshooting
 
@@ -322,22 +322,22 @@ npm start
 
 | Component | Version | Status |
 |-----------|---------|--------|
-| **Core CLI** | 3.2.0 | ✅ Stable |
-| **Go Wrapper** | 1.0.0 | ✅ Stable |
-| **Templates** | 50+ | ✅ Active |
-| **Features** | 30+ | ✅ Growing |
+| **Core CLI** | 3.17.7 | ✅ Stable |
+| **Go Wrapper** | 2.4.0 | ✅ Stable |
+| **Templates** | 75 | ✅ Active |
+| **Features** | 10+ | ✅ Growing |
 
 ## 🤝 Contributing
 
 We welcome contributions! Here's how you can help:
 
-- 🐛 **Report Bugs**: [GitHub Issues](https://github.com/0xshariq/go_package_installer_cli/issues)
-- 💡 **Suggest Features**: [Feature Requests](https://github.com/0xshariq/go_package_installer_cli/issues/new)
+- 🐛 **Report Bugs**: [GitHub Issues](https://github.com/0xshariq/package_installer_cli/issues)
+- 💡 **Suggest Features**: [Feature Requests](https://github.com/0xshariq/package_installer_cli/issues/new)
 - 📝 **Improve Documentation**: Submit PRs for documentation improvements
 - 🔧 **Add Templates**: Create new project templates
 - 🎨 **Add Features**: Implement new integrations and features
 
-See our [Contributing Guide](https://github.com/0xshariq/package-installer-cli/tree/main/CONTRIBUTING.md) for detailed information.
+See our [Contributing Guide](https://github.com/0xshariq/package-installer-cli/core-cli/tree/main/CONTRIBUTING.md) for detailed information.
 
 ## 📄 License
 
@@ -345,9 +345,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🔗 Links
 
-- **GitHub Repository**: [go_package_installer_cli](https://github.com/0xshariq/go_package_installer_cli)
-- **Issues & Feedback**: [GitHub Issues](https://github.com/0xshariq/go_package_installer_cli/issues)
-- **Releases**: [GitHub Releases](https://github.com/0xshariq/go_package_installer_cli/releases)
+- **GitHub Repository**: [go_package_installer_cli](https://github.com/0xshariq/package_installer_cli)
+- **Issues & Feedback**: [GitHub Issues](https://github.com/0xshariq/package_installer_cli/issues)
+- **Releases**: [GitHub Releases](https://github.com/0xshariq/package_installer_cli/releases)
 
 ---
 

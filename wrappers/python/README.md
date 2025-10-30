@@ -67,11 +67,11 @@ pi --help
 
 | Document | Description |
 |----------|-------------|
-| [📋 Commands](https://github.com/0xshariq/package-installer-cli/tree/main/docs/commands.md) | Complete command reference with examples |
-| [⚡ Features](https://github.com/0xshariq/package-installer-cli/tree/main/docs/features.md) | Detailed feature documentation and usage |
-| [🎨 Templates](https://github.com/0xshariq/package-installer-cli/tree/main/docs/templates.md) | Available templates and customization options |
-| [🚀 Deployment](https://github.com/0xshariq/package-installer-cli/tree/main/docs/deploy.md) | Deployment options and platform integration |
-| [📦 Bundle Info](https://github.com/0xshariq/package-installer-cli/tree/main/docs/bundle-info.md) | Distribution bundle system and cross-platform packaging |
+| [📋 Commands](https://github.com/0xshariq/package-installer-cli/core-cli/tree/main/docs/commands.md) | Complete command reference with examples |
+| [⚡ Features](https://github.com/0xshariq/package-installer-cli/core-cli/tree/main/docs/features.md) | Detailed feature documentation and usage |
+| [🎨 Templates](https://github.com/0xshariq/package-installer-cli/core-cli/tree/main/docs/templates.md) | Available templates and customization options |
+| [🚀 Deployment](https://github.com/0xshariq/package-installer-cli/core-cli/tree/main/docs/deploy.md) | Deployment options and platform integration |
+| [📦 Bundle Info](https://github.com/0xshariq/package-installer-cli/core-cli/tree/main/docs/bundle-info.md) | Distribution bundle system and cross-platform packaging |
 
 ## 🛠️ Command Overview
 
@@ -85,7 +85,7 @@ pi --help
 | `pi doctor` | Diagnose and fix project issues | `pi doctor` |
 | `pi clean` | Clean development artifacts | `pi clean [--all]` |
 
-*For complete command documentation, see [commands](https://github.com/0xshariq/package-installer-cli/tree/main/docs/commands.md)*
+*For complete command documentation, see [commands](https://github.com/0xshariq/package-installer-cli/core-cli/tree/main/docs/commands.md)*
 
 ## 🏗️ Supported Project Types
 
@@ -98,7 +98,7 @@ pi --help
 | **Ruby** | Rails Applications |
 | **React Native** | Mobile Applications |
 
-*For detailed template information, see [templates](https://github.com/0xshariq/package-installer-cli/tree/main/docs/templates.md)*
+*For detailed template information, see [templates](https://github.com/0xshariq/package-installer-cli/core-cli/tree/main/docs/templates.md)*
 
 ## 🎯 System Requirements
 
@@ -135,7 +135,7 @@ pip install --user package-installer-cli
 
 ## 🤝 Contributing
 
-We welcome contributions! Please see our [Contributing Guide](https://github.com/0xshariq/package-installer-cli/tree/main/CONTRIBUTING.md) for details.
+We welcome contributions! Please see our [Contributing Guide](https://github.com/0xshariq/package-installer-cli/core-cli/tree/main/CONTRIBUTING.md) for details.
 
 ## 📄 License
 
@@ -144,8 +144,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 🔗 Links
 
 - **PyPI Package**: [package-installer-cli](https://pypi.org/project/package-installer-cli/)
-- **GitHub Repository**: [py_package_installer_cli](https://github.com/0xshariq/py_package_installer_cli)
-- **Issues & Feedback**: [GitHub Issues](https://github.com/0xshariq/py_package_installer_cli/issues)
+- **GitHub Repository**: [py_package_installer_cli](https://github.com/0xshariq/package_installer_cli)
+- **Issues & Feedback**: [GitHub Issues](https://github.com/0xshariq/package_installer_cli/issues)
 
 ---
 

@@ -230,7 +230,7 @@ SCRIPT_PATH=$(dirname $(gem which package_installer_cli))/../install_dependencie
 bash "$SCRIPT_PATH"
 
 # Or download and run directly
-curl -fsSL https://raw.githubusercontent.com/0xshariq/ruby_package_installer_cli/main/install_dependencies.sh | bash
+curl -fsSL https://raw.githubusercontent.com/0xshariq/package_installer_cli/wrappers/ruby/main/install_dependencies.sh | bash
 ```
 
 **The script automatically:**
@@ -320,10 +320,10 @@ pi upgrade-cli
 
 | Document | Description |
 |----------|-------------|
-| [📋 Commands](https://github.com/0xshariq/package-installer-cli/tree/main/docs/commands.md) | Complete command reference with examples |
-| [⚡ Features](https://github.com/0xshariq/package-installer-cli/tree/main/docs/features.md) | Detailed feature documentation and usage |
-| [🎨 Templates](https://github.com/0xshariq/package-installer-cli/tree/main/docs/templates.md) | Available templates and customization options |
-| [🚀 Deployment](https://github.com/0xshariq/package-installer-cli/tree/main/docs/deploy.md) | Deployment options and platform integration |
+| [📋 Commands](https://github.com/0xshariq/package-installer-cli/core-cli/tree/main/docs/commands.md) | Complete command reference with examples |
+| [⚡ Features](https://github.com/0xshariq/package-installer-cli/core-cli/tree/main/docs/features.md) | Detailed feature documentation and usage |
+| [🎨 Templates](https://github.com/0xshariq/package-installer-cli/core-cli/tree/main/docs/templates.md) | Available templates and customization options |
+| [🚀 Deployment](https://github.com/0xshariq/package-installer-cli/core-cli/tree/main/docs/deploy.md) | Deployment options and platform integration |
 
 ## 🛠️ Command Overview
 
@@ -337,7 +337,7 @@ pi upgrade-cli
 | `pi doctor` | Diagnose and fix project issues | `pi doctor` |
 | `pi clean` | Clean development artifacts | `pi clean [--all]` |
 
-*For complete command documentation, see [commands](https://github.com/0xshariq/package-installer-cli/tree/main/docs/commands.md)*
+*For complete command documentation, see [commands](https://github.com/0xshariq/package-installer-cli/core-cli/tree/main/docs/commands.md)*
 
 ## 🏗️ Supported Project Types
 
@@ -350,7 +350,7 @@ pi upgrade-cli
 | **Ruby** | Rails, Sinatra | bundler |
 | **PHP** | Laravel, Symfony | composer |
 
-*For detailed template information, see [templates](https://github.com/0xshariq/package-installer-cli/tree/main/docs/templates.md)*
+*For detailed template information, see [templates](https://github.com/0xshariq/package-installer-cli/core-cli/tree/main/docs/templates.md)*
 
 ## 🎯 System Requirements
 
@@ -529,14 +529,14 @@ If you're still having issues:
    ls -la node_modules/ | head -10
    ```
 
-4. **Create Issue**: [GitHub Issues](https://github.com/0xshariq/ruby_package_installer_cli/issues)
+4. **Create Issue**: [GitHub Issues](https://github.com/0xshariq/package_installer_cli/issues)
    - Include output of `pi doctor`
    - Include your OS, Ruby, and Node.js versions
    - Include full error messages
 
 ## 🤝 Contributing
 
-We welcome contributions! Please see our [Contributing Guide](https://github.com/0xshariq/package-installer-cli/tree/main/CONTRIBUTING.md) for details.
+We welcome contributions! Please see our [Contributing Guide](https://github.com/0xshariq/package-installer-cli/core-cli/tree/main/CONTRIBUTING.md) for details.
 
 ## 📄 License
 
@@ -545,9 +545,8 @@ This project is licensed under the MIT License - see the [LICENSE](https://githu
 ## 🔗 Links
 
 - **Ruby Gem**: [package-installer-cli](https://rubygems.org/gems/package-installer-cli)
-- **GitHub Repository**: [ruby_package_installer_cli](https://github.com/0xshariq/ruby_package_installer_cli)
-- **Original CLI Repository**: [package-installer-cli](https://github.com/0xshariq/package-installer-cli)
-- **Issues & Feedback**: [GitHub Issues](https://github.com/0xshariq/ruby_package_installer_cli/issues)
+- **GitHub Repository**: [ruby_package_installer_cli](https://github.com/0xshariq/package_installer_cli)
+- **Issues & Feedback**: [GitHub Issues](https://github.com/0xshariq/package_installer_cli/issues)
 
 ---
 
