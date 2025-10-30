@@ -1,11 +1,11 @@
 [package]
 name = "package-installer-cli"
-version = "2.4.0"
+version = "2.5.0"
 authors = ["0xshariq khanshariq92213@gmail.com"]
 edition = "2021"
 description = "A cross-platform CLI for scaffolding modern web applications. Uses bundled CLI with all dependencies included - no manual installation required."
 license = "Apache-2.0"
-repository = "https://github.com/0xshariq/rust_package_installer_cli"
+repository = "https://github.com/0xshariq/package_installer_cli"
 readme = "README.md"
 keywords = ["cli", "scaffold", "template", "web", "framework"]
 categories = ["command-line-utilities", "development-tools"]
