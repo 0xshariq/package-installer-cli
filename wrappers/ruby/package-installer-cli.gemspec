@@ -1,20 +1,20 @@
 Gem::Specification.new do |spec|
   spec.name          = "package-installer-cli"
-  spec.version       = "2.4.0"
+  spec.version       = "2.5.0"
   spec.authors       = ["sharique"]
   spec.email         = ["khanshariq92213@gmail.com"]
 
   spec.summary       = "A cross-platform, interactive CLI to scaffold modern web app templates"
   spec.description   = "A cross-platform, interactive CLI to scaffold modern web application templates with framework, language, UI, bundler support and feature integration. Built with Ruby and includes all dependencies bundled."
-  spec.homepage      = "https://github.com/0xshariq/ruby_package_installer_cli"
+  spec.homepage      = "https://github.com/0xshariq/package_installer_cli"
   spec.license       = "MIT"
   spec.required_ruby_version = ">= 2.6.0"
 
   spec.metadata["source_url"] = "https://github.com/0xshariq/package-installer-cli"
   spec.metadata["homepage_uri"] = spec.homepage
-  spec.metadata["source_code_uri"] = "https://github.com/0xshariq/ruby_package_installer_cli"
-  spec.metadata["changelog_uri"] = "https://github.com/0xshariq/ruby_package_installer_cli/blob/main/CHANGELOG.md"
-  spec.metadata["bug_tracker_uri"] = "https://github.com/0xshariq/ruby_package_installer_cli/issues"
+  spec.metadata["source_code_uri"] = "https://github.com/0xshariq/package_installer_cli"
+  spec.metadata["changelog_uri"] = "https://github.com/0xshariq/package_installer_cli/blob/main/CHANGELOG.md"
+  spec.metadata["bug_tracker_uri"] = "https://github.com/0xshariq/package_installer_cli/issues"
 
   # No extensions needed - all dependencies are bundled
 
@@ -63,9 +63,8 @@ Gem::Specification.new do |spec|
       source ~/.bashrc
     
     🆘 Need help?
-      • Run 'pi doctor' to check system status
-      • Visit: https://github.com/0xshariq/ruby_package_installer_cli
-      • Issues: https://github.com/0xshariq/ruby_package_installer_cli/issues
+      • Visit: https://github.com/0xshariq/package_installer_cli
+      • Issues: https://github.com/0xshariq/package_installer_cli/issues
     
     💎 Happy coding with Package Installer CLI!
   MSG
