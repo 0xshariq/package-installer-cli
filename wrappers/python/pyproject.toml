@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "package-installer-cli"
-version = "2.4.0"
+version = "2.5.0"
 description = "A powerful CLI tool to bootstrap projects with pre-configured templates and features"
 readme = "README.md"
 license = {text = "Apache-2.0"}
@@ -95,11 +95,11 @@ test = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/0xshariq/py_package_installer_cli"
-Documentation = "https://github.com/0xshariq/py_package_installer_cli#readme"
-Repository = "https://github.com/0xshariq/py_package_installer_cli.git"
-"Bug Tracker" = "https://github.com/0xshariq/py_package_installer_cli/issues"
-Changelog = "https://github.com/0xshariq/py_package_installer_cli/blob/main/CHANGELOG.md"
+Homepage = "https://github.com/0xshariq/package_installer_cli"
+Documentation = "https://github.com/0xshariq/package_installer_cli#readme"
+Repository = "https://github.com/0xshariq/package_installer_cli.git"
+"Bug Tracker" = "https://github.com/0xshariq/package_installer_cli/issues"
+Changelog = "https://github.com/0xshariq/package_installer_cli/wrappers/python/blob/main/CHANGELOG.md"
 
 [project.scripts]
 pi = "cli:main"
