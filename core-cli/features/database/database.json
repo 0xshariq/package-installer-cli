@@ -872,5 +872,36 @@
         }
       }
     }
+  },
+  "sqlite": {
+    "typeorm": {
+      "javascript": {},
+      "typescript": {}
+    },
+    "drizzle": {
+      "typescript": {}
+    },
+    "prisma": {
+      "typescript": {}
+    },
+    "sequelize": {
+      "javascript": {},
+      "typescript": {}
+    },
+    "GORM": {
+      "go": {}
+    },
+    "Peewee": {
+      "python": {}
+    },
+    "SQLAlchemy": {
+      "python": {}
+    },
+    "Sequel": {
+      "ruby": {}
+    },
+    "djangoORM": {
+      "python": {}
+    }
   }
 }
