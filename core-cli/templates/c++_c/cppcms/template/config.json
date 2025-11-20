@@ -1,0 +1,13 @@
+{
+    "service": {
+        "api": "http",
+        "mode": "http",
+        "port": 8080,
+        "worker_threads": 1
+    },
+    "http": {
+        "script_names": [
+            "/"
+        ]
+    }
+}
