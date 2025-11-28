@@ -875,33 +875,324 @@
   },
   "sqlite": {
     "typeorm": {
-      "javascript": {},
-      "typescript": {}
+      "javascript": {
+        "expressjs": {
+          "controllers/sqliteController.js": {
+            "action": "create"
+          },
+          "routes/sqliteRoutes.js": {
+            "action": "create"
+          },
+          "utils/entity/User.js": {
+            "action": "create"
+          },
+          "utils/data-source.js": {
+            "action": "create"
+          },
+          ".env": {
+            "action": "append"
+          }
+        },
+        "nextjs": {
+          "app/api/sqlite/route.js": {
+            "action": "create"
+          },
+          "lib/entity/User.js": {
+            "action": "create"
+          },
+          "lib/data-source.js": {
+            "action": "create"
+          },
+          ".env": {
+            "action": "append"
+          }
+        }
+      },
+      "typescript": {
+        "expressjs": {
+          "controllers/sqliteController.ts": {
+            "action": "create"
+          },
+          "routes/sqliteRoutes.ts": {
+            "action": "create"
+          },
+          "utils/entity/User.ts": {
+            "action": "create"
+          },
+          "utils/data-source.ts": {
+            "action": "create"
+          },
+          ".env": {
+            "action": "append"
+          }
+        },
+        "nestjs": {
+          ".env": {
+            "action": "append"
+          },
+          "src/sqlite/sqlite.controller.ts": {
+            "action": "create"
+          },
+          "src/sqlite/sqlite.module.ts": {
+            "action": "create"
+          },
+          "src/sqlite/sqlite.service.ts": {
+            "action": "create"
+          },
+          "src/typeorm/entities/user.entity.ts": {
+            "action": "create"
+          },
+          "src/typeorm/typeorm.module.ts": {
+            "action": "create"
+          }
+        },
+        "nextjs": {
+          "app/api/sqlite/route.js": {
+            "action": "create"
+          },
+          "lib/entity/User.js": {
+            "action": "create"
+          },
+          "lib/data-source.js": {
+            "action": "create"
+          },
+          ".env": {
+            "action": "append"
+          }
+        },
+        "remixjs": {
+          "app/routes/api/users.ts": {
+            "action": "create"
+          },
+          "app/utils/entity/User.ts": {
+            "action": "create"
+          },
+          "app/utils/data-source.ts": {
+            "action": "create"
+          },
+          ".env": {
+            "action": "append"
+          }
+        }
+      }
     },
     "drizzle": {
-      "typescript": {}
+      "typescript": {
+        "expressjs": {
+          ".env": {
+            "action": "append"
+          },
+          "controllers/sqliteController.ts": {
+            "action": "create"
+          },
+          "routes/sqliteRoutes.ts": {
+            "action": "create"
+          },
+          "utils/schema.ts": {
+            "action": "create"
+          },
+          "utils/sqlite.ts": {
+            "action": "create"
+          }
+        },
+        "nestjs": {
+          ".env": {
+            "action": "append"
+          },
+          "src/sqlite/sqlite.controller.ts": {
+            "action": "create"
+          },
+          "src/sqlite/sqlite.module.ts": {
+            "action": "create"
+          },
+          "src/sqlite/sqlite.service.ts": {
+            "action": "create"
+          },
+          "src/sqlite/schema.ts": {
+            "action": "create"
+          }
+        },
+        "nextjs": {
+          "app/api/sqlite/route.ts": {
+            "action": "create"
+          },
+          "lib/schema.ts": {
+            "action": "create"
+          },
+          "lib/sqlite.ts": {
+            "action": "create"
+          },
+          ".env": {
+            "action": "append"
+          }
+        },
+        "remixjs": {
+          "app/routes/api/users.ts": {
+            "action": "create"
+          },
+          "utils/schema.ts": {
+            "action": "create"
+          },
+          "utils/sqlite.ts": {
+            "action": "create"
+          },
+          ".env": {
+            "action": "append"
+          }
+        }
+      }
     },
     "prisma": {
-      "typescript": {}
+      "typescript": {
+        "expressjs": {
+          "controllers/prismaController.ts": {
+            "action": "create"
+          },
+          "prisma/schema.prisma": {
+            "action": "create"
+          },
+          "routes/prismaRoutes.ts": {
+            "action": "create"
+          },
+          "utils/prisma.ts": {
+            "action": "create"
+          },
+          ".env": {
+            "action": "append"
+          }
+        },
+        "nestjs": {
+          "src/prisma/prisma.service.ts": {
+            "action": "create"
+          },
+          "src/prisma/prisma.module.ts": {
+            "action": "create"
+          },
+          "src/sqlite/sqlite.controller.ts": {
+            "action": "create"
+          },
+          "src/sqlite/sqlite.module.ts": {
+            "action": "create"
+          },
+          "src/sqlite/sqlite.service.ts": {
+            "action": "create"
+          },
+          "prisma/schema.prisma": {
+            "action": "create"
+          },
+          ".env": {
+            "action": "append"
+          }
+        },
+        "nextjs": {
+          "app/api/sqlite/route.ts": {
+            "action": "create"
+          },
+          "lib/prisma.ts": {
+            "action": "create"
+          },
+          ".env": {
+            "action": "append"
+          },
+          "prisma/schema.prisma": {
+            "action": "create"
+          }
+        },
+        "remixjs": {
+          ".env": {
+            "action": "append"
+          },
+          "prisma/schema.prisma": {
+            "action": "create"
+          },
+          "app/routes/api/users.ts": {
+            "action": "create"
+          },
+          "app/utils/prisma.ts": {
+            "action": "create"
+          }
+        }
+      }
     },
     "sequelize": {
-      "javascript": {},
-      "typescript": {}
+      "javascript": {
+        ".env": {
+          "action": "append"
+        },
+        "db.js": {
+          "action": "create"
+        }
+      },
+      "typescript": {
+        ".env": {
+          "action": "append"
+        },
+        "db.ts": {
+          "action": "create"
+        }
+      }
     },
     "GORM": {
-      "go": {}
+      "go": {
+        ".env": {
+          "action": "append"
+        },
+        "main.go": {
+          "action": "create"
+        }
+      }
     },
     "Peewee": {
-      "python": {}
+      "python": {
+        ".env": {
+          "action": "append"
+        },
+        "models.py": {
+          "action": "create"
+        },
+        "db.py": {
+          "action": "create"
+        }
+      }
     },
     "SQLAlchemy": {
-      "python": {}
+      "python": {
+        ".env": {
+          "action": "append"
+        },
+        "models.py": {
+          "action": "create"
+        },
+        "db.py": {
+          "action": "create"
+        }
+      }
     },
     "Sequel": {
-      "ruby": {}
+      "ruby": {
+        "models/user.rb": {
+          "action": "create"
+        },
+        "db.rb": {
+          "action": "create"
+        },
+        ".env": {
+          "action": "append"
+        }
+      }
     },
     "djangoORM": {
-      "python": {}
+      "python": {
+        ".env": {
+          "action": "append"
+        },
+        "models.py": {
+          "action": "create"
+        },
+        "settings.py": {
+          "action": "create"
+        }
+      }
     }
   }
 }
