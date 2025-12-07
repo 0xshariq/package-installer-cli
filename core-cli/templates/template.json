@@ -8,7 +8,9 @@
       ],
       "ui": [],
       "options": [],
-      "templates": []
+      "templates": [
+        "template"
+      ]
     },
     "crow": {
       "type": "",
@@ -30,7 +32,9 @@
       ],
       "ui": [],
       "options": [],
-      "templates": []
+      "templates": [
+        "template"
+      ]
     },
     "ulfius": {
       "type": "",
@@ -40,7 +44,9 @@
       ],
       "ui": [],
       "options": [],
-      "templates": []
+      "templates": [
+        "template"
+      ]
     },
     "wt": {
       "type": "",
@@ -50,7 +56,9 @@
       ],
       "ui": [],
       "options": [],
-      "templates": []
+      "templates": [
+        "template"
+      ]
     }
   },
   "combination-templates": {
@@ -115,7 +123,9 @@
       ],
       "ui": [],
       "options": [],
-      "templates": []
+      "templates": [
+        "template"
+      ]
     },
     "electron": {
       "type": "desktop",
@@ -136,7 +146,9 @@
       ],
       "ui": [],
       "options": [],
-      "templates": []
+      "templates": [
+        "template"
+      ]
     },
     "nwjs": {
       "type": "desktop",
@@ -147,7 +159,9 @@
       ],
       "ui": [],
       "options": [],
-      "templates": []
+      "templates": [
+        "template"
+      ]
     },
     "qt": {
       "type": "desktop",
@@ -157,7 +171,9 @@
       ],
       "ui": [],
       "options": [],
-      "templates": []
+      "templates": [
+        "template"
+      ]
     },
     "tauri": {
       "type": "desktop",
@@ -192,7 +208,9 @@
       ],
       "ui": [],
       "options": [],
-      "templates": []
+      "templates": [
+        "template"
+      ]
     },
     "bevy": {
       "type": "game",
@@ -202,7 +220,9 @@
       ],
       "ui": [],
       "options": [],
-      "templates": []
+      "templates": [
+        "template"
+      ]
     },
     "godot": {
       "type": "game",
@@ -213,7 +233,9 @@
       ],
       "ui": [],
       "options": [],
-      "templates": []
+      "templates": [
+        "template"
+      ]
     },
     "pygame": {
       "type": "game",
@@ -223,7 +245,9 @@
       ],
       "ui": [],
       "options": [],
-      "templates": []
+      "templates": [
+        "template"
+      ]
     },
     "threejs": {
       "type": "game",
@@ -234,7 +258,9 @@
       ],
       "ui": [],
       "options": [],
-      "templates": []
+      "templates": [
+        "template"
+      ]
     },
     "unity": {
       "type": "game",
@@ -482,7 +508,9 @@
       ],
       "ui": [],
       "options": [],
-      "templates": []
+      "templates": [
+        "template"
+      ]
     },
     "reactjs": {
       "type": "frontend",
@@ -790,13 +818,25 @@
     }
   },
   "rust": {
+    "actix-web": {
+      "type": "rust",
+      "description": "",
+      "languages": [],
+      "ui": [],
+      "options": [],
+      "templates": [
+        "template"
+      ]
+    },
     "axum": {
       "type": "rust",
       "description": "Modern async web framework built on Tokio.",
       "languages": [],
       "ui": [],
       "options": [],
-      "templates": []
+      "templates": [
+        "template"
+      ]
     },
     "gotham": {
       "type": "rust",
@@ -804,7 +844,9 @@
       "languages": [],
       "ui": [],
       "options": [],
-      "templates": []
+      "templates": [
+        "template"
+      ]
     },
     "poem": {
       "type": "rust",
@@ -812,7 +854,9 @@
       "languages": [],
       "ui": [],
       "options": [],
-      "templates": []
+      "templates": [
+        "template"
+      ]
     },
     "rocket": {
       "type": "rust",
@@ -820,7 +864,39 @@
       "languages": [],
       "ui": [],
       "options": [],
-      "templates": []
+      "templates": [
+        "template"
+      ]
+    },
+    "rouillle": {
+      "type": "rust",
+      "description": "",
+      "languages": [],
+      "ui": [],
+      "options": [],
+      "templates": [
+        "template"
+      ]
+    },
+    "salvo": {
+      "type": "rust",
+      "description": "",
+      "languages": [],
+      "ui": [],
+      "options": [],
+      "templates": [
+        "template"
+      ]
+    },
+    "thruster": {
+      "type": "rust",
+      "description": "",
+      "languages": [],
+      "ui": [],
+      "options": [],
+      "templates": [
+        "template"
+      ]
     },
     "tide": {
       "type": "rust",
@@ -828,7 +904,9 @@
       "languages": [],
       "ui": [],
       "options": [],
-      "templates": []
+      "templates": [
+        "template"
+      ]
     },
     "warp": {
       "type": "rust",
@@ -836,7 +914,9 @@
       "languages": [],
       "ui": [],
       "options": [],
-      "templates": []
+      "templates": [
+        "template"
+      ]
     }
   },
   "web3": {
@@ -896,7 +976,10 @@
       ],
       "ui": [],
       "options": [],
-      "templates": []
+      "templates": [
+        "solidity-learning",
+        "uniswap-simple-swap"
+      ]
     },
     "truffle": {
       "type": "web3",
