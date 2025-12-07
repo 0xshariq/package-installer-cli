@@ -1,0 +1,18 @@
+{
+  "name": "my-nwjs-app",
+  "version": "0.0.1",
+  "description": "My first NW.js desktop app",
+  "main": "index.html",
+  "window": {
+    "title": "My NW.js App",
+    "width": 900,
+    "height": 600,
+    "position": "center",
+    "toolbar": false,
+    "frame": true
+  },
+  "chromium-args": "--enable-features=OverlayScrollbar",
+  "node-remote": [
+    "<all_urls>"
+  ]
+}
