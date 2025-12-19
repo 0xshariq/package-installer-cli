@@ -1,0 +1,45 @@
+<script lang="ts">
+  import { login } from '$lib/stores/auth';
+
+  async function handleLogin() {
+    await login();
+  }
+</script>
+
+<button 
+  on:click={handleLogin}
+  class="button login"
+>
+  Log In
+</button>
+
+<style>
+  .button {
+    padding: 1.1rem 2.8rem;
+    font-size: 1.2rem;
+    font-weight: 600;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    outline: none;
+  }
+
+  .button:focus {
+    box-shadow: 0 0 0 4px rgba(99, 179, 237, 0.5);
+  }
+
+  .button.login {
+    background-color: #63b3ed;
+    color: #1a1e27;
+  }
+
+  .button.login:hover {
+    background-color: #4299e1;
+    transform: translateY(-5px) scale(1.03);
+    box-shadow: 0 12px 25px rgba(0, 0, 0, 0.5);
+  }
+</style>
