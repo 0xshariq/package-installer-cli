@@ -35,3 +35,5 @@ docker-build.sh
 node_modules/
 
 /pnpm-workspace.yaml
+
+./env

@@ -674,7 +674,10 @@
       "languages": [],
       "ui": [],
       "options": [],
-      "templates": []
+      "templates": [
+        "laravel-react-template",
+        "laravel-vue-template"
+      ]
     },
     "slim": {
       "type": "php",
