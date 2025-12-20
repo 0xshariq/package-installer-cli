@@ -659,6 +659,48 @@
       "templates": []
     }
   },
+  "php": {
+    "cakephp": {
+      "type": "php",
+      "description": "Rapid development framework.",
+      "languages": [],
+      "ui": [],
+      "options": [],
+      "templates": []
+    },
+    "laravel": {
+      "type": "php",
+      "description": "Popular full-stack framework.",
+      "languages": [],
+      "ui": [],
+      "options": [],
+      "templates": []
+    },
+    "slim": {
+      "type": "php",
+      "description": "Micro framework for APIs and web apps.",
+      "languages": [],
+      "ui": [],
+      "options": [],
+      "templates": []
+    },
+    "symfony": {
+      "type": "php",
+      "description": "Modular full-stack framework.",
+      "languages": [],
+      "ui": [],
+      "options": [],
+      "templates": []
+    },
+    "yii": {
+      "type": "php",
+      "description": "High-performance framework.",
+      "languages": [],
+      "ui": [],
+      "options": [],
+      "templates": []
+    }
+  },
   "python": {
     "bottle": {
       "type": "python",
