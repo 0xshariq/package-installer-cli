@@ -72,7 +72,7 @@ async function getServerlessConfig(): Promise<ServerlessConfig> {
       type: 'list',
       name: 'runtime',
       message: 'Select runtime:',
-      choices: (answers) => {
+      choices: (answers: { provider: string; }) => {
         if (answers.provider === 'aws') {
           return [
             'nodejs18.x',
@@ -109,7 +109,7 @@ async function getServerlessConfig(): Promise<ServerlessConfig> {
       type: 'list',
       name: 'region',
       message: 'Select region:',
-      choices: (answers) => {
+      choices: (answers: { provider: string; }) => {
         if (answers.provider === 'aws') {
           return [
             'us-east-1',
