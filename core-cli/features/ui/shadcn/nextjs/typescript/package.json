@@ -1,5 +1,5 @@
 {
     "devDependencies": {
-        "@shadcn/ui": "^0.0.4"
+        "shadcn": "^3.6.2"
     }
 }
