@@ -39,17 +39,17 @@ export interface ProjectInfo {
  */
 export function createBanner(title: string = 'Package Installer CLI'): void {
   console.clear();
-  
+
   // Create figlet text with proper title
   const figletText = figlet.textSync(title.length > 15 ? 'Package Installer' : title, {
     font: 'ANSI Shadow',
     horizontalLayout: 'fitted',
     width: 80
   });
-  
+
   // Apply gradient
   const gradientText = gradientString('cyan', 'magenta', 'yellow')(figletText);
-  
+
   // Create a box around it
   const banner = boxen(gradientText, {
     padding: 1,
@@ -58,14 +58,14 @@ export function createBanner(title: string = 'Package Installer CLI'): void {
     borderColor: 'cyan',
     backgroundColor: '#1a1a1a'
   });
-  
+
   console.log(banner);
-  
+
   // Add tagline with updated branding
   const tagline = chalk.hex('#00d2d3')('🚀 Advanced Project Analytics Dashboard');
   const version = chalk.hex('#95afc0')('v3.2.0');
   const author = chalk.hex('#ffa502')('by @0xshariq');
-  
+
   const centered = `${tagline} ${version} ${author}`;
   const padding = Math.max(0, Math.floor(((process.stdout.columns || 80) - centered.length) / 2));
   console.log(' '.repeat(padding) + centered);
@@ -77,7 +77,7 @@ export function createBanner(title: string = 'Package Installer CLI'): void {
  */
 export function displayProjectStats(stats: DashboardStats): void {
   console.log(gradientString('cyan', 'magenta')('📊 PROJECT STATISTICS\n'));
-  
+
   // Main stats table
   const statsTable = new Table({
     head: [
@@ -91,7 +91,7 @@ export function displayProjectStats(stats: DashboardStats): void {
       border: ['cyan']
     }
   });
-  
+
   statsTable.push(
     [
       chalk.white('🏗️  Total Projects'),
@@ -124,13 +124,13 @@ export function displayProjectStats(stats: DashboardStats): void {
       chalk.gray('Most recent CLI activity')
     ]
   );
-  
+
   console.log(statsTable.toString());
-  
+
   // Display command breakdown if available
   if (Object.keys(stats.commandBreakdown).length > 0) {
     console.log('\n' + gradientString('green', 'blue')('🎮 COMMAND USAGE BREAKDOWN\n'));
-    
+
     const commandTable = new Table({
       head: [
         chalk.hex('#10ac84')('Command'),
@@ -143,17 +143,17 @@ export function displayProjectStats(stats: DashboardStats): void {
         border: ['green']
       }
     });
-    
+
     const totalCommands = Object.values(stats.commandBreakdown).reduce((sum, count) => sum + count, 0);
-    
+
     Object.entries(stats.commandBreakdown)
-      .sort(([,a], [,b]) => b - a)
+      .sort(([, a], [, b]) => b - a)
       .slice(0, 8)
       .forEach(([command, count]) => {
         const percentage = ((count / totalCommands) * 100).toFixed(1);
         const barLength = Math.round((count / totalCommands) * 20);
         const bar = '█'.repeat(barLength) + '░'.repeat(20 - barLength);
-        
+
         commandTable.push([
           chalk.white(command),
           chalk.cyan(count.toString()),
@@ -161,14 +161,14 @@ export function displayProjectStats(stats: DashboardStats): void {
           chalk.hex('#74b9ff')(bar)
         ]);
       });
-    
+
     console.log(commandTable.toString());
   }
-  
+
   // Language breakdown pie chart (text-based)
   if (Object.keys(stats.languageBreakdown).length > 0) {
     console.log('\n' + gradientString('yellow', 'red')('🎯 LANGUAGE BREAKDOWN\n'));
-    
+
     const total = Object.values(stats.languageBreakdown).reduce((a, b) => a + b, 0);
     const langTable = new Table({
       head: [
@@ -182,12 +182,12 @@ export function displayProjectStats(stats: DashboardStats): void {
         border: ['yellow']
       }
     });
-    
+
     for (const [lang, count] of Object.entries(stats.languageBreakdown)) {
       const percentage = ((count / total) * 100).toFixed(1);
       const barLength = Math.round((count / total) * 20);
       const bar = '█'.repeat(barLength) + '░'.repeat(20 - barLength);
-      
+
       langTable.push([
         getLanguageIcon(lang) + ' ' + chalk.white(lang),
         chalk.cyan(count.toString()),
@@ -195,14 +195,14 @@ export function displayProjectStats(stats: DashboardStats): void {
         chalk.hex('#00d2d3')(bar)
       ]);
     }
-    
+
     console.log(langTable.toString());
   }
-  
+
   // Framework breakdown display
   if (Object.keys(stats.frameworkBreakdown).length > 0) {
     console.log('\n' + gradientString('magenta', 'cyan')('🎯 FRAMEWORK BREAKDOWN\n'));
-    
+
     const total = Object.values(stats.frameworkBreakdown).reduce((a, b) => a + b, 0);
     const frameworkTable = new Table({
       head: [
@@ -216,12 +216,12 @@ export function displayProjectStats(stats: DashboardStats): void {
         border: ['magenta']
       }
     });
-    
+
     for (const [framework, count] of Object.entries(stats.frameworkBreakdown)) {
       const percentage = ((count / total) * 100).toFixed(1);
       const barLength = Math.round((count / total) * 20);
       const bar = '█'.repeat(barLength) + '░'.repeat(20 - barLength);
-      
+
       frameworkTable.push([
         getFrameworkIcon(framework) + ' ' + chalk.white(framework),
         chalk.cyan(count.toString()),
@@ -229,7 +229,7 @@ export function displayProjectStats(stats: DashboardStats): void {
         chalk.hex('#ff6b6b')(bar)
       ]);
     }
-    
+
     console.log(frameworkTable.toString());
   }
 }
@@ -239,9 +239,9 @@ export function displayProjectStats(stats: DashboardStats): void {
  */
 export function displayRecentProjects(projects: ProjectInfo[]): void {
   if (projects.length === 0) return;
-  
+
   console.log('\n' + gradientString('green', 'blue')('📂 RECENT PROJECTS\n'));
-  
+
   const projectTable = new Table({
     head: [
       chalk.hex('#10ac84')('Project'),
@@ -255,7 +255,7 @@ export function displayRecentProjects(projects: ProjectInfo[]): void {
       border: ['green']
     }
   });
-  
+
   projects.slice(0, 10).forEach(project => {
     projectTable.push([
       chalk.white('📁 ' + project.name),
@@ -265,7 +265,7 @@ export function displayRecentProjects(projects: ProjectInfo[]): void {
       chalk.gray(formatDate(project.lastModified))
     ]);
   });
-  
+
   console.log(projectTable.toString());
 }
 
@@ -274,12 +274,12 @@ export function displayRecentProjects(projects: ProjectInfo[]): void {
  */
 export function displayFeatureUsageFromHistory(featureStats: Array<{ feature: string; count: number; frameworks: string[] }>): void {
   console.log('\n' + gradientString('orange', 'red')('🎯 FEATURE USAGE\n'));
-  
+
   if (featureStats.length === 0) {
     console.log(chalk.gray('   No features used yet. Use \'pi add\' to add features to projects.\n'));
     return;
   }
-  
+
   const featureTable = new Table({
     head: [
       chalk.cyan('Feature'),
@@ -310,11 +310,11 @@ export function displayFeatureUsageFromHistory(featureStats: Array<{ feature: st
       'middle': '│'
     }
   });
-  
+
   featureStats.slice(0, 5).forEach((feature) => {
     const icon = getFeatureIcon(feature.feature);
     const popularity = '█'.repeat(Math.ceil((feature.count / Math.max(...featureStats.map(f => f.count))) * 10));
-    
+
     featureTable.push([
       `${icon} ${feature.feature}`,
       chalk.green(feature.count.toString()),
@@ -322,7 +322,7 @@ export function displayFeatureUsageFromHistory(featureStats: Array<{ feature: st
       chalk.blue(popularity)
     ]);
   });
-  
+
   console.log(featureTable.toString());
 }
 
@@ -331,17 +331,17 @@ export function displayFeatureUsageFromHistory(featureStats: Array<{ feature: st
  */
 export function displayProjectStatsFromHistory(history: any): void {
   console.log('\n' + gradientString('cyan', 'blue')('📊 PROJECT STATISTICS\n'));
-  
+
   const stats = history.statistics;
   const frameworks = new Map<string, number>();
   const languages = new Map<string, number>();
-  
+
   // Calculate framework and language usage
   history.projects.forEach((project: any) => {
     frameworks.set(project.framework, (frameworks.get(project.framework) || 0) + 1);
     languages.set(project.language, (languages.get(project.language) || 0) + 1);
   });
-  
+
   const projectTable = new Table({
     head: [
       chalk.cyan('Metric'),
@@ -416,12 +416,12 @@ export function displayProjectStatsFromHistory(history: any): void {
  */
 export function displayRecentProjectsFromHistory(recentProjects: any[]): void {
   console.log('\n' + gradientString('green', 'teal')('📁 RECENT PROJECTS\n'));
-  
+
   if (recentProjects.length === 0) {
     console.log(chalk.gray('   No projects found. Create your first project with \'pi create\'.\n'));
     return;
   }
-  
+
   const projectTable = new Table({
     head: [
       chalk.cyan('Project'),
@@ -457,7 +457,7 @@ export function displayRecentProjectsFromHistory(recentProjects: any[]): void {
   recentProjects.slice(0, 5).forEach((project) => {
     const createdDate = new Date(project.createdAt).toLocaleDateString();
     const features = project.features?.length > 0 ? project.features.join(', ') : 'None';
-    
+
     projectTable.push([
       chalk.white(project.name),
       chalk.yellow(project.framework),
@@ -466,7 +466,7 @@ export function displayRecentProjectsFromHistory(recentProjects: any[]): void {
       chalk.gray(createdDate)
     ]);
   });
-  
+
   console.log(projectTable.toString());
 }
 
@@ -491,7 +491,7 @@ function getFeatureIcon(featureName: string): string {
  */
 export function displayCommandsGrid(): void {
   console.log('\n' + gradientString('purple', 'pink')('🎯 AVAILABLE COMMANDS\n'));
-  
+
   const commands = [
     {
       name: 'create',
@@ -560,7 +560,7 @@ export function displayCommandsGrid(): void {
       color: '#5f27cd'
     }
   ];
-  
+
   const commandTable = new Table({
     head: [
       chalk.hex('#ff6b6b')('Command'),
@@ -573,7 +573,7 @@ export function displayCommandsGrid(): void {
       border: ['magenta']
     }
   });
-  
+
   commands.forEach(cmd => {
     commandTable.push([
       chalk.hex(cmd.color)(cmd.icon + ' ' + cmd.name),
@@ -581,7 +581,7 @@ export function displayCommandsGrid(): void {
       chalk.gray(`pi ${cmd.name}`)
     ]);
   });
-  
+
   console.log(commandTable.toString());
 }
 
@@ -590,7 +590,7 @@ export function displayCommandsGrid(): void {
  */
 export function displaySystemInfo(): void {
   console.log('\n' + gradientString('orange', 'red')('💻 SYSTEM INFORMATION\n'));
-  
+
   const systemTable = new Table({
     head: [
       chalk.hex('#ffa502')('Property'),
@@ -602,7 +602,7 @@ export function displaySystemInfo(): void {
       border: ['yellow']
     }
   });
-  
+
   systemTable.push(
     [chalk.white('🖥️  Platform'), chalk.cyan(process.platform)],
     [chalk.white('⚡ Node Version'), chalk.green(process.version)],
@@ -610,7 +610,7 @@ export function displaySystemInfo(): void {
     [chalk.white('🔧 Architecture'), chalk.blue(process.arch)],
     [chalk.white('💾 Memory Usage'), chalk.magenta(formatMemory(process.memoryUsage().heapUsed))]
   );
-  
+
   console.log(systemTable.toString());
 }
 
@@ -620,7 +620,7 @@ export function displaySystemInfo(): void {
 export function createLoadingAnimation(message: string): NodeJS.Timer {
   const frames = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'];
   let i = 0;
-  
+
   return setInterval(() => {
     process.stdout.write('\r' + chalk.hex('#00d2d3')(frames[i]) + ' ' + chalk.white(message));
     i = (i + 1) % frames.length;
@@ -632,8 +632,7 @@ export function createLoadingAnimation(message: string): NodeJS.Timer {
  */
 export function displaySuccessMessage(message: string, details?: string[]): void {
   const box = boxen(
-    `${chalk.green('✨ SUCCESS! ✨')}\n\n${chalk.white(message)}${
-      details ? '\n\n' + details.map(d => chalk.gray('• ' + d)).join('\n') : ''
+    `${chalk.green('✨ SUCCESS! ✨')}\n\n${chalk.white(message)}${details ? '\n\n' + details.map(d => chalk.gray('• ' + d)).join('\n') : ''
     }`,
     {
       padding: 1,
@@ -643,7 +642,7 @@ export function displaySuccessMessage(message: string, details?: string[]): void
       backgroundColor: '#0a3d0a'
     }
   );
-  
+
   console.log('\n' + box);
 }
 
@@ -652,8 +651,7 @@ export function displaySuccessMessage(message: string, details?: string[]): void
  */
 export function displayErrorMessage(message: string, suggestions?: string[]): void {
   const box = boxen(
-    `${chalk.red('❌ ERROR! ❌')}\n\n${chalk.white(message)}${
-      suggestions ? '\n\n' + chalk.yellow('Suggestions:') + '\n' + 
+    `${chalk.red('❌ ERROR! ❌')}\n\n${chalk.white(message)}${suggestions ? '\n\n' + chalk.yellow('Suggestions:') + '\n' +
       suggestions.map(s => chalk.gray('• ' + s)).join('\n') : ''
     }`,
     {
@@ -664,7 +662,7 @@ export function displayErrorMessage(message: string, suggestions?: string[]): vo
       backgroundColor: '#3d0a0a'
     }
   );
-  
+
   console.log('\n' + box);
 }
 
@@ -675,10 +673,10 @@ export function createProgressBar(current: number, total: number, width: number 
   const percentage = current / total;
   const filled = Math.round(width * percentage);
   const empty = width - filled;
-  
+
   const bar = '█'.repeat(filled) + '░'.repeat(empty);
   const percent = (percentage * 100).toFixed(1);
-  
+
   return `${chalk.hex('#00d2d3')(bar)} ${chalk.white(percent)}% (${current}/${total})`;
 }
 
@@ -701,7 +699,7 @@ function getLanguageIcon(language: string): string {
     'express': '🚂',
     'nestjs': '🔴'
   };
-  
+
   return icons[language.toLowerCase()] || '📄';
 }
 
@@ -726,7 +724,7 @@ function getFrameworkIcon(framework: string): string {
     'spring': '🍃',
     'laravel': '🔴'
   };
-  
+
   return icons[framework.toLowerCase()] || '🏗️';
 }
 
@@ -745,11 +743,11 @@ function formatDate(date: Date): string {
   const now = new Date();
   const diffTime = Math.abs(now.getTime() - date.getTime());
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-  
+
   if (diffDays === 1) return 'Today';
   if (diffDays === 2) return 'Yesterday';
   if (diffDays <= 7) return `${diffDays} days ago`;
-  
+
   return date.toLocaleDateString();
 }
 
@@ -760,7 +758,7 @@ async function detectProjectLanguage(projectPath: string): Promise<string[]> {
   try {
     const files = await fs.readdir(projectPath);
     const detectionResults = detectLanguageFromFiles(files);
-    
+
     return detectionResults
       .filter(result => result.confidence > 50)
       .sort((a, b) => b.confidence - a.confidence)
@@ -779,20 +777,20 @@ async function detectProjectLanguage(projectPath: string): Promise<string[]> {
 async function detectProjectFramework(projectPath: string): Promise<string | null> {
   try {
     // Check for Next.js
-    if (await fs.pathExists(path.join(projectPath, 'next.config.js')) || 
-        await fs.pathExists(path.join(projectPath, 'next.config.mjs')) ||
-        await fs.pathExists(path.join(projectPath, 'next.config.ts'))) {
+    if (await fs.pathExists(path.join(projectPath, 'next.config.js')) ||
+      await fs.pathExists(path.join(projectPath, 'next.config.mjs')) ||
+      await fs.pathExists(path.join(projectPath, 'next.config.ts'))) {
       return 'Next.js';
     }
-    
+
     // Check for Angular
     if (await fs.pathExists(path.join(projectPath, 'angular.json'))) {
       return 'Angular';
     }
-    
+
     // Check for Vue
     if (await fs.pathExists(path.join(projectPath, 'vue.config.js')) ||
-        await fs.pathExists(path.join(projectPath, 'vite.config.js'))) {
+      await fs.pathExists(path.join(projectPath, 'vite.config.js'))) {
       const packageJson = path.join(projectPath, 'package.json');
       if (await fs.pathExists(packageJson)) {
         const pkg = await fs.readJson(packageJson);
@@ -804,7 +802,7 @@ async function detectProjectFramework(projectPath: string): Promise<string | nul
         }
       }
     }
-    
+
     // Check for Express
     const packageJson = path.join(projectPath, 'package.json');
     if (await fs.pathExists(packageJson)) {
@@ -813,12 +811,12 @@ async function detectProjectFramework(projectPath: string): Promise<string | nul
         return 'Express';
       }
     }
-    
+
     // Check for Rust
     if (await fs.pathExists(path.join(projectPath, 'Cargo.toml'))) {
       return 'Rust';
     }
-    
+
     return null;
   } catch (error) {
     return null;
@@ -837,52 +835,52 @@ export async function gatherProjectStats(workspacePath: string = process.cwd()):
     usageStreak: 0,
     lastUsed: 'Never'
   };
-  
+
   try {
     // Load real data from history.json in .package-installer-cli folder
     const historyManager = new HistoryManager();
     await historyManager.init();
     const data = historyManager.getHistory();
-    
+
     if (data) {
       // Get project statistics
       const projects = data.projects || [];
       stats.totalProjects = projects.length;
-      
+
       // Extract recent project names (last 5)
       stats.recentProjects = projects
         .slice(-5)
         .map((p: any) => p.name || 'Unnamed Project')
         .reverse();
-      
+
       // Calculate language breakdown from projects
       projects.forEach((project: any) => {
         if (project.language) {
           stats.languageBreakdown[project.language] = (stats.languageBreakdown[project.language] || 0) + 1;
         }
       });
-      
+
       // Calculate framework breakdown from projects
       projects.forEach((project: any) => {
         if (project.framework) {
           stats.frameworkBreakdown[project.framework] = (stats.frameworkBreakdown[project.framework] || 0) + 1;
         }
       });
-      
+
       // Get feature statistics
       const features = data.features || [];
       stats.featuresUsed = features
         .slice(-10)
         .map((f: any) => f.name || 'Unknown Feature')
         .filter((name: string) => name !== 'Unknown Feature');
-      
+
       // Get command statistics using historyManager methods
       const commandStats = historyManager.getCommandStats();
       commandStats.forEach(stat => {
         stats.commandBreakdown[stat.command] = stat.count;
       });
       stats.totalCommands = Object.values(stats.commandBreakdown).reduce((sum: number, count: number) => sum + count, 0);
-      
+
       // Calculate usage streak and last used
       const allEvents = [...projects, ...features];
       if (allEvents.length > 0) {
@@ -890,21 +888,21 @@ export async function gatherProjectStats(workspacePath: string = process.cwd()):
           .map((event: any) => new Date(event.createdAt || event.addedAt || event.timestamp))
           .filter((date: Date) => !isNaN(date.getTime()))
           .sort((a, b) => b.getTime() - a.getTime());
-        
+
         if (dates.length > 0) {
           stats.lastUsed = formatRelativeTime(dates[0]);
           stats.usageStreak = calculateUsageStreak(dates);
         }
       }
     }
-    
+
     // If in a project directory, detect current project info
     try {
       const languages = await detectProjectLanguage(workspacePath);
       languages.forEach((lang: string) => {
         stats.languageBreakdown[lang] = (stats.languageBreakdown[lang] || 0) + 1;
       });
-      
+
       const framework = await detectProjectFramework(workspacePath);
       if (framework) {
         stats.frameworkBreakdown[framework] = (stats.frameworkBreakdown[framework] || 0) + 1;
@@ -912,12 +910,12 @@ export async function gatherProjectStats(workspacePath: string = process.cwd()):
     } catch (error) {
       // Ignore if not in a valid project directory
     }
-    
+
   } catch (error) {
     console.warn('Warning: Could not load analytics data:', (error as Error).message || error);
     // Return stats with all zeros - no dummy data
   }
-  
+
   return stats;
 }
 
@@ -930,39 +928,39 @@ function formatRelativeTime(date: Date): string {
   const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
   const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
   const diffMinutes = Math.floor(diffMs / (1000 * 60));
-  
+
   if (diffMinutes < 60) return `${diffMinutes} minutes ago`;
   if (diffHours < 24) return `${diffHours} hours ago`;
   if (diffDays === 1) return 'Yesterday';
   if (diffDays < 7) return `${diffDays} days ago`;
   if (diffDays < 30) return `${Math.floor(diffDays / 7)} weeks ago`;
   if (diffDays < 365) return `${Math.floor(diffDays / 30)} months ago`;
-  
+
   return `${Math.floor(diffDays / 365)} years ago`;
 }
 
 function calculateUsageStreak(dates: Date[]): number {
   if (dates.length === 0) return 0;
-  
+
   let streak = 1;
   const today = new Date();
   today.setHours(0, 0, 0, 0);
-  
+
   for (let i = 0; i < dates.length - 1; i++) {
     const current = new Date(dates[i]);
     const next = new Date(dates[i + 1]);
     current.setHours(0, 0, 0, 0);
     next.setHours(0, 0, 0, 0);
-    
+
     const diffDays = Math.floor((current.getTime() - next.getTime()) / (1000 * 60 * 60 * 24));
-    
+
     if (diffDays === 1) {
       streak++;
     } else if (diffDays > 1) {
       break;
     }
   }
-  
+
   return streak;
 }
 
@@ -978,25 +976,25 @@ export async function scanForRecentProjects(): Promise<ProjectInfo[]> {
     path.join(process.env.HOME || '', 'Code'),
     process.cwd()
   ];
-  
+
   for (const dir of commonDirs) {
     try {
       if (await fs.pathExists(dir)) {
         const entries = await fs.readdir(dir, { withFileTypes: true });
-        
+
         for (const entry of entries.slice(0, 20)) { // Limit to prevent too much scanning
           if (entry.isDirectory()) {
             const projectPath = path.join(dir, entry.name);
-            
+
             // Check if it's a valid project
             const hasPackageJson = await fs.pathExists(path.join(projectPath, 'package.json'));
             const hasCargoToml = await fs.pathExists(path.join(projectPath, 'Cargo.toml'));
             const hasRequirementsTxt = await fs.pathExists(path.join(projectPath, 'requirements.txt'));
-            
+
             if (hasPackageJson || hasCargoToml || hasRequirementsTxt) {
               const stats = await fs.stat(projectPath);
               const languages = await detectProjectLanguage(projectPath);
-              
+
               projects.push({
                 name: entry.name,
                 path: projectPath,
@@ -1012,6 +1010,6 @@ export async function scanForRecentProjects(): Promise<ProjectInfo[]> {
       // Continue if directory can't be read
     }
   }
-  
+
   return projects.sort((a, b) => b.lastModified.getTime() - a.lastModified.getTime()).slice(0, 10);
 }

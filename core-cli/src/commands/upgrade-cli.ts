@@ -82,12 +82,12 @@ async function detectPackageManager(): Promise<string> {
   try {
     await execAsync('pnpm --version');
     return 'pnpm';
-  } catch {}
+  } catch { }
 
   try {
     await execAsync('yarn --version');
     return 'yarn';
-  } catch {}
+  } catch { }
 
   return 'npm';
 }
@@ -174,12 +174,12 @@ export async function upgradeCliCommand(): Promise<void> {
     showUpgradeHelp();
     return;
   }
-  
+
   console.log('\n' + chalk.hex('#10ac84')('🚀 Package Installer CLI Upgrade'));
   console.log(chalk.hex('#95afc0')('Checking for updates...\n'));
-  
+
   const spinner = ora(chalk.hex('#f39c12')('🔍 Fetching version information...')).start();
-  
+
   try {
     const [currentVersion, latestVersion, packageManager, packageInfo] = await Promise.all([
       getCurrentVersion(),
@@ -187,17 +187,17 @@ export async function upgradeCliCommand(): Promise<void> {
       detectPackageManager(),
       getPackageInfo()
     ]);
-    
+
     spinner.succeed(chalk.green('✅ Version information retrieved'));
-    
+
     // Show upgrade summary
     showUpgradeSummary(currentVersion, latestVersion, packageInfo);
-    
+
     if (currentVersion === latestVersion) {
       console.log('\n' + chalk.hex('#10ac84')('🎉 You are already using the latest version!'));
       return;
     }
-    
+
     if (currentVersion === 'unknown') {
       console.log('\n' + chalk.hex('#ffa502')('⚠️  Could not detect current version.'));
       console.log(chalk.hex('#95afc0')('   The CLI might not be installed globally.'));
@@ -205,16 +205,16 @@ export async function upgradeCliCommand(): Promise<void> {
     } else {
       // Check for breaking changes and get user confirmation
       const shouldProceed = await showBreakingChangesWarning(currentVersion, latestVersion);
-      
+
       if (!shouldProceed) {
         console.log('\n' + chalk.yellow('⏹️  Upgrade cancelled by user'));
         return;
       }
     }
-    
+
     // Perform upgrade with @latest tag
     const upgradeSpinner = ora(chalk.hex('#10ac84')(`🚀 Upgrading CLI using ${packageManager}...`)).start();
-    
+
     let upgradeCommand: string;
     switch (packageManager) {
       case 'pnpm':
@@ -226,23 +226,23 @@ export async function upgradeCliCommand(): Promise<void> {
       default:
         upgradeCommand = 'npm install -g @0xshariq/package-installer@latest';
     }
-    
+
     upgradeSpinner.text = chalk.hex('#10ac84')(`Installing ${latestVersion} with @latest tag...`);
     await execAsync(upgradeCommand, { timeout: 120000 }); // 2 minute timeout
-    
+
     upgradeSpinner.succeed(chalk.green('✅ CLI upgraded successfully!'));
-    
+
     // Verify upgrade
     const verifySpinner = ora(chalk.hex('#00d2d3')('🔍 Verifying upgrade...')).start();
     const newVersion = await getCurrentVersion();
-    
+
     if (newVersion === latestVersion) {
       verifySpinner.succeed(chalk.green(`✅ Upgrade verified! Now running v${newVersion}`));
     } else {
       verifySpinner.warn(chalk.yellow('⚠️  Upgrade completed but version verification failed'));
       console.log(chalk.hex('#95afc0')('   Try running: pi --version'));
     }
-    
+
     // Show success message with changelog link
     console.log('\n' + boxen(
       chalk.hex('#10ac84')('🎉 Upgrade Complete!') + '\n\n' +
@@ -262,7 +262,7 @@ export async function upgradeCliCommand(): Promise<void> {
         backgroundColor: '#001a00'
       }
     ));
-    
+
   } catch (error: any) {
     spinner.fail(chalk.red('❌ Upgrade failed'));
     console.log(chalk.red(`\n❌ Error: ${error.message}`));

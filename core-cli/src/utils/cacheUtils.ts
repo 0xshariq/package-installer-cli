@@ -10,7 +10,7 @@ import chalk from 'chalk';
 import zlib from 'zlib';
 import crypto from 'crypto';
 import { promisify } from 'util';
-import {  FeatureConfig, TemplateMetadata, CacheStrategy } from './types.js';
+import { FeatureConfig, TemplateMetadata, CacheStrategy } from './types.js';
 
 const compress = promisify(zlib.gzip);
 const decompress = promisify(zlib.gunzip);
@@ -345,7 +345,7 @@ export class AdvancedCacheManager {
   private async save(): Promise<void> {
     try {
       await this.acquireLock();
-      
+
       let data = JSON.stringify(this.cache, null, 0);
       let buffer = Buffer.from(data);
 
@@ -368,7 +368,7 @@ export class AdvancedCacheManager {
    */
   private generateEncryptionKey(): string {
     const keyPath = path.join(this.cacheDir, '.key');
-    
+
     try {
       if (fs.existsSync(keyPath)) {
         return fs.readFileSync(keyPath, 'utf-8');
@@ -383,7 +383,7 @@ export class AdvancedCacheManager {
     } catch (error) {
       console.warn('Could not save encryption key');
     }
-    
+
     return key;
   }
 
@@ -393,7 +393,7 @@ export class AdvancedCacheManager {
   private async acquireLock(): Promise<void> {
     let attempts = 0;
     const maxAttempts = 10;
-    
+
     while (attempts < maxAttempts) {
       try {
         await fs.writeFile(this.lockFile, process.pid.toString(), { flag: 'wx' });
@@ -507,7 +507,7 @@ export class AdvancedCacheManager {
    */
   private async applySizeLimits(): Promise<void> {
     const currentSize = JSON.stringify(this.cache).length;
-    
+
     if (currentSize > this.maxSize) {
       switch (this.strategy) {
         case 'lru':
@@ -549,7 +549,7 @@ export class AdvancedCacheManager {
    */
   private applyTTLEviction(): void {
     const now = Date.now();
-    
+
     this.cache.analysis = this.cache.analysis.filter(a => {
       const age = now - new Date(a.timestamp).getTime();
       return age < (a.ttl || 24 * 60 * 60 * 1000);
@@ -561,7 +561,7 @@ export class AdvancedCacheManager {
    */
   private async optimizePerformanceData(): Promise<void> {
     const operations = this.cache.performance.operations;
-    
+
     // Keep only recent operations (last 1000)
     if (operations.length > 1000) {
       this.cache.performance.operations = operations.slice(-1000);
@@ -570,13 +570,13 @@ export class AdvancedCacheManager {
     // Recalculate metrics
     const recentOps = operations.slice(-100); // Last 100 operations
     const successfulOps = recentOps.filter(op => op.success);
-    
-    this.cache.performance.averageResponseTime = 
+
+    this.cache.performance.averageResponseTime =
       recentOps.reduce((sum, op) => sum + op.duration, 0) / recentOps.length || 0;
-    
-    this.cache.performance.errorRate = 
+
+    this.cache.performance.errorRate =
       ((recentOps.length - successfulOps.length) / recentOps.length) * 100 || 0;
-    
+
     this.cache.performance.totalOperations = operations.length;
     this.cache.performance.lastOptimized = new Date().toISOString();
   }
@@ -612,7 +612,7 @@ export class AdvancedCacheManager {
     const id = crypto.randomUUID();
     const hash = this.generateHash({ path: projectData.path, dependencies: projectData.dependencies });
     const checksum = this.generateChecksum(projectData);
-    
+
     const project: ProjectCache = {
       id,
       ...projectData,
@@ -624,10 +624,10 @@ export class AdvancedCacheManager {
 
     // Remove existing entry
     this.cache.projects = this.cache.projects.filter(p => p.path !== project.path);
-    
+
     // Add new entry using strategy
     this.addProjectByStrategy(project);
-    
+
     await this.save();
   }
 
@@ -698,11 +698,11 @@ export class AdvancedCacheManager {
    */
   async getCachedFeature(name: string, version?: string): Promise<FeatureCache | null> {
     const features = this.cache.features.filter(f => f.name === name);
-    
+
     if (version) {
       return features.find(f => f.version === version) || null;
     }
-    
+
     // Return latest version
     return features.sort((a, b) => new Date(b.lastUpdated).getTime() - new Date(a.lastUpdated).getTime())[0] || null;
   }
@@ -760,7 +760,7 @@ export class AdvancedCacheManager {
     };
 
     let data = JSON.stringify(exportData, null, 2);
-    
+
     if (filePath.endsWith('.gz')) {
       const compressed = await compress(Buffer.from(data));
       await fs.writeFile(filePath, compressed);
@@ -774,7 +774,7 @@ export class AdvancedCacheManager {
    */
   async importCache(filePath: string): Promise<void> {
     let data: Buffer;
-    
+
     if (filePath.endsWith('.gz')) {
       const compressed = await fs.readFile(filePath);
       data = await decompress(compressed);
@@ -783,7 +783,7 @@ export class AdvancedCacheManager {
     }
 
     const importedCache = JSON.parse(data.toString());
-    
+
     // Validate imported data
     if (importedCache.version === '3.0.0') {
       this.cache = { ...this.getDefaultCache(), ...importedCache };
@@ -837,9 +837,9 @@ export class AdvancedCacheManager {
    * Filter array by age and pattern
    */
   private filterByAge<T extends Record<string, any>>(
-    array: T[], 
-    dateField: string, 
-    cutoff: number, 
+    array: T[],
+    dateField: string,
+    cutoff: number,
     pattern?: RegExp
   ): T[] {
     return array.filter(item => {
@@ -873,18 +873,18 @@ export class AdvancedCacheManager {
   }): Promise<void> {
     try {
       await fs.ensureDir(path.dirname(this.historyFile));
-      
+
       let history: any = { projects: [], features: [], commands: [] };
-      
+
       if (await fs.pathExists(this.historyFile)) {
         history = await fs.readJson(this.historyFile);
       }
-      
+
       // Ensure arrays exist
       if (!history.projects) history.projects = [];
       if (!history.features) history.features = [];
       if (!history.commands) history.commands = [];
-      
+
       // Add project with timestamp
       const projectEntry = {
         ...projectData,
@@ -892,18 +892,18 @@ export class AdvancedCacheManager {
         lastAccessed: new Date().toISOString(),
         id: crypto.randomBytes(8).toString('hex')
       };
-      
+
       // Remove existing entry for same path
       history.projects = history.projects.filter((p: any) => p.path !== projectData.path);
-      
+
       // Add to beginning of array
       history.projects.unshift(projectEntry);
-      
+
       // Keep only last 50 projects
       history.projects = history.projects.slice(0, 50);
-      
+
       await fs.writeJson(this.historyFile, history, { spaces: 2 });
-      
+
     } catch (error) {
       console.warn('Failed to update project history:', error);
     }
@@ -922,28 +922,28 @@ export class AdvancedCacheManager {
   }): Promise<void> {
     try {
       await fs.ensureDir(path.dirname(this.historyFile));
-      
+
       let history: any = { projects: [], features: [], commands: [] };
-      
+
       if (await fs.pathExists(this.historyFile)) {
         history = await fs.readJson(this.historyFile);
       }
-      
+
       if (!history.features) history.features = [];
-      
+
       const featureEntry = {
         ...featureData,
         usedAt: new Date().toISOString(),
         id: crypto.randomBytes(8).toString('hex')
       };
-      
+
       history.features.unshift(featureEntry);
-      
+
       // Keep only last 100 feature usages
       history.features = history.features.slice(0, 100);
-      
+
       await fs.writeJson(this.historyFile, history, { spaces: 2 });
-      
+
     } catch (error) {
       console.warn('Failed to update feature history:', error);
     }
@@ -961,28 +961,28 @@ export class AdvancedCacheManager {
   }): Promise<void> {
     try {
       await fs.ensureDir(path.dirname(this.historyFile));
-      
+
       let history: any = { projects: [], features: [], commands: [] };
-      
+
       if (await fs.pathExists(this.historyFile)) {
         history = await fs.readJson(this.historyFile);
       }
-      
+
       if (!history.commands) history.commands = [];
-      
+
       const commandEntry = {
         ...commandData,
         executedAt: new Date().toISOString(),
         id: crypto.randomBytes(8).toString('hex')
       };
-      
+
       history.commands.unshift(commandEntry);
-      
+
       // Keep only last 200 command executions
       history.commands = history.commands.slice(0, 200);
-      
+
       await fs.writeJson(this.historyFile, history, { spaces: 2 });
-      
+
     } catch (error) {
       console.warn('Failed to update command history:', error);
     }
@@ -1023,7 +1023,7 @@ export class AdvancedCacheManager {
     try {
       const history = await this.getHistory();
       const features = history.features || [];
-      
+
       const stats = {
         totalUsages: features.length,
         uniqueFeatures: [...new Set(features.map((f: any) => f.name))].length,
@@ -1031,13 +1031,13 @@ export class AdvancedCacheManager {
         recentFeatures: features.slice(0, 10),
         successRate: features.filter((f: any) => f.success).length / Math.max(1, features.length) * 100
       };
-      
+
       // Calculate most used features
       features.forEach((f: any) => {
         const key = f.provider ? `${f.name}/${f.provider}` : f.name;
         stats.mostUsedFeatures[key] = (stats.mostUsedFeatures[key] || 0) + 1;
       });
-      
+
       return stats;
     } catch (error) {
       console.warn('Failed to get feature stats:', error);

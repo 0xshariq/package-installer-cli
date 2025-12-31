@@ -10,8 +10,8 @@ import gradientString from 'gradient-string';
 import boxen from 'boxen';
 import { createStandardHelp, CommandHelpConfig } from '../utils/helpFormatter.js';
 import { displayCommandBanner } from '../utils/banner.js';
-import { 
-  createBanner, 
+import {
+  createBanner,
   displaySystemInfo,
   displaySuccessMessage
 } from '../utils/dashboard.js';
@@ -50,7 +50,7 @@ export function showAnalyzeHelp(): void {
           '📈 Command Usage Stats - Frequency and trends of CLI commands',
           '🚀 Project Analytics - Created projects and framework breakdown',
           '📁 Recent Activity - Last created/modified projects timeline',
-          '🎯 Feature Usage - Most used features and integrations', 
+          '🎯 Feature Usage - Most used features and integrations',
           '⚙️ Environment Info - Development environment overview',
           '📊 Performance - CLI performance metrics and insights'
         ]
@@ -62,7 +62,7 @@ export function showAnalyzeHelp(): void {
       'Use --reset to start fresh analytics tracking'
     ]
   };
-  
+
   createStandardHelp(helpConfig);
 }
 
@@ -79,17 +79,17 @@ export async function analyzeCommand(options: any = {}): Promise<void> {
   displayCommandBanner('Analytics', 'Comprehensive project analytics and usage insights');
 
   const historyManager = new HistoryManager();
-  
+
   try {
     // Load analytics data from history.json
     const historyData = await loadAnalyticsData();
-    
+
     // Handle specific options
     if (options.export) {
       await exportAnalyticsData(historyData, options.export || 'json');
       return;
     }
-    
+
     if (options.reset) {
       await resetAnalyticsData();
       return;
@@ -101,7 +101,7 @@ export async function analyzeCommand(options: any = {}): Promise<void> {
     } else {
       await displayAnalyticsDashboard(historyData);
     }
-    
+
   } catch (error) {
     console.error(chalk.red('❌ Failed to load analytics:'), error);
     displaySuccessMessage(
@@ -116,7 +116,7 @@ export async function analyzeCommand(options: any = {}): Promise<void> {
  */
 async function loadAnalyticsData(): Promise<any> {
   const historyPath = path.join(os.homedir(), '.package-installer-cli', 'history.json');
-  
+
   if (!await fs.pathExists(historyPath)) {
     return {
       commands: {},
@@ -131,7 +131,7 @@ async function loadAnalyticsData(): Promise<any> {
       }
     };
   }
-  
+
   return await fs.readJson(historyPath);
 }
 
@@ -140,25 +140,25 @@ async function loadAnalyticsData(): Promise<any> {
  */
 async function displayAnalyticsDashboard(data: any): Promise<void> {
   console.log('\n');
-  
+
   // Show summary overview first
   displaySummaryOverview(data);
-  
+
   // Display command usage statistics
   displayCommandStatistics(data);
-  
+
   // Display project statistics
   displayProjectStatistics(data);
-  
+
   // Display feature usage
   displayFeatureUsage(data);
-  
+
   // Display recent activity
   displayRecentActivity(data);
-  
+
   // Display performance insights
   displayPerformanceInsights(data);
-  
+
   // Display system info
   displaySystemInfo();
 }
@@ -168,28 +168,28 @@ async function displayAnalyticsDashboard(data: any): Promise<void> {
  */
 async function displayDetailedAnalyticsDashboard(data: any): Promise<void> {
   console.log('\n');
-  
+
   // Show summary overview first
   displaySummaryOverview(data);
-  
+
   // Display command usage statistics with trends
   displayDetailedCommandStatistics(data);
-  
+
   // Display detailed project statistics
   displayDetailedProjectStatistics(data);
-  
+
   // Display feature usage breakdown
   displayDetailedFeatureUsage(data);
-  
+
   // Display time-based analytics
   displayTimeBasedAnalytics(data);
-  
+
   // Display recent activity with more details
   displayDetailedRecentActivity(data);
-  
+
   // Display performance insights
   displayPerformanceInsights(data);
-  
+
   // Display system info
   displaySystemInfo();
 }
@@ -203,15 +203,15 @@ function displaySummaryOverview(data: any): void {
   const totalFeatures = data.statistics?.totalFeatures || 0;
   const uniqueFrameworks = Object.keys(data.statistics?.frameworks || {}).length;
   const uniqueLanguages = Object.keys(data.statistics?.languages || {}).length;
-  
+
   // Calculate productivity score
   const productivityScore = calculateProductivityScore(totalCommands, totalProjects, totalFeatures);
   const scoreColor = productivityScore >= 80 ? '#10ac84' : productivityScore >= 60 ? '#ffa502' : productivityScore >= 40 ? '#ff6b6b' : '#95afc0';
-  
-  const summaryContent = 
+
+  const summaryContent =
     gradientString(['#e056fd', '#f18a8a'])('🚀 Package Installer CLI Analytics Dashboard') + '\n' +
     gradientString(['#74b9ff', '#0984e3'])('━'.repeat(60)) + '\n\n' +
-    
+
     // Main metrics row
     chalk.hex('#00d2d3')('📈 OVERVIEW METRICS') + '\n\n' +
     `${chalk.white('⚡ Commands Executed:')} ${chalk.cyan.bold(totalCommands.toString().padStart(8))} ${getUsageEmoji(totalCommands)}\n` +
@@ -219,18 +219,18 @@ function displaySummaryOverview(data: any): void {
     `${chalk.white('🎯 Features Added:   ')} ${chalk.yellow.bold(totalFeatures.toString().padStart(8))} ${getFeatureEmoji(totalFeatures)}\n` +
     `${chalk.white('🎨 Frameworks Used:  ')} ${chalk.blue.bold(uniqueFrameworks.toString().padStart(8))} ${getFrameworkEmoji(uniqueFrameworks)}\n` +
     `${chalk.white('🔤 Languages Used:   ')} ${chalk.magenta.bold(uniqueLanguages.toString().padStart(8))} ${getLanguageEmoji(uniqueLanguages)}\n\n` +
-    
+
     // Productivity section
     chalk.hex('#ff6b6b')('🎯 PRODUCTIVITY SCORE') + '\n\n' +
     `${chalk.white('Overall Score:')} ${chalk.hex(scoreColor).bold(productivityScore + '/100')} ` +
     getScoreBar(productivityScore) + '\n' +
     chalk.gray(`${getProductivityMessage(productivityScore)}`) + '\n\n' +
-    
+
     // Journey summary
     chalk.hex('#9c88ff')('✨ YOUR CODING JOURNEY') + '\n\n' +
     chalk.gray('You\'ve been building amazing projects with Package Installer CLI!\n') +
     chalk.gray(`Keep exploring new frameworks and features to boost your productivity.`);
-  
+
   console.log(boxen(summaryContent, {
     padding: 2,
     margin: { top: 1, bottom: 1 },
@@ -285,7 +285,7 @@ function getScoreBar(score: number): string {
   const barLength = 20;
   const filled = Math.round((score / 100) * barLength);
   const empty = barLength - filled;
-  
+
   let bar = '';
   if (score >= 80) {
     bar = chalk.green('█'.repeat(filled)) + chalk.gray('░'.repeat(empty));
@@ -296,7 +296,7 @@ function getScoreBar(score: number): string {
   } else {
     bar = chalk.gray('█'.repeat(filled)) + chalk.gray('░'.repeat(empty));
   }
-  
+
   return `[${bar}]`;
 }
 
@@ -317,37 +317,37 @@ function displayCommandStatistics(data: any): void {
   const commands = data.commands || {};
   const totalCommands = data.statistics?.totalCommands || 0;
   const commandEntries = Object.entries(commands);
-  
+
   let content = gradientString(['#4facfe', '#00f2fe'])('📊 Command Usage Statistics') + '\n' +
-                gradientString(['#74b9ff', '#0984e3'])('━'.repeat(45)) + '\n\n';
-  
+    gradientString(['#74b9ff', '#0984e3'])('━'.repeat(45)) + '\n\n';
+
   if (totalCommands > 0 && commandEntries.length > 0) {
-    const sortedCommands = commandEntries.sort(([,a]: any, [,b]: any) => b - a).slice(0, 8);
+    const sortedCommands = commandEntries.sort(([, a]: any, [, b]: any) => b - a).slice(0, 8);
     const maxCount = Math.max(...Object.values(commands).map(c => Number(c)));
-    
+
     // Add header
     content += chalk.hex('#00d2d3')('Command'.padEnd(12)) + ' ' +
-               chalk.hex('#ffa502')('Usage'.padEnd(35)) + ' ' +
-               chalk.hex('#10ac84')('Count') + '\n\n';
-    
+      chalk.hex('#ffa502')('Usage'.padEnd(35)) + ' ' +
+      chalk.hex('#10ac84')('Count') + '\n\n';
+
     sortedCommands.forEach(([cmd, count]: any, index: number) => {
       const percentage = ((count / totalCommands) * 100).toFixed(1);
       const barLength = Math.min(Math.ceil((count / maxCount) * 25), 25);
-      
+
       // Create a colorful progress bar
       let bar = '';
       const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#feca57', '#ff9ff3', '#54a0ff'];
       const color = colors[index % colors.length];
       bar = chalk.hex(color)('█'.repeat(barLength)) + chalk.gray('░'.repeat(25 - barLength));
-      
+
       // Get command emoji
       const emoji = getCommandEmoji(cmd);
-      
+
       content += `${emoji} ${chalk.white(cmd.padEnd(10))} ${bar} ${chalk.cyan(count.toString().padStart(4))} ${chalk.gray('(' + percentage + '%)')}\n`;
     });
-    
+
     content += '\n' + chalk.hex('#95afc0')(`📈 Total: ${totalCommands} commands • Most used: ${sortedCommands[0][0]}`);
-    
+
     // Add usage insights
     const insights = generateUsageInsights(sortedCommands, totalCommands);
     if (insights) {
@@ -355,10 +355,10 @@ function displayCommandStatistics(data: any): void {
     }
   } else {
     content += chalk.gray('🔍 No command usage data available yet\n\n') +
-               chalk.gray('Start using the CLI to see your command patterns!\n') +
-               chalk.hex('#00d2d3')('Try: ') + chalk.white('pi create my-app') + chalk.gray(' or ') + chalk.white('pi add auth');
+      chalk.gray('Start using the CLI to see your command patterns!\n') +
+      chalk.hex('#00d2d3')('Try: ') + chalk.white('pi create my-app') + chalk.gray(' or ') + chalk.white('pi add auth');
   }
-  
+
   console.log(boxen(content, {
     padding: 1,
     margin: { top: 1, bottom: 1 },
@@ -389,10 +389,10 @@ function getCommandEmoji(command: string): string {
 
 function generateUsageInsights(sortedCommands: any[], totalCommands: number): string {
   if (sortedCommands.length === 0) return '';
-  
+
   const topCommand = sortedCommands[0];
   const topPercentage = ((topCommand[1] / totalCommands) * 100).toFixed(0);
-  
+
   if (topCommand[0] === 'create' && parseInt(topPercentage) > 40) {
     return 'You love creating new projects! Consider exploring "pi add" to enhance them.';
   } else if (topCommand[0] === 'analyze' && parseInt(topPercentage) > 30) {
@@ -402,7 +402,7 @@ function generateUsageInsights(sortedCommands: any[], totalCommands: number): st
   } else if (sortedCommands.length >= 5) {
     return 'Balanced CLI usage across multiple commands - you\'re a power user!';
   }
-  
+
   return `${topCommand[0]} is your go-to command (${topPercentage}% usage)`;
 }
 
@@ -413,24 +413,24 @@ function displayDetailedCommandStatistics(data: any): void {
   const commands = data.commands || {};
   const totalCommands = data.statistics?.totalCommands || 0;
   const commandEntries = Object.entries(commands);
-  
+
   console.log(boxen(
     gradientString(['#4facfe', '#00f2fe'])('📊 Detailed Command Usage Statistics') + '\n\n' +
     (totalCommands > 0 && commandEntries.length > 0
       ? commandEntries
-          .sort(([,a]: any, [,b]: any) => b - a)
-          .map(([cmd, count]: any, index: number) => {
-            const percentage = ((count / totalCommands) * 100).toFixed(1);
-            const maxCount = Math.max(...Object.values(commands).map(c => Number(c)));
-            const barLength = Math.min(Math.ceil((count / maxCount) * 25), 25);
-            const bar = '█'.repeat(barLength);
-            const rank = index + 1;
-            const rankEmoji = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : '  ';
-            return `${rankEmoji} ${chalk.white(cmd.padEnd(18))} ` + 
-                   chalk.cyan(bar.padEnd(25)) + 
-                   chalk.gray(` ${count} uses (${percentage}%)`);
-          }).join('\n') + '\n\n' +
-          chalk.gray(`Total: ${totalCommands} commands • Average: ${(totalCommands / commandEntries.length).toFixed(1)} per command`)
+        .sort(([, a]: any, [, b]: any) => b - a)
+        .map(([cmd, count]: any, index: number) => {
+          const percentage = ((count / totalCommands) * 100).toFixed(1);
+          const maxCount = Math.max(...Object.values(commands).map(c => Number(c)));
+          const barLength = Math.min(Math.ceil((count / maxCount) * 25), 25);
+          const bar = '█'.repeat(barLength);
+          const rank = index + 1;
+          const rankEmoji = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : '  ';
+          return `${rankEmoji} ${chalk.white(cmd.padEnd(18))} ` +
+            chalk.cyan(bar.padEnd(25)) +
+            chalk.gray(` ${count} uses (${percentage}%)`);
+        }).join('\n') + '\n\n' +
+      chalk.gray(`Total: ${totalCommands} commands • Average: ${(totalCommands / commandEntries.length).toFixed(1)} per command`)
       : chalk.gray('  No command usage data available yet')
     ),
     {
@@ -452,19 +452,19 @@ function displayPerformanceInsights(data: any): void {
   const commands = data.commands || {};
   const projects = data.projects || [];
   const features = data.features || [];
-  
+
   const totalCommands = Object.values(commands).reduce((sum: number, count: any) => sum + Number(count), 0);
   const productivityScore = calculateProductivityScore(totalCommands, projects.length, features.length);
   const commandsPerProject = projects.length > 0 ? (totalCommands / projects.length).toFixed(1) : '0';
   const featuresPerProject = projects.length > 0 ? (features.length / projects.length).toFixed(1) : '0';
-  
+
   // Calculate efficiency metrics
   const efficiencyRating = getEfficiencyRating(parseFloat(commandsPerProject), parseFloat(featuresPerProject));
   const developmentVelocity = getDevelopmentVelocity(projects, features);
-  
+
   let content = gradientString(['#74b9ff', '#00b894'])('⚡ Performance & Productivity Insights') + '\n' +
-                gradientString(['#0984e3', '#00b894'])('━'.repeat(50)) + '\n\n';
-  
+    gradientString(['#0984e3', '#00b894'])('━'.repeat(50)) + '\n\n';
+
   // Performance metrics grid
   content += chalk.hex('#00d2d3')('📊 CORE METRICS') + '\n\n';
   content += `${chalk.white('🎯 Productivity Score:')} ${getScoreDisplay(productivityScore)}\n`;
@@ -472,19 +472,19 @@ function displayPerformanceInsights(data: any): void {
   content += `${chalk.white('🔧 Features per Project:')} ${chalk.cyan(featuresPerProject)} ${getFeaturesRating(parseFloat(featuresPerProject))}\n`;
   content += `${chalk.white('🚀 Development Velocity:')} ${chalk.yellow(developmentVelocity)} ${getVelocityEmoji(developmentVelocity)}\n`;
   content += `${chalk.white('⭐ Efficiency Rating:')} ${chalk.magenta(efficiencyRating)} ${getEfficiencyEmoji(efficiencyRating)}\n\n`;
-  
+
   // Insights section
   content += chalk.hex('#ff6b6b')('💡 INSIGHTS & RECOMMENDATIONS') + '\n\n';
   const insights = generatePerformanceInsights(productivityScore, commandsPerProject, featuresPerProject, projects.length);
   content += chalk.gray(insights.join('\n• '));
-  
+
   // Achievement badges
   const badges = generateAchievementBadges(totalCommands, projects.length, features.length, productivityScore);
   if (badges.length > 0) {
     content += '\n\n' + chalk.hex('#9c88ff')('🏆 ACHIEVEMENTS UNLOCKED') + '\n\n';
     content += badges.join(' ');
   }
-  
+
   console.log(boxen(content, {
     padding: 2,
     margin: { top: 1, bottom: 1 },
@@ -559,7 +559,7 @@ function getVelocityEmoji(velocity: string): string {
 
 function generatePerformanceInsights(score: number, commandsPerProject: string, featuresPerProject: string, projectCount: number): string[] {
   const insights: string[] = [];
-  
+
   if (score >= 80) {
     insights.push('Outstanding performance! You\'re maximizing CLI potential.');
   } else if (score >= 60) {
@@ -569,47 +569,47 @@ function generatePerformanceInsights(score: number, commandsPerProject: string, 
   } else {
     insights.push('Getting started! Run "pi --help" to discover powerful features.');
   }
-  
+
   const commandsNum = parseFloat(commandsPerProject);
   if (commandsNum < 3 && projectCount > 0) {
     insights.push('Consider using more commands per project for better automation.');
   } else if (commandsNum >= 8) {
     insights.push('Excellent command usage! You\'re leveraging CLI automation well.');
   }
-  
+
   const featuresNum = parseFloat(featuresPerProject);
   if (featuresNum < 2 && projectCount > 0) {
     insights.push('Try adding more features with "pi add" to enhance your projects.');
   } else if (featuresNum >= 4) {
     insights.push('Great feature adoption! Your projects are well-equipped.');
   }
-  
+
   if (projectCount >= 10) {
     insights.push('Impressive project count! You\'re a prolific builder.');
   } else if (projectCount >= 5) {
     insights.push('Good project activity! Keep building and experimenting.');
   }
-  
+
   return insights;
 }
 
 function generateAchievementBadges(commands: number, projects: number, features: number, score: number): string[] {
   const badges: string[] = [];
-  
+
   if (commands >= 100) badges.push(chalk.hex('#ffd700')('🥇 Command Master'));
   else if (commands >= 50) badges.push(chalk.hex('#c0c0c0')('🥈 Command Expert'));
   else if (commands >= 25) badges.push(chalk.hex('#cd7f32')('🥉 Command User'));
-  
+
   if (projects >= 20) badges.push(chalk.hex('#ff6b6b')('🏗️ Architect'));
   else if (projects >= 10) badges.push(chalk.hex('#4ecdc4')('🚀 Builder'));
   else if (projects >= 5) badges.push(chalk.hex('#45b7d1')('🌱 Creator'));
-  
+
   if (features >= 30) badges.push(chalk.hex('#9c88ff')('🌟 Feature Master'));
   else if (features >= 15) badges.push(chalk.hex('#feca57')('✨ Feature Explorer'));
-  
+
   if (score >= 90) badges.push(chalk.hex('#10ac84')('👑 CLI Legend'));
   else if (score >= 80) badges.push(chalk.hex('#00d2d3')('⚡ Power User'));
-  
+
   return badges;
 }
 
@@ -620,9 +620,9 @@ function displayTimeBasedAnalytics(data: any): void {
   const projects = data.projects || [];
   const features = data.features || [];
   const allEvents = [...projects, ...features];
-  
+
   const timeStats = analyzeTimePatterns(allEvents);
-  
+
   console.log(boxen(
     gradientString(['#fd79a8', '#fdcb6e'])('📅 Time-Based Analytics') + '\n\n' +
     chalk.white(`Most Active Day: `) + chalk.yellow(timeStats.mostActiveDay || 'N/A') + '\n' +
@@ -645,38 +645,38 @@ function displayDetailedRecentActivity(data: any): void {
   const projects = data.projects || [];
   const features = data.features || [];
   const commands = data.commands || {};
-  
+
   // Get recent projects (last 30 days)
   const thirtyDaysAgo = Date.now() - (30 * 24 * 60 * 60 * 1000);
-  const recentProjects = projects.filter((p: any) => 
+  const recentProjects = projects.filter((p: any) =>
     new Date(p.createdAt || 0).getTime() > thirtyDaysAgo
   );
-  
-  const recentFeatures = features.filter((f: any) => 
+
+  const recentFeatures = features.filter((f: any) =>
     new Date(f.createdAt || 0).getTime() > thirtyDaysAgo
   );
-  
+
   console.log(boxen(
     gradientString(['#6c5ce7', '#a29bfe'])('📈 Detailed Recent Activity (Last 30 Days)') + '\n\n' +
     chalk.white(`Recent Projects: `) + chalk.cyan(recentProjects.length) + '\n' +
     chalk.white(`Recent Features: `) + chalk.magenta(recentFeatures.length) + '\n' +
     chalk.white(`Total CLI Commands: `) + chalk.green(Object.values(commands).reduce((sum: number, count: any) => sum + Number(count), 0)) + '\n\n' +
-    
-    (recentProjects.length > 0 
+
+    (recentProjects.length > 0
       ? chalk.white('Latest Projects:\n') +
-        recentProjects
-          .slice(0, 5)
-          .map((p: any) => chalk.gray(`  • ${p.name || 'Unnamed'} (${getTimeAgo(p.createdAt)})`))
-          .join('\n') + '\n\n'
+      recentProjects
+        .slice(0, 5)
+        .map((p: any) => chalk.gray(`  • ${p.name || 'Unnamed'} (${getTimeAgo(p.createdAt)})`))
+        .join('\n') + '\n\n'
       : chalk.gray('No recent projects\n\n')
     ) +
-    
+
     (recentFeatures.length > 0
       ? chalk.white('Latest Features:\n') +
-        recentFeatures
-          .slice(0, 5)
-          .map((f: any) => chalk.gray(`  • ${f.name || 'Unnamed'} (${getTimeAgo(f.createdAt)})`))
-          .join('\n')
+      recentFeatures
+        .slice(0, 5)
+        .map((f: any) => chalk.gray(`  • ${f.name || 'Unnamed'} (${getTimeAgo(f.createdAt)})`))
+        .join('\n')
       : chalk.gray('No recent features')
     ),
     {
@@ -693,16 +693,16 @@ function displayDetailedRecentActivity(data: any): void {
  */
 function calculateProductivityScore(totalCommands: number, projectCount: number, featureCount: number): number {
   let score = 0;
-  
+
   // Command usage (0-40 points)
   score += Math.min(40, totalCommands * 2);
-  
+
   // Project diversity (0-30 points)
   score += Math.min(30, projectCount * 5);
-  
+
   // Feature adoption (0-30 points)
   score += Math.min(30, featureCount * 3);
-  
+
   return Math.round(score);
 }
 
@@ -716,27 +716,27 @@ function getProductivityTip(score: number): string {
 
 function analyzeTimePatterns(events: any[]): any {
   if (events.length === 0) return {};
-  
+
   const dayCount: Record<string, number> = {};
   const hourCount: Record<string, number> = {};
-  
+
   events.forEach(event => {
     if (event.createdAt) {
       const date = new Date(event.createdAt);
       const day = date.toLocaleDateString('en-US', { weekday: 'long' });
       const hour = date.getHours();
-      
+
       dayCount[day] = (dayCount[day] || 0) + 1;
       hourCount[hour] = (hourCount[hour] || 0) + 1;
     }
   });
-  
+
   const mostActiveDay = Object.entries(dayCount)
-    .sort(([,a], [,b]) => b - a)[0]?.[0];
-    
+    .sort(([, a], [, b]) => b - a)[0]?.[0];
+
   const mostActiveHour = Object.entries(hourCount)
-    .sort(([,a], [,b]) => b - a)[0]?.[0];
-  
+    .sort(([, a], [, b]) => b - a)[0]?.[0];
+
   return {
     mostActiveDay,
     mostActiveHour: mostActiveHour ? `${mostActiveHour}:00` : undefined,
@@ -746,42 +746,42 @@ function analyzeTimePatterns(events: any[]): any {
 
 function getTimeInsight(timeStats: any): string {
   if (!timeStats.mostActiveDay) return 'No activity patterns detected yet.';
-  
+
   const insights = [
     `You're most active on ${timeStats.mostActiveDay}s`,
     timeStats.mostActiveHour ? `Peak activity around ${timeStats.mostActiveHour}` : '',
     `Averaging ${timeStats.weeklyAverage} actions per week`
   ].filter(Boolean);
-  
+
   return insights.join(' • ');
 }
 
 function getWeeksSpan(events: any[]): number {
   if (events.length === 0) return 1;
-  
+
   const dates = events
     .map(e => new Date(e.createdAt || Date.now()))
     .filter(d => !isNaN(d.getTime()));
-    
+
   if (dates.length === 0) return 1;
-  
+
   const earliest = Math.min(...dates.map(d => d.getTime()));
   const weeksSpan = Math.max(1, (Date.now() - earliest) / (1000 * 60 * 60 * 24 * 7));
-  
+
   return weeksSpan;
 }
 function getProjectsPerMonth(projects: any[]): string {
   if (projects.length === 0) return '0.0';
-  
+
   const dates = projects
     .map(p => new Date(p.createdAt || Date.now()))
     .filter(d => !isNaN(d.getTime()));
-    
+
   if (dates.length === 0) return '0.0';
-  
+
   const earliest = Math.min(...dates.map(d => d.getTime()));
   const monthsSpan = Math.max(1, (Date.now() - earliest) / (1000 * 60 * 60 * 24 * 30));
-  
+
   return (projects.length / monthsSpan).toFixed(1);
 }
 
@@ -799,7 +799,7 @@ function getCategoryEmoji(category: string): string {
     ai: '🤖',
     storage: '💾'
   };
-  
+
   return categoryMap[category] || '⚡';
 }
 
@@ -808,12 +808,12 @@ function getTimeAgo(dateString: string): string {
   const now = new Date();
   const diffMs = now.getTime() - date.getTime();
   const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-  
+
   if (diffDays === 0) return 'today';
   if (diffDays === 1) return 'yesterday';
   if (diffDays < 30) return `${diffDays} days ago`;
   if (diffDays < 365) return `${Math.floor(diffDays / 30)} months ago`;
-  
+
   return `${Math.floor(diffDays / 365)} years ago`;
 }
 
@@ -821,26 +821,26 @@ function displayProjectStatistics(data: any): void {
   const projects = data.projects || [];
   const frameworks = data.statistics?.frameworks || {};
   const languages = data.statistics?.languages || {};
-  
+
   console.log(boxen(
     gradientString(['#ff6b6b', '#feca57'])('🚀 Project Statistics') + '\n\n' +
     chalk.white(`Total Projects Created: `) + chalk.cyan(projects.length) + '\n\n' +
-    (Object.keys(frameworks).length > 0 
+    (Object.keys(frameworks).length > 0
       ? chalk.white('Most Used Frameworks:\n') +
-        Object.entries(frameworks)
-          .sort(([,a]: any, [,b]: any) => b - a)
-          .slice(0, 5)
-          .map(([fw, count]: any) => chalk.white(`  ${fw.padEnd(12)}: `) + chalk.green(count))
-          .join('\n') + '\n\n'
+      Object.entries(frameworks)
+        .sort(([, a]: any, [, b]: any) => b - a)
+        .slice(0, 5)
+        .map(([fw, count]: any) => chalk.white(`  ${fw.padEnd(12)}: `) + chalk.green(count))
+        .join('\n') + '\n\n'
       : chalk.gray('No framework data available\n\n')
     ) +
     (Object.keys(languages).length > 0
       ? chalk.white('Languages Explored:\n') +
-        Object.entries(languages)
-          .sort(([,a]: any, [,b]: any) => b - a)
-          .slice(0, 5)
-          .map(([lang, count]: any) => chalk.white(`  ${lang.padEnd(12)}: `) + chalk.yellow(count))
-          .join('\n')
+      Object.entries(languages)
+        .sort(([, a]: any, [, b]: any) => b - a)
+        .slice(0, 5)
+        .map(([lang, count]: any) => chalk.white(`  ${lang.padEnd(12)}: `) + chalk.yellow(count))
+        .join('\n')
       : chalk.gray('No language data available')
     ),
     {
@@ -859,31 +859,31 @@ function displayDetailedProjectStatistics(data: any): void {
   const projects = data.projects || [];
   const frameworks = data.statistics?.frameworks || {};
   const languages = data.statistics?.languages || {};
-  
+
   console.log(boxen(
     gradientString(['#ff6b6b', '#feca57'])('🚀 Detailed Project Statistics') + '\n\n' +
     chalk.white(`Total Projects Created: `) + chalk.cyan(projects.length) + '\n' +
     chalk.white(`Average Projects per Month: `) + chalk.green(getProjectsPerMonth(projects)) + '\n\n' +
-    
-    (Object.keys(frameworks).length > 0 
+
+    (Object.keys(frameworks).length > 0
       ? chalk.white('Framework Distribution:\n') +
-        Object.entries(frameworks)
-          .sort(([,a]: any, [,b]: any) => b - a)
-          .map(([fw, count]: any) => {
-            const percentage = ((count / projects.length) * 100).toFixed(1);
-            return chalk.white(`  ${fw.padEnd(15)}: `) + chalk.green(`${count} (${percentage}%)`);
-          }).join('\n') + '\n\n'
+      Object.entries(frameworks)
+        .sort(([, a]: any, [, b]: any) => b - a)
+        .map(([fw, count]: any) => {
+          const percentage = ((count / projects.length) * 100).toFixed(1);
+          return chalk.white(`  ${fw.padEnd(15)}: `) + chalk.green(`${count} (${percentage}%)`);
+        }).join('\n') + '\n\n'
       : chalk.gray('No framework data available\n\n')
     ) +
-    
+
     (Object.keys(languages).length > 0
       ? chalk.white('Language Preferences:\n') +
-        Object.entries(languages)
-          .sort(([,a]: any, [,b]: any) => b - a)
-          .map(([lang, count]: any) => {
-            const percentage = ((count / projects.length) * 100).toFixed(1);
-            return chalk.white(`  ${lang.padEnd(15)}: `) + chalk.yellow(`${count} (${percentage}%)`);
-          }).join('\n')
+      Object.entries(languages)
+        .sort(([, a]: any, [, b]: any) => b - a)
+        .map(([lang, count]: any) => {
+          const percentage = ((count / projects.length) * 100).toFixed(1);
+          return chalk.white(`  ${lang.padEnd(15)}: `) + chalk.yellow(`${count} (${percentage}%)`);
+        }).join('\n')
       : chalk.gray('No language data available')
     ),
     {
@@ -901,23 +901,23 @@ function displayDetailedProjectStatistics(data: any): void {
 function displayFeatureUsage(data: any): void {
   const features = data.features || [];
   const featureStats: Record<string, number> = {};
-  
+
   // Count feature usage
   features.forEach((feature: any) => {
     if (feature.name) {
       featureStats[feature.name] = (featureStats[feature.name] || 0) + 1;
     }
   });
-  
+
   console.log(boxen(
     gradientString(['#9c88ff', '#f093fb'])('🎯 Feature Usage') + '\n\n' +
     (Object.keys(featureStats).length > 0
       ? Object.entries(featureStats)
-          .sort(([,a]: any, [,b]: any) => b - a)
-          .slice(0, 8)
-          .map(([feature, count]: any) => 
-            chalk.white(`  ${feature.padEnd(18)}: `) + chalk.magenta(`${count} times`))
-          .join('\n')
+        .sort(([, a]: any, [, b]: any) => b - a)
+        .slice(0, 8)
+        .map(([feature, count]: any) =>
+          chalk.white(`  ${feature.padEnd(18)}: `) + chalk.magenta(`${count} times`))
+        .join('\n')
       : chalk.gray('  No feature usage data available yet\n  Install features with "pi add" to see usage stats!')
     ),
     {
@@ -935,7 +935,7 @@ function displayFeatureUsage(data: any): void {
 function displayDetailedFeatureUsage(data: any): void {
   const features = data.features || [];
   const featureStats: Record<string, { count: number; category: string; lastUsed: string }> = {};
-  
+
   // Count feature usage and track categories
   features.forEach((feature: any) => {
     if (feature.name) {
@@ -949,19 +949,19 @@ function displayDetailedFeatureUsage(data: any): void {
       featureStats[feature.name].count++;
     }
   });
-  
+
   console.log(boxen(
     gradientString(['#9c88ff', '#f093fb'])('🎯 Detailed Feature Usage Analytics') + '\n\n' +
     (Object.keys(featureStats).length > 0
       ? Object.entries(featureStats)
-          .sort(([,a]: any, [,b]: any) => b.count - a.count)
-          .map(([feature, stats]: any) => {
-            const categoryEmoji = getCategoryEmoji(stats.category);
-            return `${categoryEmoji} ${chalk.white(feature.padEnd(20))} ` + 
-                   chalk.magenta(`${stats.count} uses`) + 
-                   chalk.gray(` • Last: ${getTimeAgo(stats.lastUsed)}`);
-          }).join('\n') + '\n\n' +
-          chalk.gray(`Total features used: ${Object.keys(featureStats).length}`)
+        .sort(([, a]: any, [, b]: any) => b.count - a.count)
+        .map(([feature, stats]: any) => {
+          const categoryEmoji = getCategoryEmoji(stats.category);
+          return `${categoryEmoji} ${chalk.white(feature.padEnd(20))} ` +
+            chalk.magenta(`${stats.count} uses`) +
+            chalk.gray(` • Last: ${getTimeAgo(stats.lastUsed)}`);
+        }).join('\n') + '\n\n' +
+      chalk.gray(`Total features used: ${Object.keys(featureStats).length}`)
       : chalk.gray('  No feature usage data available yet')
     ),
     {
@@ -981,16 +981,16 @@ function displayRecentActivity(data: any): void {
   const recentProjects = projects
     .sort((a: any, b: any) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime())
     .slice(0, 5);
-    
+
   console.log(boxen(
     gradientString(['#a8edea', '#fed6e3'])('📁 Recent Activity') + '\n\n' +
     (recentProjects.length > 0
       ? recentProjects
-          .map((project: any) => 
-            chalk.white(`  ${project.name || 'Unknown'} `) +
-            chalk.gray(`(${project.framework || 'unknown'})`) +
-            (project.createdAt ? '\n    ' + chalk.dim(new Date(project.createdAt).toLocaleDateString()) : '')
-          ).join('\n')
+        .map((project: any) =>
+          chalk.white(`  ${project.name || 'Unknown'} `) +
+          chalk.gray(`(${project.framework || 'unknown'})`) +
+          (project.createdAt ? '\n    ' + chalk.dim(new Date(project.createdAt).toLocaleDateString()) : '')
+        ).join('\n')
       : chalk.gray('  No recent projects')
     ),
     {
@@ -1007,14 +1007,14 @@ function displayRecentActivity(data: any): void {
  */
 async function exportAnalyticsData(data: any, method: string = 'json'): Promise<void> {
   const timestamp = new Date().toISOString().split('T')[0];
-  
+
   // Ensure method is a string and normalize it
   const methodStr = typeof method === 'string' ? method : 'json';
   const normalizedMethod = methodStr.toLowerCase().trim();
-  
+
   let filename = '';
   let content = '';
-  
+
   try {
     switch (normalizedMethod) {
       case 'xml':
@@ -1022,21 +1022,21 @@ async function exportAnalyticsData(data: any, method: string = 'json'): Promise<
         content = convertToXML(data);
         await fs.writeFile(filename, content, 'utf8');
         break;
-        
+
       case 'yaml':
       case 'yml':
         filename = `analytics-export-${timestamp}.yaml`;
         content = convertToYAML(data);
         await fs.writeFile(filename, content, 'utf8');
         break;
-        
+
       case 'json':
       default:
         filename = `analytics-export-${timestamp}.json`;
         await fs.writeJson(filename, data, { spaces: 2 });
         break;
     }
-    
+
     displaySuccessMessage(
       `Analytics exported as ${normalizedMethod.toUpperCase()}`,
       [
@@ -1046,7 +1046,7 @@ async function exportAnalyticsData(data: any, method: string = 'json'): Promise<
         `💾 Size: ${await getFileSize(filename)}`
       ]
     );
-    
+
   } catch (error) {
     console.error(chalk.red('❌ Export failed:'), error);
     console.log(chalk.yellow('\n💡 Supported formats: json, xml, yaml, yml'));
@@ -1070,11 +1070,11 @@ function objectToXML(obj: any, rootName: string = 'root', indent: string = ''): 
   if (obj === null || obj === undefined) {
     return `${indent}<${rootName}></${rootName}>\n`;
   }
-  
+
   if (typeof obj === 'string' || typeof obj === 'number' || typeof obj === 'boolean') {
     return `${indent}<${rootName}>${escapeXML(String(obj))}</${rootName}>\n`;
   }
-  
+
   if (Array.isArray(obj)) {
     let xml = `${indent}<${rootName}>\n`;
     obj.forEach((item, index) => {
@@ -1083,7 +1083,7 @@ function objectToXML(obj: any, rootName: string = 'root', indent: string = ''): 
     xml += `${indent}</${rootName}>\n`;
     return xml;
   }
-  
+
   if (typeof obj === 'object') {
     let xml = `${indent}<${rootName}>\n`;
     Object.entries(obj).forEach(([key, value]) => {
@@ -1093,7 +1093,7 @@ function objectToXML(obj: any, rootName: string = 'root', indent: string = ''): 
     xml += `${indent}</${rootName}>\n`;
     return xml;
   }
-  
+
   return `${indent}<${rootName}>${escapeXML(String(obj))}</${rootName}>\n`;
 }
 
@@ -1121,11 +1121,11 @@ function convertToYAML(data: any): string {
  */
 function objectToYAML(obj: any, indent: number = 0): string {
   const spaces = '  '.repeat(indent);
-  
+
   if (obj === null || obj === undefined) {
     return 'null\n';
   }
-  
+
   if (typeof obj === 'string') {
     // Escape strings that might need quotes
     if (obj.includes('\n') || obj.includes('"') || obj.includes("'") || obj.includes(':')) {
@@ -1133,14 +1133,14 @@ function objectToYAML(obj: any, indent: number = 0): string {
     }
     return `${obj}\n`;
   }
-  
+
   if (typeof obj === 'number' || typeof obj === 'boolean') {
     return `${obj}\n`;
   }
-  
+
   if (Array.isArray(obj)) {
     if (obj.length === 0) return '[]\n';
-    
+
     let yaml = '\n';
     obj.forEach(item => {
       yaml += `${spaces}- `;
@@ -1153,10 +1153,10 @@ function objectToYAML(obj: any, indent: number = 0): string {
     });
     return yaml;
   }
-  
+
   if (typeof obj === 'object') {
     if (Object.keys(obj).length === 0) return '{}\n';
-    
+
     let yaml = '\n';
     Object.entries(obj).forEach(([key, value]) => {
       yaml += `${spaces}${key}: `;
@@ -1168,7 +1168,7 @@ function objectToYAML(obj: any, indent: number = 0): string {
     });
     return yaml;
   }
-  
+
   return `${obj}\n`;
 }
 
@@ -1179,13 +1179,13 @@ async function getFileSize(filename: string): Promise<string> {
   try {
     const stats = await fs.stat(filename);
     const bytes = stats.size;
-    
+
     if (bytes === 0) return '0 Bytes';
-    
+
     const k = 1024;
     const sizes = ['Bytes', 'KB', 'MB', 'GB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
-    
+
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   } catch (error) {
     return 'Unknown';
@@ -1197,7 +1197,7 @@ async function getFileSize(filename: string): Promise<string> {
  */
 async function resetAnalyticsData(): Promise<void> {
   const historyPath = path.join(os.homedir(), '.package-installer-cli', 'history.json');
-  
+
   const emptyData = {
     commands: {},
     projects: [],
@@ -1210,10 +1210,10 @@ async function resetAnalyticsData(): Promise<void> {
       languages: {}
     }
   };
-  
+
   await fs.ensureDir(path.dirname(historyPath));
   await fs.writeJson(historyPath, emptyData, { spaces: 2 });
-  
+
   displaySuccessMessage(
     'Analytics data reset',
     ['All usage statistics have been cleared', 'Fresh analytics will be collected from now on']

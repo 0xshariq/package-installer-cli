@@ -5,14 +5,14 @@
 
 import { LanguageDetectionResult, PackageManagerDetectionResult } from './types.js';
 
-export type SupportedLanguage = 
-  | 'javascript' | 'typescript' 
+export type SupportedLanguage =
+  | 'javascript' | 'typescript'
   | 'rust' | 'python' | 'go' | 'ruby';
 
-export type PackageManagerType = 
+export type PackageManagerType =
   | 'npm' | 'pnpm' | 'yarn' | 'bun'
   | 'cargo' | 'pip' | 'poetry' | 'conda' | 'pipenv'
-  | 'go' | 'bundler' | 'gem' | 'composer'|'make';
+  | 'go' | 'bundler' | 'gem' | 'composer' | 'make';
 
 export interface EnhancedLanguageConfig {
   name: SupportedLanguage;
@@ -1214,7 +1214,7 @@ export const ENHANCED_LANGUAGE_CONFIGS: Record<SupportedLanguage, EnhancedLangua
       ]
     }
   }
-  
+
   // Additional languages would be added here with full configuration...
   // For brevity, I'm showing the structure with key languages implemented
 };
@@ -1233,11 +1233,11 @@ export function getLanguageConfig(language: SupportedLanguage): EnhancedLanguage
 export function detectLanguageFromFiles(files: string[]): LanguageDetectionResult[] {
   const results: LanguageDetectionResult[] = [];
   const fileSet = new Set(files.map(f => f.split('/').pop() || f));
-  
+
   for (const [language, config] of Object.entries(ENHANCED_LANGUAGE_CONFIGS)) {
     let confidence = 0;
     const indicators: string[] = [];
-    
+
     // Check for required config files (high confidence)
     const requiredFiles = config.configFiles.filter(cf => cf.required);
     const hasRequiredFile = requiredFiles.some(cf => {
@@ -1247,26 +1247,26 @@ export function detectLanguageFromFiles(files: string[]): LanguageDetectionResul
       }
       return fileSet.has(cf.filename);
     });
-    
+
     if (hasRequiredFile) {
       confidence += 80;
       indicators.push('Required config file found');
     }
-    
+
     // Check for optional config files (medium confidence)
     const optionalMatches = config.configFiles.filter(cf => !cf.required && fileSet.has(cf.filename));
     confidence += optionalMatches.length * 15;
-    
+
     // Check for lock files (medium confidence)
     const lockFileMatches = config.packageManagers.flatMap(pm => pm.lockFiles).filter(lf => fileSet.has(lf));
     confidence += lockFileMatches.length * 20;
-    
+
     // Check for source files (low confidence)
-    const sourceFiles = files.filter(f => 
+    const sourceFiles = files.filter(f =>
       config.sourceFileExtensions.some(ext => f.endsWith(ext))
     );
     confidence += Math.min(sourceFiles.length * 5, 30);
-    
+
     if (confidence > 20) {
       results.push({
         language: language as SupportedLanguage,
@@ -1277,28 +1277,28 @@ export function detectLanguageFromFiles(files: string[]): LanguageDetectionResul
       });
     }
   }
-  
+
   return results.sort((a, b) => b.confidence - a.confidence);
 }
 
 export function detectPackageManager(language: SupportedLanguage, files: string[]): PackageManagerDetectionResult[] {
   const config = ENHANCED_LANGUAGE_CONFIGS[language];
   if (!config) return [];
-  
+
   const results: PackageManagerDetectionResult[] = [];
   const fileSet = new Set(files);
-  
+
   for (const pm of config.packageManagers) {
     let confidence = 0;
-    
+
     // Check for lock files (high confidence)
     const lockFileMatches = pm.lockFiles.filter(lf => fileSet.has(lf));
     confidence += lockFileMatches.length * 60;
-    
+
     // Check for config files (medium confidence)
     const configMatches = pm.configFiles.filter(cf => fileSet.has(cf));
     confidence += configMatches.length * 30;
-    
+
     if (confidence > 0) {
       results.push({
         packageManager: pm.name,
@@ -1309,14 +1309,14 @@ export function detectPackageManager(language: SupportedLanguage, files: string[
       });
     }
   }
-  
+
   return results.sort((a, b) => b.confidence - a.confidence);
 }
 
 export function getPreferredPackageManager(language: SupportedLanguage): EnhancedPackageManager | null {
   const config = ENHANCED_LANGUAGE_CONFIGS[language];
   if (!config || config.packageManagers.length === 0) return null;
-  
+
   return config.packageManagers.sort((a, b) => a.priority - b.priority)[0];
 }
 
@@ -1329,7 +1329,7 @@ export function getLanguagesByCategory(category: EnhancedLanguageConfig['categor
 export function getPopularFrameworks(language: SupportedLanguage, limit: number = 5): EnhancedFrameworkPattern[] {
   const config = ENHANCED_LANGUAGE_CONFIGS[language];
   if (!config) return [];
-  
+
   return config.frameworkDetection
     .sort((a, b) => b.popularity - a.popularity)
     .slice(0, limit);
@@ -1356,13 +1356,13 @@ export function getLanguageMaturityStatus(language: SupportedLanguage): string {
 
 export function getAllConfigFiles(): string[] {
   const allConfigFiles = new Set<string>();
-  
+
   // Add config files from all languages
   Object.values(ENHANCED_LANGUAGE_CONFIGS).forEach(config => {
     config.configFiles.forEach(cf => {
       allConfigFiles.add(cf.filename);
     });
-    
+
     // Add package manager config files
     config.packageManagers.forEach(pm => {
       if (pm.configFiles) {
@@ -1370,7 +1370,7 @@ export function getAllConfigFiles(): string[] {
       }
     });
   });
-  
+
   return Array.from(allConfigFiles);
 }
 

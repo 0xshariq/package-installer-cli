@@ -14,7 +14,7 @@ import { getPackageVersion } from './utils.js';
 export function generateBanner(): string {
   const packageGradient = gradient(['#0072ff', '#00c6ff', '#4facfe']);
   const installerGradient = gradient(['#00c6ff', '#0072ff', '#667eea']);
-  
+
   return boxen(
     packageGradient('           ██████╗  █████╗  ██████╗██╗  ██╗ █████╗  ██████╗ ███████╗') + '\n' +
     packageGradient('           ██╔══██╗██╔══██╗██╔════╝██║ ██╔╝██╔══██╗██╔════╝ ██╔════╝') + '\n' +
@@ -50,7 +50,7 @@ export function generateBanner(): string {
 export function generateVersionBanner(): string {
   const version = getPackageVersion();
   return boxen(
-    chalk.hex('#00d2d3')('📦 Version: ') + chalk.hex('#ffa502')(`v${version}`) + 
+    chalk.hex('#00d2d3')('📦 Version: ') + chalk.hex('#ffa502')(`v${version}`) +
     chalk.hex('#95afc0')('  •  ') + chalk.hex('#00d2d3')('🎯 Frameworks: ') + chalk.hex('#ffa502')('75') +
     chalk.hex('#95afc0')('  •  ') + chalk.hex('#00d2d3')('📋 Templates: ') + chalk.hex('#ffa502')('50+') +
     chalk.hex('#95afc0')('  •  ') + chalk.hex('#00d2d3')('📋 Commands: ') + chalk.hex('#ffa502')('22') +
@@ -77,7 +77,7 @@ export function displayBanner(): void {
  */
 export function displayCommandBanner(commandName: string, description: string): void {
   const commandGradient = gradient(['#4facfe', '#00f2fe']);
-  
+
   console.log('\n' + boxen(
     commandGradient(`🚀 ${commandName.toUpperCase()} COMMAND`) + '\n\n' +
     chalk.white(description) + '\n\n' +

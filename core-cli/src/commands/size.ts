@@ -5,7 +5,7 @@ import { displayCommandBanner } from '../utils/banner.js';
 
 function humanBytes(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`;
-  const units = ['KB','MB','GB','TB'];
+  const units = ['KB', 'MB', 'GB', 'TB'];
   let i = -1;
   do {
     bytes = bytes / 1024;
@@ -32,8 +32,8 @@ async function folderSize(p: string): Promise<number> {
   return total;
 }
 
-async function listLargestFiles(p: string, limit = 10): Promise<Array<{file: string, size: number}>> {
-  const results: Array<{file: string,size:number}> = [];
+async function listLargestFiles(p: string, limit = 10): Promise<Array<{ file: string, size: number }>> {
+  const results: Array<{ file: string, size: number }> = [];
   async function walk(curr: string) {
     try {
       const stats = await fs.stat(curr);
@@ -52,7 +52,7 @@ async function listLargestFiles(p: string, limit = 10): Promise<Array<{file: str
     }
   }
   await walk(p);
-  results.sort((a,b) => b.size - a.size);
+  results.sort((a, b) => b.size - a.size);
   return results.slice(0, limit);
 }
 
@@ -98,15 +98,15 @@ export async function sizeCommand(targets?: string[] | string, options?: any) {
     // Resolve and dedupe
     paths = Array.from(new Set(paths.map(p => p === '.' ? process.cwd() : path.resolve(process.cwd(), p))));
 
-  const topN = options?.top ? Number(options.top) : 10;
-  const showAll = !!options?.all;
-  const jsonOutput = !!options?.json;
+    const topN = options?.top ? Number(options.top) : 10;
+    const showAll = !!options?.all;
+    const jsonOutput = !!options?.json;
 
     let combinedTotal = 0;
-    const combinedFiles: Array<{file:string,size:number}> = [];
+    const combinedFiles: Array<{ file: string, size: number }> = [];
 
-  const resultsPerPath: Array<any> = [];
-  for (const p of paths) {
+    const resultsPerPath: Array<any> = [];
+    for (const p of paths) {
       if (!await fs.pathExists(p)) {
         console.log(chalk.red(`❌ Path not found: ${p}`));
         continue;
@@ -170,7 +170,7 @@ export async function sizeCommand(targets?: string[] | string, options?: any) {
         } else {
           console.log(`\n${chalk.hex('#667eea')('Top ' + topN + ' largest files in ' + p + ':')}`);
           largest.forEach((f, idx) => {
-            console.log(`${String(idx+1).padStart(2)}. ${chalk.yellow(humanBytes(f.size)).padEnd(10)} ${chalk.gray(f.file)}`);
+            console.log(`${String(idx + 1).padStart(2)}. ${chalk.yellow(humanBytes(f.size)).padEnd(10)} ${chalk.gray(f.file)}`);
             combinedFiles.push(f);
           });
         }
@@ -180,7 +180,7 @@ export async function sizeCommand(targets?: string[] | string, options?: any) {
     // JSON output
     if (jsonOutput) {
       const uniqCombined = Array.from(new Map(combinedFiles.map(f => [f.file, f])).values());
-      uniqCombined.sort((a,b) => b.size - a.size);
+      uniqCombined.sort((a, b) => b.size - a.size);
       const out = {
         scannedPaths: paths,
         perPath: resultsPerPath,
@@ -199,10 +199,10 @@ export async function sizeCommand(targets?: string[] | string, options?: any) {
 
       if (topN > 0 && combinedFiles.length > 0) {
         const uniqCombined = Array.from(new Map(combinedFiles.map(f => [f.file, f])).values());
-        uniqCombined.sort((a,b) => b.size - a.size);
+        uniqCombined.sort((a, b) => b.size - a.size);
         console.log(`\n${chalk.hex('#667eea')('Top ' + topN + ' largest files across all inputs:')}`);
         uniqCombined.slice(0, topN).forEach((f, idx) => {
-          console.log(`${String(idx+1).padStart(2)}. ${chalk.yellow(humanBytes(f.size)).padEnd(10)} ${chalk.gray(f.file)}`);
+          console.log(`${String(idx + 1).padStart(2)}. ${chalk.yellow(humanBytes(f.size)).padEnd(10)} ${chalk.gray(f.file)}`);
         });
       }
     }

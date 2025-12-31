@@ -7,20 +7,20 @@ import path from 'path';
 import fs from 'fs-extra';
 import { createStandardHelp, CommandHelpConfig } from '../utils/helpFormatter.js';
 import { displayCommandBanner } from '../utils/banner.js';
-import { 
-  EmailTemplate,
-  SystemInfo,
-  generateEmailTemplate,
-  generateTestEmailTemplate,
-  collectBugReportData,
-  collectFeatureRequestData,
-  collectTemplateRequestData,
-  collectQuestionData,
-  collectImprovementData,
-  collectDocsData,
-  collectCustomMessageData,
-  collectContactInfo,
-  collectQuickFeedback
+import {
+    EmailTemplate,
+    SystemInfo,
+    generateEmailTemplate,
+    generateTestEmailTemplate,
+    collectBugReportData,
+    collectFeatureRequestData,
+    collectTemplateRequestData,
+    collectQuestionData,
+    collectImprovementData,
+    collectDocsData,
+    collectCustomMessageData,
+    collectContactInfo,
+    collectQuickFeedback
 } from '../email-templates/index.js';
 export interface EmailCategory {
     name: string;
@@ -418,7 +418,7 @@ async function sendEmailViaMcp(
         const to = 'khanshariq92213@gmail.com';
 
         // Handle custom credentials if provided
-    if (customCredentials) {
+        if (customCredentials) {
             // Create temporary .env file with custom credentials
             const tempDir = os.tmpdir();
             tempEnvFile = path.join(tempDir, `temp-email-config-${Date.now()}.env`);
@@ -1016,40 +1016,40 @@ export async function emailCommand(
         }
 
         // Handle setup flag
-            if (options.setup) {
-                // Delegate permanent setup to the Email MCP Server installer (npx/global/local)
-                const mcpInfo = await checkEmailMcpAvailability();
-                if (!mcpInfo.available) {
-                    console.log(chalk.yellow('⚠️ Email MCP Server not installed. Please install it first:'));
-                    console.log(chalk.cyan('npm install -g @0xshariq/email-mcp-server'));
-                    return;
-                }
-
-                try {
-                    let setupCmd = '';
-                    const execOptions: any = { stdio: 'inherit', encoding: 'utf8' };
-                    switch (mcpInfo.installationType) {
-                        case 'npx':
-                            setupCmd = 'npx @0xshariq/email-mcp-server setup';
-                            break;
-                        case 'global':
-                            setupCmd = 'email-cli setup';
-                            break;
-                        case 'local':
-                            setupCmd = `node "${mcpInfo.path}" setup`;
-                            execOptions.cwd = path.dirname(mcpInfo.path!);
-                            break;
-                        default:
-                            setupCmd = 'npx @0xshariq/email-mcp-server setup';
-                    }
-                    execSync(setupCmd, execOptions);
-                } catch (err) {
-                    console.log(chalk.red('❌ Failed to run external email setup command. Please run manually:'));
-                    console.log(chalk.cyan('npx @0xshariq/email-mcp-server setup'));
-                }
-
+        if (options.setup) {
+            // Delegate permanent setup to the Email MCP Server installer (npx/global/local)
+            const mcpInfo = await checkEmailMcpAvailability();
+            if (!mcpInfo.available) {
+                console.log(chalk.yellow('⚠️ Email MCP Server not installed. Please install it first:'));
+                console.log(chalk.cyan('npm install -g @0xshariq/email-mcp-server'));
                 return;
             }
+
+            try {
+                let setupCmd = '';
+                const execOptions: any = { stdio: 'inherit', encoding: 'utf8' };
+                switch (mcpInfo.installationType) {
+                    case 'npx':
+                        setupCmd = 'npx @0xshariq/email-mcp-server setup';
+                        break;
+                    case 'global':
+                        setupCmd = 'email-cli setup';
+                        break;
+                    case 'local':
+                        setupCmd = `node "${mcpInfo.path}" setup`;
+                        execOptions.cwd = path.dirname(mcpInfo.path!);
+                        break;
+                    default:
+                        setupCmd = 'npx @0xshariq/email-mcp-server setup';
+                }
+                execSync(setupCmd, execOptions);
+            } catch (err) {
+                console.log(chalk.red('❌ Failed to run external email setup command. Please run manually:'));
+                console.log(chalk.cyan('npx @0xshariq/email-mcp-server setup'));
+            }
+
+            return;
+        }
 
         // Handle status flag
         if (options.status) {
@@ -1248,7 +1248,7 @@ export async function emailCommand(
             };
         }
 
-    const success = await sendEmailViaMcp(subject, plainBody, htmlBody, customCredentials, !!options.forceHtml);
+        const success = await sendEmailViaMcp(subject, plainBody, htmlBody, customCredentials, !!options.forceHtml);
 
         if (success) {
             console.log(boxen(

@@ -63,7 +63,7 @@ function detectProjectInfo(): ProjectInfo {
   };
 
   const cwd = process.cwd();
-  
+
   // Check for package.json (Node.js projects)
   const packageJsonPath = path.join(cwd, 'package.json');
   if (fs.existsSync(packageJsonPath)) {
@@ -75,7 +75,7 @@ function detectProjectInfo(): ProjectInfo {
 
       // Detect framework from dependencies
       const deps = { ...packageJson.dependencies, ...packageJson.devDependencies };
-      
+
       if (deps.next) {
         projectInfo.framework = 'nextjs';
         projectInfo.buildDir = '.next';
@@ -219,7 +219,7 @@ function displayProjectInfo(projectInfo: ProjectInfo, options: DeployOptions): v
 
   console.log(chalk.cyan('📦 Project Information'));
   console.log(chalk.gray('========================\n'));
-  
+
   console.log(`${chalk.blue('Type:')} ${projectInfo.type}`);
   if (projectInfo.framework) {
     console.log(`${chalk.blue('Framework:')} ${projectInfo.framework}`);
@@ -233,7 +233,7 @@ function displayProjectInfo(projectInfo: ProjectInfo, options: DeployOptions): v
   if (projectInfo.buildDir) {
     console.log(`${chalk.blue('Build Directory:')} ${projectInfo.buildDir}`);
   }
-  
+
   if (projectInfo.envFiles.length > 0) {
     console.log(`${chalk.blue('Environment Files:')} ${projectInfo.envFiles.join(', ')}`);
   }
@@ -241,7 +241,7 @@ function displayProjectInfo(projectInfo: ProjectInfo, options: DeployOptions): v
   if (projectInfo.suggestedPlatforms.length > 0) {
     console.log(`${chalk.blue('Suggested Platforms:')} ${projectInfo.suggestedPlatforms.slice(0, 3).join(', ')}`);
   }
-  
+
   console.log(); // Empty line
 }
 
@@ -641,7 +641,7 @@ export async function deployCommand(): Promise<void> {
 
 function showAvailablePlatforms(): void {
   console.log(chalk.cyan('\n🌐 Available Deployment Platforms:\n'));
-  
+
   console.log(chalk.hex('#eb5424')('� Auth0'));
   console.log(chalk.gray('   • Authentication and identity management'));
   console.log(chalk.gray('   • Framework-specific SDK configuration'));
@@ -747,7 +747,7 @@ function showAvailablePlatforms(): void {
 
 async function configureDeployment(): Promise<void> {
   console.log(chalk.cyan('⚙️ Deployment Configuration\n'));
-  
+
   const { action } = await inquirer.prompt([
     {
       type: 'list',
@@ -786,7 +786,7 @@ async function configureDeployment(): Promise<void> {
 
 async function configurePlatformCredentials(): Promise<void> {
   console.log(chalk.cyan('\n🔐 Platform Credentials Configuration\n'));
-  
+
   const { platform } = await inquirer.prompt([
     {
       type: 'list',
@@ -819,7 +819,7 @@ async function configurePlatformCredentials(): Promise<void> {
 
 async function configureBuildSettings(): Promise<void> {
   console.log(chalk.cyan('\n🔨 Build Settings Configuration\n'));
-  
+
   const { buildConfig } = await inquirer.prompt([
     {
       type: 'checkbox',
@@ -846,7 +846,7 @@ async function configureBuildSettings(): Promise<void> {
 
 async function configureEnvironmentVariables(): Promise<void> {
   console.log(chalk.cyan('\n🌍 Environment Variables Configuration\n'));
-  
+
   const { envAction } = await inquirer.prompt([
     {
       type: 'list',
@@ -883,7 +883,7 @@ async function configureEnvironmentVariables(): Promise<void> {
 
 async function configureDomainSettings(): Promise<void> {
   console.log(chalk.cyan('\n🌐 Domain Configuration\n'));
-  
+
   const { domainAction } = await inquirer.prompt([
     {
       type: 'list',
@@ -905,139 +905,139 @@ async function configureDomainSettings(): Promise<void> {
 
 async function showPlatformSetupCommands(): Promise<void> {
   console.log(chalk.cyan('\n⚡ Platform Setup Commands\n'));
-  
+
   const platforms = [
-    { 
-      name: 'Auth0', 
-      cli: 'auth0', 
+    {
+      name: 'Auth0',
+      cli: 'auth0',
       install: 'npm install -g @auth0/auth0-cli',
       setup: 'auth0 login',
       docs: 'https://auth0.com/docs/cli',
       package: 'https://www.npmjs.com/package/@auth0/auth0-cli'
     },
-    { 
-      name: 'AWS', 
-      cli: 'aws-cli', 
+    {
+      name: 'AWS',
+      cli: 'aws-cli',
       install: 'pip install awscli',
       setup: 'aws configure',
       docs: 'https://docs.aws.amazon.com/cli/',
       package: 'https://pypi.org/project/awscli/'
     },
-    { 
-      name: 'Capistrano', 
-      cli: 'capistrano', 
+    {
+      name: 'Capistrano',
+      cli: 'capistrano',
       install: 'gem install capistrano',
       setup: 'cap install',
       docs: 'https://capistranorb.com/',
       package: 'https://rubygems.org/gems/capistrano'
     },
-    { 
-      name: 'Cloud Foundry', 
-      cli: 'cf', 
+    {
+      name: 'Cloud Foundry',
+      cli: 'cf',
       install: 'Download from GitHub releases',
       setup: 'cf login',
       docs: 'https://docs.cloudfoundry.org/cf-cli/',
       package: 'https://github.com/cloudfoundry/cli/releases'
     },
-    { 
-      name: 'Cloudflare', 
-      cli: 'wrangler', 
+    {
+      name: 'Cloudflare',
+      cli: 'wrangler',
       install: 'npm install -g wrangler',
       setup: 'wrangler login',
       docs: 'https://developers.cloudflare.com/workers/wrangler/',
       package: 'https://www.npmjs.com/package/wrangler'
     },
-    { 
-      name: 'DigitalOcean', 
-      cli: 'doctl', 
+    {
+      name: 'DigitalOcean',
+      cli: 'doctl',
       install: 'Download from GitHub releases',
       setup: 'doctl auth init',
       docs: 'https://docs.digitalocean.com/reference/doctl/',
       package: 'https://github.com/digitalocean/doctl/releases'
     },
-    { 
-      name: 'Docker Hub', 
-      cli: 'docker', 
+    {
+      name: 'Docker Hub',
+      cli: 'docker',
       install: 'Download Docker Desktop',
       setup: 'docker login',
       docs: 'https://docs.docker.com/engine/reference/commandline/cli/',
       package: 'https://docs.docker.com/get-docker/'
     },
-    { 
-      name: 'Firebase', 
-      cli: 'firebase-tools', 
+    {
+      name: 'Firebase',
+      cli: 'firebase-tools',
       install: 'npm install -g firebase-tools',
       setup: 'firebase login',
       docs: 'https://firebase.google.com/docs/cli',
       package: 'https://www.npmjs.com/package/firebase-tools'
     },
-    { 
-      name: 'Fly.io', 
-      cli: 'flyctl', 
+    {
+      name: 'Fly.io',
+      cli: 'flyctl',
       install: 'curl -L https://fly.io/install.sh | sh',
       setup: 'flyctl auth login',
       docs: 'https://fly.io/docs/flyctl/',
       package: 'https://fly.io/docs/getting-started/installing-flyctl/'
     },
-    { 
-      name: 'GitHub Pages', 
-      cli: 'gh', 
+    {
+      name: 'GitHub Pages',
+      cli: 'gh',
       install: 'Download from GitHub releases',
       setup: 'gh auth login',
       docs: 'https://cli.github.com/manual/',
       package: 'https://github.com/cli/cli/releases'
     },
-    { 
-      name: 'Google Cloud', 
-      cli: 'gcloud', 
+    {
+      name: 'Google Cloud',
+      cli: 'gcloud',
       install: 'Download Cloud SDK',
       setup: 'gcloud auth login',
       docs: 'https://cloud.google.com/sdk/gcloud/',
       package: 'https://cloud.google.com/sdk/docs/install'
     },
-    { 
-      name: 'GoReleaser', 
-      cli: 'goreleaser', 
+    {
+      name: 'GoReleaser',
+      cli: 'goreleaser',
       install: 'go install github.com/goreleaser/goreleaser@latest',
       setup: 'export GITHUB_TOKEN=your_token',
       docs: 'https://goreleaser.com/',
       package: 'https://goreleaser.com/install/'
     },
-    { 
-      name: 'Heroku', 
-      cli: 'heroku', 
+    {
+      name: 'Heroku',
+      cli: 'heroku',
       install: 'npm install -g heroku',
       setup: 'heroku login',
       docs: 'https://devcenter.heroku.com/articles/heroku-cli',
       package: 'https://www.npmjs.com/package/heroku'
     },
-    { 
-      name: 'Netlify', 
-      cli: 'netlify-cli', 
+    {
+      name: 'Netlify',
+      cli: 'netlify-cli',
       install: 'npm install -g netlify-cli',
       setup: 'netlify login',
       docs: 'https://docs.netlify.com/cli/get-started/',
       package: 'https://www.npmjs.com/package/netlify-cli'
     },
-    { 
-      name: 'Railway', 
-      cli: 'railway', 
+    {
+      name: 'Railway',
+      cli: 'railway',
       install: 'npm install -g @railway/cli',
       setup: 'railway login',
       docs: 'https://docs.railway.app/reference/cli-api',
       package: 'https://www.npmjs.com/package/@railway/cli'
     },
-    { 
-      name: 'Serverless', 
-      cli: 'serverless', 
+    {
+      name: 'Serverless',
+      cli: 'serverless',
       install: 'npm install -g serverless',
       setup: 'serverless login',
       docs: 'https://www.serverless.com/framework/docs/',
       package: 'https://www.npmjs.com/package/serverless'
     },
-    { 
-      name: 'Vercel', 
-      cli: 'vercel', 
+    {
+      name: 'Vercel',
+      cli: 'vercel',
       install: 'npm install -g vercel',
       setup: 'vercel login',
       docs: 'https://vercel.com/docs/cli',
@@ -1056,7 +1056,7 @@ async function showPlatformSetupCommands(): Promise<void> {
 
 async function showPlatformSetupCommand(platform: string): Promise<void> {
   console.log(chalk.cyan(`\n⚡ ${platform.charAt(0).toUpperCase() + platform.slice(1)} Setup\n`));
-  
+
   const setupCommands: { [key: string]: { cli: string; install: string; setup: string; docs: string; package: string } } = {
     'auth0': {
       cli: 'auth0',
@@ -1183,13 +1183,13 @@ async function showPlatformSetupCommand(platform: string): Promise<void> {
   if (config) {
     console.log(chalk.green('📦 Installation:'));
     console.log(chalk.gray(`  ${config.install}\n`));
-    
+
     console.log(chalk.green('🔧 Setup:'));
     console.log(chalk.gray(`  ${config.setup}\n`));
-    
+
     console.log(chalk.green('📚 Documentation:'));
     console.log(chalk.blue(`  ${config.docs}\n`));
-    
+
     console.log(chalk.green('🔗 Package Manager:'));
     console.log(chalk.magenta(`  ${config.package}\n`));
   } else {

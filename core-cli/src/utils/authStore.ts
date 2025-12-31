@@ -32,7 +32,7 @@ export class AuthStore {
     // Restrict directory permissions to user only
     try {
       await fs.chmod(this.dir, 0o700);
-    } catch {}
+    } catch { }
 
     if (await fs.pathExists(this.file)) {
       try {
@@ -49,7 +49,7 @@ export class AuthStore {
     // Restrict file permissions to user only
     try {
       await fs.chmod(this.file, 0o600);
-    } catch {}
+    } catch { }
   }
 
   private hashPassword(password: string, salt: Buffer): Buffer {

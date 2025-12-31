@@ -13,7 +13,7 @@ export async function cloneRepo(userRepo: string, projectName?: string, options:
     // Validate and process repository format
     let repoUrl = userRepo;
     let provider = 'github'; // default
-    
+
     if (!userRepo.startsWith('http') && !userRepo.startsWith('git@')) {
       // Handle provider prefixes
       if (userRepo.includes(':')) {
@@ -42,7 +42,7 @@ export async function cloneRepo(userRepo: string, projectName?: string, options:
             break;
         }
       }
-      
+
       // Validate user/repo format
       if (!repoUrl.includes('/') || repoUrl.split('/').length !== 2) {
         throw new Error(`Invalid repository format: "${userRepo}"\n` +
@@ -55,7 +55,7 @@ export async function cloneRepo(userRepo: string, projectName?: string, options:
           '  • https://github.com/user/repo.git'
         );
       }
-      
+
       const [user, repo] = repoUrl.split('/');
       if (!user || !repo) {
         throw new Error('Invalid repository format. Both user and repo names are required');
@@ -83,13 +83,13 @@ export async function cloneRepo(userRepo: string, projectName?: string, options:
     console.log(`${chalk.hex('#ffa502')('Repository:')} ${chalk.hex('#00d2d3')(userRepo)}`);
     console.log(`${chalk.hex('#ffa502')('Provider:')} ${chalk.hex('#9c88ff')(provider.toUpperCase())}`);
     console.log(`${chalk.hex('#ffa502')('Target:')} ${chalk.hex('#95afc0')(targetDir)}`);
-    
+
     const spinner = ora(chalk.hex('#00d2d3')('🔄 Cloning repository...')).start();
 
     try {
       // Check if degit is available, if not try to use npx
       let degitCommand = '';
-      
+
       try {
         await execAsync('degit --version');
         degitCommand = 'degit';
@@ -97,10 +97,10 @@ export async function cloneRepo(userRepo: string, projectName?: string, options:
         // Fallback to npx degit
         degitCommand = 'npx degit';
       }
-      
+
       // Build the repository URL for degit
       let degitRepo = repoUrl;
-      
+
       // Add provider prefix for non-GitHub providers
       if (provider !== 'github') {
         switch (provider) {
@@ -115,11 +115,11 @@ export async function cloneRepo(userRepo: string, projectName?: string, options:
             break;
         }
       }
-      
+
       const fullCommand = `${degitCommand} ${degitRepo} ${targetDir}`;
       spinner.text = chalk.hex('#00d2d3')(`Executing: ${fullCommand}`);
-      
-      await execAsync(fullCommand, { 
+
+      await execAsync(fullCommand, {
         cwd: process.cwd(),
         timeout: 60000 // 60 second timeout
       });
@@ -130,7 +130,7 @@ export async function cloneRepo(userRepo: string, projectName?: string, options:
       if (!options.noDeps) {
         await installDependenciesForClone(targetPath, targetDir || 'cloned-repo');
       }
-      
+
       // Create .env file from templates
       await createEnvFile(targetPath);
 
@@ -150,7 +150,7 @@ export async function cloneRepo(userRepo: string, projectName?: string, options:
 
     } catch (error: any) {
       spinner.fail(chalk.red('Failed to clone repository'));
-      
+
       if (error.message.includes('not found') || error.message.includes('404')) {
         throw new Error(`Repository ${userRepo} not found or is private`);
       } else {
@@ -180,10 +180,10 @@ export async function cloneRepo(userRepo: string, projectName?: string, options:
 async function createEnvFile(targetPath: string): Promise<void> {
   try {
     const envSpinner = ora(chalk.blue('Creating .env file...')).start();
-    
+
     // Look for .env template files
     const envTemplateFiles = await fs.readdir(targetPath);
-    const envTemplates = envTemplateFiles.filter(file => 
+    const envTemplates = envTemplateFiles.filter(file =>
       file.startsWith('.env.') && file !== '.env'
     );
 
@@ -198,7 +198,7 @@ async function createEnvFile(targetPath: string): Promise<void> {
     for (const templateFile of envTemplates) {
       const templatePath = path.join(targetPath, templateFile);
       const content = await fs.readFile(templatePath, 'utf-8');
-      
+
       // Extract variable names from template files
       const lines = content.split('\n');
       for (const line of lines) {
@@ -221,7 +221,7 @@ async function createEnvFile(targetPath: string): Promise<void> {
 
       const envPath = path.join(targetPath, '.env');
       await fs.writeFile(envPath, envContent + '\n');
-      
+
       envSpinner.succeed(chalk.green(`Created .env file with ${envVars.size} variables`));
     } else {
       envSpinner.info(chalk.gray('No environment variables found in template files'));
@@ -235,7 +235,7 @@ async function createEnvFile(targetPath: string): Promise<void> {
 
 async function initializeGitRepository(targetPath: string, targetDir: string): Promise<void> {
   const gitSpinner = ora(chalk.hex('#00d2d3')('🔧 Initializing git repository...')).start();
-  
+
   try {
     // Try to initialize git repository using MCP server commands first
     try {
@@ -245,7 +245,7 @@ async function initializeGitRepository(targetPath: string, targetDir: string): P
       gitSpinner.text = chalk.hex('#00d2d3')('Initializing git with git init...');
       await execAsync('git init', { cwd: targetPath });
     }
-    
+
     // Add all files to git
     try {
       gitSpinner.text = chalk.hex('#00d2d3')('Adding files with gadd...');
@@ -254,7 +254,7 @@ async function initializeGitRepository(targetPath: string, targetDir: string): P
       gitSpinner.text = chalk.hex('#00d2d3')('Adding files with git add...');
       await execAsync('git add .', { cwd: targetPath });
     }
-    
+
     // Make initial commit
     try {
       gitSpinner.text = chalk.hex('#00d2d3')('Creating initial commit with gcommit...');
@@ -263,9 +263,9 @@ async function initializeGitRepository(targetPath: string, targetDir: string): P
       gitSpinner.text = chalk.hex('#00d2d3')('Creating initial commit with git commit...');
       await execAsync('git commit -m "Initial Commit from Package Installer CLI - Cloned Repository"', { cwd: targetPath });
     }
-    
+
     gitSpinner.succeed(chalk.hex('#10ac84')('✅ Git repository initialized with initial commit'));
-    
+
   } catch (error: any) {
     gitSpinner.warn(chalk.hex('#ffa502')('⚠️  Could not initialize git repository automatically'));
     console.log(chalk.hex('#95afc0')('💡 You can initialize git manually:'));

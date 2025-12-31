@@ -29,7 +29,7 @@ export function getPackageVersion(): string {
       path.resolve(__dirname, '../../package.json'),
       path.resolve(__dirname, '../../../package.json')
     ];
-    
+
     for (const packagePath of possiblePaths) {
       if (fs.existsSync(packagePath)) {
         const packageJsonContent = fs.readFileSync(packagePath, 'utf-8');
@@ -39,7 +39,7 @@ export function getPackageVersion(): string {
         }
       }
     }
-    
+
     // Fallback to hardcoded version as last resort
     console.warn('Warning: Could not read version from package.json, using fallback version');
     return '3.6.0';
@@ -76,7 +76,7 @@ export function snakeCase(str: string): string {
 }
 
 export function titleCase(str: string): string {
-  return str.replace(/\w\S*/g, (txt) => 
+  return str.replace(/\w\S*/g, (txt) =>
     txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()
   );
 }
@@ -132,7 +132,7 @@ export function getFrameworkTheme(framework: string) {
     astro: chalk.magenta,
     default: chalk.blueBright
   };
-  
+
   return themes[framework.toLowerCase() as keyof typeof themes] || themes.default;
 }
 
@@ -150,7 +150,7 @@ export function getLanguageIcon(language: string): string {
     swift: '🍎',
     dart: '🎯'
   };
-  
+
   return icons[language.toLowerCase() as keyof typeof icons] || '📄';
 }
 
@@ -174,7 +174,7 @@ export function getFrameworkIcon(framework: string): string {
     qwik: '⚡',
     astro: '🚀'
   };
-  
+
   return icons[framework.toLowerCase() as keyof typeof icons] || '📦';
 }
 
@@ -224,7 +224,7 @@ export function validateProjectName(name: string): ValidationResult<string> {
     'public', 'static', 'assets', 'components', 'pages', 'api', 'lib',
     'utils', 'types', 'config', 'docs', 'test', 'tests', '__tests__'
   ];
-  
+
   if (reservedNames.includes(trimmedName.toLowerCase())) {
     errors.push(`"${trimmedName}" is a reserved name and cannot be used`);
   }
@@ -255,9 +255,9 @@ export function validateProjectName(name: string): ValidationResult<string> {
  * Enhanced framework and template utilities
  */
 export function frameworkSupportsDatabase(frameworkConfig: any): boolean {
-  return frameworkConfig && 
-         frameworkConfig.databases && 
-         Object.keys(frameworkConfig.databases).length > 0;
+  return frameworkConfig &&
+    frameworkConfig.databases &&
+    Object.keys(frameworkConfig.databases).length > 0;
 }
 
 export function getAvailableDatabases(frameworkConfig: any): string[] {
@@ -295,7 +295,7 @@ export function extractTemplateMetadata(templatePath: string): TemplateMetadata 
   try {
     const packageJsonPath = path.join(templatePath, 'package.json');
     const readmePath = path.join(templatePath, 'README.md');
-    
+
     let packageJson: any = {};
     let readmeContent = '';
 
@@ -361,17 +361,17 @@ function detectFrameworks(dependencies: Record<string, string>): string[] {
 
 function detectLanguages(templatePath: string): string[] {
   const languages = new Set<string>();
-  
+
   try {
     // Check for TypeScript
     if (fs.existsSync(path.join(templatePath, 'tsconfig.json')) ||
-        fs.existsSync(path.join(templatePath, 'tsconfig.app.json'))) {
+      fs.existsSync(path.join(templatePath, 'tsconfig.app.json'))) {
       languages.add('typescript');
     }
 
     // Check for JavaScript (default if no TS)
-    if (languages.size === 0 || 
-        fs.existsSync(path.join(templatePath, 'jsconfig.json'))) {
+    if (languages.size === 0 ||
+      fs.existsSync(path.join(templatePath, 'jsconfig.json'))) {
       languages.add('javascript');
     }
 
@@ -382,7 +382,7 @@ function detectLanguages(templatePath: string): string[] {
 
     // Check for Python
     if (fs.existsSync(path.join(templatePath, 'requirements.txt')) ||
-        fs.existsSync(path.join(templatePath, 'pyproject.toml'))) {
+      fs.existsSync(path.join(templatePath, 'pyproject.toml'))) {
       languages.add('python');
     }
 
@@ -464,7 +464,7 @@ export async function isDirectoryEmpty(dirPath: string): Promise<boolean> {
   if (!fs.existsSync(dirPath)) {
     return true;
   }
-  
+
   const files = fs.readdirSync(dirPath);
   return files.length === 0 || files.every(file => file.startsWith('.'));
 }
@@ -547,9 +547,9 @@ export async function getProjectName(providedName?: string): Promise<string> {
     }
     return validation.value!;
   }
-  
+
   const { default: inquirer } = await import('inquirer');
-  
+
   let projectName = '';
   let isValid = false;
 
@@ -572,14 +572,14 @@ export async function getProjectName(providedName?: string): Promise<string> {
         }
       }
     ]);
-    
+
     const validation = validateProjectName(name);
     if (validation.isValid) {
       projectName = validation.value!;
       isValid = true;
     }
   }
-  
+
   return projectName;
 }
 
@@ -601,12 +601,12 @@ export function formatFileSize(bytes: number): string {
   const units = ['B', 'KB', 'MB', 'GB'];
   let size = bytes;
   let unitIndex = 0;
-  
+
   while (size >= 1024 && unitIndex < units.length - 1) {
     size /= 1024;
     unitIndex++;
   }
-  
+
   return `${size.toFixed(1)} ${units[unitIndex]}`;
 }
 
@@ -622,7 +622,7 @@ export function generateId(length: number = 8): string {
  */
 export function deepMerge<T extends Record<string, any>>(target: T, source: Partial<T>): T {
   const result = { ...target };
-  
+
   for (const key in source) {
     if (source[key] && typeof source[key] === 'object' && target[key] && typeof target[key] === 'object') {
       result[key] = deepMerge(target[key], source[key] as any);
@@ -630,7 +630,7 @@ export function deepMerge<T extends Record<string, any>>(target: T, source: Part
       result[key] = source[key] as any;
     }
   }
-  
+
   return result;
 }
 
@@ -643,20 +643,20 @@ export async function retry<T>(
   delay: number = 1000
 ): Promise<T> {
   let lastError: Error;
-  
+
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
     try {
       return await fn();
     } catch (error) {
       lastError = error as Error;
-      
+
       if (attempt === maxAttempts) {
         throw lastError;
       }
-      
+
       await new Promise(resolve => setTimeout(resolve, delay * attempt));
     }
   }
-  
+
   throw lastError!;
 }

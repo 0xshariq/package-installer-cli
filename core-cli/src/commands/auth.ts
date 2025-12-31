@@ -91,7 +91,7 @@ async function interactiveRegister() {
 async function interactiveLogin() {
   const responses = await inquirer.prompt([
     { name: 'email', message: 'Email:', type: 'input', validate: (v: string) => /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v) || 'Enter a valid email' },
-  { name: 'password', message: 'Password:', type: 'password', validate: (v: string) => v.length >= 8 || 'Password must be at least 8 characters' },
+    { name: 'password', message: 'Password:', type: 'password', validate: (v: string) => v.length >= 8 || 'Password must be at least 8 characters' },
   ]);
   const { email, password } = responses as { email: string; password: string };
   try {

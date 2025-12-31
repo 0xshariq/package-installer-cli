@@ -43,7 +43,7 @@ export function printBanner(version: string, frameworkCount: number, templateCou
   const description = '💡 Create stunning web applications with integrated features in seconds';
 
   // Create the banner content with better spacing - package and installer on separate lines
-  const bannerContent = 
+  const bannerContent =
     titleGradient(packageArt) + '\n' +
     titleGradient(installerArt) + '\n\n' +
     subtitleGradient(subtitle) + '\n' +
@@ -91,31 +91,31 @@ export function printBanner(version: string, frameworkCount: number, templateCou
  */
 export function showProjectSummary(options: ProjectOptions, selectedFeatures: Array<{ feature: string; provider?: string }> = []): void {
   const { framework, language, bundler, src, tailwind, ui } = options;
-  
+
   console.log(chalk.cyan('\n📋 Project Configuration Summary:'));
   console.log(chalk.gray('═'.repeat(70)));
-  
+
   // Basic project information
   console.log(`  ${chalk.bold('🏷️  Project Name:')} ${chalk.cyan(options.projectName || 'N/A')}`);
   console.log(`  ${chalk.bold('🚀 Framework:')} ${chalk.green(framework.charAt(0).toUpperCase() + framework.slice(1))}`);
-  
+
   if (language && language !== 'rust') {
     console.log(`  ${chalk.bold('💻 Language:')} ${chalk.yellow(language.charAt(0).toUpperCase() + language.slice(1))}`);
   }
-  
+
   if (bundler) {
     console.log(`  ${chalk.bold('📦 Bundler:')} ${chalk.magenta(bundler.charAt(0).toUpperCase() + bundler.slice(1))}`);
   }
-  
+
   // Configuration options
   if (typeof src === 'boolean') {
     console.log(`  ${chalk.bold('📁 Src Directory:')} ${src ? chalk.green('✓ Enabled') : chalk.red('✗ Disabled')}`);
   }
-  
+
   if (typeof tailwind === 'boolean') {
     console.log(`  ${chalk.bold('🎨 Tailwind CSS:')} ${tailwind ? chalk.green('✓ Enabled') : chalk.red('✗ Disabled')}`);
   }
-  
+
   if (ui) {
     console.log(`  ${chalk.bold('🎭 UI Library:')} ${chalk.blue(ui.charAt(0).toUpperCase() + ui.slice(1))}`);
   }
@@ -124,7 +124,7 @@ export function showProjectSummary(options: ProjectOptions, selectedFeatures: Ar
   if (selectedFeatures.length > 0) {
     console.log(chalk.gray('─'.repeat(70)));
     console.log(`  ${chalk.bold('🔧 Selected Features:')} ${chalk.green(`(${selectedFeatures.length} features)`)}`);
-    
+
     selectedFeatures.forEach((feature, index) => {
       const isLast = index === selectedFeatures.length - 1;
       const prefix = isLast ? '└─' : '├─';
@@ -136,7 +136,7 @@ export function showProjectSummary(options: ProjectOptions, selectedFeatures: Ar
     console.log(chalk.gray('─'.repeat(70)));
     console.log(`  ${chalk.bold('⚙️  Template Type:')} ${chalk.green('Combination Template (Pre-configured)')}`);
   }
-  
+
   console.log(chalk.gray('═'.repeat(70)));
 }
 
@@ -145,38 +145,38 @@ export function showProjectSummary(options: ProjectOptions, selectedFeatures: Ar
  */
 export function showCombinationTemplateInfo(framework: string, database?: string, orm?: string): void {
   console.log(chalk.cyan('\n📦 Template Features:'));
-  
+
   const features = [];
-  
+
   if (framework.includes('shadcn')) {
     features.push({ name: 'Shadcn/ui Components', icon: '🎨', description: 'Beautiful, accessible UI components' });
   }
-  
+
   if (framework.includes('expressjs')) {
     features.push({ name: 'Express.js Backend', icon: '🚀', description: 'Fast, minimalist web framework' });
   }
-  
+
   if (framework.includes('nestjs')) {
     features.push({ name: 'NestJS Backend', icon: '🏗️', description: 'Scalable Node.js server-side framework' });
   }
-  
+
   if (framework.includes('reactjs')) {
     features.push({ name: 'React.js Frontend', icon: '⚛️', description: 'Modern JavaScript library for UI' });
   }
-  
+
   if (database) {
-    features.push({ 
-      name: `${database.charAt(0).toUpperCase() + database.slice(1)} Database`, 
-      icon: '🗄️', 
-      description: 'Production-ready database setup' 
+    features.push({
+      name: `${database.charAt(0).toUpperCase() + database.slice(1)} Database`,
+      icon: '🗄️',
+      description: 'Production-ready database setup'
     });
   }
-  
+
   if (orm) {
-    features.push({ 
-      name: `${orm.charAt(0).toUpperCase() + orm.slice(1)} ORM`, 
-      icon: '🔗', 
-      description: 'Object-relational mapping for database operations' 
+    features.push({
+      name: `${orm.charAt(0).toUpperCase() + orm.slice(1)} ORM`,
+      icon: '🔗',
+      description: 'Object-relational mapping for database operations'
     });
   }
 
@@ -186,7 +186,7 @@ export function showCombinationTemplateInfo(framework: string, database?: string
     console.log(`  ${chalk.gray(prefix)} ${feature.icon} ${chalk.green(feature.name)}`);
     console.log(`  ${chalk.gray(isLast ? '   ' : '│  ')} ${chalk.dim(feature.description)}`);
   });
-  
+
   console.log(`\n  ${chalk.yellow('💡 All configurations are pre-configured for optimal development experience!')}`);
 }
 
@@ -194,10 +194,10 @@ export function showCombinationTemplateInfo(framework: string, database?: string
  * Enhanced success message with better project type detection and commands
  */
 export function showSuccessMessage(
-  filename: string, 
-  targetPath: string, 
-  theme: any, 
-  dependenciesInstalled: boolean = false, 
+  filename: string,
+  targetPath: string,
+  theme: any,
+  dependenciesInstalled: boolean = false,
   framework?: string,
   installedFeatures: Array<{ feature: string; provider?: string }> = []
 ): void {
@@ -213,7 +213,7 @@ export function showSuccessMessage(
   const hasBackend = isCombinationTemplate && fs.existsSync(path.join(targetPath, 'backend'));
   const hasPackageJson = fs.existsSync(path.join(targetPath, 'package.json'));
   const hasPnpmLock = fs.existsSync(path.join(targetPath, 'pnpm-lock.yaml'));
-  
+
   // Enhanced command determination
   let devCommand, buildCommand, installCommand, packageManager;
 
@@ -238,7 +238,7 @@ export function showSuccessMessage(
 
   // Main success message with enhanced styling
   const successTitle = gradient(['#0072ff', '#00c6ff'])(`🎉 Project "${chalk.bold(projectName)}" Created Successfully!`);
-  
+
   let successContent = successTitle + '\n\n' +
     `${chalk.bold('📁 Location:')} ${chalk.cyan(targetPath)}\n` +
     `${chalk.bold('📦 Package Manager:')} ${chalk.yellow(packageManager || 'N/A')}\n`;
@@ -252,11 +252,11 @@ export function showSuccessMessage(
   if (cdCommand) {
     successContent += chalk.white(`${chalk.bold('🚀 Quick Start:')}\n  ${chalk.cyan(cdCommand)}\n`);
   }
-  
+
   if (!dependenciesInstalled && installCommand) {
     successContent += `  ${chalk.yellow(installCommand)}\n`;
   }
-  
+
   successContent += `  ${chalk.green(devCommand)}\n\n`;
   successContent += chalk.yellow('💡 Check the README.md file for detailed instructions!');
 
@@ -305,7 +305,7 @@ export function showSuccessMessage(
     installedFeatures.length > 0 ? 'Feature documentation is available in their respective folders' : 'Add more features anytime with the add command'
   ].filter(Boolean);
 
-  const tipsContent = tips.map((tip, index) => 
+  const tipsContent = tips.map((tip, index) =>
     `  ${chalk.gray('•')} ${chalk.white(tip)}`
   ).join('\n');
 
@@ -330,7 +330,7 @@ export function showSuccessMessage(
  */
 export function showErrorMessage(title: string, message: string, details?: string, suggestions?: string[]): void {
   console.log();
-  
+
   let errorContent = gradient(['#667eea', '#764ba2'])(`❌ ${title}`) + '\n\n' +
     chalk.red(message);
 
@@ -354,7 +354,7 @@ export function showErrorMessage(title: string, message: string, details?: strin
     title: '🚨 Error',
     titleAlignment: 'center'
   });
-  
+
   console.log(errorBox);
 }
 
@@ -407,27 +407,27 @@ export class ProgressSpinner {
  */
 export function createProgressCallback(operation: string): (progress: number, message: string) => void {
   let lastPercent = 0;
-  
+
   return (progress: number, message: string) => {
     const currentPercent = Math.round(progress);
-    
+
     if (currentPercent > lastPercent) {
-      const bar = '█'.repeat(Math.floor(currentPercent / 2)) + 
-                  '░'.repeat(50 - Math.floor(currentPercent / 2));
-      
+      const bar = '█'.repeat(Math.floor(currentPercent / 2)) +
+        '░'.repeat(50 - Math.floor(currentPercent / 2));
+
       const statusColor = progress >= 100 ? 'green' : 'cyan';
-      
-      process.stdout.write('\r' + 
-        chalk[statusColor](`${operation}: `) + 
+
+      process.stdout.write('\r' +
+        chalk[statusColor](`${operation}: `) +
         `[${chalk.cyan(bar)}] ` +
-        chalk.bold(`${currentPercent}%`) + 
+        chalk.bold(`${currentPercent}%`) +
         (message ? ` - ${chalk.gray(message)}` : '')
       );
-      
+
       if (progress >= 100) {
         console.log(); // New line after completion
       }
-      
+
       lastPercent = currentPercent;
     }
   };
@@ -446,7 +446,7 @@ export function showBanner(): void {
 export function logError(message: string, error?: Error | string): void {
   const errorMsg = error instanceof Error ? error.message : error || 'Unknown error';
   console.error(chalk.red(`❌ ${message}: ${errorMsg}`));
-  
+
   if (error instanceof Error && process.env.DEBUG) {
     console.error(chalk.gray(error.stack));
   }
@@ -470,18 +470,18 @@ export function logInfo(message: string): void {
 export function displayFeatureSelection(features: Array<{ name: string; provider?: string; description?: string }>, selectedCount: number = 0): void {
   console.log(chalk.cyan('\n🔧 Available Features:'));
   console.log(chalk.gray('─'.repeat(60)));
-  
+
   features.forEach((feature, index) => {
     const providerIcon = getProviderIcon(feature.provider || 'other');
     console.log(`  ${chalk.dim(String(index + 1).padStart(2))}. ${providerIcon} ${chalk.bold(feature.name)}`);
     console.log(`      ${chalk.gray(feature.provider || 'default')} • ${chalk.dim(feature.description || 'No description available')}`);
   });
-  
+
   if (selectedCount > 0) {
     console.log(chalk.gray('─'.repeat(60)));
     console.log(`  ${chalk.green(`✓ ${selectedCount} feature${selectedCount > 1 ? 's' : ''} selected`)}`);
   }
-  
+
   console.log(chalk.gray('─'.repeat(60)));
 }
 
@@ -506,7 +506,7 @@ function getProviderIcon(provider: string): string {
     'cms': '📝',
     'other': '⚙️'
   };
-  
+
   return icons[provider.toLowerCase()] || icons['other'];
 }
 
@@ -514,27 +514,27 @@ function getProviderIcon(provider: string): string {
  * Display installation summary
  */
 export function showInstallationSummary(
-  installed: string[], 
-  failed: string[], 
+  installed: string[],
+  failed: string[],
   skipped: string[] = []
 ): void {
   console.log(chalk.cyan('\n📦 Installation Summary:'));
   console.log(chalk.gray('═'.repeat(50)));
-  
+
   if (installed.length > 0) {
     console.log(chalk.green(`✅ Successfully installed (${installed.length}):`));
     installed.forEach(item => console.log(`   • ${item}`));
   }
-  
+
   if (failed.length > 0) {
     console.log(chalk.red(`❌ Failed to install (${failed.length}):`));
     failed.forEach(item => console.log(`   • ${item}`));
   }
-  
+
   if (skipped.length > 0) {
     console.log(chalk.yellow(`⏭️  Skipped (${skipped.length}):`));
     skipped.forEach(item => console.log(`   • ${item}`));
   }
-  
+
   console.log(chalk.gray('═'.repeat(50)));
 }

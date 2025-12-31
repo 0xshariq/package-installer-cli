@@ -33,23 +33,23 @@ async function getFeaturesConfig(): Promise<Record<string, any>> {
   try {
     // Use the centralized path resolver
     const featuresPath = getFeaturesJsonPath();
-    
+
     if (fs.existsSync(featuresPath)) {
       const baseConfig = JSON.parse(fs.readFileSync(featuresPath, 'utf-8'));
       const processedConfig: Record<string, any> = {};
-      
+
       // Process each feature to load individual JSON files
       for (const [featureName, config] of Object.entries(baseConfig.features || baseConfig)) {
         const featureConfig = config as any;
-        
+
         if (featureConfig.jsonPath) {
           try {
             // Load the individual feature JSON file
             const individualFeaturePath = path.resolve(path.dirname(featuresPath), featureConfig.jsonPath);
-            
+
             if (fs.existsSync(individualFeaturePath)) {
               const individualFeatureData = JSON.parse(fs.readFileSync(individualFeaturePath, 'utf-8'));
-              
+
               // Merge the base config with the individual feature data
               processedConfig[featureName] = {
                 ...featureConfig,
@@ -69,7 +69,7 @@ async function getFeaturesConfig(): Promise<Record<string, any>> {
           processedConfig[featureName] = featureConfig;
         }
       }
-      
+
       // Cache the processed config
       featuresConfigCache = { features: processedConfig };
       return featuresConfigCache;
@@ -98,11 +98,11 @@ export async function getAvailableFeatures(): Promise<string[]> {
 async function getSubFeatures(category: string): Promise<string[]> {
   const config = await getFeaturesConfig();
   const categoryConfig = config.features?.[category];
-  
+
   if (!categoryConfig || typeof categoryConfig !== 'object') {
     return [];
   }
-  
+
   return Object.keys(categoryConfig.files || {});
 }
 
@@ -112,7 +112,7 @@ async function getSubFeatures(category: string): Promise<string[]> {
 async function listAvailableFeatures(): Promise<void> {
   await ensureFeaturesLoaded();
   const featuresConfig = await getFeaturesConfig();
-  
+
   if (!featuresConfig.features || Object.keys(featuresConfig.features).length === 0) {
     console.log(chalk.yellow('⚠️  No features found in configuration'));
     return;
@@ -122,7 +122,7 @@ async function listAvailableFeatures(): Promise<void> {
     const providers = config.files ? Object.keys(config.files) : [];
     const description = config.description || 'No description available';
     const frameworks = config.supportedFrameworks ? config.supportedFrameworks.join(', ') : 'All frameworks';
-    
+
     return {
       name: key,
       description,
@@ -168,7 +168,7 @@ function showFeatureDisclaimer(): void {
       titleAlignment: 'center'
     }
   );
-  
+
   console.log(disclaimerBox);
 }
 
@@ -189,7 +189,7 @@ async function promptFeatureCategory(availableFeatures: string[]): Promise<strin
       pageSize: 12
     }
   ]);
-  
+
   return feature;
 }
 
@@ -210,7 +210,7 @@ async function promptFeatureProvider(category: string, providers: string[]): Pro
       pageSize: 10
     }
   ]);
-  
+
   return provider;
 }
 
@@ -235,7 +235,7 @@ function isFrameworkSupported(featureConfig: any, framework: string): boolean {
  */
 function showEnhancedSetupInstructions(feature: string, provider: string): void {
   console.log(chalk.green(`\n🔧 Setup Instructions for ${chalk.bold(provider)} (${feature}):`));
-  
+
   switch (feature) {
     case 'auth':
       console.log(chalk.hex('#95afc0')('1. Configure authentication provider credentials'));
@@ -243,77 +243,77 @@ function showEnhancedSetupInstructions(feature: string, provider: string): void 
       console.log(chalk.hex('#95afc0')('3. Set up authentication routes and middleware'));
       console.log(chalk.hex('#95afc0')('4. Update your app configuration'));
       break;
-      
+
     case 'ai':
       console.log(chalk.hex('#95afc0')('1. Get API key from your AI provider'));
       console.log(chalk.hex('#95afc0')('2. Add API key to .env file'));
       console.log(chalk.hex('#95afc0')('3. Test AI integration endpoints'));
       console.log(chalk.hex('#95afc0')('4. Configure rate limiting and error handling'));
       break;
-      
+
     case 'database':
       console.log(chalk.hex('#95afc0')('1. Set up your database connection'));
       console.log(chalk.hex('#95afc0')('2. Update connection string in .env'));
       console.log(chalk.hex('#95afc0')('3. Run migrations if needed'));
       console.log(chalk.hex('#95afc0')('4. Test database connectivity'));
       break;
-      
+
     case 'aws':
       console.log(chalk.hex('#95afc0')('1. Configure AWS credentials (AWS CLI or IAM roles)'));
       console.log(chalk.hex('#95afc0')('2. Set up required AWS permissions'));
       console.log(chalk.hex('#95afc0')('3. Update AWS region in configuration'));
       console.log(chalk.hex('#95afc0')('4. Test AWS service integration'));
       break;
-      
+
     case 'payment':
       console.log(chalk.hex('#95afc0')('1. Get API keys from payment provider'));
       console.log(chalk.hex('#95afc0')('2. Add keys to .env file (separate test/live keys)'));
       console.log(chalk.hex('#95afc0')('3. Configure webhooks for payment events'));
       console.log(chalk.hex('#95afc0')('4. Test payment flow in sandbox mode'));
       break;
-      
+
     case 'storage':
       console.log(chalk.hex('#95afc0')('1. Configure storage provider credentials'));
       console.log(chalk.hex('#95afc0')('2. Set up bucket/container permissions'));
       console.log(chalk.hex('#95afc0')('3. Add storage configuration to .env'));
       console.log(chalk.hex('#95afc0')('4. Test file upload/download functionality'));
       break;
-      
+
     case 'monitoring':
       console.log(chalk.hex('#95afc0')('1. Get monitoring service API key'));
       console.log(chalk.hex('#95afc0')('2. Add configuration to .env file'));
       console.log(chalk.hex('#95afc0')('3. Set up error tracking and alerts'));
       console.log(chalk.hex('#95afc0')('4. Configure performance monitoring'));
       break;
-      
+
     case 'analytics':
       console.log(chalk.hex('#95afc0')('1. Get analytics service tracking ID'));
       console.log(chalk.hex('#95afc0')('2. Add tracking configuration'));
       console.log(chalk.hex('#95afc0')('3. Set up custom events and goals'));
       console.log(chalk.hex('#95afc0')('4. Verify data collection'));
       break;
-      
+
     case 'docker':
       console.log(chalk.hex('#95afc0')('1. Install Docker on your system'));
       console.log(chalk.hex('#95afc0')('2. Run: docker-compose up -d'));
       console.log(chalk.hex('#95afc0')('3. Your app will be available at the configured port'));
       console.log(chalk.hex('#95afc0')('4. Check logs: docker-compose logs'));
       break;
-      
+
     case 'testing':
       console.log(chalk.hex('#95afc0')('1. Configure test environment variables'));
       console.log(chalk.hex('#95afc0')('2. Set up test database/services'));
       console.log(chalk.hex('#95afc0')('3. Run tests: npm test'));
       console.log(chalk.hex('#95afc0')('4. Set up CI/CD test automation'));
       break;
-      
+
     default:
       console.log(chalk.hex('#95afc0')(`1. Check the ${feature} configuration files`));
       console.log(chalk.hex('#95afc0')('2. Update .env file with necessary variables'));
       console.log(chalk.hex('#95afc0')('3. Test the integration'));
       console.log(chalk.hex('#95afc0')('4. Review documentation for advanced setup'));
   }
-  
+
   console.log(chalk.hex('#95afc0')('\n💡 Check your project files for any additional setup instructions'));
   console.log(chalk.hex('#95afc0')('🔗 Refer to the provider\'s official documentation for detailed configuration'));
 }
@@ -325,7 +325,7 @@ export async function showAddHelp(): Promise<void> {
   await ensureFeaturesLoaded();
   const featuresConfig = await getFeaturesConfig();
   const availableFeatures = Object.keys(featuresConfig.features || {});
-  
+
   const helpConfig: CommandHelpConfig = {
     commandName: 'Add',
     emoji: '➕',
@@ -351,7 +351,7 @@ export async function showAddHelp(): Promise<void> {
     additionalSections: [
       {
         title: `Available Features (${availableFeatures.length})`,
-        items: availableFeatures.length > 0 
+        items: availableFeatures.length > 0
           ? availableFeatures
           : ['No features configured']
       },
@@ -375,7 +375,7 @@ export async function showAddHelp(): Promise<void> {
       'Use "pi add --list" to see detailed feature information'
     ]
   };
-  
+
   createStandardHelp(helpConfig);
 }
 
@@ -478,19 +478,19 @@ export async function addCommand(
       // Standalone add command - detect framework from project files
       // Get cached project info or detect it (simplified)
       projectInfo = null; // Simplified - always detect fresh
-      
+
       if (!projectInfo) {
         console.log(chalk.yellow('🔍 Analyzing project structure...'));
         projectInfo = await detectProjectStack(projectPath);
-        
+
         // Cache the detected project info
         if (projectInfo.framework && projectInfo.language) {
           try {
             const packageJsonPath = path.join(projectPath, 'package.json');
-            const projectName = await fs.pathExists(packageJsonPath) 
+            const projectName = await fs.pathExists(packageJsonPath)
               ? (await fs.readJson(packageJsonPath)).name || path.basename(projectPath)
               : path.basename(projectPath);
-              
+
             await cacheProjectData(
               projectPath,
               projectName,
@@ -501,12 +501,12 @@ export async function addCommand(
           }
         }
       }
-      
+
       if (!projectInfo || !projectInfo.framework) {
         console.log(chalk.red('❌ No supported framework detected in current directory'));
         console.log(chalk.yellow('💡 Supported frameworks: Next.js, React, Express, NestJS, Vue, Angular, Remix'));
         console.log(chalk.yellow('💡 Make sure you\'re in a project root with package.json'));
-        
+
         // Show detected files for debugging
         const files = await fs.readdir(projectPath);
         const relevantFiles = files.filter(f => f.endsWith('.json') || f.startsWith('package') || f.startsWith('tsconfig'));
@@ -537,8 +537,8 @@ export async function addCommand(
     const featuresConfig = await getFeaturesConfig();
     const availableFeatures = Object.keys(featuresConfig.features || {});
 
-    
-    
+
+
     // Show additional project details
     if (projectInfo.packageManager) {
       console.log(chalk.gray(`📦 Package manager: ${projectInfo.packageManager}`));
@@ -570,7 +570,7 @@ export async function addCommand(
         const isComingSoon = Object.keys(config.files || {}).length === 0;
         const status = isComingSoon ? chalk.hex('#95afc0')(' (Coming Soon)') : '';
         const description = (config as any).description || 'No description available';
-        
+
         return {
           name: `${chalk.bold.cyan(key)}${status}\n  ${chalk.gray(description)}`,
           value: key,
@@ -629,7 +629,7 @@ export async function addCommand(
           .split('-')
           .map((word: string) => word.charAt(0).toUpperCase() + word.slice(1))
           .join(' ');
-        
+
         return {
           name: `${chalk.bold.green(formattedName)} - ${getProviderDescription(selectedFeature!, subFeature)}`,
           value: subFeature
@@ -653,14 +653,14 @@ export async function addCommand(
 
     // Add the selected feature
     console.log(chalk.hex('#9c88ff')(`\n🚀 Adding ${selectedFeature}${selectedProvider ? ` (${selectedProvider})` : ''} to your project...`));
-    
+
     await addFeature(selectedFeature!, selectedProvider, process.cwd());
 
     // Record feature addition in history
     try {
       const currentPath = process.cwd();
       const projectName = path.basename(currentPath);
-      
+
       await historyManager.recordFeature({
         name: selectedFeature!,
         projectName: projectName,
@@ -671,14 +671,14 @@ export async function addCommand(
       });
     } catch (error) {
       console.warn(chalk.yellow('⚠️  Could not save feature to history'));
-    }    console.log(chalk.green(`\n✅ Successfully added ${selectedFeature}${selectedProvider ? ` (${selectedProvider})` : ''} to your project!`));
-    
+    } console.log(chalk.green(`\n✅ Successfully added ${selectedFeature}${selectedProvider ? ` (${selectedProvider})` : ''} to your project!`));
+
     // Show next steps
     showNextSteps(selectedFeature!, selectedProvider);
 
   } catch (error: any) {
     console.error(chalk.red(`❌ Error adding feature: ${error.message}`));
-    
+
     // Record failed feature addition
     try {
       await historyManager.recordFeature({
@@ -757,44 +757,44 @@ function getProviderDescription(feature: string, provider: string): string {
  */
 function showNextSteps(feature: string, provider?: string): void {
   console.log(`\n${chalk.hex('#00d2d3')('📋 Next Steps:')}`);
-  
+
   switch (feature) {
     case 'auth':
       console.log(chalk.hex('#95afc0')('1. Configure your authentication provider'));
       console.log(chalk.hex('#95afc0')('2. Update your .env file with API keys'));
       console.log(chalk.hex('#95afc0')('3. Test the authentication flow'));
       break;
-      
+
     case 'aws':
       console.log(chalk.hex('#95afc0')('1. Configure AWS credentials'));
       console.log(chalk.hex('#95afc0')('2. Update .env file with AWS region and access keys'));
       console.log(chalk.hex('#95afc0')('3. Test the AWS service integration'));
       break;
-      
+
     case 'ai':
       console.log(chalk.hex('#95afc0')('1. Get API key from your AI provider'));
       console.log(chalk.hex('#95afc0')('2. Add API key to .env file'));
       console.log(chalk.hex('#95afc0')('3. Test AI integration endpoints'));
       break;
-      
+
     case 'database':
       console.log(chalk.hex('#95afc0')('1. Set up your database connection'));
       console.log(chalk.hex('#95afc0')('2. Update connection string in .env'));
       console.log(chalk.hex('#95afc0')('3. Run migrations if needed'));
       break;
-      
+
     case 'docker':
       console.log(chalk.hex('#95afc0')('1. Install Docker on your system'));
       console.log(chalk.hex('#95afc0')('2. Run: docker-compose up -d'));
       console.log(chalk.hex('#95afc0')('3. Your app will be available at the configured port'));
       break;
-      
+
     default:
       console.log(chalk.hex('#95afc0')(`1. Check the ${feature} configuration`));
       console.log(chalk.hex('#95afc0')('2. Update .env file with necessary variables'));
       console.log(chalk.hex('#95afc0')('3. Test the integration'));
   }
-  
+
   console.log(chalk.hex('#95afc0')('\n💡 Check your project files for any additional setup instructions'));
 }
 
@@ -809,7 +809,7 @@ export async function addFeatureToProject(
 ): Promise<boolean> {
   try {
     console.log(chalk.cyan(`🔧 Adding ${provider} for ${category}...`));
-    
+
     // Call the main add command with framework override
     await addCommand(category, provider, {
       framework,
@@ -817,7 +817,7 @@ export async function addFeatureToProject(
       list: false,
       verbose: false
     });
-    
+
     return true;
   } catch (error) {
     console.log(chalk.red(`❌ Failed to add ${provider} for ${category}: ${error}`));

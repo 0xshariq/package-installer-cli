@@ -59,7 +59,7 @@ export function showCleanHelp(): void {
       'Use --cache to clean package manager caches for more space'
     ]
   };
-  
+
   createStandardHelp(helpConfig);
 }
 
@@ -80,10 +80,10 @@ export async function cleanCommand(options: any = {}): Promise<void> {
 
   const projectPath = process.cwd();
   const isDryRun = options['dryRun'] || options['dry-run'];
-  
+
   // Determine what to clean based on flags
   const targets = determineCleanTargets(options);
-  
+
   if (targets.length === 0) {
     console.log(chalk.yellow('⚠️  No clean targets specified. Use --help for available options.'));
     console.log(chalk.gray('💡 Tip: Use --all for a safe clean of common artifacts'));
@@ -105,9 +105,9 @@ export async function cleanCommand(options: any = {}): Promise<void> {
 
     for (const target of targets) {
       spinner.text = `${isDryRun ? 'Analyzing' : 'Cleaning'} ${target.name}...`;
-      
+
       const targetSize = await cleanTarget(projectPath, target, isDryRun);
-      
+
       if (targetSize > 0) {
         totalSize += targetSize;
         itemsCleaned++;
@@ -122,7 +122,7 @@ export async function cleanCommand(options: any = {}): Promise<void> {
       console.log(chalk.green(`\n✅ ${isDryRun ? 'Analysis' : 'Cleanup'} completed!`));
       console.log(chalk.white(`📊 Total ${action}: ${chalk.bold(formatFileSize(totalSize))}`));
       console.log(chalk.white(`📁 Items ${action}: ${chalk.bold(itemsCleaned)}`));
-      
+
       if (results.length > 0) {
         console.log(chalk.cyan('\n📋 Breakdown:'));
         results.forEach(result => {
@@ -151,7 +151,7 @@ export async function cleanCommand(options: any = {}): Promise<void> {
  */
 function determineCleanTargets(options: any): any[] {
   const targets = [];
-  
+
   // Handle --node-modules flag
   if (options.all || options['nodeModules'] || options['node-modules']) {
     targets.push({
@@ -160,7 +160,7 @@ function determineCleanTargets(options: any): any[] {
       description: 'Node.js dependencies'
     });
   }
-  
+
   // Handle --build flag
   if (options.all || options.build) {
     targets.push({
@@ -169,7 +169,7 @@ function determineCleanTargets(options: any): any[] {
       description: 'Build outputs and compiled files'
     });
   }
-  
+
   // Handle --cache flag
   if (options.all || options.cache) {
     targets.push({
@@ -178,7 +178,7 @@ function determineCleanTargets(options: any): any[] {
       description: 'Package manager and build caches'
     });
   }
-  
+
   // Handle --logs flag
   if (options.all || options.logs) {
     targets.push({
@@ -187,7 +187,7 @@ function determineCleanTargets(options: any): any[] {
       description: 'Log files and debug outputs'
     });
   }
-  
+
   // Handle --deep flag (includes lock files)
   if (options.deep) {
     targets.push({
@@ -195,7 +195,7 @@ function determineCleanTargets(options: any): any[] {
       patterns: ['package-lock.json', 'yarn.lock', 'pnpm-lock.yaml', 'Cargo.lock', 'Pipfile.lock', 'poetry.lock'],
       description: 'Dependency lock files (requires reinstall)'
     });
-    
+
     // Add more aggressive cleaning for deep clean
     targets.push({
       name: 'temporary files',
@@ -203,16 +203,16 @@ function determineCleanTargets(options: any): any[] {
       description: 'Temporary files and system artifacts'
     });
   }
-  
+
   // If no specific options are provided and not --all, show available options
-  const hasSpecificOption = options['nodeModules'] || options['node-modules'] || 
-                            options.build || options.cache || options.logs || 
-                            options.deep || options.all;
-  
+  const hasSpecificOption = options['nodeModules'] || options['node-modules'] ||
+    options.build || options.cache || options.logs ||
+    options.deep || options.all;
+
   if (!hasSpecificOption) {
     return []; // Return empty to show help message
   }
-  
+
   return targets;
 }
 
@@ -221,7 +221,7 @@ function determineCleanTargets(options: any): any[] {
  */
 async function cleanTarget(projectPath: string, target: any, dryRun: boolean): Promise<number> {
   let totalSize = 0;
-  
+
   for (const pattern of target.patterns) {
     try {
       // Handle different pattern types
@@ -234,7 +234,7 @@ async function cleanTarget(projectPath: string, target: any, dryRun: boolean): P
         if (await fs.pathExists(fullPath)) {
           const size = await getDirectorySize(fullPath);
           totalSize += size;
-          
+
           if (!dryRun && size > 0) {
             await fs.remove(fullPath);
           }
@@ -245,7 +245,7 @@ async function cleanTarget(projectPath: string, target: any, dryRun: boolean): P
       // This is expected behavior for clean operations
     }
   }
-  
+
   return totalSize;
 }
 
@@ -254,29 +254,29 @@ async function cleanTarget(projectPath: string, target: any, dryRun: boolean): P
  */
 async function cleanGlobPattern(projectPath: string, pattern: string, dryRun: boolean): Promise<number> {
   let totalSize = 0;
-  
+
   try {
     // Import glob dynamically
     const { glob } = await import('glob');
-    
-    const matches = await glob(pattern, { 
+
+    const matches = await glob(pattern, {
       cwd: projectPath,
       absolute: false,
       dot: true,
       ignore: ['node_modules/node_modules/**'] // Avoid nested node_modules issues
     });
-    
+
     const matchArray = Array.isArray(matches) ? matches : [matches];
-    
+
     for (const match of matchArray) {
       if (!match) continue;
-      
+
       const fullPath = path.join(projectPath, match);
       try {
         if (await fs.pathExists(fullPath)) {
           const size = await getDirectorySize(fullPath);
           totalSize += size;
-          
+
           if (!dryRun && size > 0) {
             await fs.remove(fullPath);
           }
@@ -289,7 +289,7 @@ async function cleanGlobPattern(projectPath: string, pattern: string, dryRun: bo
     // Fallback to simple directory walking for pattern matching
     totalSize += await fallbackPatternMatch(projectPath, pattern, dryRun);
   }
-  
+
   return totalSize;
 }
 
@@ -298,7 +298,7 @@ async function cleanGlobPattern(projectPath: string, pattern: string, dryRun: bo
  */
 async function fallbackPatternMatch(projectPath: string, pattern: string, dryRun: boolean): Promise<number> {
   let totalSize = 0;
-  
+
   // Handle common patterns manually
   if (pattern.includes('**')) {
     // Recursive pattern - search directories
@@ -308,7 +308,7 @@ async function fallbackPatternMatch(projectPath: string, pattern: string, dryRun
         try {
           const size = await getDirectorySize(filePath);
           totalSize += size;
-          
+
           if (!dryRun && size > 0) {
             await fs.remove(filePath);
           }
@@ -321,17 +321,17 @@ async function fallbackPatternMatch(projectPath: string, pattern: string, dryRun
     // Simple pattern
     const simplePattern = pattern.replace('*', '');
     const fullPath = path.join(projectPath, simplePattern);
-    
+
     if (await fs.pathExists(fullPath)) {
       const size = await getDirectorySize(fullPath);
       totalSize += size;
-      
+
       if (!dryRun && size > 0) {
         await fs.remove(fullPath);
       }
     }
   }
-  
+
   return totalSize;
 }
 
@@ -341,10 +341,10 @@ async function fallbackPatternMatch(projectPath: string, pattern: string, dryRun
 async function walkDirectory(dir: string, callback: (filePath: string) => Promise<void>): Promise<void> {
   try {
     const entries = await fs.readdir(dir, { withFileTypes: true });
-    
+
     for (const entry of entries) {
       const fullPath = path.join(dir, entry.name);
-      
+
       if (entry.isDirectory()) {
         await callback(fullPath);
         // Recurse into subdirectory (with depth limit to avoid infinite loops)
@@ -365,17 +365,17 @@ async function walkDirectory(dir: string, callback: (filePath: string) => Promis
  */
 async function getDirectorySize(dir: string): Promise<number> {
   let size = 0;
-  
+
   try {
     const stat = await fs.stat(dir);
-    
+
     if (stat.isFile()) {
       return stat.size;
     }
-    
+
     if (stat.isDirectory()) {
       const entries = await fs.readdir(dir);
-      
+
       for (const entry of entries) {
         const entryPath = path.join(dir, entry);
         size += await getDirectorySize(entryPath);
@@ -384,7 +384,7 @@ async function getDirectorySize(dir: string): Promise<number> {
   } catch (error) {
     // Ignore permission errors
   }
-  
+
   return size;
 }
 
@@ -395,11 +395,11 @@ function formatFileSize(bytes: number): string {
   const units = ['B', 'KB', 'MB', 'GB'];
   let size = bytes;
   let unitIndex = 0;
-  
+
   while (size >= 1024 && unitIndex < units.length - 1) {
     size /= 1024;
     unitIndex++;
   }
-  
+
   return `${size.toFixed(1)} ${units[unitIndex]}`;
 }

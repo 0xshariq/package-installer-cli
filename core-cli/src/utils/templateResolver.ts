@@ -5,6 +5,7 @@
 
 import path from 'path';
 import fs from 'fs-extra';
+import { getCliRootPath, getTemplatesPath } from './pathResolver.js';
 
 // Local lightweight FrameworkOptions type to avoid circular runtime imports
 export interface FrameworkOptions {
@@ -13,7 +14,6 @@ export interface FrameworkOptions {
   ui?: string;
   bundler?: string;
 }
-import { getCliRootPath, getTemplatesPath } from './pathResolver.js';
 
 export interface ProjectInfo {
   framework: string;
@@ -56,7 +56,7 @@ export { getFrameworkConfig };
  */
 export function generateTemplateName(framework: string, options: FrameworkOptions): string {
   const config = getFrameworkConfig(framework);
-  
+
   // Only generate template names for frameworks that have options
   if (!config?.options && !config?.ui && !config?.bundlers) {
     return '';
@@ -100,13 +100,13 @@ export function generateTemplateName(framework: string, options: FrameworkOption
     }
 
     const generatedName = (parts.length > 0 ? parts.join('-') + '-template' : '');
-    
+
     // Find exact match in templates array
     const exactMatch = config.templates.find((template: string) => template === generatedName);
     if (exactMatch) {
       return exactMatch;
     }
-    
+
     // If no exact match, return the first template as fallback
     return config.templates[0];
   }

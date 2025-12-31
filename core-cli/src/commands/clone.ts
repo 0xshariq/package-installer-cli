@@ -62,14 +62,14 @@ export function showCloneHelp(): void {
       'Shallow clones are faster but have limited git history'
     ]
   };
-  
+
   createStandardHelp(helpConfig);
 }
 
 export async function cloneRepo(userRepo: string, projectName?: string, options: any = {}) {
   const startTime = Date.now();
   const cacheManager = new CacheManager();
-  
+
   // Check for help flag
   if (options.help || options['-h'] || options['--help']) {
     showCloneHelp();
@@ -96,7 +96,7 @@ export async function cloneRepo(userRepo: string, projectName?: string, options:
 
   try {
     const result = await cloneRepoUtil(userRepo, actualProjectName, cloneOptions);
-    
+
     // Track the clone operation in history
     if (result) {
       await cacheManager.addProjectToHistory({
@@ -107,7 +107,7 @@ export async function cloneRepo(userRepo: string, projectName?: string, options:
         features: [],
         createdAt: new Date().toISOString()
       });
-      
+
       // Track command completion
       const duration = Date.now() - startTime;
       await cacheManager.addCommandToHistory({
@@ -128,7 +128,7 @@ export async function cloneRepo(userRepo: string, projectName?: string, options:
       success: false,
       duration
     });
-    
+
     throw error;
   }
 }

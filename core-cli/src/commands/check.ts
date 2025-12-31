@@ -97,11 +97,11 @@ const PROJECT_TYPES: ProjectType[] = getSupportedLanguages().map(lang => {
       break;
     case 'ruby':
       registryUrl = 'https://rubygems.org';
-      packageInfoUrl = (packageName: string) => `https://rubygems.org/api/v1/gems/${packageName}.json`;  
+      packageInfoUrl = (packageName: string) => `https://rubygems.org/api/v1/gems/${packageName}.json`;
       break;
     case 'go':
-      registryUrl = 'https://proxy.golang.org'; 
-      packageInfoUrl = (packageName: string) => `https://proxy.golang.org/${packageName}/@v/list`;  
+      registryUrl = 'https://proxy.golang.org';
+      packageInfoUrl = (packageName: string) => `https://proxy.golang.org/${packageName}/@v/list`;
       break;
     default:
       // For unsupported languages, we'll try npm registry as fallback
@@ -484,7 +484,7 @@ export function showCheckHelp(): void {
     ],
     examples: [
       { command: 'check', description: 'Check all packages in current project' },
-  { command: 'check', description: 'Check all packages with detailed info' },
+      { command: 'check', description: 'Check all packages with detailed info' },
       { command: 'check react', description: 'Check specific package version' },
       { command: 'check @types/node', description: 'Check scoped packages' },
       { command: 'check --help', description: 'Show this help message' }
@@ -505,7 +505,7 @@ export function showCheckHelp(): void {
       'Check specific packages by name for targeted updates'
     ]
   };
-  
+
   createStandardHelp(helpConfig);
 }
 
@@ -564,7 +564,7 @@ async function checkProjectPackages(verbose: boolean = false) {
   try {
     // Detect ALL project types instead of just one
     const allProjectTypes = await detectAllProjectTypes();
-    
+
     if (allProjectTypes.length === 0) {
       spinner.fail(chalk.hex('#ff4757')('❌ No supported project configuration files found'));
       console.log(chalk.hex('#95afc0')('💡 Supported files: package.json, tsconfig.json, Cargo.toml, requirements.txt, pyproject.toml, go.mod, Gemfile'));
@@ -577,16 +577,16 @@ async function checkProjectPackages(verbose: boolean = false) {
     for (let i = 0; i < allProjectTypes.length; i++) {
       const projectType = allProjectTypes[i];
       const isMultiProject = allProjectTypes.length > 1;
-      
+
       if (isMultiProject) {
         console.log('\n' + chalk.hex('#667eea')('═'.repeat(80)));
         console.log(chalk.hex('#667eea')(`📋 Analyzing ${projectType.name} Dependencies (${i + 1}/${allProjectTypes.length})`));
         console.log(chalk.hex('#667eea')('═'.repeat(80)));
       }
-      
+
       await analyzeSingleProjectType(projectType, verbose, isMultiProject);
     }
-    
+
     return; // Exit early since we've processed all project types
   } catch (error: any) {
     spinner.fail(chalk.hex('#ff4757')(`❌ Failed to analyze projects: ${error.message}`));
@@ -597,7 +597,7 @@ async function checkProjectPackages(verbose: boolean = false) {
 // New function to analyze a single project type
 async function analyzeSingleProjectType(projectType: ProjectType, verbose: boolean, isMultiProject: boolean = false) {
   const spinner = ora(`Analyzing ${projectType.name} dependencies...`).start();
-  
+
   try {
     let dependencies: Record<string, string> = {};
 
@@ -683,15 +683,15 @@ async function detectAllProjectTypes(): Promise<ProjectType[]> {
   // Check for additional files in each detected project type
   for (const projectType of PROJECT_TYPES) {
     if (foundTypes.find(t => t.name === projectType.name)) continue; // Already found
-    
+
     for (const file of projectType.files) {
       if (priorityFiles.includes(file)) continue; // Already checked
-      
+
       const filePath = path.join(process.cwd(), file);
       if (await fs.pathExists(filePath)) {
         console.log(chalk.green(`   ✅ Found additional: ${file}`));
         foundFiles.push(file);
-        
+
         if (!foundTypes.find(t => t.name === projectType.name)) {
           console.log(chalk.green(`   📦 Detected: ${projectType.name}`));
           foundTypes.push(projectType);
@@ -989,15 +989,15 @@ function displayPackageInfo(packages: PackageInfo[], projectType?: ProjectType, 
   // Compact summary header
   console.log('\n' + chalk.hex('#00d2d3')('📊 Package Analysis Results'));
   console.log(chalk.gray('─'.repeat(80)));
-  
+
   const summary = [
     `${chalk.hex('#10ac84')('✅')} ${upToDatePackages.length} up-to-date`,
     outdatedPackages.length > 0 ? `${chalk.hex('#f39c12')('⚠️')} ${outdatedPackages.length} need updates` : null,
     deprecatedPackages.length > 0 ? `${chalk.hex('#ff4757')('🚨')} ${deprecatedPackages.length} deprecated` : null
   ].filter(Boolean).join('  •  ');
-  
+
   console.log(`${chalk.bold(`Total: ${packages.length}`)}  •  ${summary}`);
-  
+
   if (projectType) {
     console.log(`${chalk.hex('#00d2d3')('📋')} ${projectType.name} (${chalk.cyan(projectType.packageManager)})`);
   }
@@ -1018,22 +1018,22 @@ function displayPackageInfo(packages: PackageInfo[], projectType?: ProjectType, 
     groupedPackages.forEach((pkg, index) => {
       const statusIcon = pkg.isDeprecated ? '🚨' : pkg.needsUpdate ? '⚠️' : '✅';
       const statusColor = pkg.isDeprecated ? '#ff4757' : pkg.needsUpdate ? '#f39c12' : '#10ac84';
-      
+
       // Format version comparison compactly
-      const versionText = pkg.needsUpdate && pkg.latestVersion !== 'unknown' 
+      const versionText = pkg.needsUpdate && pkg.latestVersion !== 'unknown'
         ? `${chalk.dim(pkg.currentVersion)} → ${chalk.hex(statusColor)(pkg.latestVersion)}`
         : chalk.dim(pkg.currentVersion);
-      
+
       // Truncate name and description for compact view
       const name = pkg.name.length > 25 ? pkg.name.slice(0, 22) + '...' : pkg.name;
-      const desc = pkg.description 
+      const desc = pkg.description
         ? (pkg.description.length > 50 ? pkg.description.slice(0, 47) + '...' : pkg.description)
         : chalk.dim('No description');
-      
+
       console.log(
         `${statusIcon} ${chalk.bold(name.padEnd(25))} ${versionText.padEnd(20)} ${chalk.gray(desc)}`
       );
-      
+
       // Show deprecation warning inline
       if (pkg.isDeprecated && pkg.deprecatedMessage) {
         console.log(`   ${chalk.hex('#ff4757')('⚠️')} ${chalk.dim(pkg.deprecatedMessage.slice(0, 80))}`);

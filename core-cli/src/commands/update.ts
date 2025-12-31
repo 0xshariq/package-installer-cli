@@ -64,10 +64,10 @@ export async function updateCommand(packages?: string, options: any = {}): Promi
 
   try {
     const projectPath = process.cwd();
-    
+
     // Detect project configuration
     const projectConfig = await detectProjectConfig(projectPath);
-    
+
     if (!projectConfig) {
       console.log(chalk.yellow('⚠️  No supported project detected in current directory'));
       console.log(chalk.gray('Supported project types:'));
@@ -83,7 +83,7 @@ export async function updateCommand(packages?: string, options: any = {}): Promi
 
     // Parse package names if provided
     const packageList = packages ? packages.split(',').map(pkg => pkg.trim()).filter(Boolean) : [];
-    
+
     if (packageList.length > 0) {
       console.log(chalk.cyan(`� Updating specific packages: ${packageList.join(', ')}`));
       await updateSpecificPackages(projectPath, projectConfig, packageList, options);
@@ -174,7 +174,7 @@ async function updateSpecificPackages(
   console.log(chalk.blue(`\n� Analyzing ${packageNames.length} package(s) for updates...`));
 
   const packagesInfo: PackageInfo[] = [];
-  
+
   // Analyze each package
   for (const packageName of packageNames) {
     const info = await analyzePackageUpdate(projectPath, projectConfig, packageName);
@@ -195,11 +195,11 @@ async function updateSpecificPackages(
 
   // Check for breaking changes
   const hasBreakingChanges = packagesInfo.some(pkg => pkg.hasBreakingChanges);
-  
+
   if (hasBreakingChanges) {
     console.log(chalk.red('\n⚠️  WARNING: Breaking changes detected!'));
     displayBreakingChanges(packagesInfo.filter(pkg => pkg.hasBreakingChanges));
-    
+
     const { confirm } = await inquirer.prompt([
       {
         type: 'confirm',
@@ -208,7 +208,7 @@ async function updateSpecificPackages(
         default: false
       }
     ]);
-    
+
     if (!confirm) {
       console.log(chalk.yellow('❌ Update cancelled by user'));
       return;
@@ -231,7 +231,7 @@ async function updateAllDependencies(
 
   // Get current dependencies
   const currentDeps = await getCurrentDependencies(projectPath, projectConfig);
-  
+
   if (Object.keys(currentDeps).length === 0) {
     console.log(chalk.yellow('❌ No dependencies found to update'));
     return;
@@ -260,11 +260,11 @@ async function updateAllDependencies(
 
   // Check for breaking changes
   const breakingPackages = packagesInfo.filter(pkg => pkg.hasBreakingChanges);
-  
+
   if (breakingPackages.length > 0) {
     console.log(chalk.red(`\n⚠️  WARNING: ${breakingPackages.length} package(s) have potential breaking changes!`));
     displayBreakingChanges(breakingPackages);
-    
+
     const { confirm } = await inquirer.prompt([
       {
         type: 'confirm',
@@ -273,7 +273,7 @@ async function updateAllDependencies(
         default: false
       }
     ]);
-    
+
     if (!confirm) {
       console.log(chalk.yellow('❌ Update cancelled by user'));
       return;
@@ -289,7 +289,7 @@ async function updateAllDependencies(
  */
 async function getCurrentDependencies(projectPath: string, projectConfig: ProjectConfig): Promise<Record<string, string>> {
   const dependencies: Record<string, string> = {};
-  
+
   try {
     switch (projectConfig.type) {
       case 'JavaScript/TypeScript': {
@@ -390,7 +390,7 @@ async function getCurrentDependencies(projectPath: string, projectConfig: Projec
   } catch (error) {
     console.warn(chalk.yellow(`⚠️  Could not read dependencies: ${error}`));
   }
-  
+
   return dependencies;
 }
 
@@ -404,14 +404,14 @@ async function analyzePackageUpdate(
 ): Promise<PackageInfo | null> {
   const currentDeps = await getCurrentDependencies(projectPath, projectConfig);
   const currentVersion = currentDeps[packageName];
-  
+
   if (!currentVersion) {
     return null;
   }
 
   let latestVersion = '';
   let breakingChangeDetails: string[] = [];
-  
+
   try {
     // Get latest version based on project type
     switch (projectConfig.type) {
@@ -439,7 +439,7 @@ async function analyzePackageUpdate(
 
   const cleanCurrent = semver.clean(currentVersion) || currentVersion;
   const cleanLatest = semver.clean(latestVersion) || latestVersion;
-  
+
   let updateType: 'patch' | 'minor' | 'major' | 'unknown' = 'unknown';
   let hasBreakingChanges = false;
 
@@ -493,16 +493,16 @@ async function getLatestNpmVersion(packageName: string): Promise<string> {
  */
 async function getNpmBreakingChanges(packageName: string, currentVersion: string, latestVersion: string): Promise<string[]> {
   const changes: string[] = [];
-  
+
   // Check if it's a major version bump (likely breaking)
   const currentMajor = semver.major(semver.clean(currentVersion) || '0.0.0');
   const latestMajor = semver.major(semver.clean(latestVersion) || '0.0.0');
-  
+
   if (latestMajor > currentMajor) {
     changes.push(`Major version change: ${currentMajor}.x.x → ${latestMajor}.x.x`);
     changes.push('This usually indicates breaking changes. Check the package changelog.');
   }
-  
+
   return changes;
 }
 
@@ -592,13 +592,13 @@ function displayUpdateSummary(updates: PackageInfo[]): void {
   }
 
   console.log(chalk.cyan('\n📦 Package Updates Available:\n'));
-  
+
   const table = updates.map(pkg => {
     const versionChange = `${pkg.currentVersion} → ${pkg.latestVersion}`;
-    const status = pkg.hasBreakingChanges ? 
-      chalk.yellow('⚠️  Breaking') : 
+    const status = pkg.hasBreakingChanges ?
+      chalk.yellow('⚠️  Breaking') :
       chalk.green('✅ Safe');
-    
+
     return [
       chalk.bold(pkg.name),
       versionChange,
@@ -610,16 +610,16 @@ function displayUpdateSummary(updates: PackageInfo[]): void {
   // Simple table formatting
   console.log('Package'.padEnd(25) + 'Version Change'.padEnd(20) + 'Status'.padEnd(15) + 'Language');
   console.log('─'.repeat(70));
-  
+
   table.forEach(row => {
     console.log(
-      row[0].padEnd(25) + 
-      row[1].padEnd(20) + 
-      row[2].padEnd(15) + 
+      row[0].padEnd(25) +
+      row[1].padEnd(20) +
+      row[2].padEnd(15) +
       row[3]
     );
   });
-  
+
   console.log();
 }
 
@@ -628,11 +628,11 @@ function displayUpdateSummary(updates: PackageInfo[]): void {
  */
 function displayBreakingChanges(packages: PackageInfo[]): void {
   const packagesWithBreaking = packages.filter(pkg => pkg.hasBreakingChanges);
-  
+
   if (packagesWithBreaking.length === 0) return;
 
   console.log(chalk.red('⚠️  Breaking Changes Detected:\n'));
-  
+
   packagesWithBreaking.forEach(pkg => {
     console.log(chalk.yellow(`${pkg.name}:`));
     (pkg.breakingChangeDetails || []).forEach(change => {
@@ -640,7 +640,7 @@ function displayBreakingChanges(packages: PackageInfo[]): void {
     });
     console.log();
   });
-  
+
   console.log(chalk.yellow('Please review these changes before updating!\n'));
 }
 
@@ -648,17 +648,17 @@ function displayBreakingChanges(packages: PackageInfo[]): void {
  * Perform actual package updates
  */
 async function performPackageUpdates(
-  projectPath: string, 
-  projectConfig: ProjectConfig, 
-  packages: PackageInfo[], 
+  projectPath: string,
+  projectConfig: ProjectConfig,
+  packages: PackageInfo[],
   options: any
 ): Promise<void> {
   const spinner = ora('Updating packages...').start();
-  
+
   try {
     for (const pkg of packages) {
       spinner.text = `Updating ${pkg.name}...`;
-      
+
       switch (pkg.language || projectConfig.type) {
         case 'javascript':
         case 'typescript':
@@ -683,7 +683,7 @@ async function performPackageUpdates(
           break;
       }
     }
-    
+
     spinner.succeed(chalk.green('✅ All packages updated successfully!'));
   } catch (error: any) {
     spinner.fail(chalk.red('❌ Failed to update packages'));
@@ -703,7 +703,7 @@ async function updateNpmPackage(projectPath: string, packageName: string, versio
  */
 async function updatePythonPackage(projectPath: string, packageName: string, version: string): Promise<void> {
   const hasPoetry = await fs.pathExists(path.join(projectPath, 'pyproject.toml'));
-  
+
   if (hasPoetry) {
     await execAsync(`poetry add ${packageName}@${version}`, { cwd: projectPath });
   } else {
@@ -741,8 +741,8 @@ async function updatePythonDependencies(projectPath: string, options: any): Prom
 
   try {
     const hasPoetry = await fs.pathExists(path.join(projectPath, 'pyproject.toml')) ||
-                     await fs.pathExists(path.join(projectPath, 'poetry.lock'));
-    
+      await fs.pathExists(path.join(projectPath, 'poetry.lock'));
+
     if (hasPoetry) {
       // Use Poetry
       await execAsync('poetry update', { cwd: projectPath });
@@ -868,6 +868,6 @@ export function showUpdateHelp(): void {
       'Use --latest flag with caution as it may introduce breaking changes'
     ]
   };
-  
+
   createStandardHelp(helpConfig);
 }

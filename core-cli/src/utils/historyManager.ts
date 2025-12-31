@@ -112,7 +112,7 @@ export class HistoryManager {
   async init(): Promise<void> {
     try {
       await fs.ensureDir(this.cliDir);
-      
+
       if (await fs.pathExists(this.historyFile)) {
         const data = await fs.readJson(this.historyFile);
         this.history = { ...this.getDefaultHistory(), ...data };
@@ -123,11 +123,11 @@ export class HistoryManager {
       // Update last used timestamp
       this.history.statistics.lastUsed = new Date().toISOString();
       await this.save();
-      
+
       // Initialize separate framework and feature files
       await this.initializeFrameworksFile();
       await this.initializeFeaturesFile();
-      
+
     } catch (error) {
       console.warn(chalk.yellow('⚠️  History initialization failed, using memory history'));
       this.history = this.getDefaultHistory();
@@ -213,11 +213,11 @@ export class HistoryManager {
     };
 
     this.history.projects.unshift(projectEntry);
-    
+
     // Update statistics
     this.history.statistics.totalProjects++;
     this.updateFrameworkUsage(project.framework, project.language, project.template);
-    
+
     await this.save();
     await this.saveFrameworksFile();
   }
@@ -248,18 +248,18 @@ export class HistoryManager {
     };
 
     this.history.features.unshift(featureEntry);
-    
+
     // Update project to include the feature
     const project = this.history.projects.find(p => p.path === feature.projectPath);
     if (project && !project.features.includes(feature.name)) {
       project.features.push(feature.name);
       project.lastModified = now;
     }
-    
+
     // Update statistics
     this.history.statistics.totalFeatures++;
     this.updateFeatureUsage(feature.name, feature.framework, feature.provider);
-    
+
     await this.save();
     await this.saveFeaturesFile();
   }
@@ -287,16 +287,16 @@ export class HistoryManager {
     };
 
     this.history.commands.unshift(commandEntry);
-    
+
     // Keep only last 100 commands
     if (this.history.commands.length > 100) {
       this.history.commands = this.history.commands.slice(0, 100);
     }
-    
+
     // Update statistics
     this.history.statistics.totalCommands++;
     this.history.statistics.totalUsageTime += command.executionTime;
-    
+
     await this.save();
   }
 
@@ -316,12 +316,12 @@ export class HistoryManager {
     const fw = this.history.statistics.frameworkUsage[framework];
     fw.count++;
     fw.lastUsed = new Date().toISOString();
-    
+
     if (!fw.languages[language]) {
       fw.languages[language] = 0;
     }
     fw.languages[language]++;
-    
+
     if (template && !fw.templates[template]) {
       fw.templates[template] = 0;
     }
@@ -331,7 +331,7 @@ export class HistoryManager {
 
     // Update most used framework
     const frameworks = Object.entries(this.history.statistics.frameworkUsage);
-    const mostUsed = frameworks.reduce((prev, curr) => 
+    const mostUsed = frameworks.reduce((prev, curr) =>
       prev[1].count > curr[1].count ? prev : curr
     );
     this.history.statistics.mostUsedFramework = mostUsed[0];
@@ -353,12 +353,12 @@ export class HistoryManager {
     const feat = this.history.statistics.featureUsage[feature];
     feat.count++;
     feat.lastUsed = new Date().toISOString();
-    
+
     if (!feat.frameworks[framework]) {
       feat.frameworks[framework] = 0;
     }
     feat.frameworks[framework]++;
-    
+
     if (provider) {
       if (!feat.providers[provider]) {
         feat.providers[provider] = 0;
@@ -369,7 +369,7 @@ export class HistoryManager {
     // Update most used feature
     const features = Object.entries(this.history.statistics.featureUsage);
     if (features.length > 0) {
-      const mostUsed = features.reduce((prev, curr) => 
+      const mostUsed = features.reduce((prev, curr) =>
         prev[1].count > curr[1].count ? prev : curr
       );
       this.history.statistics.mostUsedFeature = mostUsed[0];
@@ -449,7 +449,7 @@ export class HistoryManager {
    */
   getCommandStats(): { command: string; count: number; lastUsed: string }[] {
     const commandCounts: Record<string, { count: number; lastUsed: string }> = {};
-    
+
     this.history.commands.forEach(cmd => {
       if (!commandCounts[cmd.command]) {
         commandCounts[cmd.command] = { count: 0, lastUsed: cmd.executedAt };
@@ -500,11 +500,11 @@ export class HistoryManager {
     if (await fs.pathExists(this.historyFile)) {
       await fs.copy(this.historyFile, backupFile);
     }
-    
+
     // Reset history
     this.history = this.getDefaultHistory();
     await this.save();
-    
+
     // Clear separate files
     await fs.remove(this.frameworksFile);
     await fs.remove(this.featuresFile);
@@ -523,7 +523,7 @@ export class HistoryManager {
       frameworks: await this.loadFrameworksFile(),
       features: await this.loadFeaturesFile()
     };
-    
+
     await fs.writeJson(outputPath, exportData, { spaces: 2 });
   }
 
@@ -561,32 +561,32 @@ export class HistoryManager {
   async addCloneHistory(entry: CloneHistoryEntry): Promise<void> {
     try {
       await this.init();
-      
+
       // Create unique ID for the clone entry
       const id = crypto.randomBytes(8).toString('hex');
-      
+
       // Add to history with ID
       const historyEntry = {
         id,
         ...entry
       };
-      
+
       this.history.cloneHistory = this.history.cloneHistory || [];
       this.history.cloneHistory.unshift(historyEntry);
-      
+
       // Keep only last 50 clone entries
       if (this.history.cloneHistory.length > 50) {
         this.history.cloneHistory = this.history.cloneHistory.slice(0, 50);
       }
-      
+
       // Update statistics
       if (entry.success) {
         this.history.statistics.totalProjects++;
       }
-      
+
       // Save to file
       await this.save();
-      
+
     } catch (error: any) {
       console.error(chalk.red('Failed to add clone history:'), error.message);
     }

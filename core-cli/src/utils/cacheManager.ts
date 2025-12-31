@@ -25,7 +25,7 @@ export async function initializeCache(): Promise<void> {
 /**
  * Get cached template files (simplified - returns null for now)
  */
-export async function getCachedTemplateFiles(templateName: string): Promise<Record<string, string> | null> { 
+export async function getCachedTemplateFiles(templateName: string): Promise<Record<string, string> | null> {
   // Simplified implementation - just return null for now
   return null;
 }
@@ -72,11 +72,11 @@ export async function cacheProjectData(
 export async function getDirectorySize(dirPath: string): Promise<number> {
   try {
     let totalSize = 0;
-    
+
     async function calculateSize(currentPath: string): Promise<void> {
       try {
         const stats = await fs.stat(currentPath);
-        
+
         if (stats.isFile()) {
           totalSize += stats.size;
         } else if (stats.isDirectory()) {
@@ -92,7 +92,7 @@ export async function getDirectorySize(dirPath: string): Promise<number> {
         // Skip files/directories that can't be accessed
       }
     }
-    
+
     await calculateSize(dirPath);
     return totalSize;
   } catch (error) {
@@ -132,7 +132,7 @@ export function getCacheStats(): any {
 export function getCacheStatus(): any {
   try {
     const cache = cacheManagerInstance.getCache();
-    
+
     return {
       initialized: true,
       version: cache.version || '1.0.0',

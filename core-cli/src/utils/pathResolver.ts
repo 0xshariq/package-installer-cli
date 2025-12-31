@@ -14,14 +14,14 @@ import { fileURLToPath } from 'url';
 export function getCliRootPath(): string {
   const __filename = fileURLToPath(import.meta.url);
   const __dirname = path.dirname(__filename);
-  
+
   // All possible package names across different package managers
   const packageNames = [
     '@0xshariq/package-installer',  // npm
     'package-installer-cli',        // PyPI, RubyGems, Rust crates
     'go_package_installer_cli'      // Go (from github.com/0xshariq/go_package_installer_cli)
   ];
-  
+
   // Method 1: Walk up the directory tree to find package.json with any of our package names
   let currentDir = __dirname;
   while (currentDir !== path.dirname(currentDir)) {
@@ -38,11 +38,11 @@ export function getCliRootPath(): string {
     }
     currentDir = path.dirname(currentDir);
   }
-  
+
   // Method 2: Check if this is a local development environment
   const localDevPath = path.resolve(__dirname, '..', '..');
-  if (fs.existsSync(path.join(localDevPath, 'package.json')) && 
-      fs.existsSync(path.join(localDevPath, 'features'))) {
+  if (fs.existsSync(path.join(localDevPath, 'package.json')) &&
+    fs.existsSync(path.join(localDevPath, 'features'))) {
     try {
       const packageJson = JSON.parse(fs.readFileSync(path.join(localDevPath, 'package.json'), 'utf-8'));
       if (packageNames.includes(packageJson.name)) {
@@ -52,7 +52,7 @@ export function getCliRootPath(): string {
       // Continue to other methods
     }
   }
-  
+
   // Method 3: Check current working directory (in case the CLI is run from the project root)
   const cwdPath = process.cwd();
   const workspacePackage = path.join(cwdPath, 'package.json');
@@ -66,7 +66,7 @@ export function getCliRootPath(): string {
       // Continue to other methods
     }
   }
-  
+
   // Method 4: Try to resolve using require.resolve for npm installations
   for (const packageName of packageNames) {
     try {
@@ -79,11 +79,11 @@ export function getCliRootPath(): string {
       // Package not found in require cache, try next
     }
   }
-  
+
   // Method 5: Check common global installation paths for all package managers
   const globalPaths = [];
   const homeDir = process.env.HOME || process.env.USERPROFILE || '';
-  
+
   // npm global paths
   globalPaths.push(
     // Linux/macOS npm global paths
@@ -96,14 +96,14 @@ export function getCliRootPath(): string {
     path.join(process.env.APPDATA || '', 'npm/node_modules/@0xshariq/package-installer'),
     path.join(process.env.ProgramFiles || '', 'nodejs/node_modules/@0xshariq/package-installer')
   );
-  
+
   // Check all global paths
   for (const globalPath of globalPaths) {
     if (fs.existsSync(globalPath) && fs.existsSync(path.join(globalPath, 'features'))) {
       return globalPath;
     }
   }
-  
+
   // Method 6: Check if npm prefix is available and use it (for npm installations)
   try {
     const { execSync } = require('child_process');
@@ -115,13 +115,13 @@ export function getCliRootPath(): string {
   } catch (error) {
     // npm not available or command failed
   }
-  
+
   // Method 7: Check relative to script location as last resort
   const scriptRelativePath = path.resolve(__dirname, '../../');
   if (fs.existsSync(path.join(scriptRelativePath, 'features'))) {
     return scriptRelativePath;
   }
-  
+
   // Final fallback: use the local development path but warn user
   console.warn('⚠️  Could not resolve CLI root path, using fallback. Some features may not work correctly.');
   console.warn('💡 Try running with npx for better compatibility: npx @0xshariq/package-installer');

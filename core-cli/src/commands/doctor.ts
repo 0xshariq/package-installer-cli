@@ -67,7 +67,7 @@ async function checkNodeSetup(): Promise<DiagnosticIssue[]> {
     try {
       const nodeVersion = execSync('node --version', { encoding: 'utf8' }).trim();
       const majorVersion = parseInt(nodeVersion.slice(1).split('.')[0]);
-      
+
       if (majorVersion < 16) {
         issues.push({
           type: 'warning',
@@ -140,17 +140,17 @@ async function checkProjectDependencies(projectPath: string): Promise<Diagnostic
 
     // Check for vulnerabilities (simplified check)
     try {
-      const auditResult = execSync('npm audit --json', { 
-        cwd: projectPath, 
+      const auditResult = execSync('npm audit --json', {
+        cwd: projectPath,
         encoding: 'utf8',
         stdio: 'pipe'
       });
       const audit = JSON.parse(auditResult);
-      
+
       if (audit.metadata && audit.metadata.vulnerabilities) {
         const vulns = audit.metadata.vulnerabilities;
         const totalVulns = Object.values(vulns).reduce((sum: number, count: any) => sum + count, 0);
-        
+
         if (totalVulns > 0) {
           issues.push({
             type: 'warning',
@@ -293,7 +293,7 @@ export async function doctorCommand(options: any = {}): Promise<void> {
 
     // Run comprehensive diagnostics
     const allIssues = await runComprehensiveDiagnostics(projectPath);
-    
+
     if (allIssues.length === 0) {
       displaySuccessMessage(
         'Perfect health! 🎉',
@@ -357,9 +357,9 @@ async function runComprehensiveDiagnostics(projectPath: string): Promise<Diagnos
  */
 async function performNodeCheck(): Promise<void> {
   console.log(chalk.blue('\n🔍 Checking Node.js setup...\n'));
-  
+
   const issues = await checkNodeSetup();
-  
+
   if (issues.length === 0) {
     console.log(chalk.green('✅ Node.js setup is healthy'));
   } else {
@@ -372,9 +372,9 @@ async function performNodeCheck(): Promise<void> {
  */
 async function performDependencyCheck(projectPath: string): Promise<void> {
   console.log(chalk.blue('\n🔍 Checking project dependencies...\n'));
-  
+
   const issues = await checkProjectDependencies(projectPath);
-  
+
   if (issues.length === 0) {
     console.log(chalk.green('✅ Dependencies are healthy'));
   } else {
@@ -387,9 +387,9 @@ async function performDependencyCheck(projectPath: string): Promise<void> {
  */
 async function performToolsCheck(): Promise<void> {
   console.log(chalk.blue('\n🔍 Checking development tools...\n'));
-  
+
   const issues = await checkDevelopmentTools();
-  
+
   if (issues.length === 0) {
     console.log(chalk.green('✅ Development tools are healthy'));
   } else {
@@ -441,7 +441,7 @@ function displayDiagnosticResults(issues: DiagnosticIssue[]): void {
  */
 async function performAutoFix(issues: DiagnosticIssue[], projectPath: string): Promise<void> {
   const fixableIssues = issues.filter(issue => issue.autoFixable);
-  
+
   if (fixableIssues.length === 0) {
     console.log(chalk.yellow('\n⚠️  No auto-fixable issues found'));
     return;
@@ -499,7 +499,7 @@ async function checkDevelopmentTools(): Promise<DiagnosticIssue[]> {
 async function runDiagnostics(options: any): Promise<any[]> {
   const issues: any[] = [];
   const projectPath = process.cwd();
-  
+
   // Check Node.js and npm issues
   if (!options.checkDeps && !options.checkConfig && !options.checkTools) {
     issues.push(...await checkNodejsIssues());
@@ -517,7 +517,7 @@ async function runDiagnostics(options: any): Promise<any[]> {
       issues.push(...await checkToolsIssues());
     }
   }
-  
+
   return issues;
 }
 
@@ -526,12 +526,12 @@ async function runDiagnostics(options: any): Promise<any[]> {
  */
 async function checkNodejsIssues(): Promise<any[]> {
   const issues: any[] = [];
-  
+
   try {
     // Check Node.js version
     const nodeVersion = process.version;
     const majorVersion = parseInt(nodeVersion.replace('v', '').split('.')[0]);
-    
+
     if (majorVersion < 16) {
       issues.push({
         type: 'warning',
@@ -542,12 +542,12 @@ async function checkNodejsIssues(): Promise<any[]> {
         recommendation: 'Visit https://nodejs.org to download the latest version'
       });
     }
-    
+
     // Check npm configuration
     try {
       const npmVersion = execSync('npm --version', { encoding: 'utf8' }).trim();
       const npmMajor = parseInt(npmVersion.split('.')[0]);
-      
+
       if (npmMajor < 8) {
         issues.push({
           type: 'info',
@@ -568,7 +568,7 @@ async function checkNodejsIssues(): Promise<any[]> {
         recommendation: 'Reinstall Node.js from https://nodejs.org'
       });
     }
-    
+
     // Check npm cache issues
     try {
       const cacheInfo = execSync('npm config get cache', { encoding: 'utf8' }).trim();
@@ -585,7 +585,7 @@ async function checkNodejsIssues(): Promise<any[]> {
     } catch (error) {
       // Ignore cache check errors
     }
-    
+
   } catch (error) {
     issues.push({
       type: 'error',
@@ -596,7 +596,7 @@ async function checkNodejsIssues(): Promise<any[]> {
       recommendation: 'Install Node.js from https://nodejs.org'
     });
   }
-  
+
   return issues;
 }
 
@@ -605,13 +605,13 @@ async function checkNodejsIssues(): Promise<any[]> {
  */
 async function checkDependencyIssues(projectPath: string): Promise<any[]> {
   const issues: any[] = [];
-  
+
   // Check for package.json
   const packageJsonPath = path.join(projectPath, 'package.json');
   if (await fs.pathExists(packageJsonPath)) {
     try {
       const packageJson = await fs.readJson(packageJsonPath);
-      
+
       // Check for missing node_modules
       const nodeModulesPath = path.join(projectPath, 'node_modules');
       if (!await fs.pathExists(nodeModulesPath)) {
@@ -627,16 +627,16 @@ async function checkDependencyIssues(projectPath: string): Promise<any[]> {
         // Check for outdated lock file
         const lockFiles = ['package-lock.json', 'yarn.lock', 'pnpm-lock.yaml'];
         let hasLockFile = false;
-        
+
         for (const lockFile of lockFiles) {
           const lockPath = path.join(projectPath, lockFile);
           if (await fs.pathExists(lockPath)) {
             hasLockFile = true;
-            
+
             // Check if lock file is older than package.json
             const packageStat = await fs.stat(packageJsonPath);
             const lockStat = await fs.stat(lockPath);
-            
+
             if (lockStat.mtime < packageStat.mtime) {
               issues.push({
                 type: 'warning',
@@ -650,7 +650,7 @@ async function checkDependencyIssues(projectPath: string): Promise<any[]> {
             break;
           }
         }
-        
+
         if (!hasLockFile) {
           issues.push({
             type: 'info',
@@ -662,14 +662,14 @@ async function checkDependencyIssues(projectPath: string): Promise<any[]> {
           });
         }
       }
-      
+
       // Check for security vulnerabilities
       try {
-        const auditResult = execSync('npm audit --audit-level moderate', { 
+        const auditResult = execSync('npm audit --audit-level moderate', {
           encoding: 'utf8',
           stdio: 'pipe'
         });
-        
+
         if (auditResult.includes('vulnerabilities')) {
           issues.push({
             type: 'warning',
@@ -692,12 +692,12 @@ async function checkDependencyIssues(projectPath: string): Promise<any[]> {
           });
         }
       }
-      
+
       // Check for duplicate dependencies
       if (packageJson.dependencies && packageJson.devDependencies) {
         const duplicates = Object.keys(packageJson.dependencies)
           .filter(dep => packageJson.devDependencies[dep]);
-        
+
         if (duplicates.length > 0) {
           issues.push({
             type: 'warning',
@@ -709,7 +709,7 @@ async function checkDependencyIssues(projectPath: string): Promise<any[]> {
           });
         }
       }
-      
+
     } catch (error) {
       issues.push({
         type: 'error',
@@ -721,7 +721,7 @@ async function checkDependencyIssues(projectPath: string): Promise<any[]> {
       });
     }
   }
-  
+
   return issues;
 }
 
@@ -730,7 +730,7 @@ async function checkDependencyIssues(projectPath: string): Promise<any[]> {
  */
 async function checkConfigurationIssues(projectPath: string): Promise<any[]> {
   const issues: any[] = [];
-  
+
   // Check for .gitignore
   const gitignorePath = path.join(projectPath, '.gitignore');
   if (!await fs.pathExists(gitignorePath)) {
@@ -756,7 +756,7 @@ async function checkConfigurationIssues(projectPath: string): Promise<any[]> {
       });
     }
   }
-  
+
   // Check for README.md
   const readmePath = path.join(projectPath, 'README.md');
   if (!await fs.pathExists(readmePath)) {
@@ -769,13 +769,13 @@ async function checkConfigurationIssues(projectPath: string): Promise<any[]> {
       fix: 'create-readme'
     });
   }
-  
+
   // Check TypeScript configuration
   const tsconfigPath = path.join(projectPath, 'tsconfig.json');
   if (await fs.pathExists(tsconfigPath)) {
     try {
       const tsconfig = await fs.readJson(tsconfigPath);
-      
+
       if (!tsconfig.compilerOptions) {
         issues.push({
           type: 'warning',
@@ -797,7 +797,7 @@ async function checkConfigurationIssues(projectPath: string): Promise<any[]> {
       });
     }
   }
-  
+
   return issues;
 }
 
@@ -806,11 +806,11 @@ async function checkConfigurationIssues(projectPath: string): Promise<any[]> {
  */
 async function checkToolsIssues(): Promise<any[]> {
   const issues: any[] = [];
-  
+
   // Check Git installation and configuration
   try {
     execSync('git --version', { stdio: 'ignore' });
-    
+
     // Check Git user configuration
     try {
       execSync('git config user.name', { stdio: 'ignore' });
@@ -824,7 +824,7 @@ async function checkToolsIssues(): Promise<any[]> {
         recommendation: 'Run: git config --global user.name "Your Name"'
       });
     }
-    
+
     try {
       execSync('git config user.email', { stdio: 'ignore' });
     } catch (error) {
@@ -837,7 +837,7 @@ async function checkToolsIssues(): Promise<any[]> {
         recommendation: 'Run: git config --global user.email "your.email@example.com"'
       });
     }
-    
+
   } catch (error) {
     issues.push({
       type: 'error',
@@ -848,7 +848,7 @@ async function checkToolsIssues(): Promise<any[]> {
       recommendation: 'Install Git from https://git-scm.com'
     });
   }
-  
+
   return issues;
 }
 
@@ -857,22 +857,22 @@ async function checkToolsIssues(): Promise<any[]> {
  */
 function displayIssues(issues: any[]): void {
   const Table = require('cli-table3');
-  
+
   const table = new Table({
     head: [
-      chalk.hex('#00d2d3')('Type'), 
-      chalk.hex('#10ac84')('Category'), 
+      chalk.hex('#00d2d3')('Type'),
+      chalk.hex('#10ac84')('Category'),
       chalk.hex('#ffa502')('Issue'),
       chalk.hex('#9c88ff')('Fixable')
     ],
     colWidths: [10, 15, 45, 10],
     style: { head: [], border: ['cyan'] }
   });
-  
+
   issues.forEach(issue => {
-    const typeColor = issue.type === 'error' ? chalk.red : 
-                     issue.type === 'warning' ? chalk.yellow : chalk.blue;
-    
+    const typeColor = issue.type === 'error' ? chalk.red :
+      issue.type === 'warning' ? chalk.yellow : chalk.blue;
+
     table.push([
       typeColor(issue.type.toUpperCase()),
       chalk.white(issue.category),
@@ -880,15 +880,15 @@ function displayIssues(issues: any[]): void {
       issue.fixable ? chalk.green('✓') : chalk.red('✗')
     ]);
   });
-  
+
   console.log(chalk.hex('#ffa502')('\n🚨 DETECTED ISSUES\n'));
   console.log(table.toString());
-  
+
   // Show recommendations for non-fixable issues
   const recommendations = issues
     .filter(issue => !issue.fixable && issue.recommendation)
     .map(issue => `${issue.title}: ${issue.recommendation}`);
-  
+
   if (recommendations.length > 0) {
     console.log(chalk.hex('#00d2d3')('\n💡 MANUAL FIXES REQUIRED:\n'));
     recommendations.forEach((rec, index) => {
@@ -902,17 +902,17 @@ function displayIssues(issues: any[]): void {
  */
 async function attemptFixes(issues: any[]): Promise<void> {
   const fixableIssues = issues.filter(issue => issue.fixable);
-  
+
   if (fixableIssues.length === 0) {
     console.log(chalk.yellow('\n⚠️ No automatically fixable issues found'));
     return;
   }
-  
+
   console.log(chalk.hex('#00d2d3')('\n🔧 ATTEMPTING FIXES...\n'));
-  
+
   for (const issue of fixableIssues) {
     const spinner = ora(`Fixing: ${issue.title}`).start();
-    
+
     try {
       await applyFix(issue.fix);
       spinner.succeed(chalk.green(`Fixed: ${issue.title}`));
@@ -920,7 +920,7 @@ async function attemptFixes(issues: any[]): Promise<void> {
       spinner.fail(chalk.red(`Failed to fix: ${issue.title} - ${error.message}`));
     }
   }
-  
+
   displaySuccessMessage(
     'Automatic fixes completed!',
     ['Some issues may require manual intervention']
@@ -935,31 +935,31 @@ async function applyFix(fixCommand: string): Promise<void> {
     case 'npm install':
       execSync('npm install', { stdio: 'ignore' });
       break;
-      
+
     case 'npm install -g npm@latest':
       execSync('npm install -g npm@latest', { stdio: 'ignore' });
       break;
-      
+
     case 'npm cache clean --force':
       execSync('npm cache clean --force', { stdio: 'ignore' });
       break;
-      
+
     case 'npm audit fix':
       execSync('npm audit fix', { stdio: 'ignore' });
       break;
-      
+
     case 'create-gitignore':
       await createBasicGitignore();
       break;
-      
+
     case 'update-gitignore':
       await updateGitignore();
       break;
-      
+
     case 'create-readme':
       await createBasicReadme();
       break;
-      
+
     default:
       throw new Error(`Unknown fix command: ${fixCommand}`);
   }
@@ -1010,11 +1010,11 @@ Thumbs.db
  */
 async function updateGitignore(): Promise<void> {
   let gitignoreContent = await fs.readFile('.gitignore', 'utf-8');
-  
+
   if (!gitignoreContent.includes('node_modules')) {
     gitignoreContent += '\n# Dependencies\nnode_modules/\n';
   }
-  
+
   await fs.writeFile('.gitignore', gitignoreContent);
 }
 
@@ -1024,7 +1024,7 @@ async function updateGitignore(): Promise<void> {
 async function createBasicReadme(): Promise<void> {
   const packageJsonPath = path.join(process.cwd(), 'package.json');
   let projectName = path.basename(process.cwd());
-  
+
   if (await fs.pathExists(packageJsonPath)) {
     try {
       const packageJson = await fs.readJson(packageJsonPath);
@@ -1033,7 +1033,7 @@ async function createBasicReadme(): Promise<void> {
       // Use directory name
     }
   }
-  
+
   const readmeContent = `# ${projectName}
 
 A new project created with Package Installer CLI.

@@ -23,7 +23,7 @@ import { updateCommand, showUpdateHelp } from './commands/update.js';
 import { analyzeCommand, showAnalyzeHelp } from './commands/analyze.js';
 import { deployCommand, showDeployHelp } from './commands/deploy.js';
 import { cleanCommand, showCleanHelp } from './commands/clean.js';
-import { cacheCommand,showCacheHelp } from './commands/cache.js';
+import { cacheCommand, showCacheHelp } from './commands/cache.js';
 import { environmentCommand, showEnvironmentHelp } from './commands/env.js';
 import { doctorCommand, showDoctorHelp } from './commands/doctor.js';
 import { emailCommand, showEmailHelp } from './commands/email.js';
@@ -168,7 +168,7 @@ program
   })
   .on('--help', () => {
     showCreateHelp();
-  })      
+  })
   .action(async (projectName: string | undefined) => {
     try {
       displayCommandBanner('create', 'Create a new project from templates');
@@ -310,7 +310,8 @@ program
   .command('upgrade-cli')
   .alias('upgrade')
   .description(chalk.hex('#ff6b6b')('🚀 ') + chalk.hex('#fd79a8')('Update Package Installer CLI to the latest version'))
-  .on('--help', () => {``
+  .on('--help', () => {
+    ``
     showUpgradeHelp();
   })
   .action(async () => {
@@ -580,10 +581,10 @@ if (process.argv.length === 2) {
     chalk.hex('#ff6b6b')('  ') + piGradient('pi') + ' ' + gradient(['#ff6b6b', '#ff9a9e'])('update') + chalk.hex('#95afc0')('           # Update packages to latest versions') + '\n' +
     chalk.hex('#00d2d3')('  ') + piGradient('pi') + ' ' + gradient(['#00d2d3', '#0084ff'])('clone') + chalk.hex('#95afc0')(' user/repo   # Clone and setup GitHub repositories') + '\n' +
     chalk.hex('#00d2d3')('  ') + piGradient('pi') + ' ' + gradient(['#00d2d3', '#4facfe'])('email') + chalk.hex('#95afc0')('            # Contact developer with feedback') + '\n\n' +
-  chalk.hex('#ffa502')('Need help? Try these:') + '\n\n' +
+    chalk.hex('#ffa502')('Need help? Try these:') + '\n\n' +
     chalk.hex('#ff6b6b')('  ') + piGradient('pi') + ' ' + chalk.hex('#ff6b6b')('--help') + chalk.hex('#95afc0')('           # See all available commands') + '\n' +
     chalk.hex('#95afc0')('  ') + piGradient('pi') + ' ' + chalk.hex('#95afc0')('command --help') + chalk.hex('#95afc0')('   # Get detailed help for any command') + '\n\n' +
-  chalk.hex('#95afc0')('  ') + piGradient('pi') + ' ' + chalk.hex('#95afc0')('auth --help') + chalk.hex('#95afc0')('      # Detailed help for authentication commands') + '\n\n' +
+    chalk.hex('#95afc0')('  ') + piGradient('pi') + ' ' + chalk.hex('#95afc0')('auth --help') + chalk.hex('#95afc0')('      # Detailed help for authentication commands') + '\n\n' +
     chalk.hex('#00d2d3')('💡 Pro tip: All commands are interactive - just run them and follow prompts!'),
     {
       padding: 1,
@@ -607,7 +608,7 @@ if (process.argv.length === 2) {
 // If user asked for auth help explicitly (pi auth --help), show our formatted auth help and exit
 const preArgs = process.argv.slice(2).map(a => String(a).toLowerCase());
 if (preArgs[0] === 'auth' && (preArgs.includes('--help') || preArgs.includes('-h'))) {
-  try { showAuthHelp(); } catch {};
+  try { showAuthHelp(); } catch { };
   process.exit(0);
 }
 
