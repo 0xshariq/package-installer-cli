@@ -1,0 +1,6 @@
+type Query {
+  hello: String!
+}
+type Mutation {
+  createMessage(content: String!): Message!
+}
