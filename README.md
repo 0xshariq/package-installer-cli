@@ -1,3 +1,5 @@
+# This repo is now archive , please see the [devforge repo](https://github.com/0xshariq/devforge/)
+
 # package-installer-cli — Monorepo
 
 [![npm version](https://img.shields.io/npm/v/@0xshariq/package-installer.svg)](https://www.npmjs.com/package/@0xshariq/package-installer)
